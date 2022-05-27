@@ -1,7 +1,6 @@
 namespace FSH.WebApi.Domain.Common.Contracts;
 
-public interface IHaveImageAndIcon
+public interface IHaveImage
 {
   public string? ImagePath { get; }
-  public string? IconPath { get; }
 }

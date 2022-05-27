@@ -7,40 +7,40 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Catalog;
 
-public class BrandSeeder : ICustomSeeder
+public class ProductSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;
-  private readonly ILogger<BrandSeeder> _logger;
+  private readonly ILogger<ProductSeeder> _logger;
 
-  public BrandSeeder(ISerializerService serializerService, ILogger<BrandSeeder> logger, ApplicationDbContext db)
+  public ProductSeeder(ISerializerService serializerService, ILogger<ProductSeeder> logger, ApplicationDbContext db)
   {
     _serializerService = serializerService;
     _logger = logger;
     _db = db;
   }
 
-  public string Order => "02.01";
+  public string Order => "02.02";
 
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    if (!_db.Brands.Any())
+    if (!_db.Products.Any())
     {
-      _logger.LogInformation("Started to Seed Brands");
+      _logger.LogInformation("Started to Seed Products");
 
       // Here you can use your own logic to populate the database.
       // As an example, I am using a JSON file to populate the database.
-      string brandData = await File.ReadAllTextAsync(path + "/Catalog/brands.json", cancellationToken);
-      var brands = _serializerService.Deserialize<List<Brand>>(brandData);
+      string productsData = await File.ReadAllTextAsync(path + "/Catalog/products.json", cancellationToken);
+      var products = _serializerService.Deserialize<List<Product>>(productsData);
 
-      foreach (var brand in brands)
+      foreach (var product in products)
       {
-        await _db.Brands.AddAsync(brand, cancellationToken);
+        await _db.Products.AddAsync(product, cancellationToken);
       }
 
       await _db.SaveChangesAsync(cancellationToken);
-      _logger.LogInformation("Seeded Brands");
+      _logger.LogInformation("Seeded Products");
     }
   }
 }

@@ -1,22 +1,27 @@
 [
   {
-    "Id": "ed974720-389d-41df-b4af-e3fb12306211",
-    "Name": "ثوب ابيض",
+    "Id": "ca43337c-c9bc-4c18-98e1-3bf8694f9fb7",
+    "Name": "غيسل عادي",
     "ImageUrl": "/images/services/placeholder.png"
   },
   {
-    "Id": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
-    "Name": "ثوب ملون",
+    "Id": "538f5ce7-9bd4-4309-8e62-6e566b01fdfe",
+    "Name": "غسيل مستعجل",
     "ImageUrl": "/images/services/placeholder.png"
   },
   {
-    "Id": "f528c67c-a23a-43db-afd8-58e23085236b",
-    "Name": "شماغ ابيض",
+    "Id": "d72ee823-f4e6-43c4-84b5-0e27f8c290f2",
+    "Name": "كوي عادي",
     "ImageUrl": "/images/services/placeholder.png"
   },
   {
-    "Id": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
-    "Name": "شماغ ملون",
+    "Id": "5a1488ed-8e5c-40f9-ab48-6b73ecc1d6a0",
+    "Name": "كوي بالبخار",
+    "ImageUrl": "/images/services/placeholder.png"
+  },
+  {
+    "Id": "ED78DBED-A805-4AF7-9C5C-9DB944C37335",
+    "Name": "كوي مستعجل",
     "ImageUrl": "/images/services/placeholder.png"
   }
 ]
