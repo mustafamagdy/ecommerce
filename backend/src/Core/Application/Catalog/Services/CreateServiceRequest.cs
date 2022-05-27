@@ -1,33 +1,35 @@
-using FSH.WebApi.Domain.Common.Events;
-
 namespace FSH.WebApi.Application.Catalog.Services;
 
 public class CreateServiceRequest : IRequest<Guid>
 {
   public string Name { get; set; } = default!;
   public string? Description { get; set; }
-  public decimal Rate { get; set; }
-  public Guid ServiceCategoryId { get; set; }
-  public FileUploadRequest? Image { get; set; }
+  public string? ImageUrl { get; set; }
+}
+
+public class CreateServiceRequestValidator : CustomValidator<CreateServiceRequest>
+{
+  public CreateServiceRequestValidator(IReadRepository<Service> repository,
+    IStringLocalizer<CreateServiceRequestValidator>
+      T) =>
+    RuleFor(p => p.Name)
+      .NotEmpty()
+      .MaximumLength(75)
+      .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new ServiceByNameSpec(name), ct) is null)
+      .WithMessage((_, name) => T["Service {0} already Exists.", name]);
 }
 
 public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest, Guid>
 {
-  private readonly IRepository<Service> _repository;
-  private readonly IFileStorageService _file;
+  // Add Domain Events automatically by using IRepositoryWithEvents
+  private readonly IRepositoryWithEvents<Service> _repository;
 
-  public CreateServiceRequestHandler(IRepository<Service> repository, IFileStorageService file) =>
-    (_repository, _file) = (repository, file);
+  public CreateServiceRequestHandler(IRepositoryWithEvents<Service> repository) => _repository =
+    repository;
 
   public async Task<Guid> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
   {
-    string serviceImagePath = await _file.UploadAsync<Service>(request.Image, FileType.Image, cancellationToken);
-    string serviceIconPath = await _file.UploadAsync<Service>(request.Image, FileType.Image, cancellationToken);
-
-    var service = new Service(request.Name, request.Description, request.ServiceCategoryId, serviceImagePath, serviceIconPath);
-
-    // Add Domain Events to be raised after the commit
-    service.DomainEvents.Add(EntityCreatedEvent.WithEntity(service));
+    var service = new Service(request.Name, request.Description, request.ImageUrl);
 
     await _repository.AddAsync(service, cancellationToken);
 

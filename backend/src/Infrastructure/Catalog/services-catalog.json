@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "ed974720-389d-41df-b4af-e3fb12306211",
+    "ServiceId": "",
+    "ProductId": "",
+    "Price": 0.0000,
+    "Priority": "normal"
+  },
+  {
+    "Id": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
+    "ServiceId": "",
+    "ProductId": "",
+    "Price": 0.0000,
+    "Priority": "normal"
+  },
+  {
+    "Id": "f528c67c-a23a-43db-afd8-58e23085236b",
+    "ServiceId": "",
+    "ProductId": "",
+    "Price": 0.0000,
+    "Priority": "normal"
+  },
+  {
+    "Id": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
+    "ServiceId": "",
+    "ProductId": "",
+    "Price": 0.0000,
+    "Priority": "normal"
+  }
+]

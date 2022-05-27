@@ -20,7 +20,7 @@ public class ApplicationDbContext : BaseDbContext
 
   public DbSet<Product> Products => Set<Product>();
   public DbSet<Brand> Brands => Set<Brand>();
-  public DbSet<ServiceCategory> ServiceCategories => Set<ServiceCategory>();
+  public DbSet<ServiceCatalog> ServiceCatalogs => Set<ServiceCatalog>();
   public DbSet<Service> Services => Set<Service>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)

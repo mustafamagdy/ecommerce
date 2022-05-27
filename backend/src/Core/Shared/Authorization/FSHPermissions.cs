@@ -28,7 +28,7 @@ public static class FSHResource
   public const string RoleClaims = nameof(RoleClaims);
   public const string Products = nameof(Products);
   public const string Brands = nameof(Brands);
-  public const string ServiceCategories = nameof(ServiceCategories);
+  public const string ServiceCatalog = nameof(ServiceCatalog);
   public const string Services = nameof(Services);
 }
 
@@ -86,10 +86,10 @@ public static class FSHPermissions
     new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true),
 
     // Service Categories
-    new("View Service Categories", FSHAction.View, FSHResource.ServiceCategories),
-    new("Create Service Category", FSHAction.Create, FSHResource.ServiceCategories),
-    new("Update Service Categories", FSHAction.Update, FSHResource.ServiceCategories),
-    new("Delete Service Categories", FSHAction.Delete, FSHResource.ServiceCategories),
+    new("View Service Catalog", FSHAction.View, FSHResource.ServiceCatalog),
+    new("Create Service Catalog", FSHAction.Create, FSHResource.ServiceCatalog),
+    new("Update Service Catalog", FSHAction.Update, FSHResource.ServiceCatalog),
+    new("Delete Service Catalog", FSHAction.Delete, FSHResource.ServiceCatalog),
 
     // Services
     new("View Services", FSHAction.View, FSHResource.Services),

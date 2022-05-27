@@ -1,34 +1,38 @@
-﻿using FSH.WebApi.Domain.Common.Events;
+﻿using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 
 namespace FSH.WebApi.Application.Catalog.Services;
 
 public class DeleteServiceRequest : IRequest<Guid>
 {
-    public Guid Id { get; set; }
+  public Guid Id { get; set; }
 
-    public DeleteServiceRequest(Guid id) => Id = id;
+  public DeleteServiceRequest(Guid id) => Id = id;
 }
 
 public class DeleteServiceRequestHandler : IRequestHandler<DeleteServiceRequest, Guid>
 {
-    private readonly IRepository<Service> _repository;
-    private readonly IStringLocalizer _t;
+  // Add Domain Events automatically by using IRepositoryWithEvents
+  private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
+  private readonly IRepositoryWithEvents<Service> _serviceRepo;
+  private readonly IStringLocalizer _t;
 
-    public DeleteServiceRequestHandler(IRepository<Service> repository, IStringLocalizer<DeleteServiceRequestHandler>
-    localizer) =>
-        (_repository, _t) = (repository, localizer);
+  public DeleteServiceRequestHandler(IReadRepository<ServiceCatalog> serviceCatalogRepo, IRepositoryWithEvents<Service> serviceRepo,
+    IStringLocalizer<DeleteServiceRequestHandler> localizer) =>
+    (_serviceCatalogRepo, _serviceRepo, _t) = (serviceCatalogRepo, serviceRepo, localizer);
 
-    public async Task<Guid> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
+  public async Task<Guid> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
+  {
+    if (await _serviceCatalogRepo.AnyAsync(new ServiceCatalogByServiceSpec(request.Id), cancellationToken))
     {
-        var service = await _repository.GetByIdAsync(request.Id, cancellationToken);
-
-        _ = service ?? throw new NotFoundException(_t["Service {0} Not Found."]);
-
-        // Add Domain Events to be raised after the commit
-        service.DomainEvents.Add(EntityDeletedEvent.WithEntity(service));
-
-        await _repository.DeleteAsync(service, cancellationToken);
-
-        return request.Id;
+      throw new ConflictException(_t["Service cannot be deleted as it's being used in service catalogs."]);
     }
+
+    var service = await _serviceRepo.GetByIdAsync(request.Id, cancellationToken);
+
+    _ = service ?? throw new NotFoundException(_t["Service {0} Not Found."]);
+
+    await _serviceRepo.DeleteAsync(service, cancellationToken);
+
+    return request.Id;
+  }
 }
