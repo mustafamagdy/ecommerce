@@ -4,10 +4,10 @@ public class OrderDto : IDto
 {
   public Guid Id { get; set; }
   public string OrderNumber { get; set; }
-  public DateOnly OrderDate { get; set; }
-  public DateTime OrderTime { get; set; }
+  public string OrderDate { get; set; }
+  public string OrderTime { get; set; }
   public string CustomerName { get; set; }
-  public List<OrderItemDto> Items { get; set; }
+  public List<OrderItemDto> OrderItems { get; set; }
 }
 
 public class OrderItemDto : IDto

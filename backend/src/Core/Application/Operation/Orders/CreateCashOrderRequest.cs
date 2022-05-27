@@ -4,12 +4,12 @@ using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
-public class OrderItemRequest
+public class OrderItemRequest : IRequest<OrderItemDto>
 {
   public Guid ItemId { get; set; }
 }
 
-public class CreateCashOrderRequest
+public class CreateCashOrderRequest : IRequest<OrderDto>
 {
   public List<OrderItemRequest> Items { get; set; }
 }
@@ -33,6 +33,20 @@ public class GetServiceCatalogDetailByIdSpec : Specification<ServiceCatalog, Ser
     Query
       .Include(a => a.Product)
       .Include(a => a.Service)
+      .Where(a => a.Id == serviceCatalogId);
+}
+
+public class GetOrderDetailByIdSpec : Specification<Order, OrderDto>, ISingleResultSpecification
+{
+  public GetOrderDetailByIdSpec(Guid serviceCatalogId) =>
+    Query
+      .Include(a => a.Customer)
+      .Include(a => a.OrderItems)
+      .ThenInclude(a => a.ServiceCatalog)
+      .ThenInclude(a => a.Product)
+      .Include(a => a.OrderItems)
+      .ThenInclude(a => a.ServiceCatalog)
+      .ThenInclude(a => a.Product)
       .Where(a => a.Id == serviceCatalogId);
 }
 
@@ -61,18 +75,29 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(defaultCustomer));
     }
 
-    var order = new Order(defaultCustomer.Id);
+    //todo: order number generator
+    var orderNumber = "1234";
+    var order = new Order(defaultCustomer.Id, orderNumber);
     await _repository.AddAsync(order, cancellationToken);
 
+    //todo: get vat percentage from system settings
+    decimal vatPercentage = 0.15M;
     var items = new List<OrderItem>();
     foreach (OrderItemRequest item in request.Items)
     {
-      var serviceItem =  (ISingleResultSpecification<ServiceCatalog, ServiceCatalogDto>)(await _serviceCatalogRepo.GetBySpecAsync(new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken));
-      items.Add(new OrderItem(serviceItem, item.ItemId));
+      var serviceItem = await _serviceCatalogRepo.GetBySpecAsync((ISpecification<ServiceCatalog, ServiceCatalogDto>)new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
+      if (serviceItem is null)
+      {
+        throw new ArgumentNullException(nameof(serviceItem));
+      }
+
+      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, serviceItem.Price, vatPercentage, order.Id));
     }
 
-    await _orderItemRepo.AddAsync(items);
+    await _orderItemRepo.AddRangeAsync(items, cancellationToken);
 
-    return order.Adapt<OrderDto>();
+    var newOrder = await _repository.GetBySpecAsync(new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+
+    return newOrder.Adapt<OrderDto>();
   }
 }

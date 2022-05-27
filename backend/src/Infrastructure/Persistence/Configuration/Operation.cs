@@ -32,7 +32,12 @@ public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
     builder.IsMultiTenant();
 
     builder
-      .Property(b => b.ItemName)
+      .Property(b => b.ServiceName)
+      .IsRequired()
+      .HasMaxLength(256);
+
+    builder
+      .Property(b => b.ProductName)
       .IsRequired()
       .HasMaxLength(256);
 
