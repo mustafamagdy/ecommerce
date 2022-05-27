@@ -1,5 +1,6 @@
 ﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Domain.Operation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -26,14 +27,17 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
 
     builder
       .Property(b => b.Name)
-      .HasMaxLength(1024);
+      .HasMaxLength(256);
+
+    builder
+      .Property(b => b.Rate)
+      .HasPrecision(7, 3);
 
     builder
       .Property(p => p.ImagePath)
       .HasMaxLength(2048);
   }
 }
-
 
 public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
 {
@@ -44,7 +48,7 @@ public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
     builder
       .Property(b => b.Price)
       .IsRequired()
-      .HasPrecision(4);
+      .HasPrecision(7, 3);
 
     builder
       .Property(a => a.Priority)
@@ -66,5 +70,46 @@ public class ServiceConfig : IEntityTypeConfiguration<Service>
     builder
       .Property(p => p.ImagePath)
       .HasMaxLength(2048);
+  }
+}
+
+public class CustomerConfig : IEntityTypeConfiguration<Customer>
+{
+  public void Configure(EntityTypeBuilder<Customer> builder)
+  {
+    builder.IsMultiTenant();
+
+    builder
+      .Property(b => b.Name)
+      .HasMaxLength(1024);
+  }
+}
+
+public class OrderConfig : IEntityTypeConfiguration<Order>
+{
+  public void Configure(EntityTypeBuilder<Order> builder)
+  {
+    builder.IsMultiTenant();
+  }
+}
+
+public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
+{
+  public void Configure(EntityTypeBuilder<OrderItem> builder)
+  {
+    builder.IsMultiTenant();
+
+    builder
+      .Property(b => b.ItemName)
+      .IsRequired()
+      .HasMaxLength(256);
+
+    builder
+      .Property(b => b.Price)
+      .HasPrecision(7, 3);
+
+    builder
+      .Property(b => b.VatPercent)
+      .HasPrecision(7, 3);
   }
 }

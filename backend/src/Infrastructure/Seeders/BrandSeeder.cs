@@ -5,7 +5,7 @@ using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.WebApi.Infrastructure.Catalog;
+namespace FSH.WebApi.Infrastructure.Seeders;
 
 public class BrandSeeder : ICustomSeeder
 {
@@ -31,7 +31,7 @@ public class BrandSeeder : ICustomSeeder
 
       // Here you can use your own logic to populate the database.
       // As an example, I am using a JSON file to populate the database.
-      string brandData = await File.ReadAllTextAsync(path + "/Catalog/brands.json", cancellationToken);
+      string brandData = await File.ReadAllTextAsync(path + "/Seeders/brands.json", cancellationToken);
       var brands = _serializerService.Deserialize<List<Brand>>(brandData);
 
       foreach (var brand in brands)

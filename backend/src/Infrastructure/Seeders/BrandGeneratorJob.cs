@@ -11,7 +11,7 @@ using Hangfire.Server;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.WebApi.Infrastructure.Catalog;
+namespace FSH.WebApi.Infrastructure.Seeders;
 
 public class BrandGeneratorJob : IBrandGeneratorJob
 {
