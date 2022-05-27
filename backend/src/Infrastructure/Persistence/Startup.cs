@@ -81,10 +81,13 @@ internal static class Startup
     // Add Repositories
     services.AddScoped(typeof(IRepository<>), typeof(ApplicationDbRepository<>));
 
-    foreach (var aggregateRootType in
-             typeof(IAggregateRoot).Assembly.GetExportedTypes()
-               .Where(t => typeof(IAggregateRoot).IsAssignableFrom(t) && t.IsClass)
-               .ToList())
+    var aggregateRootTypes = typeof(IAggregateRoot)
+      .Assembly
+      .GetExportedTypes()
+      .Where(t => typeof(IAggregateRoot).IsAssignableFrom(t) && t.IsClass)
+      .ToList();
+
+    foreach (var aggregateRootType in aggregateRootTypes)
     {
       // Add ReadRepositories.
       services.AddScoped(typeof(IReadRepository<>).MakeGenericType(aggregateRootType), sp =>
