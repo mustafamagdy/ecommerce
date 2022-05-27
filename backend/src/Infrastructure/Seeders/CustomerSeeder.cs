@@ -1,46 +1,46 @@
 using System.Reflection;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.WebApi.Infrastructure.Catalog;
+namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class ServiceSeeder : ICustomSeeder
+public class CustomerSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;
-  private readonly ILogger<ServiceSeeder> _logger;
+  private readonly ILogger<CustomerSeeder> _logger;
 
-  public ServiceSeeder(ISerializerService serializerService, ILogger<ServiceSeeder> logger, ApplicationDbContext db)
+  public CustomerSeeder(ISerializerService serializerService, ILogger<CustomerSeeder> logger, ApplicationDbContext db)
   {
     _serializerService = serializerService;
     _logger = logger;
     _db = db;
   }
 
-  public string Order => "02.03";
+  public string Order => "02.02";
 
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    if (!_db.Services.Any())
+    if (!_db.Customers.Any())
     {
-      _logger.LogInformation("Started to Seed Services");
+      _logger.LogInformation("Started to Seed Customers");
 
       // Here you can use your own logic to populate the database.
       // As an example, I am using a JSON file to populate the database.
-      string serviceCategoryData = await File.ReadAllTextAsync(path + "/Catalog/services.json", cancellationToken);
-      var serviceCategories = _serializerService.Deserialize<List<Service>>(serviceCategoryData);
+      string productsData = await File.ReadAllTextAsync(path + "/Seeders/customers.json", cancellationToken);
+      var products = _serializerService.Deserialize<List<Customer>>(productsData);
 
-      foreach (var serviceCategory in serviceCategories)
+      foreach (var product in products)
       {
-        await _db.Services.AddAsync(serviceCategory, cancellationToken);
+        await _db.Customers.AddAsync(product, cancellationToken);
       }
 
       await _db.SaveChangesAsync(cancellationToken);
-      _logger.LogInformation("Seeded Services");
+      _logger.LogInformation("Seeded Customers");
     }
   }
 }
