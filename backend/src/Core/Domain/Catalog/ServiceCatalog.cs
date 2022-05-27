@@ -1,11 +1,12 @@
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace FSH.WebApi.Domain.Catalog;
 
 public enum ServicePriority
 {
-  [Description("normal")] Normal,
-  [Description("urgent")] Urgent
+  [EnumMember(Value = "normal")] Normal,
+  [EnumMember(Value = "urgent")] Urgent
 }
 
 public class ServiceCatalog : AuditableEntity, IAggregateRoot

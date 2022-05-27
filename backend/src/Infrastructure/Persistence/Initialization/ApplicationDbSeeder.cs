@@ -37,8 +37,7 @@ internal class ApplicationDbSeeder
   {
     foreach (string roleName in FSHRoles.DefaultRoles)
     {
-      if (await _roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName)
-          is not ApplicationRole role)
+      if (await _roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName) is not { } role)
       {
         // Create the role
         _logger.LogInformation("Seeding {Role} Role for '{TenantId}' Tenant", roleName, _currentTenant.Id);

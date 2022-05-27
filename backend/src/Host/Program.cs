@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using FSH.WebApi.Application;
 using FSH.WebApi.Host.Configurations;
@@ -23,9 +25,16 @@ try
   });
 
   builder.Services.AddControllers(opt =>
-  {
-    opt.Filters.Add<HasValidSubscriptionLevelFilter>();
-  }).AddFluentValidation();
+    {
+      opt.Filters.Add<HasValidSubscriptionLevelFilter>();
+    })
+    .AddFluentValidation()
+    .AddJsonOptions(opt =>
+    {
+      opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+      opt.JsonSerializerOptions.Converters.Clear();
+      opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+    });
 
   builder.Services.AddInfrastructure(builder.Configuration);
   builder.Services.AddApplication();
@@ -37,7 +46,8 @@ try
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
   app.Run();
-} catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", StringComparison.Ordinal))
+}
+catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", StringComparison.Ordinal))
 {
   StaticLogger.EnsureInitialized();
   Log.Fatal(ex, "Unhandled exception");

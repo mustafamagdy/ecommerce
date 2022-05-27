@@ -34,6 +34,7 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
   }
 }
 
+
 public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
 {
   public void Configure(EntityTypeBuilder<ServiceCatalog> builder)
@@ -47,7 +48,7 @@ public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
 
     builder
       .Property(a => a.Priority)
-      .HasConversion<EnumToStringConverter<ServicePriority>>()
+      .HasConversion<string>()
       .HasDefaultValue(ServicePriority.Normal);
   }
 }
