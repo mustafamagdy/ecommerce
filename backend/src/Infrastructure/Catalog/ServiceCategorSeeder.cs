@@ -7,40 +7,40 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Catalog;
 
-public class BrandSeeder : ICustomSeeder
+public class ServiceCategorySeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;
-  private readonly ILogger<BrandSeeder> _logger;
+  private readonly ILogger<ServiceCategorySeeder> _logger;
 
-  public BrandSeeder(ISerializerService serializerService, ILogger<BrandSeeder> logger, ApplicationDbContext db)
+  public ServiceCategorySeeder(ISerializerService serializerService, ILogger<ServiceCategorySeeder> logger, ApplicationDbContext db)
   {
     _serializerService = serializerService;
     _logger = logger;
     _db = db;
   }
 
-  public string Order => "01.01";
+  public string Order => "02.01";
 
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    if (!_db.Brands.Any())
+    if (!_db.ServiceCategories.Any())
     {
-      _logger.LogInformation("Started to Seed Brands");
+      _logger.LogInformation("Started to Seed ServiceCategories");
 
       // Here you can use your own logic to populate the database.
       // As an example, I am using a JSON file to populate the database.
-      string brandData = await File.ReadAllTextAsync(path + "/Catalog/brands.json", cancellationToken);
-      var brands = _serializerService.Deserialize<List<Brand>>(brandData);
+      string serviceCategoryData = await File.ReadAllTextAsync(path + "/Catalog/service-categories.json", cancellationToken);
+      var serviceCategories = _serializerService.Deserialize<List<ServiceCategory>>(serviceCategoryData);
 
-      foreach (var brand in brands)
+      foreach (var serviceCategory in serviceCategories)
       {
-        await _db.Brands.AddAsync(brand, cancellationToken);
+        await _db.ServiceCategories.AddAsync(serviceCategory, cancellationToken);
       }
 
       await _db.SaveChangesAsync(cancellationToken);
-      _logger.LogInformation("Seeded Brands");
+      _logger.LogInformation("Seeded ServiceCategories");
     }
   }
 }
