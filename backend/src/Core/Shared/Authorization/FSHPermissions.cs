@@ -85,7 +85,8 @@ public static class FSHPermissions
     new("Create Tenant Subscription", FSHAction.Create, FSHResource.Subscriptions, IsRoot: true),
     new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true),
 
-    // Service Categories
+    // Service Catalogs
+    new("Search Service Catalog", FSHAction.Search, FSHResource.ServiceCatalog),
     new("View Service Catalog", FSHAction.View, FSHResource.ServiceCatalog),
     new("Create Service Catalog", FSHAction.Create, FSHResource.ServiceCatalog),
     new("Update Service Catalog", FSHAction.Update, FSHResource.ServiceCatalog),
