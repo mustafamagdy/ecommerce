@@ -16,4 +16,8 @@
         <ProjectReference Include="..\Domain\Domain.csproj" />
         <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Operation\Customers" />
+      <Folder Include="Operation\OrderItems" />
+    </ItemGroup>
 </Project>

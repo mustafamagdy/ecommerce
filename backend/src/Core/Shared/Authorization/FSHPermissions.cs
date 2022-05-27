@@ -30,6 +30,8 @@ public static class FSHResource
   public const string Brands = nameof(Brands);
   public const string ServiceCatalog = nameof(ServiceCatalog);
   public const string Services = nameof(Services);
+  public const string Orders = nameof(Orders);
+  public const string Customers = nameof(Customers);
 }
 
 public static class FSHPermissions
@@ -97,6 +99,20 @@ public static class FSHPermissions
     new("Create Service", FSHAction.Create, FSHResource.Services),
     new("Update Services", FSHAction.Update, FSHResource.Services),
     new("Delete Services", FSHAction.Delete, FSHResource.Services),
+
+    // Orders & Order Items
+    new("Search Orders", FSHAction.Search, FSHResource.Orders),
+    new("View Orders", FSHAction.View, FSHResource.Orders),
+    new("Create Order", FSHAction.Create, FSHResource.Orders),
+    new("Update Order", FSHAction.Update, FSHResource.Orders),
+    new("Delete Order", FSHAction.Delete, FSHResource.Orders),
+
+    // Customers
+    new("Search Customers", FSHAction.Search, FSHResource.Customers),
+    new("View Customers", FSHAction.View, FSHResource.Customers),
+    new("Create Order", FSHAction.Create, FSHResource.Customers),
+    new("Update Customer", FSHAction.Update, FSHResource.Customers),
+    new("Delete Customer", FSHAction.Delete, FSHResource.Customers),
   };
 
   public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

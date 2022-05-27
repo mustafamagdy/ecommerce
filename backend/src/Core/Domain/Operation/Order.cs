@@ -2,6 +2,7 @@ namespace FSH.WebApi.Domain.Operation;
 
 public class Order : AuditableEntity, IAggregateRoot
 {
+  public string OrderNumber { get; set; }
   public Guid CustomerId { get; private set; }
   public virtual Customer Customer { get; private set; } = default!;
 
