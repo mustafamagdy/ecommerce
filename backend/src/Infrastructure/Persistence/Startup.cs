@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -43,7 +44,9 @@ internal static class Startup
       .AddTransient<CustomSeederRunner>()
       .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
       .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
-      .AddRepositories();
+      .AddRepositories()
+      .AddSingleton<TenantSequenceGenerator>()
+      ;
   }
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
