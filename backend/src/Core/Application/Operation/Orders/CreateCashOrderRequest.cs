@@ -1,6 +1,7 @@
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Customers;
+using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
@@ -24,19 +25,24 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
   // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Order> _repository;
   private readonly IReadRepository<Customer> _customerRepo;
+  private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
+  private readonly IRepositoryWithEvents<OrderPayment> _paymentRepo;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepository<OrderItem> _orderItemRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
 
   public CreateCashOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
     IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
-    ITenantSequenceGenerator sequenceGenerator)
+    ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo,
+    IRepositoryWithEvents<OrderPayment> paymentRepo)
   {
     _repository = repository;
     _customerRepo = customerRepo;
     _orderItemRepo = orderItemRepo;
     _serviceCatalogRepo = serviceCatalogRepo;
     _sequenceGenerator = sequenceGenerator;
+    _paymentMethodRepo = paymentMethodRepo;
+    _paymentRepo = paymentRepo;
   }
 
   public async Task<OrderDto> Handle(CreateCashOrderRequest request, CancellationToken cancellationToken)
@@ -47,6 +53,11 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(defaultCustomer));
     }
 
+    var cashPaymentMethod = await _paymentMethodRepo.GetBySpecAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
+    if (cashPaymentMethod is null)
+    {
+      throw new NotFoundException(nameof(cashPaymentMethod));
+    }
 
     var orderNumber = _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(defaultCustomer.Id, orderNumber);
@@ -66,8 +77,10 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
 
-    var newOrder = await _repository.GetBySpecAsync(new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    var cashPayment = new OrderPayment(order.Id, cashPaymentMethod.Id, order.NetAmount);
+    await _paymentRepo.AddAsync(cashPayment, cancellationToken);
 
-    return newOrder.Adapt<OrderDto>();
+    var newOrder = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    return newOrder;
   }
 }

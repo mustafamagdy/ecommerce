@@ -9,6 +9,8 @@ namespace FSH.WebApi.Application.Operation.Orders;
 public class CreateOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 {
   public Guid CustomerId { get; set; }
+  public Guid PaymentMethodId { get; set; }
+  public decimal PaidAmount { get; set; }
 }
 
 public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<CreateOrderRequest>
@@ -16,6 +18,17 @@ public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<Creat
   public CreateOrderRequestValidator(IReadRepository<Order> repository, IStringLocalizer<IBaseRequest> t)
     : base(t)
   {
+    RuleFor(p => p.CustomerId)
+      .NotEmpty();
+
+    RuleFor(p => p.PaymentMethodId)
+      .NotEmpty();
+
+    //todo: validate amount for cash
+
+    RuleFor(p => p.PaidAmount)
+      .GreaterThanOrEqualTo(0)
+      .LessThanOrEqualTo(1000);
   }
 }
 
@@ -25,16 +38,20 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
   private readonly IReadRepository<Customer> _customerRepo;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepository<OrderItem> _orderItemRepo;
+  private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
+  private readonly IRepositoryWithEvents<OrderPayment> _paymentRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
 
   public CreateOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo, IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
-    ITenantSequenceGenerator sequenceGenerator)
+    ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<OrderPayment> paymentRepo)
   {
     _repository = repository;
     _customerRepo = customerRepo;
     _orderItemRepo = orderItemRepo;
     _serviceCatalogRepo = serviceCatalogRepo;
     _sequenceGenerator = sequenceGenerator;
+    _paymentMethodRepo = paymentMethodRepo;
+    _paymentRepo = paymentRepo;
   }
 
   public async Task<OrderDto> Handle(CreateOrderRequest request, CancellationToken cancellationToken)
@@ -43,6 +60,12 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
     if (customer is null)
     {
       throw new NotFoundException(nameof(customer));
+    }
+
+    var paymentMethod = await _paymentMethodRepo.GetByIdAsync(request.PaymentMethodId, cancellationToken);
+    if (paymentMethod is null)
+    {
+      throw new NotFoundException(nameof(paymentMethod));
     }
 
     string orderNumber = _sequenceGenerator.NextFormatted(nameof(Order));
@@ -63,8 +86,11 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
 
-    var newOrder = await _repository.GetBySpecAsync(new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    var cashPayment = new OrderPayment(order.Id, paymentMethod.Id, request.PaidAmount);
+    await _paymentRepo.AddAsync(cashPayment, cancellationToken);
 
-    return newOrder.Adapt<OrderDto>();
+    var newOrder = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+
+    return newOrder;
   }
 }

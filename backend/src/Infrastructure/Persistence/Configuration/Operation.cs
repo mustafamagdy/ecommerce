@@ -62,3 +62,15 @@ public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
       .HasPrecision(7, 3);
   }
 }
+
+public class OrderPaymentConfig : IEntityTypeConfiguration<OrderPayment>
+{
+  public void Configure(EntityTypeBuilder<OrderPayment> builder)
+  {
+    builder.IsMultiTenant();
+
+    builder
+      .Property(a => a.Amount)
+      .HasPrecision(7, 3);
+  }
+}

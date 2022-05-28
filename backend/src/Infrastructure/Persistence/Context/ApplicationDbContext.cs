@@ -26,6 +26,8 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<Customer> Customers => Set<Customer>();
   public DbSet<Order> Orders => Set<Order>();
   public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+  public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
+  public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
