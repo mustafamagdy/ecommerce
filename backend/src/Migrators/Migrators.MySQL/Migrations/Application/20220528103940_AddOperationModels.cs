@@ -53,7 +53,7 @@ namespace Migrators.MySQL.Migrations.Application
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(1024)", maxLength: 1024, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CashDefault = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
@@ -71,7 +71,7 @@ namespace Migrators.MySQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    OrderNumber = table.Column<string>(type: "longtext", nullable: false)
+                    OrderNumber = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CustomerId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
@@ -106,6 +106,7 @@ namespace Migrators.MySQL.Migrations.Application
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ServiceName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Qty = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(7,3)", precision: 7, scale: 3, nullable: false),
                     VatPercent = table.Column<decimal>(type: "decimal(7,3)", precision: 7, scale: 3, nullable: false),
                     OrderId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -134,6 +135,13 @@ namespace Migrators.MySQL.Migrations.Application
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Customers_PhoneNumber",
+                schema: "Catalog",
+                table: "Customers",
+                column: "PhoneNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 schema: "Catalog",
                 table: "OrderItems",
@@ -150,6 +158,13 @@ namespace Migrators.MySQL.Migrations.Application
                 schema: "Catalog",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderNumber",
+                schema: "Catalog",
+                table: "Orders",
+                column: "OrderNumber",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

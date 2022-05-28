@@ -46,7 +46,7 @@ internal static class Startup
       .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
       .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
       .AddRepositories()
-      .AddSingleton<ITenantSequenceGenerator, TenantSequenceGenerator>();
+      .AddTransient<ITenantSequenceGenerator, TenantSequenceGenerator>();
   }
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220527194036_AddOperationModels")]
+    [Migration("20220528103940_AddOperationModels")]
     partial class AddOperationModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,7 +243,8 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -251,6 +252,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasColumnType("varchar(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Customers", "Catalog");
 
@@ -286,7 +290,8 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.Property<string>("OrderNumber")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -296,6 +301,9 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique();
 
                     b.ToTable("Orders", "Catalog");
 
@@ -319,6 +327,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ServiceCatalogId")
                         .HasColumnType("char(36)");
