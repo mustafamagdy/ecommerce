@@ -1,16 +1,20 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Finbuckle.MultiTenant;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Configuration;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class TenantSequenceGenerator
+public class TenantSequenceGenerator : ITenantSequenceGenerator
 {
+  private readonly ITenantInfo _currentTenant;
   private static readonly object Lock = new object();
   private readonly string _sequenceFilesDir;
 
-  public TenantSequenceGenerator(IConfiguration config)
+  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant)
   {
+    _currentTenant = currentTenant;
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     _sequenceFilesDir = Path.Combine(path, config["DatabaseSettings:SequenceDir"]);
     if (!Directory.Exists(_sequenceFilesDir))
@@ -19,25 +23,31 @@ public class TenantSequenceGenerator
     }
   }
 
+  public string NextFormatted(string entityName)
+  {
+    var next = Next(entityName);
+    return next.ToString().PadLeft(7, '0');
+  }
+
   public long Next(string entityName)
   {
-    string key = "test";
-    string tenantSequencesFile = Path.Combine(_sequenceFilesDir, key + ".txt");
+    string tenantSequencesFile = Path.Combine(_sequenceFilesDir, _currentTenant.Identifier + ".txt");
     lock (Lock)
     {
-      using var sFile = File.Open(tenantSequencesFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+      using var sFile = File.Open(tenantSequencesFile, FileMode.OpenOrCreate, FileAccess.Read);
       using var sr = new StreamReader(sFile);
       string sequenceValues = sr.ReadToEnd();
       sr.Close();
       sr.Dispose();
 
       string pattern = $"({entityName})=(?<max>\\d+)";
-      var reg = new Regex(pattern);
-      var match = reg.Match(sequenceValues);
-      long max = 0;
+      var regex = new Regex(pattern);
+      var match = regex.Match(sequenceValues);
+      long maxCount = 0;
       if (match.Success)
       {
-        max = Convert.ToInt64(match.Groups["max"].Value);
+        if (!long.TryParse(match.Groups["max"].Value, out maxCount))
+          maxCount = 0;
       }
       else
       {
@@ -49,13 +59,16 @@ public class TenantSequenceGenerator
         sequenceValues += $"{entityName}=0";
       }
 
-      max++;
-      var val = $"$1={max}";
-      var newSeq = Regex.Replace(sequenceValues, pattern, val);
+      maxCount++;
+      string replacePattern = $"$1={maxCount}";
+      string newContent = Regex.Replace(sequenceValues, pattern, replacePattern);
       using var sw = new StreamWriter(tenantSequencesFile, append: false);
-      sw.Write(newSeq);
+      sw.Write(newContent);
+
       sw.Close();
-      return max;
+      sw.Dispose();
+
+      return maxCount;
     }
   }
 }
