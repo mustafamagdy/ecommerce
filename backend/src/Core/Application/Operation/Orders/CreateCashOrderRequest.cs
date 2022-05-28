@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Operation;
 using Mapster;
 
@@ -57,14 +58,21 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
   private readonly IReadRepository<Customer> _customerRepo;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepository<OrderItem> _orderItemRepo;
+  private readonly TenantSequenceGenerator _sequenceGenerator;
 
   public CreateCashOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
-    IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo)
+    IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo, TenantSequenceGenerator sequenceGenerator)
   {
     _repository = repository;
     _customerRepo = customerRepo;
     _orderItemRepo = orderItemRepo;
     _serviceCatalogRepo = serviceCatalogRepo;
+    _sequenceGenerator = sequenceGenerator;
+
+    for (int i = 0; i < 1000; i++)
+    {
+      var val = _sequenceGenerator.Next("orders");
+    }
   }
 
   public async Task<OrderDto> Handle(CreateCashOrderRequest request, CancellationToken cancellationToken)
