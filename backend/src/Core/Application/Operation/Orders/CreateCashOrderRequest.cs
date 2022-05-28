@@ -1,6 +1,7 @@
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
@@ -58,21 +59,17 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
   private readonly IReadRepository<Customer> _customerRepo;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepository<OrderItem> _orderItemRepo;
-  private readonly TenantSequenceGenerator _sequenceGenerator;
+  private readonly ITenantSequenceGenerator _sequenceGenerator;
 
   public CreateCashOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
-    IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo, TenantSequenceGenerator sequenceGenerator)
+    IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
+    ITenantSequenceGenerator sequenceGenerator)
   {
     _repository = repository;
     _customerRepo = customerRepo;
     _orderItemRepo = orderItemRepo;
     _serviceCatalogRepo = serviceCatalogRepo;
     _sequenceGenerator = sequenceGenerator;
-
-    for (int i = 0; i < 1000; i++)
-    {
-      var val = _sequenceGenerator.Next("orders");
-    }
   }
 
   public async Task<OrderDto> Handle(CreateCashOrderRequest request, CancellationToken cancellationToken)
@@ -83,8 +80,8 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(defaultCustomer));
     }
 
-    //todo: order number generator
-    var orderNumber = "1234";
+
+    var orderNumber = _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(defaultCustomer.Id, orderNumber);
     await _repository.AddAsync(order, cancellationToken);
 
