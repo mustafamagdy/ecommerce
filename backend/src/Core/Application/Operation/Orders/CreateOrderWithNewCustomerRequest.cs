@@ -6,17 +6,17 @@ using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
-public class CreateOrderWithNewCustomerRequest : IRequest<OrderDto>
+public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<OrderDto>
 {
   public CreateSimpleCustomerRequest Customer { get; set; }
-  public List<OrderItemRequest> Items { get; set; }
 }
 
-public class CreateOrderWithNewCustomerRequestValidator : CustomValidator<CreateOrderWithNewCustomerRequest>
+public class CreateOrderWithNewCustomerRequestValidator : CreateOrderRequestBaseValidator<CreateOrderWithNewCustomerRequest>
 {
-  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Order> repository, IStringLocalizer<CreateCashOrderRequestValidator> T) =>
-    RuleFor(p => p.Items)
-      .NotEmpty();
+  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Order> repository, IStringLocalizer<IBaseRequest> t)
+    : base(t)
+  {
+  }
 }
 
 public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOrderWithNewCustomerRequest, OrderDto>
@@ -59,7 +59,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
         throw new ArgumentNullException(nameof(serviceItem));
       }
 
-      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
+      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
     }
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);

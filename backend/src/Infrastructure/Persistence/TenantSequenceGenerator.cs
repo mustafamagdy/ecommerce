@@ -7,11 +7,15 @@ using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
+public static class Lock
+{
+  public static object LockObj = new object();
+}
+
 public class TenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
   private readonly IHostEnvironment _env;
-  private static readonly object Lock = new object();
   private readonly string _sequenceFilesDir;
 
   public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env)
@@ -36,7 +40,7 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
   {
     string sequenceFileName = $"{_env.GetShortenName()}-{_currentTenant.Identifier}.txt";
     string tenantSequencesFile = Path.Combine(_sequenceFilesDir, sequenceFileName);
-    lock (Lock)
+    lock (Lock.LockObj)
     {
       using var sFile = File.Open(tenantSequencesFile, FileMode.OpenOrCreate, FileAccess.Read);
       using var sr = new StreamReader(sFile);

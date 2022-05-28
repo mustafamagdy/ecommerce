@@ -14,6 +14,12 @@ public class CustomerConfig : IEntityTypeConfiguration<Customer>
     builder
       .Property(b => b.Name)
       .HasMaxLength(1024);
+
+    builder
+      .Property(b => b.PhoneNumber)
+      .HasMaxLength(64);
+
+    builder.HasIndex(a => a.PhoneNumber).IsUnique();
   }
 }
 
@@ -25,7 +31,9 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
 
     builder
       .Property(a => a.OrderNumber)
-      .IsUnicode();
+      .HasMaxLength(64);
+
+    builder.HasIndex(a => a.OrderNumber).IsUnique();
   }
 }
 
