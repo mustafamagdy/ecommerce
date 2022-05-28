@@ -12,7 +12,7 @@ public class OrdersBySearchRequestSpec : EntitiesByPaginationFilterSpec<Order, O
   public OrdersBySearchRequestSpec(SearchOrdersRequest request)
     : base(request) =>
     Query
-      .Where(a => request.OrderNumber != null && a.OrderNumber == request.OrderNumber)
+      .Where(a => request.OrderNumber == null || a.OrderNumber == request.OrderNumber)
       .OrderBy(c => c.OrderNumber, !request.HasOrderBy());
 }
 
