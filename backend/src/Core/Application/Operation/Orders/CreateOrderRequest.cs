@@ -6,17 +6,17 @@ using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
-public class CreateOrderRequest : IRequest<OrderDto>
+public class CreateOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 {
   public Guid CustomerId { get; set; }
-  public List<OrderItemRequest> Items { get; set; }
 }
 
-public class CreateOrderRequestValidator : CustomValidator<CreateOrderRequest>
+public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<CreateOrderRequest>
 {
-  public CreateOrderRequestValidator(IReadRepository<Order> repository, IStringLocalizer<CreateCashOrderRequestValidator> T) =>
-    RuleFor(p => p.Items)
-      .NotEmpty();
+  public CreateOrderRequestValidator(IReadRepository<Order> repository, IStringLocalizer<IBaseRequest> t)
+    : base(t)
+  {
+  }
 }
 
 public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, OrderDto>
@@ -58,7 +58,7 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
         throw new ArgumentNullException(nameof(serviceItem));
       }
 
-      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
+      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
     }
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
