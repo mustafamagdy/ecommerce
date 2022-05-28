@@ -10,7 +10,7 @@ public class OrderItemRequest : IRequest<OrderItemDto>
 
 public class OrderItemRequestValidator : CustomValidator<OrderItemRequest>
 {
-  public OrderItemRequestValidator(IStringLocalizer t)
+  public OrderItemRequestValidator(IStringLocalizer<IBaseRequest> t)
   {
     RuleFor(p => p.Qty)
       .GreaterThan(0)

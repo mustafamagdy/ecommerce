@@ -7,6 +7,8 @@ public class GetOrderDetailByIdSpec : Specification<Order, OrderDto>, ISingleRes
   public GetOrderDetailByIdSpec(Guid serviceCatalogId) =>
     Query
       .Include(a => a.Customer)
+      .Include(a => a.OrderPayments)
+        .ThenInclude(a => a.PaymentMethod)
       .Include(a => a.OrderItems)
         .ThenInclude(a => a.ServiceCatalog)
           .ThenInclude(a => a.Product)
