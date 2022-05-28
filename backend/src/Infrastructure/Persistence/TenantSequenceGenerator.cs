@@ -3,18 +3,21 @@ using System.Text.RegularExpressions;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
 public class TenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
+  private readonly IHostEnvironment _env;
   private static readonly object Lock = new object();
   private readonly string _sequenceFilesDir;
 
-  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant)
+  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env)
   {
     _currentTenant = currentTenant;
+    _env = env;
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     _sequenceFilesDir = Path.Combine(path, config["DatabaseSettings:SequenceDir"]);
     if (!Directory.Exists(_sequenceFilesDir))
@@ -31,7 +34,8 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
 
   public long Next(string entityName)
   {
-    string tenantSequencesFile = Path.Combine(_sequenceFilesDir, _currentTenant.Identifier + ".txt");
+    string sequenceFileName = $"{_env.GetShortenName()}-{_currentTenant.Identifier}.txt";
+    string tenantSequencesFile = Path.Combine(_sequenceFilesDir, sequenceFileName);
     lock (Lock)
     {
       using var sFile = File.Open(tenantSequencesFile, FileMode.OpenOrCreate, FileAccess.Read);
