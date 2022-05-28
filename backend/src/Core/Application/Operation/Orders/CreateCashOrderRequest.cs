@@ -1,15 +1,11 @@
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
-
-public class OrderItemRequest : IRequest<OrderItemDto>
-{
-  public Guid ItemId { get; set; }
-}
 
 public class CreateCashOrderRequest : IRequest<OrderDto>
 {
@@ -22,34 +18,6 @@ public class CreateCashOrderRequestValidator : CustomValidator<CreateCashOrderRe
     IStringLocalizer<CreateCashOrderRequestValidator> T) =>
     RuleFor(p => p.Items)
       .NotEmpty();
-}
-
-public class GetDefaultCashCustomerSpec : Specification<Customer>, ISingleResultSpecification
-{
-  public GetDefaultCashCustomerSpec() => Query.Where(a => a.CashDefault);
-}
-
-public class GetServiceCatalogDetailByIdSpec : Specification<ServiceCatalog, ServiceCatalogDto>, ISingleResultSpecification
-{
-  public GetServiceCatalogDetailByIdSpec(Guid serviceCatalogId) =>
-    Query
-      .Include(a => a.Product)
-      .Include(a => a.Service)
-      .Where(a => a.Id == serviceCatalogId);
-}
-
-public class GetOrderDetailByIdSpec : Specification<Order, OrderDto>, ISingleResultSpecification
-{
-  public GetOrderDetailByIdSpec(Guid serviceCatalogId) =>
-    Query
-      .Include(a => a.Customer)
-      .Include(a => a.OrderItems)
-      .ThenInclude(a => a.ServiceCatalog)
-      .ThenInclude(a => a.Product)
-      .Include(a => a.OrderItems)
-      .ThenInclude(a => a.ServiceCatalog)
-      .ThenInclude(a => a.Product)
-      .Where(a => a.Id == serviceCatalogId);
 }
 
 public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequest, OrderDto>
@@ -85,10 +53,8 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
     var order = new Order(defaultCustomer.Id, orderNumber);
     await _repository.AddAsync(order, cancellationToken);
 
-    //todo: get vat percentage from system settings
-    decimal vatPercentage = 0.15M;
     var items = new List<OrderItem>();
-    foreach (OrderItemRequest item in request.Items)
+    foreach (var item in request.Items)
     {
       var serviceItem = await _serviceCatalogRepo.GetBySpecAsync((ISpecification<ServiceCatalog, ServiceCatalogDto>)new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
       if (serviceItem is null)
@@ -96,7 +62,7 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
         throw new ArgumentNullException(nameof(serviceItem));
       }
 
-      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, serviceItem.Price, vatPercentage, order.Id));
+      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
     }
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
