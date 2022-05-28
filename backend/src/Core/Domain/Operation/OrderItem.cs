@@ -9,7 +9,7 @@ public class OrderItem : BaseEntity, IAggregateRoot
   public decimal Price { get; private set; }
   public decimal VatPercent { get; private set; }
   public decimal VatAmount => Price * VatPercent;
-  public decimal ItemTotal => Price * VatAmount;
+  public decimal ItemTotal => Price + VatAmount;
   public string ItemName => $"{ServiceName} - {ProductName}";
 
   public Guid OrderId { get; private set; }
