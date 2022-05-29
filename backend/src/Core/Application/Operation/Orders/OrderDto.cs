@@ -25,3 +25,18 @@ public class OrderItemDto : IDto
   public decimal VatAmount { get; set; }
   public decimal ItemTotal { get; set; }
 }
+
+public class OrderExportDto : IDto
+{
+  public string OrderNumber { get; set; }
+  public string OrderDate { get; set; }
+  public string OrderTime { get; set; }
+  public string PhoneNumber { get; set; }
+  public string CustomerName { get; set; }
+  public decimal TotalAmount { get; set; }
+  public decimal TotalVat { get; set; }
+  public decimal NetAmount { get; set; }
+  public decimal TotalPaid { get; set; }
+  public bool Paid { get; set; }
+  public List<OrderItemDto> OrderItems { get; set; }
+}

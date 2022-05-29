@@ -1,43 +1,51 @@
-﻿using FSH.WebApi.Application.Catalog.Products;
-using FSH.WebApi.Application.Common.Exporters;
+﻿using FSH.WebApi.Application.Common.Exporters;
+using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation;
 
-public class ExportOrderInvoiceRequest : BaseFilter, IRequest<Stream>
+public class ExportOrderInvoiceRequest : IRequest<Stream>
 {
-  public Guid? BrandId { get; set; }
-  public decimal? MinimumRate { get; set; }
-  public decimal? MaximumRate { get; set; }
+  //todo: add validation at least one of those prop need to be filled
+  public Guid? OrderId { get; set; }
+  public string? OrderNumber { get; set; }
 }
 
 public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoiceRequest, Stream>
 {
-  private readonly IReadRepository<Product> _repository;
-  private readonly IExcelWriter _excelWriter;
+  private readonly IReadRepository<Order> _repository;
+  private readonly IPdfWriter _pdfWriter;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Product> repository, IExcelWriter excelWriter)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter)
   {
     _repository = repository;
-    _excelWriter = excelWriter;
+    _pdfWriter = pdfWriter;
   }
 
   public async Task<Stream> Handle(ExportOrderInvoiceRequest request, CancellationToken cancellationToken)
   {
-    var spec = new ExportOrderInvoiceWithBrandsSpecification(request);
+    var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 
-    var list = await _repository.ListAsync(spec, cancellationToken);
+    var order = await _repository.GetBySpecAsync(spec, cancellationToken);
 
-    return _excelWriter.WriteToStream(list);
+    return _pdfWriter.WriteToStream(order);
   }
 }
 
-public class ExportOrderInvoiceWithBrandsSpecification : EntitiesByBaseFilterSpec<Product, ProductExportDto>
+public class ExportOrderInvoiceWithBrandsSpec : Specification<Order, OrderExportDto>, ISingleResultSpecification
 {
-  public ExportOrderInvoiceWithBrandsSpecification(ExportOrderInvoiceRequest request)
-    : base(request) =>
+  public ExportOrderInvoiceWithBrandsSpec(ExportOrderInvoiceRequest request) =>
     Query
-      .Include(p => p.Brand)
-      .Where(p => p.BrandId.Equals(request.BrandId!.Value), request.BrandId.HasValue)
-      .Where(p => p.Rate >= request.MinimumRate!.Value, request.MinimumRate.HasValue)
-      .Where(p => p.Rate <= request.MaximumRate!.Value, request.MaximumRate.HasValue);
+      .Include(a => a.Customer)
+      .Include(a => a.OrderPayments)
+        .ThenInclude(a => a.PaymentMethod)
+      .Include(a => a.OrderItems)
+        .ThenInclude(a => a.ServiceCatalog)
+          .ThenInclude(a => a.Product)
+      .Include(a => a.OrderItems)
+        .ThenInclude(a => a.ServiceCatalog)
+          .ThenInclude(a => a.Product)
+      .Where(a =>
+           (request.OrderId == null || a.Id == request.OrderId)
+        || (request.OrderNumber == null || a.OrderNumber == request.OrderNumber));
 }
