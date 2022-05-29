@@ -26,9 +26,9 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   {
     var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 
-    var order = await _repository.GetBySpecAsync(spec, cancellationToken);
-
-    return _pdfWriter.WriteToStream(order);
+    var order = await _repository.GetBySpecAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
+    var invoice = new InvoiceDocument(order);
+    return _pdfWriter.WriteToStream(invoice);
   }
 }
 
