@@ -1,6 +1,9 @@
+using QuestPDF.Infrastructure;
+
 namespace FSH.WebApi.Application.Common.Exporters;
 
 public interface IPdfWriter : ITransientService
 {
-  Stream WriteToStream(dynamic data);
+  Stream WriteToStream<T>(in T document)
+      where T : IDocument;
 }
