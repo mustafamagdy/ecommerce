@@ -28,5 +28,12 @@ public class DtoCustomMapping
       .Map(dest => dest.OrderTime, src => src.CreatedOn.ToString("HH:mm:ss"))
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
+
+    TypeAdapterConfig<Order, OrderExportDto>
+      .NewConfig()
+      .Map(dest => dest.OrderDate, src => src.CreatedOn.Date.ToString("dd/MM/yyyy"))
+      .Map(dest => dest.OrderTime, src => src.CreatedOn.ToString("HH:mm:ss"))
+      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
+      ;
   }
 }
