@@ -2,16 +2,16 @@
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace FSH.WebApi.Infrastructure.Common.Export.Pdf;
+namespace FSH.WebApi.Infrastructure.Common.Export;
 
 public class PdfWriter : IPdfWriter
 {
   public Stream WriteToStream<T>(in T document)
     where T : IDocument
   {
-    using var memStream = new MemoryStream();
-    var pdf = document.GeneratePdf();
-    memStream.Read(pdf);
-    return memStream;
+    var pdfBytes = document.GeneratePdf();
+    Stream stream = new MemoryStream(pdfBytes);
+    stream.Seek(0, SeekOrigin.Begin);
+    return stream;
   }
 }
