@@ -4,7 +4,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public class GetOrderDetailByIdSpec : Specification<Order, OrderDto>, ISingleResultSpecification
 {
-  public GetOrderDetailByIdSpec(Guid serviceCatalogId) =>
+  public GetOrderDetailByIdSpec(Guid orderId) =>
     Query
       .Include(a => a.Customer)
       .Include(a => a.OrderPayments)
@@ -15,5 +15,5 @@ public class GetOrderDetailByIdSpec : Specification<Order, OrderDto>, ISingleRes
       .Include(a => a.OrderItems)
         .ThenInclude(a => a.ServiceCatalog)
           .ThenInclude(a => a.Product)
-      .Where(a => a.Id == serviceCatalogId);
+      .Where(a => a.Id == orderId);
 }

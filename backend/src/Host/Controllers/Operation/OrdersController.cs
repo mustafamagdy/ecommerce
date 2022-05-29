@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Operation.Orders;
+﻿using FSH.WebApi.Application.Operation;
+using FSH.WebApi.Application.Operation.Orders;
 using FSH.WebApi.Infrastructure.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
@@ -44,6 +45,15 @@ public class OrdersController : VersionedApiController
   public Task<OrderDto> GetAsync(Guid id)
   {
     return Mediator.Send(new GetOrderRequest(id));
+  }
+
+  [HttpGet("pdf/{id:guid}")]
+  [MustHavePermission(FSHAction.View, FSHResource.Orders)]
+  [OpenApiOperation("Get order details.", "")]
+  public async Task<FileResult> ExportPdfAsync(Guid id)
+  {
+    var result = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
+    return File(result.Item2, "application/octet-stream", $"invoice_{result.Item1}.pdf");
   }
 
   //

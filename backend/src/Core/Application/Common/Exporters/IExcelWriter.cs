@@ -2,5 +2,5 @@
 
 public interface IExcelWriter : ITransientService
 {
-    Stream WriteToStream<T>(IList<T> data);
+  Stream WriteToStream<T>(IList<T> data);
 }
