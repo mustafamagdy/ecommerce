@@ -20,6 +20,7 @@ public class OrderItemDto : IDto
 {
   public Guid Id { get; set; }
   public string ItemName { get; set; }
+  public int Qty { get; set; }
   public decimal Price { get; set; }
   public decimal VatPercent { get; set; }
   public decimal VatAmount { get; set; }
