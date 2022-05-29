@@ -1,3 +1,4 @@
+using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -44,23 +45,23 @@ namespace FSH.WebApi.Application.Operation.Orders
         row.RelativeItem().Column(Column =>
         {
           Column
-            .Item().Text($"Invoice #{Model.OrderNumber}")
-            .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
+            .Item().Text($"Order #{Model.OrderNumber}")
+            .FontSize(20).SemiBold().FontColor(Colors.Purple.Accent4);
 
           Column.Item().Text(text =>
           {
-            text.Span("Issue date: ").SemiBold();
-            text.Span($"{Model.OrderDate:d}");
+            text.Span("Order date: ").SemiBold();
+            text.Span($"{Model.OrderDate}");
           });
 
           Column.Item().Text(text =>
           {
-            text.Span("Due date: ").SemiBold();
-            text.Span($"{Model.OrderDate:d}");
+            text.Span("Order time: ").SemiBold();
+            text.Span($"{Model.OrderTime}");
           });
         });
 
-        row.ConstantItem(100).Height(50).Placeholder();
+        // row.ConstantItem(100).Height(50).Placeholder();
       });
     }
 
@@ -74,7 +75,7 @@ namespace FSH.WebApi.Application.Operation.Orders
         column.Item().Element(ComposeTable);
 
         var totalPrice = Model.TotalAmount;
-        column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice}$", TextStyle.Default.SemiBold());
+        column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:N2}", TextStyle.Default.SemiBold());
 
         // if (!string.IsNullOrWhiteSpace(Model.Comments))
         //   column.Item().PaddingTop(25).Element(ComposeComments);
@@ -110,10 +111,10 @@ namespace FSH.WebApi.Application.Operation.Orders
         foreach (var item in Model.OrderItems)
         {
           table.Cell().Element(CellStyle).Text(Model.OrderItems.IndexOf(item) + 1);
-          table.Cell().Element(CellStyle).Text(item.ItemName);
-          table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price}$");
+          table.Cell().Element(CellStyle).Text(item.ItemName.ArabicWithFontGlyphsToPfd());
+          table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price:F2}");
           table.Cell().Element(CellStyle).AlignRight().Text(item.Qty);
-          table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price * item.Qty}$");
+          table.Cell().Element(CellStyle).AlignRight().Text($"{(item.Price * item.Qty):N2}");
 
           static IContainer CellStyle(IContainer container) =>
             container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);

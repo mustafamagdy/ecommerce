@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace FSH.WebApi.Infrastructure.Common.Export.Pdf;
+namespace FSH.WebApi.Shared.Extensions;
 
 public static class AraibcPdfExtention
 {
