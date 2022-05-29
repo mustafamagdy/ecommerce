@@ -50,9 +50,10 @@ public class OrdersController : VersionedApiController
   [HttpGet("pdf/{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
   [OpenApiOperation("Get order details.", "")]
-  public Task<Stream> ExportPdfAsync(Guid id)
+  public async Task<FileResult> ExportPdfAsync(Guid id)
   {
-    return Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
+    var result = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
+    return File(result.Item2, "application/octet-stream", $"invoice_{result.Item1}.pdf");
   }
 
   //
