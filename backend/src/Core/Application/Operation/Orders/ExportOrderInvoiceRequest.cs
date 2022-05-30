@@ -15,11 +15,13 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
 {
   private readonly IReadRepository<Order> _repository;
   private readonly IPdfWriter _pdfWriter;
+  private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IInvoiceBarcodeGenerator barcodeGenerator)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
+    _barcodeGenerator = barcodeGenerator;
   }
 
   public async Task<(string, Stream)> Handle(ExportOrderInvoiceRequest request, CancellationToken cancellationToken)
@@ -27,7 +29,13 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 
     var order = await _repository.GetBySpecAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
-    var invoice = new InvoiceDocument(order);
+    if (order == null)
+    {
+      throw new NotFoundException(nameof(order));
+    }
+
+    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo("", "", order.OrderDate, order.TotalAmount, order.TotalVat);
+    var invoice = new InvoiceDocument(order, _barcodeGenerator.GenerateQrCode(barcodeInfo, 256, 256));
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }
