@@ -63,7 +63,7 @@ namespace FSH.WebApi.Application.Operation.Orders
           });
         });
 
-        row.ConstantItem(50).Height(50).Image(_qrImage, ImageScaling.Resize);
+        row.ConstantItem(100).Height(100).Image(_qrImage, ImageScaling.Resize);
       });
     }
 
