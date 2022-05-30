@@ -35,7 +35,8 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     }
 
     var barcodeInfo = new KsaInvoiceBarcodeInfoInfo("", "", order.OrderDate, order.TotalAmount, order.TotalVat);
-    var invoice = new InvoiceDocument(order, _barcodeGenerator.GenerateQrCode(barcodeInfo, 256, 256));
+    byte[] qrImage = _barcodeGenerator.GenerateQrCode(barcodeInfo, 50, 50);
+    var invoice = new InvoiceDocument(order, qrImage);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }

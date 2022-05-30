@@ -8,12 +8,12 @@ namespace FSH.WebApi.Application.Operation.Orders
 {
   public class InvoiceDocument : IDocument
   {
-    private readonly Stream _qrCodeImageStream;
+    private readonly byte[] _qrImage;
     public OrderExportDto Model { get; }
 
-    public InvoiceDocument(OrderExportDto model, Stream qrCodeImageStream)
+    public InvoiceDocument(OrderExportDto model, byte[] qrImage)
     {
-      _qrCodeImageStream = qrCodeImageStream;
+      _qrImage = qrImage;
       Model = model;
     }
 
@@ -63,7 +63,7 @@ namespace FSH.WebApi.Application.Operation.Orders
           });
         });
 
-        row.ConstantItem(100).Height(50).Image(_qrCodeImageStream);
+        row.ConstantItem(50).Height(50).Image(_qrImage, ImageScaling.Resize);
       });
     }
 
