@@ -49,11 +49,11 @@ public class OrdersController : VersionedApiController
 
   [HttpGet("pdf/{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
-  [OpenApiOperation("Get order details.", "")]
-  public async Task<FileResult> ExportPdfAsync(Guid id)
+  [OpenApiOperation("Export Pdf invoice for an order.", "")]
+  public async Task<FileResult> ExportPdfInvoiceAsync(Guid id)
   {
-    var result = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
-    return File(result.Item2, "application/octet-stream", $"invoice_{result.Item1}.pdf");
+    (string orderNumber, var generatedPdf) = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
+    return File(generatedPdf, "application/octet-stream", $"invoice_{orderNumber}.pdf");
   }
 
   //
