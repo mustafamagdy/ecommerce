@@ -1,3 +1,4 @@
+using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;

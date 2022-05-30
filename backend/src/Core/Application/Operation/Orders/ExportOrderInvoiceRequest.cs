@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Common.Exporters;
 using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation;
@@ -16,12 +17,15 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   private readonly IReadRepository<Order> _repository;
   private readonly IPdfWriter _pdfWriter;
   private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
+  private readonly IVatSettingProvider _vatSettingProvider;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IInvoiceBarcodeGenerator barcodeGenerator)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter,
+    IInvoiceBarcodeGenerator barcodeGenerator, IVatSettingProvider vatSettingProvider)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
     _barcodeGenerator = barcodeGenerator;
+    _vatSettingProvider = vatSettingProvider;
   }
 
   public async Task<(string, Stream)> Handle(ExportOrderInvoiceRequest request, CancellationToken cancellationToken)
@@ -34,7 +38,8 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
       throw new NotFoundException(nameof(order));
     }
 
-    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo("", "", order.OrderDate, order.TotalAmount, order.TotalVat);
+    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName, _vatSettingProvider.VatRegNo,
+      order.OrderDate, order.TotalAmount, order.TotalVat);
     byte[] qrImage = _barcodeGenerator.GenerateQrCode(barcodeInfo, 100, 100);
     var invoice = new InvoiceDocument(order, qrImage);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));

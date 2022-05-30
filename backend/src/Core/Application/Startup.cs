@@ -31,6 +31,7 @@ public class DtoCustomMapping
 
     TypeAdapterConfig<Order, OrderExportDto>
       .NewConfig()
+      .Map(dest => dest.OrderDate, src => src.CreatedOn)
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
   }
