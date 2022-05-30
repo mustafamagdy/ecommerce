@@ -8,10 +8,12 @@ namespace FSH.WebApi.Application.Operation.Orders
 {
   public class InvoiceDocument : IDocument
   {
+    private readonly Stream _qrCodeImageStream;
     public OrderExportDto Model { get; }
 
-    public InvoiceDocument(OrderExportDto model)
+    public InvoiceDocument(OrderExportDto model, Stream qrCodeImageStream)
     {
+      _qrCodeImageStream = qrCodeImageStream;
       Model = model;
     }
 
@@ -51,17 +53,17 @@ namespace FSH.WebApi.Application.Operation.Orders
           Column.Item().Text(text =>
           {
             text.Span("Order date: ").SemiBold();
-            text.Span($"{Model.OrderDate}");
+            text.Span($"{Model.OrderDate: yyyy-MM-dd}");
           });
 
           Column.Item().Text(text =>
           {
             text.Span("Order time: ").SemiBold();
-            text.Span($"{Model.OrderTime}");
+            text.Span($"{Model.OrderDate:hh:mm:ss t z}");
           });
         });
 
-        // row.ConstantItem(100).Height(50).Placeholder();
+        row.ConstantItem(100).Height(50).Image(_qrCodeImageStream);
       });
     }
 
