@@ -7,7 +7,7 @@ using SkiaSharp.QrCode.Image;
 
 namespace FSH.WebApi.Infrastructure.Integrations.EInvoice;
 
-public class InvoiceBarcodeGenerator : IInvoiceBarcodeGenerator, ITransientService
+public class InvoiceBarcodeGenerator : IInvoiceBarcodeGenerator
 {
   public string ToBase64(IInvoiceBarcodeInfo info)
   {
@@ -26,13 +26,13 @@ public class InvoiceBarcodeGenerator : IInvoiceBarcodeGenerator, ITransientServi
     return Convert.ToBase64String(byteList.ToArray());
   }
 
-  public Stream GenerateQrCode(IInvoiceBarcodeInfo info, int width, int height)
+  public byte[] GenerateQrCode(IInvoiceBarcodeInfo info, int width, int height)
   {
     string base64 = ToBase64(info);
     var qrCode = new QrCode(base64, new Vector2Slim(width, height), SKEncodedImageFormat.Png);
     var stream = new MemoryStream();
     qrCode.GenerateImage(stream);
-    return stream;
+    return stream.ToArray();
   }
 
   public void SaveQrCode(QrCode qrcodeImage, string fullFilePath)
