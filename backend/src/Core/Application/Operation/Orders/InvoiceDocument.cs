@@ -24,7 +24,7 @@ namespace FSH.WebApi.Application.Operation.Orders
 #endif
           .Element(RenderHeader);
 
-        page.Content().Height(400)
+        page.Content().MinHeight(100)
 #if troubleshoot
           .Background(Colors.Red.Accent1)
 #endif
