@@ -1,5 +1,3 @@
-using FSH.WebApi.Application.Settings.Vat;
-using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -114,7 +112,7 @@ namespace FSH.WebApi.Application.Operation.Orders
         foreach (var item in Model.OrderItems)
         {
           table.Cell().Element(CellStyle).Text(Model.OrderItems.IndexOf(item) + 1);
-          table.Cell().Element(CellStyle).Text(item.ItemName.ArabicWithFontGlyphsToPfd());
+          table.Cell().Element(CellStyle).Text(item.ItemName.FixArabic());
           table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price:F2}");
           table.Cell().Element(CellStyle).AlignRight().Text(item.Qty);
           table.Cell().Element(CellStyle).AlignRight().Text($"{(item.Price * item.Qty):N2}");
