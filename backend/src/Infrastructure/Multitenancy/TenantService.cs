@@ -4,17 +4,35 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Infrastructure.Persistence;
-using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Mapster;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
+
+public class DemoService : IHostedService
+{
+  private readonly IJobService _jobService;
+
+  public DemoService(IJobService jobService)
+  {
+    _jobService = jobService;
+  }
+
+  public Task StartAsync(CancellationToken cancellationToken)
+  {
+    _jobService.Enqueue(() => Console.WriteLine("Job is running"));
+    return Task.CompletedTask;
+  }
+
+  public Task StopAsync(CancellationToken cancellationToken)
+  {
+    Console.WriteLine("Stopping async ");
+    return Task.CompletedTask;
+  }
+}
 
 internal class TenantService : ITenantService
 {
@@ -26,8 +44,6 @@ internal class TenantService : ITenantService
   private readonly IMailService _mailService;
   private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
-  private readonly ITenantConnectionStringBuilder _csBuilder;
-  private readonly DatabaseSettings _dbSettings;
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
@@ -37,9 +53,7 @@ internal class TenantService : ITenantService
     IJobService jobService,
     IMailService mailService,
     IEmailTemplateService templateService,
-    IStringLocalizer<TenantService> localizer,
-    ITenantConnectionStringBuilder csBuilder,
-    IOptions<DatabaseSettings> dbSettings)
+    IStringLocalizer<TenantService> localizer)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -49,8 +63,6 @@ internal class TenantService : ITenantService
     _mailService = mailService;
     _templateService = templateService;
     _t = localizer;
-    _csBuilder = csBuilder;
-    _dbSettings = dbSettings.Value;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()

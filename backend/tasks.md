@@ -1,4 +1,5 @@
 ﻿Tasks:
+- refactor invoice to generate the qrcode, brcode, and logo
 - Subscription ending notification
   - Tenant
   - Root
@@ -12,3 +13,10 @@
 - Notification
   - SMS
   - Whatsapp
+
+
+
+==========================
+
+
+root tenant get list of almost ending tenant subs and send them an email and record that enal
