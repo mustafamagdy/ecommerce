@@ -1,5 +1,8 @@
-﻿using FSH.WebApi.Application.Common.Interfaces;
+﻿using System.Reflection;
+using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Common;
 
@@ -10,27 +13,35 @@ internal static class Startup
             .AddServices(typeof(ITransientService), ServiceLifetime.Transient)
             .AddServices(typeof(IScopedService), ServiceLifetime.Scoped);
 
+    internal static IServiceCollection AddHostedServices(this IServiceCollection services)
+    {
+      services.AddHostedService<DemoService>();
+      return services;
+    }
+
+
+
     internal static IServiceCollection AddServices(this IServiceCollection services, Type interfaceType, ServiceLifetime lifetime)
     {
-        var interfaceTypes =
-            AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(t => interfaceType.IsAssignableFrom(t)
-                            && t.IsClass && !t.IsAbstract)
-                .Select(t => new
-                {
-                    Service = t.GetInterfaces().FirstOrDefault(),
-                    Implementation = t
-                })
-                .Where(t => t.Service is not null
-                            && interfaceType.IsAssignableFrom(t.Service));
+      var interfaceTypes =
+        AppDomain.CurrentDomain.GetAssemblies()
+          .SelectMany(s => s.GetTypes())
+          .Where(t => interfaceType.IsAssignableFrom(t)
+                      && t.IsClass && !t.IsAbstract)
+          .Select(t => new
+          {
+            Service = t.GetInterfaces().FirstOrDefault(),
+            Implementation = t
+          })
+          .Where(t => t.Service is not null
+                      && interfaceType.IsAssignableFrom(t.Service));
 
-        foreach (var type in interfaceTypes)
-        {
-            services.AddService(type.Service!, type.Implementation, lifetime);
-        }
+      foreach (var type in interfaceTypes)
+      {
+        services.AddService(type.Service!, type.Implementation, lifetime);
+      }
 
-        return services;
+      return services;
     }
 
     internal static IServiceCollection AddService(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime) =>
