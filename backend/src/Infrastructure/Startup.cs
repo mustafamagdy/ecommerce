@@ -49,7 +49,8 @@ public static class Startup
       .AddPersistence(config)
       .AddRequestLogging(config)
       .AddRouting(options => options.LowercaseUrls = true)
-      .AddServices();
+      .AddServices()
+      .AddHostedServices();
   }
 
   private static IServiceCollection AddApiVersioning(this IServiceCollection services) =>
