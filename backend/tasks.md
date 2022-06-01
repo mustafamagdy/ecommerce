@@ -1,0 +1,14 @@
+﻿Tasks:
+- Subscription ending notification
+  - Tenant
+  - Root
+- Subscription features toggle
+- Demo account (with reset)
+- Login as admin for another tenant (open new private window and pass jwt token)
+- Cash-box operations
+  - Transfer
+  - Open/Close?
+- Predefined roles
+- Notification
+  - SMS
+  - Whatsapp
