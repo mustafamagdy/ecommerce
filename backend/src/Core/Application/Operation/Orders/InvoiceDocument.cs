@@ -1,4 +1,4 @@
-#define troubleshoot
+// #define troubleshoot
 
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
@@ -30,7 +30,7 @@ namespace FSH.WebApi.Application.Operation.Orders
 #endif
           .Element(Body);
 
-        page.Footer().Height(100)
+        page.Footer().Height(150)
 #if troubleshoot
           .Background(Colors.Yellow.Accent1)
 #endif
@@ -78,13 +78,17 @@ namespace FSH.WebApi.Application.Operation.Orders
 
       container.Column(col =>
       {
-        col.Item().Height(50).AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("LOGO 1").FontSize(10);
+        col.Item().Height(50)
+          .AlignMiddle().AlignCenter().ShowTroubleshootBorders()
+          .Width(100).Image(_qrImage, ImageScaling.Resize);
 
-        col.Item().Height(25).AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("LOGO 2").FontSize(10);
+        col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 2").FontSize(10);
+        // col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 3").FontSize(10);
+        col.Item().SeparatorLine('=', 70);
+        col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("فاتورة ضريبية مبسطة").FontSize(10);
+        col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("Simplified Tax Invoice").FontSize(10);
 
-        col.Item().Height(25).AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("LOGO 3").FontSize(10);
       });
-
 
       // container.Row(row =>
       // {
@@ -129,11 +133,18 @@ namespace FSH.WebApi.Application.Operation.Orders
 
     protected override void Footer(IContainer container)
     {
-      container.AlignCenter().Text(text =>
+      container.Column(col =>
       {
-        text.CurrentPageNumber();
-        text.Span(" / ");
-        text.TotalPages();
+        col.Item().AlignCenter().Width(70).Height(70).Image(_qrImage, ImageScaling.Resize);
+        col.Item().SeparatorLine();
+
+        col.Item().AlignCenter().Text(text =>
+        {
+          text.CurrentPageNumber();
+          text.Span(" / ");
+          text.TotalPages();
+        });
+        col.Item().SeparatorLine();
       });
     }
 
@@ -162,7 +173,6 @@ namespace FSH.WebApi.Application.Operation.Orders
         {
           table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text($"{item.Price:F0}");
           table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(item.Qty);
-          // table.Cell().Element(CellStyle).AlignCenter().AlignTop().Text(text);
           table.Cell().Element(CellStyle).AlignRight().AlignTop().Text(item.ItemName);
 
           static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
@@ -202,8 +212,15 @@ namespace FSH.WebApi.Application.Operation.Orders
   // }
 
 
-  public static class PdfTroubleshootExt
+  public static class PdfDocumentEx
   {
+    public static IContainer SeparatorLine(this IContainer element, char c = 'x', int charCount = 80)
+    {
+      var lineStr = new string(c, charCount);
+      element.AlignCenter().AlignTop().Text(lineStr, TextStyle.Default.FontSize(5));
+      return element;
+    }
+
     public static IContainer ShowTroubleshootBorders(this IContainer element)
     {
 #if troubleshoot
