@@ -28,13 +28,21 @@ public class FSHJobFilter : IClientFilter
     using var scope = _services.CreateScope();
 
     var httpContext = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
-    _ = httpContext ?? throw new InvalidOperationException("Can't create a TenantJob without HttpContext.");
+    if (httpContext is null)
+    {
+      context.SetJobParameter(MultitenancyConstants.TenantIdName, MultitenancyConstants.RootTenant);
+      context.SetJobParameter(QueryStringKeys.UserId, Guid.Empty);
+    }
+    else
+    {
+      var tenantInfo = scope.ServiceProvider.GetRequiredService<ITenantInfo>();
+      context.SetJobParameter(MultitenancyConstants.TenantIdName, tenantInfo);
 
-    var tenantInfo = scope.ServiceProvider.GetRequiredService<ITenantInfo>();
-    context.SetJobParameter(MultitenancyConstants.TenantIdName, tenantInfo);
+      string? userId = httpContext.User.GetUserId();
+      context.SetJobParameter(QueryStringKeys.UserId, userId);
+    }
 
-    string? userId = httpContext.User.GetUserId();
-    context.SetJobParameter(QueryStringKeys.UserId, userId);
+    // _ = httpContext ?? throw new InvalidOperationException("Can't create a TenantJob without HttpContext.");
   }
 
   public void OnCreated(CreatedContext context) =>
