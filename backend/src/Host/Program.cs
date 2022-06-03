@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
@@ -7,6 +8,7 @@ using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using QuestPDF.Drawing;
 using Serilog;
 
 [assembly: ApiConventionType(typeof(FSHApiConventions))]
@@ -24,10 +26,7 @@ try
       .ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt =>
-    {
-      opt.Filters.Add<HasValidSubscriptionLevelFilter>();
-    })
+  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionLevelFilter>(); })
     .AddFluentValidation()
     .AddJsonOptions(opt =>
     {
@@ -43,6 +42,9 @@ try
 
   await app.Services.InitializeDatabasesAsync();
 
+  string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+  FontManager.RegisterFont(File.OpenRead(appPath + "/Files/fonts/LibreBarcode39-Regular.ttf"));
+
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
   app.Run();
@@ -51,7 +53,8 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 {
   StaticLogger.EnsureInitialized();
   Log.Fatal(ex, "Unhandled exception");
-} finally
+}
+finally
 {
   StaticLogger.EnsureInitialized();
   Log.Information("Server Shutting down...");

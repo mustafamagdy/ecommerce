@@ -1,5 +1,6 @@
-// #define troubleshoot
+#define troubleshoot
 
+using System.Reflection;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -18,7 +19,7 @@ namespace FSH.WebApi.Application.Operation.Orders
       {
         SetupPage(page);
 
-        page.Header().Height(100)
+        page.Header().Height(200)
 #if troubleshoot
           .Background(Colors.Blue.Accent1)
 #endif
@@ -51,11 +52,11 @@ namespace FSH.WebApi.Application.Operation.Orders
 
   public class InvoiceDocument : BasePdfDocument
   {
-    private readonly IInvoiceBarcodeGenerator _qrGenerator;
+    private readonly IVatQrCodeGenerator _qrGenerator;
     public OrderExportDto Model { get; }
     private byte[] _qrCode;
 
-    public InvoiceDocument(OrderExportDto model, IInvoiceBarcodeGenerator qrGenerator)
+    public InvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator)
     {
       _qrGenerator = qrGenerator;
       Model = model;
@@ -77,14 +78,35 @@ namespace FSH.WebApi.Application.Operation.Orders
       //   });
       // });
       _qrCode = _qrGenerator.GenerateQrCode(Model.Base64QrCode, 100, 100);
+      string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+      byte[] logo = File.ReadAllBytes(appPath + "/Files/logos/tenant_logo.png");
+
       container.Column(col =>
       {
-        col.Item().Height(50)
+        col.Item().Height(30)
           .AlignMiddle().AlignCenter().ShowTroubleshootBorders()
-          .Width(100).Image(_qrCode, ImageScaling.Resize);
+          .Width(100).Image(logo, ImageScaling.Resize);
 
-        col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 2").FontSize(10);
-        // col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 3").FontSize(10);
+        col
+          .Item()
+          .Height(35)
+          .ShowTroubleshootBorders()
+          .Background(Colors.White)
+          .AlignCenter().MinimalBox()
+          .AlignMiddle()
+          .Text($"*{Model.OrderNumber}*")
+          .LineHeight(1)
+
+          .FontFamily("Libre Barcode 39") // use real font family name
+          .FontSize(36);
+
+        col
+          .Item()
+          .ShowTroubleshootBorders()
+          .AlignCenter().AlignMiddle()
+          .Text(Model.OrderNumber)
+          .FontSize(10);
+
         col.Item().SeparatorLine('=', 70);
         col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("فاتورة ضريبية مبسطة").FontSize(10);
         col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("Simplified Tax Invoice").FontSize(10);

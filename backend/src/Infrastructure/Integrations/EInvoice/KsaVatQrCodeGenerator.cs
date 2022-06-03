@@ -7,7 +7,7 @@ using SkiaSharp.QrCode.Image;
 
 namespace FSH.WebApi.Infrastructure.Integrations.EInvoice;
 
-public class InvoiceBarcodeGenerator : IInvoiceBarcodeGenerator
+public class KsaVatQrCodeGenerator : IVatQrCodeGenerator
 {
   public string ToBase64(IInvoiceBarcodeInfo info)
   {
