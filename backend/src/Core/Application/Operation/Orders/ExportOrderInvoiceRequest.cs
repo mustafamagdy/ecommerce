@@ -16,13 +16,13 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
 {
   private readonly IReadRepository<Order> _repository;
   private readonly IPdfWriter _pdfWriter;
-  private readonly IInvoiceBarcodeGenerator _invoiceBarcodeGenerator;
+  private readonly IVatQrCodeGenerator _vatQrCodeGenerator;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IInvoiceBarcodeGenerator invoiceBarcodeGenerator)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
-    _invoiceBarcodeGenerator = invoiceBarcodeGenerator;
+    _vatQrCodeGenerator = vatQrCodeGenerator;
   }
 
   public async Task<(string, Stream)> Handle(ExportOrderInvoiceRequest request, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
       throw new NotFoundException(nameof(order));
     }
 
-    var invoice = new InvoiceDocument(order, _invoiceBarcodeGenerator);
+    var invoice = new InvoiceDocument(order, _vatQrCodeGenerator);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }

@@ -16,11 +16,11 @@ public class CreateOrderHelper : ICreateOrderHelper
   private readonly IRepositoryWithEvents<Order> _repository;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
-  private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
+  private readonly IVatQrCodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
 
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
-    ITenantSequenceGenerator sequenceGenerator, IInvoiceBarcodeGenerator barcodeGenerator,
+    ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
     IVatSettingProvider vatSettingProvider)
   {
     _repository = repository;
