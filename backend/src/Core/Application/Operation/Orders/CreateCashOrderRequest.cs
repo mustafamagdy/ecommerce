@@ -38,7 +38,8 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
   public CreateCashOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
     IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo,
-    IRepositoryWithEvents<OrderPayment> paymentRepo, IInvoiceBarcodeGenerator barcodeGenerator, IVatSettingProvider vatSettingProvider)
+    IRepositoryWithEvents<OrderPayment> paymentRepo, IInvoiceBarcodeGenerator barcodeGenerator,
+    IVatSettingProvider vatSettingProvider)
   {
     _repository = repository;
     _customerRepo = customerRepo;
@@ -59,7 +60,8 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(defaultCustomer));
     }
 
-    var cashPaymentMethod = await _paymentMethodRepo.GetBySpecAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
+    var cashPaymentMethod =
+      await _paymentMethodRepo.GetBySpecAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
     if (cashPaymentMethod is null)
     {
       throw new NotFoundException(nameof(cashPaymentMethod));
@@ -77,32 +79,35 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
 
     var orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(defaultCustomer.Id, orderNumber, DateTime.Now);
-    await _repository.AddAsync(order, cancellationToken);
+    order.OrderItems = new HashSet<OrderItem>();
 
-    var items = new List<OrderItem>();
     foreach (var item in request.Items)
     {
-      var serviceItem = await _serviceCatalogRepo.GetBySpecAsync((ISpecification<ServiceCatalog, ServiceCatalogDto>)new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
+      var serviceItem = await _serviceCatalogRepo.GetBySpecAsync(
+        (ISpecification<ServiceCatalog, ServiceCatalogDto>)new GetServiceCatalogDetailByIdSpec(item.ItemId),
+        cancellationToken);
       if (serviceItem is null)
       {
         throw new ArgumentNullException(nameof(serviceItem));
       }
 
-      items.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty, serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
+      order.OrderItems.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty,
+        serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
     }
 
-    await _orderItemRepo.AddRangeAsync(items, cancellationToken);
     var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName,
       _vatSettingProvider.VatRegNo, order.OrderDate, order.TotalAmount, order.TotalVat);
 
     string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
     order = order.SetInvoiceQrCode(invoiceQrCode);
-    await _repository.UpdateAsync(order, cancellationToken);
+    await _repository.AddAsync(order, cancellationToken);
 
     var cashPayment = new OrderPayment(order.Id, cashPaymentMethod.Id, order.NetAmount);
     await _paymentRepo.AddAsync(cashPayment, cancellationToken);
 
-    var newOrder = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    var newOrder =
+      await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id),
+        cancellationToken);
     if (newOrder == null)
     {
       throw new NotFoundException($"Order {order.OrderNumber} failed to successfully saved");

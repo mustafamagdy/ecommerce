@@ -31,7 +31,7 @@ public class Order : AuditableEntity, IAggregateRoot
 
   public Order SetInvoiceQrCode(string? invoiceQrCode)
   {
-    if (invoiceQrCode is not null && !QrCodeBase64.Equals(invoiceQrCode)) QrCodeBase64 = invoiceQrCode;
+    if (invoiceQrCode is not null && (string.IsNullOrEmpty(QrCodeBase64) || !QrCodeBase64.Equals(invoiceQrCode))) QrCodeBase64 = invoiceQrCode;
     return this;
   }
 }
