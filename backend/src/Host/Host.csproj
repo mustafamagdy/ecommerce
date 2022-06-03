@@ -31,6 +31,12 @@
         <None Include="Email Templates\*.html">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Files\fonts\LibreBarcode39-Regular.ttf">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Files\logos\tenant_logo.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
     <ItemGroup>
         <Content Remove="Logs\*" />
@@ -42,6 +48,8 @@
         </None>
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Files\fonts" />
+      <Folder Include="Files\logos" />
       <Folder Include="Logs" />
     </ItemGroup>
 </Project>

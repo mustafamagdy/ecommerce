@@ -2,7 +2,7 @@ using SkiaSharp.QrCode.Image;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
-public interface IInvoiceBarcodeGenerator : ITransientService
+public interface IVatQrCodeGenerator : ITransientService
 {
   byte[] GenerateQrCode(IInvoiceBarcodeInfo info, int width, int height);
   byte[] GenerateQrCode(string base64QrCode, int width, int height);
