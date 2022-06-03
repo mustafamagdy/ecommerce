@@ -32,8 +32,9 @@
     "WriteTo": [
       {
         "Args": {
-          "path": "Logs/logs_.json",
-          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+          "path": "Logs/logs_.txt",
+//          "path": "Logs/logs_.json",
+//          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
           "rollingInterval": "Day",
           "restrictedToMinimumLevel": "Information",
           "retainedFileCountLimit": 365
