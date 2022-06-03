@@ -21,6 +21,9 @@ public class Order : AuditableEntity, IAggregateRoot
     CustomerId = customerId;
     OrderNumber = orderNumber;
     OrderDate = orderDate;
+
+    OrderItems = new();
+    OrderPayments = new();
   }
 
   public Order Update(Guid? customerId)
@@ -31,7 +34,8 @@ public class Order : AuditableEntity, IAggregateRoot
 
   public Order SetInvoiceQrCode(string? invoiceQrCode)
   {
-    if (invoiceQrCode is not null && (string.IsNullOrEmpty(QrCodeBase64) || !QrCodeBase64.Equals(invoiceQrCode))) QrCodeBase64 = invoiceQrCode;
+    if (invoiceQrCode is not null && (string.IsNullOrEmpty(QrCodeBase64) || !QrCodeBase64.Equals(invoiceQrCode)))
+      QrCodeBase64 = invoiceQrCode;
     return this;
   }
 }
