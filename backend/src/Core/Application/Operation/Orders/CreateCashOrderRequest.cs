@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Customers;
@@ -59,7 +60,18 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(cashPaymentMethod));
     }
 
-    var orderNumber = _sequenceGenerator.NextFormatted(nameof(Order));
+
+    // var stopWatch = new Stopwatch();
+    // stopWatch.Start();
+    // for (int i = 0; i < 1000; i++)
+    // {
+    //   var x = await _sequenceGenerator.NextFormatted(nameof(Order));
+    // }
+    //
+    // stopWatch.Stop();
+    // Console.WriteLine("=>>> " + stopWatch.Elapsed);
+
+    var orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(defaultCustomer.Id, orderNumber);
     await _repository.AddAsync(order, cancellationToken);
 

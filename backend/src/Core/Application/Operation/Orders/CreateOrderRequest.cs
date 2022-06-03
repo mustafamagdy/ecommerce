@@ -68,7 +68,7 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
       throw new NotFoundException(nameof(paymentMethod));
     }
 
-    string orderNumber = _sequenceGenerator.NextFormatted(nameof(Order));
+    string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(customer.Id, orderNumber);
     await _repository.AddAsync(order, cancellationToken);
 
