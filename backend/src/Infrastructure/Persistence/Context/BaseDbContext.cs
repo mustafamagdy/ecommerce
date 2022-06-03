@@ -8,11 +8,14 @@ using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
+public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string,
+  IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
+  IdentityUserToken<string>>
 {
   protected readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
@@ -21,7 +24,8 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   private readonly IEventPublisher _events;
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
-    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
+    IEventPublisher events)
     : base(currentTenant, options)
   {
     _currentUser = currentUser;
@@ -48,8 +52,10 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
-    // TODO: We want this only for development probably... maybe better make it configurable in logger.json config?
-    optionsBuilder.EnableSensitiveDataLogging();
+    if (_dbSettings.LogSensitiveInfo)
+    {
+      optionsBuilder.EnableSensitiveDataLogging();
+    }
 
     // If you want to see the sql queries that efcore executes:
 
@@ -148,7 +154,8 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
             break;
 
           case EntityState.Modified:
-            if (property.IsModified && entry.Entity is ISoftDelete && property.OriginalValue == null && property.CurrentValue != null)
+            if (property.IsModified && entry.Entity is ISoftDelete && property.OriginalValue == null &&
+                property.CurrentValue != null)
             {
               trailEntry.ChangedColumns.Add(propertyName);
               trailEntry.TrailType = TrailType.Delete;
@@ -176,7 +183,8 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     return trailEntries.Where(e => e.HasTemporaryProperties).ToList();
   }
 
-  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries, CancellationToken cancellationToken = new())
+  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries,
+    CancellationToken cancellationToken = new())
   {
     if (trailEntries == null || trailEntries.Count == 0)
     {

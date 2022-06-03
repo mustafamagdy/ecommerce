@@ -24,14 +24,14 @@ public class DtoCustomMapping
   {
     TypeAdapterConfig<Order, OrderDto>
       .NewConfig()
-      .Map(dest => dest.OrderDate, src => src.CreatedOn.Date.ToString("dd/MM/yyyy"))
-      .Map(dest => dest.OrderTime, src => src.CreatedOn.ToString("HH:mm:ss"))
+      .Map(dest => dest.OrderDate, src => src.OrderDate.ToString("dd/MM/yyyy"))
+      .Map(dest => dest.OrderTime, src => src.OrderDate.ToString("HH:mm:ss"))
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
 
     TypeAdapterConfig<Order, OrderExportDto>
       .NewConfig()
-      .Map(dest => dest.OrderDate, src => src.CreatedOn)
+      .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
   }
