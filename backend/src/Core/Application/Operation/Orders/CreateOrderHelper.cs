@@ -14,21 +14,20 @@ public interface ICreateOrderHelper : ITransientService
 public class CreateOrderHelper : ICreateOrderHelper
 {
   private readonly IRepositoryWithEvents<Order> _repository;
-  private readonly IReadRepository<Customer> _customerRepo;
-  private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
-  private readonly IRepositoryWithEvents<OrderPayment> _paymentRepo;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
-  private readonly IRepository<OrderItem> _orderItemRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
   private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
 
-  public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
-    IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
-    ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo,
-    IRepositoryWithEvents<OrderPayment> paymentRepo, IInvoiceBarcodeGenerator barcodeGenerator,
+  public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
+    ITenantSequenceGenerator sequenceGenerator, IInvoiceBarcodeGenerator barcodeGenerator,
     IVatSettingProvider vatSettingProvider)
   {
+    _repository = repository;
+    _serviceCatalogRepo = serviceCatalogRepo;
+    _sequenceGenerator = sequenceGenerator;
+    _barcodeGenerator = barcodeGenerator;
+    _vatSettingProvider = vatSettingProvider;
   }
 
   public async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
