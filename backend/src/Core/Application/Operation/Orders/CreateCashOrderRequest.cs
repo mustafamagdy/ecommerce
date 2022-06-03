@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Application.Operation.Payments;
+using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
@@ -31,11 +32,13 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepository<OrderItem> _orderItemRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
+  private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
+  private readonly IVatSettingProvider _vatSettingProvider;
 
   public CreateCashOrderRequestHandler(IRepositoryWithEvents<Order> repository, IReadRepository<Customer> customerRepo,
     IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo,
-    IRepositoryWithEvents<OrderPayment> paymentRepo)
+    IRepositoryWithEvents<OrderPayment> paymentRepo, IInvoiceBarcodeGenerator barcodeGenerator, IVatSettingProvider vatSettingProvider)
   {
     _repository = repository;
     _customerRepo = customerRepo;
@@ -44,6 +47,8 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
     _sequenceGenerator = sequenceGenerator;
     _paymentMethodRepo = paymentMethodRepo;
     _paymentRepo = paymentRepo;
+    _barcodeGenerator = barcodeGenerator;
+    _vatSettingProvider = vatSettingProvider;
   }
 
   public async Task<OrderDto> Handle(CreateCashOrderRequest request, CancellationToken cancellationToken)
@@ -60,7 +65,6 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(cashPaymentMethod));
     }
 
-
     // var stopWatch = new Stopwatch();
     // stopWatch.Start();
     // for (int i = 0; i < 1000; i++)
@@ -72,7 +76,7 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
     // Console.WriteLine("=>>> " + stopWatch.Elapsed);
 
     var orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
-    var order = new Order(defaultCustomer.Id, orderNumber);
+    var order = new Order(defaultCustomer.Id, orderNumber, DateTime.Now);
     await _repository.AddAsync(order, cancellationToken);
 
     var items = new List<OrderItem>();
@@ -88,11 +92,22 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
     }
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
+    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName,
+      _vatSettingProvider.VatRegNo, order.OrderDate, order.TotalAmount, order.TotalVat);
+
+    string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
+    order = order.SetInvoiceQrCode(invoiceQrCode);
+    await _repository.UpdateAsync(order, cancellationToken);
 
     var cashPayment = new OrderPayment(order.Id, cashPaymentMethod.Id, order.NetAmount);
     await _paymentRepo.AddAsync(cashPayment, cancellationToken);
 
     var newOrder = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    if (newOrder == null)
+    {
+      throw new NotFoundException($"Order {order.OrderNumber} failed to successfully saved");
+    }
+
     return newOrder;
   }
 }

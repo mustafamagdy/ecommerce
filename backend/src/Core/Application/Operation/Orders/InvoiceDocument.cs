@@ -51,12 +51,13 @@ namespace FSH.WebApi.Application.Operation.Orders
 
   public class InvoiceDocument : BasePdfDocument
   {
-    private readonly byte[] _qrImage;
+    private readonly IInvoiceBarcodeGenerator _qrGenerator;
     public OrderExportDto Model { get; }
+    private byte[] _qrCode;
 
-    public InvoiceDocument(OrderExportDto model, byte[] qrImage)
+    public InvoiceDocument(OrderExportDto model, IInvoiceBarcodeGenerator qrGenerator)
     {
-      _qrImage = qrImage;
+      _qrGenerator = qrGenerator;
       Model = model;
     }
 
@@ -75,19 +76,18 @@ namespace FSH.WebApi.Application.Operation.Orders
       //     col.Item().BorderColor(Colors.Black).Border(1, Unit.Point).AlignCenter().Text("LOGO").FontSize(10);
       //   });
       // });
-
+      _qrCode = _qrGenerator.GenerateQrCode(Model.Base64QrCode, 100, 100);
       container.Column(col =>
       {
         col.Item().Height(50)
           .AlignMiddle().AlignCenter().ShowTroubleshootBorders()
-          .Width(100).Image(_qrImage, ImageScaling.Resize);
+          .Width(100).Image(_qrCode, ImageScaling.Resize);
 
         col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 2").FontSize(10);
         // col.Item().AlignCenter().ShowTroubleshootBorders().Text("LOGO 3").FontSize(10);
         col.Item().SeparatorLine('=', 70);
         col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("فاتورة ضريبية مبسطة").FontSize(10);
         col.Item().AlignMiddle().AlignCenter().ShowTroubleshootBorders().Text("Simplified Tax Invoice").FontSize(10);
-
       });
 
       // container.Row(row =>
@@ -135,7 +135,7 @@ namespace FSH.WebApi.Application.Operation.Orders
     {
       container.Column(col =>
       {
-        col.Item().AlignCenter().Width(70).Height(70).Image(_qrImage, ImageScaling.Resize);
+        col.Item().AlignCenter().Width(70).Height(70).Image(_qrCode, ImageScaling.Resize);
         col.Item().SeparatorLine();
 
         col.Item().AlignCenter().Text(text =>

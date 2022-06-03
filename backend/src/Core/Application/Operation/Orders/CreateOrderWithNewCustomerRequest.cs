@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Operation.Customers;
+using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
@@ -40,9 +41,11 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly IRepositoryWithEvents<OrderPayment> _paymentRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
+  private readonly IInvoiceBarcodeGenerator _barcodeGenerator;
+  private readonly IVatSettingProvider _vatSettingProvider;
 
   public CreateOrderWithNewCustomerRequestHandler(IRepositoryWithEvents<Order> repository, IRepositoryWithEvents<Customer> customerRepo, IRepository<OrderItem> orderItemRepo, IReadRepository<ServiceCatalog> serviceCatalogRepo,
-    ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<OrderPayment> paymentRepo)
+    ITenantSequenceGenerator sequenceGenerator, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<OrderPayment> paymentRepo, IInvoiceBarcodeGenerator barcodeGenerator, IVatSettingProvider vatSettingProvider)
   {
     _repository = repository;
     _customerRepo = customerRepo;
@@ -51,6 +54,8 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
     _sequenceGenerator = sequenceGenerator;
     _paymentMethodRepo = paymentMethodRepo;
     _paymentRepo = paymentRepo;
+    _barcodeGenerator = barcodeGenerator;
+    _vatSettingProvider = vatSettingProvider;
   }
 
   public async Task<OrderDto> Handle(CreateOrderWithNewCustomerRequest request, CancellationToken cancellationToken)
@@ -69,7 +74,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
     }
 
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
-    var order = new Order(customer.Id, orderNumber);
+    var order = new Order(customer.Id, orderNumber, DateTime.Now);
     await _repository.AddAsync(order, cancellationToken);
 
     var items = new List<OrderItem>();
@@ -85,11 +90,21 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
     }
 
     await _orderItemRepo.AddRangeAsync(items, cancellationToken);
+    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName,
+      _vatSettingProvider.VatRegNo, order.OrderDate, order.TotalAmount, order.TotalVat);
+
+    string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
+    order = order.SetInvoiceQrCode(invoiceQrCode);
+    await _repository.UpdateAsync(order, cancellationToken);
 
     var cashPayment = new OrderPayment(order.Id, paymentMethod.Id, request.PaidAmount);
     await _paymentRepo.AddAsync(cashPayment, cancellationToken);
 
     var newOrder = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(order.Id), cancellationToken);
+    if (newOrder == null)
+    {
+      throw new NotFoundException($"Order {order.OrderNumber} failed to successfully saved");
+    }
 
     return newOrder;
   }
