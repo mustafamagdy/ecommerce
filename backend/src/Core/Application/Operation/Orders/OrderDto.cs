@@ -38,5 +38,6 @@ public class OrderExportDto : IDto
   public decimal NetAmount { get; set; }
   public decimal TotalPaid { get; set; }
   public bool Paid { get; set; }
+  public string Base64QrCode { get; set; }
   public List<OrderItemDto> OrderItems { get; set; }
 }

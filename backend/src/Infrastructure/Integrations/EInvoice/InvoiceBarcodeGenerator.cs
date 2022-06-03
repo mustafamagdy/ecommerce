@@ -29,7 +29,12 @@ public class InvoiceBarcodeGenerator : IInvoiceBarcodeGenerator
   public byte[] GenerateQrCode(IInvoiceBarcodeInfo info, int width, int height)
   {
     string base64 = ToBase64(info);
-    var qrCode = new QrCode(base64, new Vector2Slim(width, height), SKEncodedImageFormat.Png);
+    return GenerateQrCode(base64, width, height);
+  }
+
+  public byte[] GenerateQrCode(string base64QrCode, int width, int height)
+  {
+    var qrCode = new QrCode(base64QrCode, new Vector2Slim(width, height), SKEncodedImageFormat.Png);
     var stream = new MemoryStream();
     qrCode.GenerateImage(stream);
     return stream.ToArray();
