@@ -16,6 +16,7 @@ public class DatabaseSettings : IValidatableObject
 
   public string DBProvider { get; init; } = string.Empty;
   public string ConnectionString { get; init; } = string.Empty;
+  public bool LogSensitiveInfo { get; init; } = false;
 
   public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
   {
