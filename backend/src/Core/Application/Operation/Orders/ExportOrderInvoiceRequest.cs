@@ -1,18 +1,16 @@
 ﻿using FSH.WebApi.Application.Common.Exporters;
-using FSH.WebApi.Application.Operation.Orders;
-using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 
-namespace FSH.WebApi.Application.Operation;
+namespace FSH.WebApi.Application.Operation.Orders;
 
 public class ExportOrderInvoiceRequest : IRequest<(string, Stream)>
 {
-  //todo: add validation at least one of those prop need to be filled
+  // todo: add validation at least one of those prop need to be filled
   public Guid? OrderId { get; set; }
-  public string? OrderNumber { get; set; }
+  public string? OrderNumber { get; set; } = default;
 }
 
-public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoiceRequest, (string, Stream)>
+public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoiceRequest, (string OrderNumber, Stream PdfInvoice)>
 {
   private readonly IReadRepository<Order> _repository;
   private readonly IPdfWriter _pdfWriter;
@@ -25,7 +23,8 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     _vatQrCodeGenerator = vatQrCodeGenerator;
   }
 
-  public async Task<(string, Stream)> Handle(ExportOrderInvoiceRequest request, CancellationToken cancellationToken)
+  public async Task<(string OrderNumber, Stream PdfInvoice)> Handle(ExportOrderInvoiceRequest request, CancellationToken
+    cancellationToken)
   {
     var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 

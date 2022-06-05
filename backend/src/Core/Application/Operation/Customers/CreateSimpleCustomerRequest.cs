@@ -4,8 +4,8 @@ namespace FSH.WebApi.Application.Operation.Customers;
 
 public class CreateSimpleCustomerRequest : IRequest<CustomerDto>
 {
-  public string PhoneNumber { get; set; }
-  public string Name { get; set; }
+  public string PhoneNumber { get; set; } = default!;
+  public string Name { get; set; } = default!;
 }
 
 public class CreateSimpleCustomerRequestValidator : CustomValidator<CreateSimpleCustomerRequest>

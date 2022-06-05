@@ -12,8 +12,8 @@ public class VatSettingProvider : IVatSettingProvider
     _currentTenant = currentTenant;
   }
 
-  //todo: can multiple tenant share same legal company profile?
-  //store that in db
+  // todo: can multiple tenant share same legal company profile?
+  // store that in db
   public string LegalEntityName => _currentTenant.Name;
   public string VatRegNo => _currentTenant.Name + " VAT0123456";
 }
