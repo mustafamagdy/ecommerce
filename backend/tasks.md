@@ -1,7 +1,7 @@
 ﻿Tasks:
 [x] refactor the order number generator to use database instead of files, as the backend will be hosted on multiple servers with LB
 [x] refactor invoice to generate the qrcode, brcode, and logo
-- Order api
+- OrdeBr api
   - can send multiple payments in the same endpoint
 - login as admin for some tenant
 - call an endpoint with higher permission for 1 time operation
