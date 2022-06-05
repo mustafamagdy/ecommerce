@@ -89,10 +89,10 @@ namespace FSH.WebApi.Application.Operation.Orders
 
         col
           .Item()
-          .Height(35)
+          .Height(38)
           .ShowTroubleshootBorders()
           .Background(Colors.White)
-          .AlignCenter().MinimalBox()
+          .AlignCenter()
           .AlignMiddle()
           .Text($"*{Model.OrderNumber}*")
           .LineHeight(1)

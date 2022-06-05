@@ -53,7 +53,6 @@ public class ExportOrderInvoiceWithBrandsSpec : Specification<Order, OrderExport
       .Include(a => a.OrderItems)
       .ThenInclude(a => a.ServiceCatalog)
       .ThenInclude(a => a.Product)
-      .Where(a =>
-        (request.OrderId == null || a.Id == request.OrderId)
-        || (request.OrderNumber == null || a.OrderNumber == request.OrderNumber));
+      .Where(a => (request.OrderId == null || a.Id == request.OrderId)
+                  || (request.OrderNumber == null || a.OrderNumber == request.OrderNumber));
 }

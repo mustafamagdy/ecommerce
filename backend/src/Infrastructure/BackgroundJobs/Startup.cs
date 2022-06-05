@@ -31,7 +31,6 @@ internal static class Startup
     if (string.IsNullOrEmpty(storageSettings.ConnectionString))
       throw new Exception("Hangfire Storage Provider ConnectionString is not configured.");
     _logger.Information($"Hangfire: Current Storage Provider : {storageSettings.StorageProvider}");
-    _logger.Information("For more Hangfire storage, visit https://www.hangfire.io/extensions.html");
 
     services.AddSingleton<JobActivator, FSHJobActivator>();
 
