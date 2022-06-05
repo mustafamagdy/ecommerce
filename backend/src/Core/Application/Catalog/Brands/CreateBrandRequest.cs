@@ -8,7 +8,8 @@ public class CreateBrandRequest : IRequest<Guid>
 
 public class CreateBrandRequestValidator : CustomValidator<CreateBrandRequest>
 {
-  public CreateBrandRequestValidator(IReadRepository<Brand> repository,
+  public CreateBrandRequestValidator(
+    IReadRepository<Brand> repository,
     IStringLocalizer<CreateBrandRequestValidator> T) =>
     RuleFor(p => p.Name)
       .NotEmpty()

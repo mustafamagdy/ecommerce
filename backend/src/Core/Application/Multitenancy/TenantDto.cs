@@ -9,5 +9,5 @@ public class TenantDto
   public bool IsActive { get; set; }
   public string? Issuer { get; set; }
 
-  public List<TenantSubscriptionDto> ActiveSubscriptions { get; set; }
+  public List<TenantSubscriptionDto> ActiveSubscriptions { get; set; } = default!;
 }
