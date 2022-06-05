@@ -45,14 +45,18 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
       throw new NotFoundException(nameof(defaultCustomer));
     }
 
-    var cashPaymentMethod =
-      await _paymentMethodRepo.GetBySpecAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
+    var cashPaymentMethod = await _paymentMethodRepo.GetBySpecAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
     if (cashPaymentMethod is null)
     {
       throw new NotFoundException(nameof(cashPaymentMethod));
     }
 
-    var order = await _orderHelper.CreateOrder(request.Items, defaultCustomer, cashPaymentMethod, cancellationToken);
+    var order = await _orderHelper.CreateOrder(request.Items, defaultCustomer,
+      new List<OrderPaymentAmount>
+      {
+        new() { PaymentMethodId = cashPaymentMethod.Id, Amount = 0 }
+      },
+      cancellationToken);
 
     return order.Adapt<OrderDto>();
   }
