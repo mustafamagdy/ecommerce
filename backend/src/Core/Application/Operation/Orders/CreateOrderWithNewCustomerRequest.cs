@@ -10,8 +10,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<OrderDto>
 {
   public CreateSimpleCustomerRequest Customer { get; set; } = default!;
-  public Guid PaymentMethodId { get; set; } = default!;
-  public decimal PaidAmount { get; set; } = default!;
+  public List<OrderPaymentAmount> Payments { get; set; }
 }
 
 public class
@@ -23,13 +22,9 @@ public class
   {
     RuleFor(a => a.Customer).SetValidator(new CreateSimpleCustomerRequestValidator(customerRepo, t));
 
-    RuleFor(p => p.PaymentMethodId)
-      .NotEmpty();
-
-    // todo: validate amount for cash
-    RuleFor(p => p.PaidAmount)
-      .GreaterThanOrEqualTo(0)
-      .LessThanOrEqualTo(1000);
+    RuleFor(a => a.Payments)
+      .NotEmpty()
+      .ForEach(a => a.SetValidator(new OrderPaymentAmountValidator()));
   }
 }
 
@@ -55,13 +50,16 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
       throw new NotFoundException(nameof(customer));
     }
 
-    var paymentMethod = await _paymentMethodRepo.GetByIdAsync(request.PaymentMethodId, cancellationToken);
-    if (paymentMethod is null)
+    foreach (var payment in request.Payments)
     {
-      throw new NotFoundException(nameof(paymentMethod));
+      var paymentMethod = await _paymentMethodRepo.GetByIdAsync(payment.PaymentMethodId, cancellationToken);
+      if (paymentMethod is null)
+      {
+        throw new NotFoundException(nameof(paymentMethod));
+      }
     }
 
-    var order = await _orderHelper.CreateOrder(request.Items, customer, paymentMethod, cancellationToken);
+    var order = await _orderHelper.CreateOrder(request.Items, customer, request.Payments, cancellationToken);
 
     return order.Adapt<OrderDto>();
   }

@@ -29,7 +29,7 @@ public class OrderItem : BaseEntity, IAggregateRoot
     OrderId = orderId;
   }
 
-  public OrderItem Update(string? serviceName, string? productName, Guid? serviceCatalogId,int? qty, decimal? price, decimal? vatPercent)
+  public OrderItem Update(string? serviceName, string? productName, Guid? serviceCatalogId, int? qty, decimal? price, decimal? vatPercent)
   {
     if (serviceName is not null && !ServiceName.Equals(serviceName)) ServiceName = serviceName;
     if (productName is not null && !ProductName.Equals(productName)) ProductName = productName;
@@ -38,6 +38,12 @@ public class OrderItem : BaseEntity, IAggregateRoot
     if (price is not null && !Price.Equals(price.Value)) Price = price.Value;
     if (vatPercent is not null && !VatPercent.Equals(vatPercent.Value)) VatPercent = vatPercent.Value;
 
+    return this;
+  }
+
+  public OrderItem SetOrderId(Guid orderId)
+  {
+    OrderId = orderId;
     return this;
   }
 }
