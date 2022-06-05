@@ -9,9 +9,9 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<OrderDto>
 {
-  public CreateSimpleCustomerRequest Customer { get; set; }
-  public Guid PaymentMethodId { get; set; }
-  public decimal PaidAmount { get; set; }
+  public CreateSimpleCustomerRequest Customer { get; set; } = default!;
+  public Guid PaymentMethodId { get; set; } = default!;
+  public decimal PaidAmount { get; set; } = default!;
 }
 
 public class
@@ -26,8 +26,7 @@ public class
     RuleFor(p => p.PaymentMethodId)
       .NotEmpty();
 
-    //todo: validate amount for cash
-
+    // todo: validate amount for cash
     RuleFor(p => p.PaidAmount)
       .GreaterThanOrEqualTo(0)
       .LessThanOrEqualTo(1000);
@@ -40,8 +39,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly ICreateOrderHelper _orderHelper;
 
-  public CreateOrderWithNewCustomerRequestHandler(ICreateOrderHelper orderHelper,
-    IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<Customer> customerRepo)
+  public CreateOrderWithNewCustomerRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<Customer> customerRepo)
   {
     _orderHelper = orderHelper;
     _paymentMethodRepo = paymentMethodRepo;

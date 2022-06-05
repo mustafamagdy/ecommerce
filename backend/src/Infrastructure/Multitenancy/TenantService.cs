@@ -68,6 +68,7 @@ internal class TenantService : ITenantService
   public async Task<List<TenantDto>> GetAllAsync()
   {
     var tenants = (await _tenantStore.GetAllAsync()).Adapt<List<TenantDto>>();
+
     // tenants.ForEach(t => t.DatabaseName = _csSecurer.MakeSecure(t.DatabaseName));
     return tenants;
   }

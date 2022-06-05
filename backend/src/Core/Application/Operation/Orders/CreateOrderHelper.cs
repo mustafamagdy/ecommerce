@@ -7,8 +7,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public interface ICreateOrderHelper : ITransientService
 {
-  Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, PaymentMethod cashPaymentMethod,
-    CancellationToken cancellationToken);
+  Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, PaymentMethod cashPaymentMethod, CancellationToken cancellationToken);
 }
 
 public class CreateOrderHelper : ICreateOrderHelper
@@ -33,7 +32,7 @@ public class CreateOrderHelper : ICreateOrderHelper
   public async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
     PaymentMethod cashPaymentMethod, CancellationToken cancellationToken)
   {
-    var orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
+    string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(customer.Id, orderNumber, DateTime.Now);
 
     foreach (var item in items)
@@ -50,8 +49,7 @@ public class CreateOrderHelper : ICreateOrderHelper
         serviceItem.Price, TEMPHelper.VatPercent(), order.Id));
     }
 
-    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName,
-      _vatSettingProvider.VatRegNo, order.OrderDate, order.TotalAmount, order.TotalVat);
+    var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(_vatSettingProvider.LegalEntityName, _vatSettingProvider.VatRegNo, order.OrderDate, order.TotalAmount, order.TotalVat);
 
     string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
     order.SetInvoiceQrCode(invoiceQrCode);

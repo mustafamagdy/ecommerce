@@ -25,8 +25,7 @@ public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<Creat
     RuleFor(p => p.PaymentMethodId)
       .NotEmpty();
 
-    //todo: validate amount for cash
-
+    // todo: validate amount for cash
     RuleFor(p => p.PaidAmount)
       .GreaterThanOrEqualTo(0)
       .LessThanOrEqualTo(1000);

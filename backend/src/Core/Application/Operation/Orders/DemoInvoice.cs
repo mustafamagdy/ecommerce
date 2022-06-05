@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using FSH.WebApi.Application.Common.Pdf;
+using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -9,13 +10,13 @@ using Unit = QuestPDF.Infrastructure.Unit;
 
 namespace FSH.WebApi.Application.Operation.Orders
 {
-  public class InvoiceDocument : BasePdfDocument
+  public class DemoInvoiceDocument : BasePdfDocument
   {
     private readonly IVatQrCodeGenerator _qrGenerator;
     public OrderExportDto Model { get; }
     private byte[] _qrCode = null!;
 
-    public InvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator)
+    public DemoInvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator)
     {
       _qrGenerator = qrGenerator;
       Model = model;

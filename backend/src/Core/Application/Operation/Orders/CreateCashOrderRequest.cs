@@ -30,8 +30,7 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
 
   private readonly ICreateOrderHelper _orderHelper;
 
-  public CreateCashOrderRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<Customer> customerRepo,
-    IReadRepository<PaymentMethod> paymentMethodRepo)
+  public CreateCashOrderRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<Customer> customerRepo, IReadRepository<PaymentMethod> paymentMethodRepo)
   {
     _orderHelper = orderHelper;
     _customerRepo = customerRepo;

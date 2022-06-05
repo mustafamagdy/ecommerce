@@ -9,9 +9,9 @@ public class CreateServiceRequest : IRequest<Guid>
 
 public class CreateServiceRequestValidator : CustomValidator<CreateServiceRequest>
 {
-  public CreateServiceRequestValidator(IReadRepository<Service> repository,
-    IStringLocalizer<CreateServiceRequestValidator>
-      T) =>
+  public CreateServiceRequestValidator(
+    IReadRepository<Service> repository,
+    IStringLocalizer<CreateServiceRequestValidator> T) =>
     RuleFor(p => p.Name)
       .NotEmpty()
       .MaximumLength(75)
