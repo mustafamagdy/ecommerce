@@ -7,6 +7,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public interface ICreateOrderHelper : ITransientService
 {
+  Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken);
   Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken);
 }
 
@@ -29,8 +30,18 @@ public class CreateOrderHelper : ICreateOrderHelper
     _vatSettingProvider = vatSettingProvider;
   }
 
-  public async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
-    List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
+  public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
+  {
+    return CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, true, cancellationToken);
+  }
+
+  public Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
+  {
+    return CreateOrder(items, customer, payments, false, cancellationToken);
+  }
+
+  private async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
+    List<OrderPaymentAmount> payments, bool cashOrder, CancellationToken cancellationToken)
   {
     var orderItems = new List<OrderItem>();
     foreach (var item in items)
@@ -46,8 +57,8 @@ public class CreateOrderHelper : ICreateOrderHelper
         serviceItem.Price, TEMPHelper.VatPercent(), Guid.Empty));
     }
 
-    decimal totalPaid = payments.Sum(a => a.Amount);
     decimal orderItemsTotal = orderItems.Sum(a => a.ItemTotal);
+    decimal totalPaid = cashOrder ? orderItemsTotal : payments.Sum(a => a.Amount);
     if (totalPaid < orderItemsTotal)
     {
       throw new InvalidOperationException($"Total paid amount {totalPaid} doesn't match order net amount {orderItemsTotal}");
