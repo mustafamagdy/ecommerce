@@ -5,12 +5,12 @@ using FSH.WebApi.Application.Identity.Users;
 
 namespace FSH.WebApi.Host.Controllers.DemoPermissions;
 
-public class Demo1 : VersionedApiController
+public class Demo1Controller : VersionedApiController
 {
   private readonly IUserService _userService;
   private readonly IRoleService _roleService;
 
-  public Demo1(IUserService userService, IRoleService roleService)
+  public Demo1Controller(IUserService userService, IRoleService roleService)
   {
     _userService = userService;
     _roleService = roleService;
@@ -24,10 +24,10 @@ public class Demo1 : VersionedApiController
     var user = await _userService.CreateAsync(
       new CreateUserRequest
       {
-        UserName = "demo1",
-        Email = "demo1@root.com",
+        UserName = "demo4",
+        Email = "demo4@root.com",
         Password = "1234@1234"
-      }, "test");
+      }, "https://localhost:5001/");
 
     var role = await _roleService.CreateOrUpdateAsync(new CreateOrUpdateRoleRequest
     {

@@ -8,6 +8,7 @@
   - call an endpoint with higher permission for 1 time operation
   - login as admin for some tenant
   - cancel payment/all payments for order
+  - permission can be scoped on specific data (like one cash box => all invoices to that cash box, or multiple subscriptions => can only manage those)
 - Subscriptions
   - ending notification
     - Tenant
@@ -23,6 +24,9 @@
 - Notification
   - SMS
   - Whatsapp
+- Pdfs
+  - Payment receipt
+  - demo watermark
 
 
 
