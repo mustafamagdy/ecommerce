@@ -16,31 +16,46 @@ public class Demo1Controller : VersionedApiController
     _roleService = roleService;
   }
 
-  [HttpGet]
+  [HttpGet("{username}")]
   [MustHavePermission(FSHAction.View, FSHResource.Brands)]
   [OpenApiOperation("Setup the permissions demo 1", "")]
-  public async Task Setup()
+  public async Task<dynamic> Setup(string username)
   {
-    var user = await _userService.CreateAsync(
+    var roleName = "user";
+    var password = "1234@1234";
+    await _userService.CreateAsync(
       new CreateUserRequest
       {
-        UserName = "demo4",
-        Email = "demo4@root.com",
-        Password = "1234@1234"
+        UserName = username,
+        Email = $"{username}@root.com",
+        Password = password
       }, "https://localhost:5001/");
 
-    var role = await _roleService.CreateOrUpdateAsync(new CreateOrUpdateRoleRequest
+    var user = (await _userService.GetListAsync(CancellationToken.None)).FirstOrDefault(s => s.UserName == username);
+// _userService.conf
+    var role = (await _roleService.GetListAsync(CancellationToken.None)).FirstOrDefault(a => a.Name == roleName);
+    if (role == null)
     {
-      Name = "user"
-    });
+      await _roleService.CreateOrUpdateAsync(new CreateOrUpdateRoleRequest
+      {
+        Name = roleName
+      });
+      role = (await _roleService.GetListAsync(CancellationToken.None)).FirstOrDefault(a => a.Name == roleName);
+    }
 
-    _userService.AssignRolesAsync(user, new UserRolesRequest
+    await _userService.AssignRolesAsync(user.Id.ToString(), new UserRolesRequest
     {
       UserRoles = new List<UserRoleDto>()
       {
-        new() { RoleId = role }
+        new() { RoleId = role.Id, Enabled = true, RoleName = role.Name }
       }
     }, CancellationToken.None);
+
+    return new
+    {
+      user.Email,
+      password
+    };
   }
 
   [HttpGet("{id:guid}")]
