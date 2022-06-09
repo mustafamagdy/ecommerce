@@ -2,18 +2,22 @@
 using FSH.WebApi.Application.Dashboard;
 using FSH.WebApi.Application.Identity.Roles;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Infrastructure.Identity;
+using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Host.Controllers.DemoPermissions;
 
 public class Demo1Controller : VersionedApiController
 {
-  private readonly IUserService _userService;
-  private readonly IRoleService _roleService;
+  private readonly RoleManager<ApplicationRole> _roleManager;
+  private readonly UserManager<ApplicationUser> _userManager;
 
-  public Demo1Controller(IUserService userService, IRoleService roleService)
+  public Demo1Controller(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
   {
-    _userService = userService;
-    _roleService = roleService;
+    _roleManager = roleManager;
+    _userManager = userManager;
   }
 
   [HttpGet("{username}")]
@@ -21,40 +25,39 @@ public class Demo1Controller : VersionedApiController
   [OpenApiOperation("Setup the permissions demo 1", "")]
   public async Task<dynamic> Setup(string username)
   {
-    var roleName = "user";
-    var password = "1234@1234";
-    await _userService.CreateAsync(
-      new CreateUserRequest
-      {
-        UserName = username,
-        Email = $"{username}@root.com",
-        Password = password
-      }, "https://localhost:5001/");
-
-    var user = (await _userService.GetListAsync(CancellationToken.None)).FirstOrDefault(s => s.UserName == username);
-// _userService.conf
-    var role = (await _roleService.GetListAsync(CancellationToken.None)).FirstOrDefault(a => a.Name == roleName);
-    if (role == null)
+    string passwordStr = "1234@1234";
+    if (await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == username)
+        is not { } newUser)
     {
-      await _roleService.CreateOrUpdateAsync(new CreateOrUpdateRoleRequest
+      string email = $"{username}@root.com";
+      newUser = new ApplicationUser
       {
-        Name = roleName
-      });
-      role = (await _roleService.GetListAsync(CancellationToken.None)).FirstOrDefault(a => a.Name == roleName);
+        FirstName = username.ToLowerInvariant(),
+        LastName = username,
+        Email = email,
+        UserName = username,
+        EmailConfirmed = true,
+        PhoneNumberConfirmed = true,
+        NormalizedEmail = email.ToUpperInvariant(),
+        NormalizedUserName = username.ToUpperInvariant(),
+        IsActive = true
+      };
+
+      var password = new PasswordHasher<ApplicationUser>();
+      newUser.PasswordHash = password.HashPassword(newUser, passwordStr);
+      await _userManager.CreateAsync(newUser);
     }
 
-    await _userService.AssignRolesAsync(user.Id.ToString(), new UserRolesRequest
+    // Assign role to user
+    if (!await _userManager.IsInRoleAsync(newUser, FSHRoles.Demo))
     {
-      UserRoles = new List<UserRoleDto>()
-      {
-        new() { RoleId = role.Id, Enabled = true, RoleName = role.Name }
-      }
-    }, CancellationToken.None);
+      await _userManager.AddToRoleAsync(newUser, FSHRoles.Demo);
+    }
 
     return new
     {
-      user.Email,
-      password
+      newUser.Email,
+      password = passwordStr
     };
   }
 

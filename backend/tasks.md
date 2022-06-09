@@ -38,7 +38,7 @@ root tenant get list of almost ending tenant subs and send them an email and rec
 ////// Permissions ///
 1- user 1 has add permission only
 2- user want to cancel order but don't have permission
-3- supervisor login temporary login for a specific scope:
-    - order id
-    - permission: cancel
+3- supervisor login temporary login for a specific scope (endpoint, serialized parameter)
+    - if the supervisor has no permission over this api => 403
+    - 
 4- user 1 call same api again with the additional one time use manager override token
