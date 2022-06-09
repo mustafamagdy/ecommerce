@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1156b92f-924e-4411-8de2-20c7c96de069",
+		"_postman_id": "4ae1b915-685c-4c96-a763-6160ead46e7f",
 		"name": "demo-permissions",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -167,6 +167,44 @@
 						"v1",
 						"demo",
 						"08da48b0-515f-478e-8681-e99a622f6985"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-create-brand-not-auth",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"brand11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/demo",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"demo"
 					]
 				}
 			},
