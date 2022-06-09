@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "69d7f145-e93e-49c6-b67e-e8365368f65b",
+		"_postman_id": "1156b92f-924e-4411-8de2-20c7c96de069",
 		"name": "demo-permissions",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Auth",
+			"name": "Auth-admin",
 			"event": [
 				{
 					"listen": "test",
@@ -52,6 +52,52 @@
 			"response": []
 		},
 		{
+			"name": "Auth-user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('user-token', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"demo1@root.com\",\n    \"password\": \"1234@1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "demo-setup",
 			"request": {
 				"auth": {
@@ -73,14 +119,54 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseUrl}}/api/v1/demo",
+					"raw": "{{baseUrl}}/api/v1/demo/demo1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
 						"v1",
-						"demo"
+						"demo",
+						"demo1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-delete-brand-not-auth",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"brand1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/demo/08da48b0-515f-478e-8681-e99a622f6985",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"demo",
+						"08da48b0-515f-478e-8681-e99a622f6985"
 					]
 				}
 			},

@@ -74,7 +74,7 @@ public static class FSHPermissions
     // brands
     new("View Brands", FSHAction.View, FSHResource.Brands, IsBasic: true),
     new("Search Brands", FSHAction.Search, FSHResource.Brands, IsBasic: true),
-    new("Create Brands", FSHAction.Create, FSHResource.Brands),
+    new("Create Brands", FSHAction.Create, FSHResource.Brands, IsDemo: true),
     new("Update Brands", FSHAction.Update, FSHResource.Brands),
     new("Delete Brands", FSHAction.Delete, FSHResource.Brands),
     new("Generate Brands", FSHAction.Generate, FSHResource.Brands),
@@ -119,9 +119,10 @@ public static class FSHPermissions
   public static IReadOnlyList<FSHPermission> Root { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsRoot).ToArray());
   public static IReadOnlyList<FSHPermission> Admin { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.IsRoot).ToArray());
   public static IReadOnlyList<FSHPermission> Basic { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsBasic).ToArray());
+  public static IReadOnlyList<FSHPermission> Demo { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsDemo).ToArray());
 }
 
-public record FSHPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false)
+public record FSHPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false, bool IsDemo = false)
 {
   public string Name => NameFor(Action, Resource);
   public static string NameFor(string action, string resource) => $"Permissions.{resource}.{action}";
