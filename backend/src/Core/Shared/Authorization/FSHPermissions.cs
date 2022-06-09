@@ -72,9 +72,9 @@ public static class FSHPermissions
     new("Export Products", FSHAction.Export, FSHResource.Products),
 
     // brands
-    new("View Brands", FSHAction.View, FSHResource.Brands, IsBasic: true),
+    new("View Brands", FSHAction.View, FSHResource.Brands, IsBasic: true, IsDemo: true),
     new("Search Brands", FSHAction.Search, FSHResource.Brands, IsBasic: true),
-    new("Create Brands", FSHAction.Create, FSHResource.Brands, IsDemo: true),
+    new("Create Brands", FSHAction.Create, FSHResource.Brands),
     new("Update Brands", FSHAction.Update, FSHResource.Brands),
     new("Delete Brands", FSHAction.Delete, FSHResource.Brands),
     new("Generate Brands", FSHAction.Generate, FSHResource.Brands),
