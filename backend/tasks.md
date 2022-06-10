@@ -1,15 +1,19 @@
 ﻿Tasks:
+
 ========================== API ==========================
 - Orders:
-  - Search (order number, customer name, phone number, customer id)
-  - Get service catalogs
-  - Auto complete customer
+  [✅] Search (order number, customer name, phone number, customer id)
   - Cancel payment, all payments (separate cancel cash permission)
+  [✅] Create with full customer
+  [✅] Create cash
+  [✅] Create with preexisting custer
 - Customers:
   - Search (name, phone)
+  - Auto complete customer
 - Service catalog:
-  - Services
-  - Items
+  [✅] Get service catalogs
+  [✅] Services
+  [✅] Items
   - Price list
   - activate/deactivate service item in a price list
 - Cash register
