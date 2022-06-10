@@ -47,13 +47,22 @@ public class FSHTenantInfo : ITenantInfo
   {
   }
 
-  public FSHTenantInfo(string id, string name, string? databaseName, string adminEmail, string? issuer = null)
+  public FSHTenantInfo(string id, string name, string? databaseName, string adminEmail, string? phoneNumber,
+    string? vatNo, string? email, string? address, string? adminName, string? adminPhoneNumber,
+    string? techSupportUserId, string? issuer = null)
   {
     Id = id;
     Identifier = id;
     Name = name;
     DatabaseName = databaseName ?? string.Empty;
     AdminEmail = adminEmail;
+    PhoneNumber = phoneNumber;
+    VatNo = vatNo;
+    Email = email;
+    Address = address;
+    AdminName = adminName;
+    AdminPhoneNumber = adminPhoneNumber;
+    TechSupportUserId = techSupportUserId;
     IsActive = true;
     Issuer = issuer;
   }
@@ -72,10 +81,16 @@ public class FSHTenantInfo : ITenantInfo
   public string DatabaseName { get; set; } = default!;
 
   public string AdminEmail { get; private set; } = default!;
+  public string? PhoneNumber { get; set; }
+  public string? VatNo { get; set; }
+  public string? Email { get; set; }
+  public string? Address { get; set; }
+  public string? AdminName { get; set; }
+  public string? AdminPhoneNumber { get; set; }
+  public string? TechSupportUserId { get; set; }
   public bool IsActive { get; private set; }
 
-  [NotMapped]
-  public List<TenantSubscription> ActiveSubscriptions { get; private set; }
+  [NotMapped] public List<TenantSubscription> ActiveSubscriptions { get; private set; }
 
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
@@ -110,12 +125,28 @@ public class FSHTenantInfo : ITenantInfo
     return this;
   }
 
-  string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
+  string? ITenantInfo.Id
+  {
+    get => Id;
+    set => Id = value ?? throw new InvalidOperationException("Id can't be null.");
+  }
 
-  string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
+  string? ITenantInfo.Identifier
+  {
+    get => Identifier;
+    set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
+  }
 
-  string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
+  string? ITenantInfo.Name
+  {
+    get => Name;
+    set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
+  }
 
-  string? ITenantInfo.DatabaseName { get => DatabaseName; set => DatabaseName = value ?? throw new InvalidOperationException
-  ("Database Name can't be null."); }
+  string? ITenantInfo.DatabaseName
+  {
+    get => DatabaseName;
+    set => DatabaseName = value ?? throw new InvalidOperationException
+      ("Database Name can't be null.");
+  }
 }

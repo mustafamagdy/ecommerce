@@ -12,4 +12,5 @@ public interface ITenantService
     Task<string> RenewSubscription(string subscriptionId, DateTime extendedExpiryDate);
     Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId);
     Task<bool> DatabaseExistAsync(string databaseName);
+    Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string tenantId);
 }

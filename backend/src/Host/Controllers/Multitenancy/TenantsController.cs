@@ -63,4 +63,20 @@ public class TenantsController : VersionNeutralApiController
       ? BadRequest()
       : Ok(await Mediator.Send(request));
   }
+
+  [HttpGet("{id}/info")]
+  [MustHavePermission(FSHAction.ViewBasic, FSHResource.Tenants)]
+  [OpenApiOperation("Get tenant details.", "")]
+  public Task<BasicTenantInfoDto> GetBasicAsync(string id)
+  {
+    return Mediator.Send(new GetBasicTenantInfoRequest(id));
+  }
+
+  [HttpPost("branch")]
+  [MustHavePermission(FSHAction.Create, FSHResource.Brands)]
+  [OpenApiOperation("Create a branch for the current tenant.", "")]
+  public Task<Guid> CreateBranchAsync(CreateBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
 }
