@@ -17,13 +17,10 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
 {
   private readonly IUserService _userService;
   private readonly IOverrideTokenService _overrideTokenService;
-  private readonly IStringLocalizer _t;
-  public PermissionAuthorizationHandler(IUserService userService, IOverrideTokenService overrideTokenService,
-  IStringLocalizer localizer)
+  public PermissionAuthorizationHandler(IUserService userService, IOverrideTokenService overrideTokenService)
   {
     _userService = userService;
     _overrideTokenService = overrideTokenService;
-    _t = localizer;
   }
 
   protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -60,7 +57,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
 
           if (actionDescriptor!.Parameters.Count < 1)
           {
-            throw new NotSupportedException(_t["MOT not supported for parameterless operation"]);
+            throw new NotSupportedException("MOT not supported for parameterless operation");
           }
 
           var p1 = actionDescriptor!.Parameters.FirstOrDefault();

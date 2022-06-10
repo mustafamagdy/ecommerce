@@ -3,11 +3,11 @@
 
 namespace Finbuckle.MultiTenant
 {
-    public interface ITenantInfo
-    {
-        string? Id { get; set; }
-        string? Identifier { get; set;  }
-        string? Name { get; set; }
-        string? DatabaseName { get; set; }
-    }
+  public interface ITenantInfo
+  {
+    string? Id { get; set; }
+    string? Identifier { get; set; }
+    string? Name { get; set; }
+    string? DatabaseName { get; set; }
+  }
 }

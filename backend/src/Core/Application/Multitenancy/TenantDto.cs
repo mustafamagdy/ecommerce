@@ -10,4 +10,5 @@ public class TenantDto
   public string? Issuer { get; set; }
 
   public List<TenantSubscriptionDto> ActiveSubscriptions { get; set; } = default!;
+  public List<BranchDto> Branches { get; set; } = default!;
 }
