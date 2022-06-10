@@ -5,6 +5,7 @@ using FSH.WebApi.Infrastructure.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using ObjectsComparer;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -16,11 +17,13 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
 {
   private readonly IUserService _userService;
   private readonly IOverrideTokenService _overrideTokenService;
-
-  public PermissionAuthorizationHandler(IUserService userService, IOverrideTokenService overrideTokenService)
+  private readonly IStringLocalizer _t;
+  public PermissionAuthorizationHandler(IUserService userService, IOverrideTokenService overrideTokenService,
+  IStringLocalizer localizer)
   {
     _userService = userService;
     _overrideTokenService = overrideTokenService;
+    _t = localizer;
   }
 
   protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -55,13 +58,18 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
             EmptyAndNullEnumerablesEqual = true
           });
 
-          var p1 = actionDescriptor.Parameters.FirstOrDefault();
+          if (actionDescriptor!.Parameters.Count < 1)
+          {
+            throw new NotSupportedException(_t["MOT not supported for parameterless operation"]);
+          }
+
+          var p1 = actionDescriptor!.Parameters.FirstOrDefault();
           var p1Type = p1.ParameterType;
 
           if (p1Type.IsPrimitive || p1Type == typeof(string) || p1Type == typeof(Guid))
           {
             string? routeValue = request.RouteValues[p1.Name]?.ToString();
-            var scopedValue = JsonSerializer.Deserialize(mot.Scope, p1Type);
+            object? scopedValue = JsonSerializer.Deserialize(mot.Scope, p1Type);
             if (comparer.Compare(routeValue, scopedValue))
             {
               context.Succeed(requirement);
@@ -70,23 +78,15 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
           else
           {
             request.EnableBuffering();
-
             var reader = new StreamReader(request.BodyReader.AsStream());
             string body = await reader.ReadToEndAsync();
-            var model = JsonConvert.DeserializeObject(body, p1Type);
             request.Body.Seek(0, SeekOrigin.Begin);
-            // request.Body.Seek(0, SeekOrigin.Begin);
 
+            object? model = JsonConvert.DeserializeObject(body, p1Type);
             if (comparer.Compare(model, mot.Scope))
             {
               context.Succeed(requirement);
             }
-
-            request.BodyReader.AdvanceTo(new SequencePosition());
-            // if (model.Equals(mot.Scope))
-            // {
-            //   context.Succeed(requirement);
-            // }
           }
         }
       }
