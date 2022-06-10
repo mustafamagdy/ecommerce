@@ -9,6 +9,7 @@ public static class FSHAction
   public const string Create = nameof(Create);
   public const string Update = nameof(Update);
   public const string Delete = nameof(Delete);
+  public const string Cancel = nameof(Cancel);
   public const string Export = nameof(Export);
   public const string Generate = nameof(Generate);
 
@@ -106,6 +107,7 @@ public static class FSHPermissions
     new("Create Order", FSHAction.Create, FSHResource.Orders),
     new("Update Order", FSHAction.Update, FSHResource.Orders),
     new("Delete Order", FSHAction.Delete, FSHResource.Orders),
+    new("Cancel Order", FSHAction.Cancel, FSHResource.Orders),
 
     // Customers
     new("Search Customers", FSHAction.Search, FSHResource.Customers),

@@ -49,14 +49,21 @@ public class OrdersController : VersionedApiController
 
   [HttpGet("pdf/{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
-  [OpenApiOperation("Export Pdf invoice for an order.", "")]
+  [OpenApiOperation("Export Pdf invoice receipt for an order.", "")]
   public async Task<FileResult> ExportPdfInvoiceAsync(Guid id)
   {
     (string orderNumber, var generatedPdf) = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
     return File(generatedPdf, "application/octet-stream", $"invoice_{orderNumber}.pdf");
   }
 
-  //
+  [HttpPut("cancel/{id:guid}")]
+  [MustHavePermission(FSHAction.Cancel, FSHResource.Orders)]
+  [OpenApiOperation("Cancel a order with its all payments.", "")]
+  public Task CancelAsync(Guid id)
+  {
+    return Mediator.Send(new CancelOrderWithPaymentsRequest(id));
+  }
+
   // [HttpPut("{id:guid}")]
   // [MustHavePermission(FSHAction.Update, FSHResource.Orders)]
   // [OpenApiOperation("Update a order.", "")]
