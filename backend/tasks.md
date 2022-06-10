@@ -5,10 +5,11 @@
   [x] can send multiple payments in the same endpoint
   - BUG: if order with customer call failed, a customer will be added anyway, do validation first
 - Permissions
-  - call an endpoint with higher permission for 1 time operation
-  - login as admin for some tenant
+  [x] call an endpoint with higher permission for 1 time operation
+  - login as admin for another tenant (open new private window and pass jwt token)
   - cancel payment/all payments for order
   - permission can be scoped on specific data (like one cash box => all invoices to that cash box, or multiple subscriptions => can only manage those)
+- Predefined roles
 - Subscriptions
   - ending notification
     - Tenant
@@ -16,11 +17,9 @@
   - features toggle
   - Payments
 - Demo account (with reset)
-- Login as admin for another tenant (open new private window and pass jwt token)
 - Cash-box operations
   - Transfer (with recipient approval)
   - Open/Close?
-- Predefined roles
 - Notification
   - SMS
   - Whatsapp
@@ -42,4 +41,4 @@ root tenant get list of almost ending tenant subs and send them an email and rec
     - if the supervisor has no permission over this api => 403
     - 
 4- user 1 call same api again with the additional one time use manager override token
-5- store the mot in cash for expired token until its ttl end
+5- (optional) store the mot in cash for expired token until its ttl end
