@@ -42,3 +42,4 @@ root tenant get list of almost ending tenant subs and send them an email and rec
     - if the supervisor has no permission over this api => 403
     - 
 4- user 1 call same api again with the additional one time use manager override token
+5- store the mot in cash for expired token until its ttl end
