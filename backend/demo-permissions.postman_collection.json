@@ -52,6 +52,53 @@
 			"response": []
 		},
 		{
+			"name": "manager-auth-for-mot",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('token', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Create\",\n  \"scope\": \"1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Auth-user",
 			"event": [
 				{

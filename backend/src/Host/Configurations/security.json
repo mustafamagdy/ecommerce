@@ -4,9 +4,11 @@
     "RequireConfirmedAccount": true,
     "RequireActiveTenantSubscription": false,
     "JwtSettings": {
-      "key": "S0M3RAN0MS3CR3T!1!MAG1C!1!",
+      "key": "PNVVBO55MUYQ8BO33SGAJCQF8U",
+      "overrideTokenKey": "TAYRRUN65Z00YU7GADJJ0E55D5",
       "tokenExpirationInMinutes": 60,
-      "refreshTokenExpirationInDays": 7
+      "refreshTokenExpirationInDays": 7,
+      "overrideTokenExpirationInMinutes": 3
     },
     "AzureAd": {
       "Instance": "https://login.microsoftonline.com/",
