@@ -52,14 +52,14 @@
 			"response": []
 		},
 		{
-			"name": "manager-auth-for-mot",
+			"name": "manager-auth-for-mot-create",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"if(pm.response.code == 200) {",
-							"    pm.environment.set('token', pm.response.json().token);",
+							"    pm.environment.set('mot', pm.response.json().token);",
 							"}"
 						],
 						"type": "text/javascript"
@@ -78,6 +78,100 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Create\",\n  \"scope\": \"1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "manager-auth-for-mot-delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('mot', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Delete\",\n  \"scope\": \"08da48b0-515f-478e-8681-e99a622f6985\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "manager-auth-for-mot-delete (invalid scope)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('mot', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Delete\",\n  \"scope\": \"1234\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -194,7 +288,13 @@
 					]
 				},
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "mot",
+						"value": "{{mot}}",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"name\":\"brand1\"\r\n}",
@@ -233,7 +333,13 @@
 					]
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "mot",
+						"value": "{{mot}}",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"name\":\"brand11\"\r\n}",
