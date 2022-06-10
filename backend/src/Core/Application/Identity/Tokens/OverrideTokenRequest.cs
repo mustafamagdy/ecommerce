@@ -2,6 +2,8 @@ namespace FSH.WebApi.Application.Identity.Tokens;
 
 public record OverrideTokenRequest(string Email, string Password, string Permission, object Scope);
 
+public record ManagerOverrideToken(string Permission, string Scope);
+
 public class OverrideTokenRequestValidator : CustomValidator<OverrideTokenRequest>
 {
   public OverrideTokenRequestValidator(IStringLocalizer<TokenRequestValidator> T)
