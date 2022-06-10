@@ -85,3 +85,10 @@
 4- user 1 call same api again with the additional one time use manager override token
 5- (optional) store the mot in cash for expired token until its ttl end
 //////////////////////////
+
+
+Tenant has branches 
+each branch has cash register(s)
+
+/////// Cash Register ///////
+
