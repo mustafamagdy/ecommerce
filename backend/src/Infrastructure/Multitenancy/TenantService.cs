@@ -4,6 +4,7 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,7 @@ internal class TenantService : ITenantService
   private readonly IMailService _mailService;
   private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
+  private readonly IReadRepository<Branch> _branchRepo;
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
@@ -53,7 +55,8 @@ internal class TenantService : ITenantService
     IJobService jobService,
     IMailService mailService,
     IEmailTemplateService templateService,
-    IStringLocalizer<TenantService> localizer)
+    IStringLocalizer<TenantService> localizer,
+    IReadRepository<Branch> branchRepo)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -63,6 +66,7 @@ internal class TenantService : ITenantService
     _mailService = mailService;
     _templateService = templateService;
     _t = localizer;
+    _branchRepo = branchRepo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -87,7 +91,9 @@ internal class TenantService : ITenantService
 
   public async Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail, request.Issuer);
+    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail,
+      request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
+      request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
     var subscription = await TryCreateSubscription(tenant);
@@ -244,5 +250,18 @@ internal class TenantService : ITenantService
       .ToListAsync();
 
     return activeSubscriptions.Count > 0 ? tenant.SetActiveSubscriptions(activeSubscriptions) : tenant;
+  }
+
+  public async Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string id)
+  {
+    var tenant = await _tenantStore.TryGetAsync(id)
+                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+
+    var tenantBranchSpec = new TenantBranchSpec(id);
+    var branches = await _branchRepo.ListAsync(tenantBranchSpec);
+
+    var tenantDto = tenant.Adapt<BasicTenantInfoDto>();
+    tenantDto.Branches = branches.Adapt<List<BranchDto>>();
+    return tenantDto;
   }
 }
