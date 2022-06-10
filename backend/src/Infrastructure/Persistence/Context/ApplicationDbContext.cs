@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public class ApplicationDbContext : BaseDbContext
   {
   }
 
+  public DbSet<Branch> Branches => Set<Branch>();
   public DbSet<Product> Products => Set<Product>();
   public DbSet<Brand> Brands => Set<Brand>();
   public DbSet<ServiceCatalog> ServiceCatalogs => Set<ServiceCatalog>();

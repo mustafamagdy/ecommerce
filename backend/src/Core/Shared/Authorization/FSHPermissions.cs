@@ -12,6 +12,7 @@ public static class FSHAction
   public const string Cancel = nameof(Cancel);
   public const string Export = nameof(Export);
   public const string Generate = nameof(Generate);
+  public const string ViewBasic = nameof(ViewBasic);
 
   public const string Clean = nameof(Clean);
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
@@ -33,6 +34,7 @@ public static class FSHResource
   public const string Services = nameof(Services);
   public const string Orders = nameof(Orders);
   public const string Customers = nameof(Customers);
+  public const string Branches = nameof(Branches);
 }
 
 public static class FSHPermissions
@@ -87,6 +89,12 @@ public static class FSHPermissions
     new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
     new("Create Tenant Subscription", FSHAction.Create, FSHResource.Subscriptions, IsRoot: true),
     new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true),
+    new("View Basic Tenants Info", FSHAction.ViewBasic, FSHResource.Tenants),
+
+    // Branches
+    new("View Branches", FSHAction.View, FSHResource.Branches),
+    new("Create Branches", FSHAction.Create, FSHResource.Branches),
+    new("Update Branches", FSHAction.Update, FSHResource.Branches),
 
     // Service Catalogs
     new("Search Service Catalog", FSHAction.Search, FSHResource.ServiceCatalog),
@@ -118,13 +126,22 @@ public static class FSHPermissions
   };
 
   public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
-  public static IReadOnlyList<FSHPermission> Root { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsRoot).ToArray());
-  public static IReadOnlyList<FSHPermission> Admin { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.IsRoot).ToArray());
-  public static IReadOnlyList<FSHPermission> Basic { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsBasic).ToArray());
-  public static IReadOnlyList<FSHPermission> Demo { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsDemo).ToArray());
+
+  public static IReadOnlyList<FSHPermission> Root { get; } =
+    new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsRoot).ToArray());
+
+  public static IReadOnlyList<FSHPermission> Admin { get; } =
+    new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.IsRoot).ToArray());
+
+  public static IReadOnlyList<FSHPermission> Basic { get; } =
+    new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsBasic).ToArray());
+
+  public static IReadOnlyList<FSHPermission> Demo { get; } =
+    new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsDemo).ToArray());
 }
 
-public record FSHPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false, bool IsDemo = false)
+public record FSHPermission(string Description, string Action, string Resource, bool IsBasic = false,
+  bool IsRoot = false, bool IsDemo = false)
 {
   public string Name => NameFor(Action, Resource);
   public static string NameFor(string action, string resource) => $"Permissions.{resource}.{action}";

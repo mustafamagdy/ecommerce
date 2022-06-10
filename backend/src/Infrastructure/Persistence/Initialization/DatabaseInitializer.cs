@@ -13,7 +13,8 @@ internal class DatabaseInitializer : IDatabaseInitializer
   private readonly IServiceProvider _serviceProvider;
   private readonly ILogger<DatabaseInitializer> _logger;
 
-  public DatabaseInitializer(TenantDbContext tenantDbContext, IServiceProvider serviceProvider, ILogger<DatabaseInitializer> logger)
+  public DatabaseInitializer(TenantDbContext tenantDbContext, IServiceProvider serviceProvider,
+    ILogger<DatabaseInitializer> logger)
   {
     _tenantDbContext = tenantDbContext;
     _serviceProvider = serviceProvider;
@@ -60,13 +61,15 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
   private async Task SeedRootTenantAsync(CancellationToken cancellationToken)
   {
-    if (await _tenantDbContext.TenantInfo.FindAsync(new object?[] { MultitenancyConstants.Root.Id }, cancellationToken: cancellationToken) is null)
+    if (await _tenantDbContext.TenantInfo.FindAsync(new object?[] { MultitenancyConstants.Root.Id },
+          cancellationToken: cancellationToken) is null)
     {
       var rootTenant = new FSHTenantInfo(
         MultitenancyConstants.Root.Id,
         MultitenancyConstants.Root.Name,
         string.Empty,
-        MultitenancyConstants.Root.EmailAddress);
+        MultitenancyConstants.Root.EmailAddress,
+        null, null, null, null, null, null, null);
 
       _tenantDbContext.TenantInfo.Add(rootTenant);
 
