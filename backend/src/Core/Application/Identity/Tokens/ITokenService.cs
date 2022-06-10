@@ -9,4 +9,5 @@ public interface ITokenService : ITransientService
 public interface IOverrideTokenService : ITransientService
 {
   Task<OverrideTokenResponse> GetOverrideTokenAsync(OverrideTokenRequest request, string ipAddress, CancellationToken cancellationToken);
+  ManagerOverrideToken ExtractManagerOverrideTokenValues(string motToken);
 }

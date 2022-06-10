@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using FSH.WebApi.Application.Common.Exceptions;
@@ -18,8 +17,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.WebApi.Infrastructure.Identity;
-
-public record ManagerOverrideToken(string Permission, object Scope);
 
 internal class OverrideTokenService : IOverrideTokenService
 {
@@ -82,15 +79,28 @@ internal class OverrideTokenService : IOverrideTokenService
       }
     }
 
-    var managerOverrideScope = new ManagerOverrideToken(request.Permission, request.Scope);
+    var managerOverrideScope = new ManagerOverrideToken(request.Permission, JsonSerializer.Serialize(request.Scope));
     return await GenerateTokensAndUpdateUser(user, managerOverrideScope);
+  }
+
+  public ManagerOverrideToken ExtractManagerOverrideTokenValues(string motToken)
+  {
+    var userPrincipal = GetPrincipalFromToken(motToken);
+    string? motPermission = userPrincipal.GetMotPermission();
+    string? motScopeJson = userPrincipal.GetMotScope();
+
+    if (motPermission is null || motScopeJson is null)
+    {
+      throw new UnauthorizedException(_t["Invalid MOT Token."]);
+    }
+
+    return new ManagerOverrideToken(motPermission, motScopeJson);
   }
 
   private async Task<bool> HasAValidSubscription(string tenantId)
   {
     return (await _tenantService.GetActiveSubscriptions(tenantId)).Any();
   }
-
 
   private async Task<OverrideTokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, ManagerOverrideToken mot)
   {
@@ -110,7 +120,7 @@ internal class OverrideTokenService : IOverrideTokenService
       new(FSHClaims.Tenant, _currentTenant!.Id),
       new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
       new(FSHClaims.MOT_Permission, mot.Permission),
-      new(FSHClaims.MOT_Scope, JsonSerializer.Serialize(mot.Scope)),
+      new(FSHClaims.MOT_Scope, mot.Scope),
     };
 
   private string GenerateEncryptedToken(SigningCredentials signingCredentials, IEnumerable<Claim> claims)
@@ -121,6 +131,30 @@ internal class OverrideTokenService : IOverrideTokenService
       signingCredentials: signingCredentials);
     var tokenHandler = new JwtSecurityTokenHandler();
     return tokenHandler.WriteToken(token);
+  }
+
+  private ClaimsPrincipal GetPrincipalFromToken(string token)
+  {
+    var tokenValidationParameters = new TokenValidationParameters
+    {
+      ValidateIssuerSigningKey = true,
+      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.OverrideTokenKey)),
+      ValidateIssuer = false,
+      ValidateAudience = false,
+      RoleClaimType = ClaimTypes.Role,
+      ClockSkew = TimeSpan.Zero,
+      ValidateLifetime = false
+    };
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+    if (securityToken is not JwtSecurityToken jwtSecurityToken
+        || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+    {
+      throw new UnauthorizedException(_t["Invalid Token."]);
+    }
+
+    return principal;
   }
 
   private SigningCredentials GetSigningCredentials()
