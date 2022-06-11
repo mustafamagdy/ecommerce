@@ -4,12 +4,12 @@ namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
 public class TenantsController : VersionNeutralApiController
 {
-  [HttpGet]
-  [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
-  [OpenApiOperation("Get a list of all tenants.", "")]
-  public Task<List<TenantDto>> GetListAsync()
+  [HttpGet("Search")]
+  [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
+  [OpenApiOperation("Search all tenants.", "")]
+  public Task<PaginationResponse<TenantDto>> GetListAsync(SearchAllTenantsRequest request)
   {
-    return Mediator.Send(new GetAllTenantsRequest());
+    return Mediator.Send(request);
   }
 
   [HttpGet("{id}")]
