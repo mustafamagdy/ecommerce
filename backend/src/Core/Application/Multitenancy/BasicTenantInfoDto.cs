@@ -5,7 +5,7 @@ public class BasicTenantInfoDto
   public string Id { get; set; } = default!;
   public string Name { get; set; } = default!;
 
-  public BasicSubscriptionInfoDto CurrentSubscription { get; set; } = default!;
+  public BasicSubscriptionInfoDto? CurrentSubscription { get; set; } = default!;
   public List<BranchDto> Branches { get; set; } = default!;
 }
 

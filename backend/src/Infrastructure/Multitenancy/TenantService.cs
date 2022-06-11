@@ -262,6 +262,10 @@ internal class TenantService : ITenantService
 
     var tenantDto = tenant.Adapt<BasicTenantInfoDto>();
     tenantDto.Branches = branches.Adapt<List<BranchDto>>();
+
+    var activeSubscription = (await GetActiveSubscriptions(id)).FirstOrDefault(a => !a.IsDemo);
+    tenantDto.CurrentSubscription = activeSubscription?.Adapt<BasicSubscriptionInfoDto>();
+
     return tenantDto;
   }
 }
