@@ -84,6 +84,7 @@ public static class FSHPermissions
     new("Clean Brands", FSHAction.Clean, FSHResource.Brands),
 
     // Tenants
+    new("Search Tenants", FSHAction.Search, FSHResource.Tenants, IsRoot: true),
     new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
     new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
     new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),

@@ -19,6 +19,63 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AdminEmail")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AdminName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AdminPhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DatabaseName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Issuer")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TechSupportUserId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VatNo")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Identifier")
+                        .IsUnique();
+
+                    b.ToTable("Tenants", "MultiTenancy");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -100,6 +157,9 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("FSHTenantInfoId")
+                        .HasColumnType("varchar(64)");
+
                     b.Property<bool>("IsDemo")
                         .HasColumnType("tinyint(1)");
 
@@ -117,6 +177,8 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FSHTenantInfoId");
 
                     b.HasIndex("SubscriptionId");
 
@@ -141,61 +203,49 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.ToTable("RootPaymentMethods", "MultiTenancy");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Infrastructure.Multitenancy.FSHTenantInfo", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(64)
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FSHTenantInfoId")
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("AdminEmail")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("AdminName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("AdminPhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("DatabaseName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Issuer")
-                        .HasColumnType("longtext");
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TechSupportUserId")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("VatNo")
+                    b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("FSHTenantInfoId");
 
-                    b.ToTable("Tenants", "MultiTenancy");
+                    b.ToTable("Branch");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
@@ -215,6 +265,10 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", null)
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("FSHTenantInfoId");
+
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
@@ -222,6 +276,20 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", null)
+                        .WithMany("Branches")
+                        .HasForeignKey("FSHTenantInfoId");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
+                {
+                    b.Navigation("Branches");
+
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>

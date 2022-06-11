@@ -4,7 +4,7 @@ namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
 public class TenantsController : VersionNeutralApiController
 {
-  [HttpGet("Search")]
+  [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
   [OpenApiOperation("Search all tenants.", "")]
   public Task<PaginationResponse<TenantDto>> GetListAsync(SearchAllTenantsRequest request)

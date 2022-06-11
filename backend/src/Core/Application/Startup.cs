@@ -1,6 +1,7 @@
 using System.Reflection;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,5 +36,10 @@ public class DtoCustomMapping
       .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
+
+    TypeAdapterConfig<FSHTenantInfo, TenantDto>
+      .NewConfig()
+      .Map(dest => dest.ActiveSubscription, src
+        => src.Subscriptions.FirstOrDefault(a => a.Active && !a.IsDemo));
   }
 }

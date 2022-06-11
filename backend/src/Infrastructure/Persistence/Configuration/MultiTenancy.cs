@@ -12,6 +12,10 @@ public class TenantSubscriptionConfig : IEntityTypeConfiguration<TenantSubscript
 {
   public void Configure(EntityTypeBuilder<TenantSubscription> builder)
   {
+    builder
+      .HasOne<FSHTenantInfo>()
+      .WithMany(a => a.Subscriptions)
+      .HasForeignKey(a => a.TenantId);
   }
 }
 

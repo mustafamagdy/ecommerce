@@ -22,7 +22,11 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
   {
     base.OnModelCreating(modelBuilder);
 
-    modelBuilder.Entity<FSHTenantInfo>().ToTable("Tenants", SchemaNames.MultiTenancy);
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .ToTable("Tenants", SchemaNames.MultiTenancy)
+      .HasKey(a => a.Id);
+
     modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);
     modelBuilder.Entity<Subscription>().ToTable("Subscriptions", SchemaNames.MultiTenancy);
     modelBuilder.Entity<PaymentMethod>().ToTable("RootPaymentMethods", SchemaNames.MultiTenancy);
