@@ -1,15 +1,4 @@
-using FSH.WebApi.Domain.Operation;
-
 namespace FSH.WebApi.Domain.MultiTenancy;
-
-public class Subscription : BaseEntity
-{
-  public bool DefaultMonthly { get; set; }
-  public string Name { get; set; }
-  public int Days { get; set; }
-  public decimal MonthlyPrice { get; set; }
-  public decimal? YearlyPrice { get; set; }
-}
 
 public class TenantSubscription : BaseEntity
 {
@@ -53,13 +42,5 @@ public class TenantSubscription : BaseEntity
   {
     Active = false;
     return this;
-  }
-}
-
-public class SubscriptionPayment : Payment
-{
-  public SubscriptionPayment(decimal amount, Guid paymentMethodId)
-    : base(amount, paymentMethodId)
-  {
   }
 }
