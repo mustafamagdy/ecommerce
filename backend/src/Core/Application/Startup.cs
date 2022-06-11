@@ -1,4 +1,5 @@
 using System.Reflection;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Orders;
 using FSH.WebApi.Domain.Operation;
 using Mapster;
