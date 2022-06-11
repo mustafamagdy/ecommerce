@@ -14,7 +14,7 @@ public class OrderPayment : Payment
 
 public abstract class Payment : AuditableEntity, IAggregateRoot
 {
-  public Payment(decimal amount, Guid paymentMethodId)
+  protected Payment(decimal amount, Guid paymentMethodId)
   {
     Amount = amount;
     PaymentMethodId = paymentMethodId;
@@ -22,5 +22,5 @@ public abstract class Payment : AuditableEntity, IAggregateRoot
 
   public decimal Amount { get; private set; }
   public Guid PaymentMethodId { get; private set; }
-  public virtual PaymentMethod PaymentMethod { get; set; }
+  public virtual PaymentMethod PaymentMethod { get; set; } = default!;
 }

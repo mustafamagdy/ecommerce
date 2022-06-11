@@ -51,17 +51,15 @@ public class TenantsController : VersionNeutralApiController
   [OpenApiOperation("Get a list of active subscriptions for a tenant.", "")]
   public Task<List<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId)
   {
-    return Mediator.Send(new GetActiveSubscriptionsRequest(tenantId));
+    return Mediator.Send(new GetTenantSubscriptionsRequest(tenantId, activeSubscription: null));
   }
 
-  [HttpPost("{tenantId}/subscription/{subscriptionId}/renew")]
+  [HttpPost("renew")]
   [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
   [OpenApiOperation("Renew subscription for a tenant", "")]
-  public async Task<ActionResult<string>> RenewSubscription(string tenantId, string subscriptionId, RenewSubscriptionRequest request)
+  public Task<string> RenewSubscription(RenewSubscriptionRequest request)
   {
-    return (tenantId != request.TenantId || subscriptionId != request.SubscriptionId)
-      ? BadRequest()
-      : Ok(await Mediator.Send(request));
+    return Mediator.Send(request);
   }
 
   [HttpGet("{id}/info")]

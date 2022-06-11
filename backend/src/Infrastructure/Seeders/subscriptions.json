@@ -1,0 +1,9 @@
+[
+  {
+    "Id": "56325915-a650-46fb-ab10-6f7a03030823",
+    "Name": "اشتراك شهري",
+    "DefaultMonthly": true,
+    "Days": 30,
+    "MonthlyPrice": 99.0
+  }
+]

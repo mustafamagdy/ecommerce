@@ -29,7 +29,7 @@ public class DeleteServiceRequestHandler : IRequestHandler<DeleteServiceRequest,
 
     var service = await _serviceRepo.GetByIdAsync(request.Id, cancellationToken);
 
-    _ = service ?? throw new NotFoundException(_t["Service {0} Not Found."]);
+    _ = service ?? throw new NotFoundException(_t["Service {0} Not Found.", request.Id]);
 
     await _serviceRepo.DeleteAsync(service, cancellationToken);
 

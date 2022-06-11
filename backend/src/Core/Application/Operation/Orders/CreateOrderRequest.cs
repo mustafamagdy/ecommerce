@@ -32,12 +32,14 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
   private readonly IReadRepository<Customer> _customerRepo;
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly ICreateOrderHelper _orderHelper;
+  private readonly IStringLocalizer _t;
 
-  public CreateOrderRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<Customer> customerRepo, IReadRepository<PaymentMethod> paymentMethodRepo)
+  public CreateOrderRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<Customer> customerRepo, IReadRepository<PaymentMethod> paymentMethodRepo, IStringLocalizer<CreateOrderRequestHandler> localizer)
   {
     _orderHelper = orderHelper;
     _customerRepo = customerRepo;
     _paymentMethodRepo = paymentMethodRepo;
+    _t = localizer;
   }
 
   public async Task<OrderDto> Handle(CreateOrderRequest request, CancellationToken cancellationToken)
@@ -45,7 +47,7 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
     var customer = await _customerRepo.GetByIdAsync(request.CustomerId, cancellationToken);
     if (customer is null)
     {
-      throw new NotFoundException(nameof(customer));
+      throw new NotFoundException(_t["Customer {0} not found", request.CustomerId]);
     }
 
     foreach (var payment in request.Payments)
@@ -53,7 +55,7 @@ public class CreateOrderRequestHandler : IRequestHandler<CreateOrderRequest, Ord
       var paymentMethod = await _paymentMethodRepo.GetByIdAsync(payment.PaymentMethodId, cancellationToken);
       if (paymentMethod is null)
       {
-        throw new NotFoundException(nameof(paymentMethod));
+        throw new NotFoundException(_t["Payment method {0} not found", payment.PaymentMethodId]);
       }
     }
 

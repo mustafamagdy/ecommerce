@@ -29,7 +29,7 @@ public class DeleteBrandRequestHandler : IRequestHandler<DeleteBrandRequest, Gui
 
     var brand = await _brandRepo.GetByIdAsync(request.Id, cancellationToken);
 
-    _ = brand ?? throw new NotFoundException(_t["Brand {0} Not Found."]);
+    _ = brand ?? throw new NotFoundException(_t["Brand {0} Not Found.", request.Id]);
 
     await _brandRepo.DeleteAsync(brand, cancellationToken);
 
