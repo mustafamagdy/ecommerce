@@ -33,12 +33,13 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
   private readonly IRepositoryWithEvents<Customer> _customerRepo;
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly ICreateOrderHelper _orderHelper;
-
-  public CreateOrderWithNewCustomerRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<Customer> customerRepo)
+  private readonly IStringLocalizer _t;
+  public CreateOrderWithNewCustomerRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<Customer> customerRepo, IStringLocalizer<CreateOrderWithNewCustomerRequestHandler> localizer)
   {
     _orderHelper = orderHelper;
     _paymentMethodRepo = paymentMethodRepo;
     _customerRepo = customerRepo;
+    _t = localizer;
   }
 
   public async Task<OrderDto> Handle(CreateOrderWithNewCustomerRequest request, CancellationToken cancellationToken)
@@ -47,7 +48,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
     customer = await _customerRepo.AddAsync(customer, cancellationToken);
     if (customer is null)
     {
-      throw new NotFoundException(nameof(customer));
+      throw new InternalServerException(_t["Failed to save new customer data"]);
     }
 
     foreach (var payment in request.Payments)
@@ -55,7 +56,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
       var paymentMethod = await _paymentMethodRepo.GetByIdAsync(payment.PaymentMethodId, cancellationToken);
       if (paymentMethod is null)
       {
-        throw new NotFoundException(nameof(paymentMethod));
+        throw new NotFoundException(_t["Payment method {0} not found", payment.PaymentMethodId]);
       }
     }
 

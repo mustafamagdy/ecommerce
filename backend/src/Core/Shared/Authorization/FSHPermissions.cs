@@ -87,6 +87,7 @@ public static class FSHPermissions
     new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
     new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
     new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
+    new("View Tenant Subscription", FSHAction.View, FSHResource.Subscriptions, IsRoot: true),
     new("Create Tenant Subscription", FSHAction.Create, FSHResource.Subscriptions, IsRoot: true),
     new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true),
     new("View Basic Tenants Info", FSHAction.ViewBasic, FSHResource.Tenants),

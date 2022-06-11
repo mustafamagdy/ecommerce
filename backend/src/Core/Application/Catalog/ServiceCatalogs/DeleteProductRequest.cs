@@ -21,7 +21,7 @@ public class DeleteServiceCatalogRequestHandler : IRequestHandler<DeleteServiceC
   {
     var catalogItem = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-    _ = catalogItem ?? throw new NotFoundException(_t["Service Catalog Item {0} Not Found."]);
+    _ = catalogItem ?? throw new NotFoundException(_t["Service Catalog Item {0} Not Found.", request.Id]);
 
     // Add Domain Events to be raised after the commit
     catalogItem.DomainEvents.Add(EntityDeletedEvent.WithEntity(catalogItem));

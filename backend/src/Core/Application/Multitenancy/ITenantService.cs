@@ -1,4 +1,6 @@
-﻿namespace FSH.WebApi.Application.Multitenancy;
+﻿using FSH.WebApi.Domain.MultiTenancy;
+
+namespace FSH.WebApi.Application.Multitenancy;
 
 public interface ITenantService
 {
@@ -7,10 +9,12 @@ public interface ITenantService
     Task<bool> ExistsWithNameAsync(string name);
     Task<TenantDto> GetByIdAsync(string id);
     Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken);
-    Task<string> ActivateAsync(string id);
-    Task<string> DeactivateAsync(string id);
-    Task<string> RenewSubscription(string subscriptionId, DateTime extendedExpiryDate);
-    Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId);
+    Task<string> ActivateAsync(string tenantId);
+    Task<string> DeactivateAsync(string tenantId);
+    Task<string> RenewSubscription(Guid subscriptionId, DateTime? extendedExpiryDate);
     Task<bool> DatabaseExistAsync(string databaseName);
     Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string tenantId);
+    Task<bool> HasAValidSubscription(string tenantId);
+    Task<IReadOnlyList<TenantSubscription>> GetActiveSubscriptions(string tenantId);
+    Task<List<TenantSubscription>> GetAllTenantSubscriptions(string tenantId);
 }

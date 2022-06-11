@@ -78,9 +78,9 @@ internal class TokenService : ITokenService
     return await GenerateTokensAndUpdateUser(user, ipAddress);
   }
 
-  private async Task<bool> HasAValidSubscription(string tenantId)
+  private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return (await _tenantService.GetActiveSubscriptions(tenantId)).Any();
+    return _tenantService.HasAValidSubscription(tenantId);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
