@@ -30,3 +30,16 @@ public interface IRepositoryWithEvents<T> : IRepositoryBase<T>
   where T : class, IAggregateRoot
 {
 }
+
+public interface ITenantRepository<TEntity> : IRepositoryBase<TEntity>
+  where TEntity : class
+
+
+{
+  Task<List<TEntity>> AddRangeAsync(List<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+}
+
+public interface IReadTenantRepository<TEntity> : IReadRepositoryBase<TEntity>
+  where TEntity : class
+{
+}

@@ -90,6 +90,38 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Branch",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TenantId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FSHTenantInfoId = table.Column<string>(type: "varchar(64)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Branch", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Branch_Tenants_FSHTenantInfoId",
+                        column: x => x.FSHTenantInfoId,
+                        principalSchema: "MultiTenancy",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "TenantSubscriptions",
                 schema: "MultiTenancy",
                 columns: table => new
@@ -102,7 +134,9 @@ namespace Migrators.MySQL.Migrations.Tenant
                     Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     SubscriptionId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Active = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    Active = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    FSHTenantInfoId = table.Column<string>(type: "varchar(64)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -114,6 +148,12 @@ namespace Migrators.MySQL.Migrations.Tenant
                         principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TenantSubscriptions_Tenants_FSHTenantInfoId",
+                        column: x => x.FSHTenantInfoId,
+                        principalSchema: "MultiTenancy",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -152,6 +192,11 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Branch_FSHTenantInfoId",
+                table: "Branch",
+                column: "FSHTenantInfoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubscriptionPayment_PaymentMethodId",
                 table: "SubscriptionPayment",
                 column: "PaymentMethodId");
@@ -169,6 +214,12 @@ namespace Migrators.MySQL.Migrations.Tenant
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_TenantSubscriptions_FSHTenantInfoId",
+                schema: "MultiTenancy",
+                table: "TenantSubscriptions",
+                column: "FSHTenantInfoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TenantSubscriptions_SubscriptionId",
                 schema: "MultiTenancy",
                 table: "TenantSubscriptions",
@@ -178,11 +229,10 @@ namespace Migrators.MySQL.Migrations.Tenant
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SubscriptionPayment");
+                name: "Branch");
 
             migrationBuilder.DropTable(
-                name: "Tenants",
-                schema: "MultiTenancy");
+                name: "SubscriptionPayment");
 
             migrationBuilder.DropTable(
                 name: "RootPaymentMethods",
@@ -194,6 +244,10 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             migrationBuilder.DropTable(
                 name: "Subscriptions",
+                schema: "MultiTenancy");
+
+            migrationBuilder.DropTable(
+                name: "Tenants",
                 schema: "MultiTenancy");
         }
     }

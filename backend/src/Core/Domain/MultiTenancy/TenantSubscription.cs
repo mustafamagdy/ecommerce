@@ -25,6 +25,7 @@ public class TenantSubscription : BaseEntity
 
   public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
   public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
+  public decimal Balance => Price - TotalPaid;
 
   public TenantSubscription Extend(DateTime newExpiryDate)
   {

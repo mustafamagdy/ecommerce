@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Finbuckle.MultiTenant;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
@@ -53,7 +54,8 @@ public class FSHTenantInfo : ITenantInfo
   public string? TechSupportUserId { get; set; }
   public bool IsActive { get; private set; }
 
-  [NotMapped] public List<TenantSubscription> ActiveSubscriptions { get; private set; }
+  public virtual HashSet<TenantSubscription> Subscriptions { get; set; } = default!;
+  public virtual HashSet<Branch> Branches { get; set; } = default!;
 
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
@@ -82,11 +84,6 @@ public class FSHTenantInfo : ITenantInfo
     IsActive = false;
   }
 
-  public FSHTenantInfo SetActiveSubscriptions(List<TenantSubscription> activeSubscriptions)
-  {
-    ActiveSubscriptions = activeSubscriptions;
-    return this;
-  }
 
   string? ITenantInfo.Id
   {

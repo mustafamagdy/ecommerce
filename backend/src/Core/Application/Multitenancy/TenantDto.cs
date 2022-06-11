@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class TenantDto
+public class TenantDto : IDto
 {
   public string Id { get; set; } = default!;
   public string Name { get; set; } = default!;
@@ -9,6 +9,6 @@ public class TenantDto
   public bool IsActive { get; set; }
   public string? Issuer { get; set; }
 
-  public List<TenantSubscriptionDto> ActiveSubscriptions { get; set; } = default!;
+  public TenantSubscriptionDto? ActiveSubscription { get; set; }
   public List<BranchDto> Branches { get; set; } = default!;
 }
