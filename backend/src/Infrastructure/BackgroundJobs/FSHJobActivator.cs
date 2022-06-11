@@ -1,4 +1,5 @@
 ﻿using Finbuckle.MultiTenant;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
