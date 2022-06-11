@@ -141,7 +141,8 @@ internal class TenantService : ITenantService
     var subscription = await GetDefaultMonthlySubscription();
     var today = DateTime.Now;
     var newExpiryDate = today.AddMonths(1);
-    var tenantSubscription = new TenantSubscription(tenant.Id, subscription.Id, today, subscription.MonthlyPrice, false);
+    var tenantSubscription =
+      new TenantSubscription(tenant.Id, subscription.Id, today, subscription.MonthlyPrice, false);
     tenantSubscription.Extend(newExpiryDate);
 
     await _tenantDbContext.AddAsync(tenantSubscription);
@@ -235,7 +236,8 @@ internal class TenantService : ITenantService
     if (extendedExpiryDate == null)
     {
       var today = DateTime.Now;
-      var subscription = await _tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.Id == tenantSubscription.SubscriptionId);
+      var subscription =
+        await _tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.Id == tenantSubscription.SubscriptionId);
       if (subscription == null)
       {
         throw new NotFoundException(_t["Subscription {0} not found", tenantSubscription.SubscriptionId]);
@@ -273,9 +275,7 @@ internal class TenantService : ITenantService
     var tenant = await _tenantStore.TryGetAsync(id)
                  ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
 
-    var activeSubscriptions = await GetActiveSubscriptions(tenant.Id);
-
-    return activeSubscriptions.Count > 0 ? tenant.SetActiveSubscriptions(activeSubscriptions.ToList()) : tenant;
+    return tenant;
   }
 
   public async Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string id)
