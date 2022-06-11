@@ -15,10 +15,11 @@ public class GetOrderRequest : IRequest<OrderDto>
 public class GetOrderRequestHandler : IRequestHandler<GetOrderRequest, OrderDto>
 {
   private readonly IReadRepository<Order> _repository;
-
-  public GetOrderRequestHandler(IReadRepository<Order> repository)
+  private readonly IStringLocalizer _t;
+  public GetOrderRequestHandler(IReadRepository<Order> repository, IStringLocalizer<GetOrderRequestHandler> localizer)
   {
     _repository = repository;
+    _t = localizer;
   }
 
   public async Task<OrderDto> Handle(GetOrderRequest request, CancellationToken cancellationToken)
@@ -26,7 +27,7 @@ public class GetOrderRequestHandler : IRequestHandler<GetOrderRequest, OrderDto>
     var order = await _repository.GetBySpecAsync((ISpecification<Order, OrderDto>)new GetOrderDetailByIdSpec(request.OrderId), cancellationToken);
     if (order is null)
     {
-      throw new NotFoundException(nameof(order));
+      throw new NotFoundException(_t["Order #{0} not found", request.OrderId]);
     }
 
     return order;

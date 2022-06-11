@@ -15,12 +15,14 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   private readonly IReadRepository<Order> _repository;
   private readonly IPdfWriter _pdfWriter;
   private readonly IVatQrCodeGenerator _vatQrCodeGenerator;
+  private readonly IStringLocalizer _t;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator, IStringLocalizer<ExportOrderInvoiceRequestHandler> localizer)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
     _vatQrCodeGenerator = vatQrCodeGenerator;
+    _t = localizer;
   }
 
   public async Task<(string OrderNumber, Stream PdfInvoice)> Handle(ExportOrderInvoiceRequest request, CancellationToken
@@ -31,7 +33,7 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     var order = await _repository.GetBySpecAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
     if (order == null)
     {
-      throw new NotFoundException(nameof(order));
+      throw new NotFoundException(_t["Order #{0} ({1}) not found", request.OrderNumber ?? string.Empty, request.OrderId ?? Guid.Empty]);
     }
 
     var invoice = new InvoiceDocument(order, _vatQrCodeGenerator);

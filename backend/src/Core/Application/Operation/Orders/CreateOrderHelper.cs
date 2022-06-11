@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Catalog.ServiceCatalogs;
+﻿using System.Security.AccessControl;
+using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Multitenancy;
@@ -18,16 +19,17 @@ public class CreateOrderHelper : ICreateOrderHelper
   private readonly ITenantSequenceGenerator _sequenceGenerator;
   private readonly IVatQrCodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
-
+  private readonly IStringLocalizer _t;
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
-    IVatSettingProvider vatSettingProvider)
+    IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer)
   {
     _repository = repository;
     _serviceCatalogRepo = serviceCatalogRepo;
     _sequenceGenerator = sequenceGenerator;
     _barcodeGenerator = barcodeGenerator;
     _vatSettingProvider = vatSettingProvider;
+    _t = localizer;
   }
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
@@ -50,7 +52,7 @@ public class CreateOrderHelper : ICreateOrderHelper
         cancellationToken);
       if (serviceItem is null)
       {
-        throw new ArgumentNullException(nameof(serviceItem));
+        throw new ArgumentNullException(_t["Service catalog item {0} is not found", item.ItemId]);
       }
 
       orderItems.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty,
@@ -61,7 +63,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     decimal totalPaid = cashOrder ? orderItemsTotal : payments.Sum(a => a.Amount);
     if (totalPaid < orderItemsTotal)
     {
-      throw new InvalidOperationException($"Total paid amount {totalPaid} doesn't match order net amount {orderItemsTotal}");
+      throw new InvalidOperationException(_t["Total paid amount {0} doesn't match order net amount {1}", totalPaid, orderItemsTotal]);
     }
 
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
