@@ -12,6 +12,7 @@ public class TenantSubscription : BaseEntity
   }
 
   public string TenantId { get; private set; }
+  public FSHTenantInfo Tenant { get; set; }
   public bool IsDemo { get; private set; }
   public DateTime StartDate { get; private set; }
   public decimal Price { get; private set; }
