@@ -1,17 +1,24 @@
 ﻿using Finbuckle.MultiTenant.Stores;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using FSH.WebApi.Shared.Multitenancy;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
 public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 {
-  public TenantDbContext(DbContextOptions<TenantDbContext> options)
+  private readonly DatabaseSettings _dbSettings;
+
+  public TenantDbContext(DbContextOptions<TenantDbContext> options, IOptions<DatabaseSettings> dbSettings)
     : base(options)
   {
+    _dbSettings = dbSettings.Value;
   }
 
   public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
@@ -27,8 +34,31 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
 
-    modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);
-    modelBuilder.Entity<Subscription>().ToTable("Subscriptions", SchemaNames.MultiTenancy);
-    modelBuilder.Entity<PaymentMethod>().ToTable("RootPaymentMethods", SchemaNames.MultiTenancy);
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .HasMany(a => a.Subscriptions)
+      .WithOne(a => a.Tenant)
+      .HasForeignKey(a => a.TenantId);
+
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .HasMany(a => a.Branches)
+      .WithOne(a => a.Tenant)
+      .HasForeignKey(a => a.TenantId);
+
+    // modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);
+    // modelBuilder.Entity<Subscription>().ToTable("Subscriptions", SchemaNames.MultiTenancy);
+    // modelBuilder.Entity<PaymentMethod>().ToTable("RootPaymentMethods", SchemaNames.MultiTenancy);
+  }
+
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+    base.OnConfiguring(optionsBuilder);
+
+    if (_dbSettings.LogSensitiveInfo)
+    {
+      optionsBuilder.EnableSensitiveDataLogging();
+      optionsBuilder.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+    }
   }
 }

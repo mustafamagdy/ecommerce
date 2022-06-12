@@ -4,6 +4,6 @@
     "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-05;User Id=root;Password=DeV12345",
     "ConnectionStringTemplate": "Data Source=127.0.0.1;Initial Catalog={0};User Id=root;Password=DeV12345",
     "SequenceTableName": "Sequences",
-    "LogSensitiveInfo" : false
+    "LogSensitiveInfo" : true
   }
 }
