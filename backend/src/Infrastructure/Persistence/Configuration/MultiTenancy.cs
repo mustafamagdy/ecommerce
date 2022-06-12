@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,6 @@ public class TenantSubscriptionConfig : IEntityTypeConfiguration<TenantSubscript
 {
   public void Configure(EntityTypeBuilder<TenantSubscription> builder)
   {
-    builder
-      .HasOne<FSHTenantInfo>()
-      .WithMany(a => a.Subscriptions)
-      .HasForeignKey(a => a.TenantId);
   }
 }
 
