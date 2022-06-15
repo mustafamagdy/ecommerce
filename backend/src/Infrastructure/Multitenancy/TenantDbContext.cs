@@ -27,7 +27,7 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
 
-    modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);
+    modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);td
     modelBuilder.Entity<Subscription>().ToTable("Subscriptions", SchemaNames.MultiTenancy);
     modelBuilder.Entity<PaymentMethod>().ToTable("RootPaymentMethods", SchemaNames.MultiTenancy);
   }
