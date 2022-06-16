@@ -56,15 +56,41 @@ public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResp
 public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRequest, PaginationResponse<TenantDto>>
 {
   private readonly IReadTenantRepository<FSHTenantInfo> _repository;
+  private readonly IDapperDbRepository _repo;
 
 
-  public SearchAllTenantsRequestHandler(IReadTenantRepository<FSHTenantInfo> repository) =>
+  public SearchAllTenantsRequestHandler(IReadTenantRepository<FSHTenantInfo> repository, IDapperDbRepository repo)
+  {
     _repository = repository;
+    _repo = repo;
+  }
 
-  public Task<PaginationResponse<TenantDto>> Handle(SearchAllTenantsRequest request,
+  public async Task<PaginationResponse<TenantDto>> Handle(SearchAllTenantsRequest request,
     CancellationToken cancellationToken)
   {
-    var spec = new TenantBySearchRequestSpec(request);
-    return _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
+    var result = await _repo.QueryAsync<TenantDto>(@"
+select t.id, t.identifier, t.name, t.adminEmail, t.isActive, ts.Id, ts.ExpiryDate, ts.IsDemo,
+       sp.Amount, pm.Name as 'PaymentMethodName', b.Id, b.Name, b.Description
+from tenants t
+         LEFT OUTER JOIN branches b on t.id = b.tenantId
+         LEFT OUTER JOIN tenantsubscriptions ts on t.id = ts.tenantId
+         LEFT OUTER JOIN subscriptions s on s.id = ts.subscriptionId
+         LEFT OUTER JOIN subscriptionpayment sp on sp.TenantSubscriptionId = ts.Id
+         LEFT OUTER JOIN rootpaymentmethods pm on pm.Id = sp.PaymentMethodId
+where (@s1 <> '' or ts.startDate >= @s1)
+   OR (@s1 <> '' or ts.startDate <= @s1)
+group by t.id,ts.id, ts.price
+having (@i = 0 or (ts.Price - sum(sp.amount)) > @i)
+",
+      new
+      {
+        i = 0,
+        s1 = "2022-01-22"
+      },
+      cancellationToken: cancellationToken);
+    // var spec = new TenantBySearchRequestSpec(request);
+    // return _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
+
+    return null;
   }
 }
