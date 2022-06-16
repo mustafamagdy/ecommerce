@@ -2,7 +2,7 @@ using System.Data;
 
 namespace FSH.WebApi.Application.Common.Persistence;
 
-public interface IDapperRepository : ITransientService
+public interface IDapperEntityRepository : ITransientService
 {
   Task<IReadOnlyList<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;
