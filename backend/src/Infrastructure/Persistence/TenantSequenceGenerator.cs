@@ -14,12 +14,12 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
   private readonly IHostEnvironment _env;
-  private readonly IDapperRepository _counterRepo;
+  private readonly IDapperEntityRepository _counterRepo;
   private readonly string _sequenceTableName;
   private bool? _counterTableExist;
   private readonly string? _connectionString;
 
-  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env, IDapperRepository counterRepo)
+  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env, IDapperEntityRepository counterRepo)
   {
     _currentTenant = currentTenant;
     _env = env;
