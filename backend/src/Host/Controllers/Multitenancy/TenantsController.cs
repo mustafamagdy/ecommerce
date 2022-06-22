@@ -4,12 +4,12 @@ namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
 public class TenantsController : VersionNeutralApiController
 {
-  [HttpGet]
-  [MustHavePermission(FSHAction.View, FSHResource.Tenants)]
-  [OpenApiOperation("Get a list of all tenants.", "")]
-  public Task<List<TenantDto>> GetListAsync()
+  [HttpPost("search")]
+  [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
+  [OpenApiOperation("Search all tenants.", "")]
+  public Task<PaginationResponse<TenantDto>> GetListAsync(SearchAllTenantsRequest request)
   {
-    return Mediator.Send(new GetAllTenantsRequest());
+    return Mediator.Send(request);
   }
 
   [HttpGet("{id}")]
@@ -51,16 +51,30 @@ public class TenantsController : VersionNeutralApiController
   [OpenApiOperation("Get a list of active subscriptions for a tenant.", "")]
   public Task<List<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId)
   {
-    return Mediator.Send(new GetActiveSubscriptionsRequest(tenantId));
+    return Mediator.Send(new GetTenantSubscriptionsRequest(tenantId, activeSubscription: null));
   }
 
-  [HttpPost("{tenantId}/subscription/{subscriptionId}/renew")]
+  [HttpPost("renew")]
   [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
   [OpenApiOperation("Renew subscription for a tenant", "")]
-  public async Task<ActionResult<string>> RenewSubscription(string tenantId, string subscriptionId, RenewSubscriptionRequest request)
+  public Task<string> RenewSubscription(RenewSubscriptionRequest request)
   {
-    return (tenantId != request.TenantId || subscriptionId != request.SubscriptionId)
-      ? BadRequest()
-      : Ok(await Mediator.Send(request));
+    return Mediator.Send(request);
+  }
+
+  [HttpGet("{id}/info")]
+  [MustHavePermission(FSHAction.ViewBasic, FSHResource.Tenants)]
+  [OpenApiOperation("Get tenant details.", "")]
+  public Task<BasicTenantInfoDto> GetBasicAsync(string id)
+  {
+    return Mediator.Send(new GetBasicTenantInfoRequest(id));
+  }
+
+  [HttpPost("branch")]
+  [MustHavePermission(FSHAction.Create, FSHResource.Brands)]
+  [OpenApiOperation("Create a branch for the current tenant.", "")]
+  public Task<Guid> CreateBranchAsync(CreateBranchRequest request)
+  {
+    return Mediator.Send(request);
   }
 }

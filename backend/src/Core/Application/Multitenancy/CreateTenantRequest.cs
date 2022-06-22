@@ -7,6 +7,14 @@ public class CreateTenantRequest : IRequest<string>
     public string? DatabaseName { get; set; }
     public string AdminEmail { get; set; } = default!;
     public string? Issuer { get; set; }
+
+    public string? PhoneNumber { get; set; }
+    public string? VatNo { get; set; }
+    public string? Email { get; set; }
+    public string? Address { get; set; }
+    public string? AdminName { get; set; }
+    public string? AdminPhoneNumber { get; set; }
+    public string? TechSupportUserId { get; set; }
 }
 
 public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, string>

@@ -18,6 +18,7 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.9.7" />
         <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
         <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.1" />
         <PackageReference Include="MailKit" Version="3.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.5" />
@@ -40,7 +41,11 @@
         <PackageReference Include="MimeKit" Version="3.2.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.4" />
         <PackageReference Include="NSwag.AspNetCore" Version="13.15.10" />
+        <PackageReference Include="ObjectsComparer" Version="1.4.1" />
+        <PackageReference Include="QuestPDF" Version="2022.6.0-prerelease" />
         <PackageReference Include="RazorEngineCore" Version="2022.1.2" />
+        <PackageReference Include="SkiaSharp" Version="2.88.1-preview.1" />
+        <PackageReference Include="SkiaSharp.QrCode" Version="0.6.0" />
         <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" Version="0.5.1" />
         <PackageReference Include="Oracle.EntityFrameworkCore" Version="6.21.61" />
         <PackageReference Include="OrchardCore.Localization.Core" Version="1.3.0" />
@@ -69,5 +74,35 @@
     </ItemGroup>
     <ItemGroup>
         <None Update="Catalog\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Catalog\services.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Catalog\services-catalog.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Catalog\products.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\brands.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\customers.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\products.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\services.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\services-catalog.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\payment-methods.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\subscriptions.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 </Project>

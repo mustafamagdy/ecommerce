@@ -4,4 +4,7 @@
         <RootNamespace>FSH.WebApi.Shared</RootNamespace>
         <AssemblyName>FSH.WebApi.Shared</AssemblyName>
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\Multitenancy\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+    </ItemGroup>
 </Project>
