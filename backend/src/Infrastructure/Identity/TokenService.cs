@@ -5,9 +5,9 @@ using System.Text;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
-using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
@@ -78,9 +78,9 @@ internal class TokenService : ITokenService
     return await GenerateTokensAndUpdateUser(user, ipAddress);
   }
 
-  private async Task<bool> HasAValidSubscription(string tenantId)
+  private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return (await _tenantService.GetActiveSubscriptions(tenantId)).Any();
+    return _tenantService.HasAValidSubscription(tenantId);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)

@@ -4,17 +4,38 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Infrastructure.Persistence;
-using FSH.WebApi.Infrastructure.Persistence.Context;
+using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
+
+public class DemoService : IHostedService
+{
+  private readonly IJobService _jobService;
+
+  public DemoService(IJobService jobService)
+  {
+    _jobService = jobService;
+  }
+
+  public Task StartAsync(CancellationToken cancellationToken)
+  {
+    _jobService.Enqueue(() => Console.WriteLine("This is a demo job is running at startup, it can be anything"));
+    return Task.CompletedTask;
+  }
+
+  public Task StopAsync(CancellationToken cancellationToken)
+  {
+    Console.WriteLine("Stopping async ");
+    return Task.CompletedTask;
+  }
+}
 
 internal class TenantService : ITenantService
 {
@@ -26,8 +47,7 @@ internal class TenantService : ITenantService
   private readonly IMailService _mailService;
   private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
-  private readonly ITenantConnectionStringBuilder _csBuilder;
-  private readonly DatabaseSettings _dbSettings;
+  private readonly IReadRepository<Branch> _branchRepo;
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
@@ -38,8 +58,7 @@ internal class TenantService : ITenantService
     IMailService mailService,
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
-    ITenantConnectionStringBuilder csBuilder,
-    IOptions<DatabaseSettings> dbSettings)
+    IReadRepository<Branch> branchRepo)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -49,13 +68,13 @@ internal class TenantService : ITenantService
     _mailService = mailService;
     _templateService = templateService;
     _t = localizer;
-    _csBuilder = csBuilder;
-    _dbSettings = dbSettings.Value;
+    _branchRepo = branchRepo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
   {
     var tenants = (await _tenantStore.GetAllAsync()).Adapt<List<TenantDto>>();
+
     // tenants.ForEach(t => t.DatabaseName = _csSecurer.MakeSecure(t.DatabaseName));
     return tenants;
   }
@@ -74,10 +93,12 @@ internal class TenantService : ITenantService
 
   public async Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail, request.Issuer);
+    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail,
+      request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
+      request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
-    var subscription = await TryCreateSubscription(tenant);
+    var subscription = await TryCreateMonthlySubscription(tenant);
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
@@ -115,29 +136,33 @@ internal class TenantService : ITenantService
     _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
   }
 
-  private async Task<TenantSubscriptionInfo> TryCreateSubscription(FSHTenantInfo tenant)
+  private async Task<TenantSubscriptionInfo> TryCreateMonthlySubscription(FSHTenantInfo tenant)
   {
-    var newExpiryDate = DateTime.Now.AddMonths(1);
-    var subscription = new TenantSubscription
-    {
-      TenantId = tenant.Id,
-      ExpiryDate = newExpiryDate,
-      IsDemo = false
-    };
+    var subscription = await GetDefaultMonthlySubscription();
+    var today = DateTime.Now;
+    var newExpiryDate = today.AddMonths(1);
+    var tenantSubscription =
+      new TenantSubscription(tenant.Id, subscription.Id, today, subscription.MonthlyPrice, false);
+    tenantSubscription.Extend(newExpiryDate);
 
-    await _tenantDbContext.AddAsync(subscription);
+    await _tenantDbContext.AddAsync(tenantSubscription);
     bool result = (await _tenantDbContext.SaveChangesAsync()) > 0;
     if (!result)
     {
       throw new DbUpdateException($"Failed to create tenant subscription for {tenant.Name}");
     }
 
-    return subscription.Adapt<TenantSubscriptionInfo>();
+    return tenantSubscription.Adapt<TenantSubscriptionInfo>();
+  }
+
+  private Task<Subscription> GetDefaultMonthlySubscription()
+  {
+    return _tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.DefaultMonthly);
   }
 
   private async Task TryRemoveSubscriptions(string tenantId)
   {
-    var subscriptions = await _tenantDbContext.Subscriptions.Where(a => a.TenantId == tenantId).ToArrayAsync();
+    var subscriptions = await _tenantDbContext.TenantSubscriptions.Where(a => a.TenantId == tenantId).ToArrayAsync();
     if (subscriptions.Length > 0)
     {
       _tenantDbContext.RemoveRange(subscriptions);
@@ -145,9 +170,9 @@ internal class TenantService : ITenantService
     }
   }
 
-  public async Task<string> ActivateAsync(string id)
+  public async Task<string> ActivateAsync(string tenantId)
   {
-    var tenant = await GetTenantInfoAsync(id);
+    var tenant = await GetTenantInfoAsync(tenantId);
 
     if (tenant.IsActive)
     {
@@ -158,29 +183,26 @@ internal class TenantService : ITenantService
 
     await _tenantStore.TryUpdateAsync(tenant);
 
-    var subscriptions = await _tenantDbContext
-      .Subscriptions
-      .Where(a => a.TenantId == tenant.Id && !a.IsDemo)
-      .OrderByDescending(a => a.ExpiryDate)
-      .ToArrayAsync();
-
     var newExpiryDate = DateTime.Now.AddMonths(1);
-    if (subscriptions.Length > 0)
+    var activeSubscriptions = await GetActiveSubscriptions(tenantId);
+    if (activeSubscriptions.Count > 0)
     {
-      var activeSubscription = subscriptions.First();
-      activeSubscription.ExpiryDate = newExpiryDate;
+      var activeSubscription = activeSubscriptions.First();
+      activeSubscription.Extend(newExpiryDate);
+
+      _tenantDbContext.Update(activeSubscription);
     }
     else
     {
-      await TryCreateSubscription(tenant);
+      await TryCreateMonthlySubscription(tenant);
     }
 
-    return _t["Tenant {0} is now Activated.", id];
+    return _t["Tenant {0} is now Activated.", tenantId];
   }
 
-  public async Task<string> DeactivateAsync(string id)
+  public async Task<string> DeactivateAsync(string tenantId)
   {
-    var tenant = await GetTenantInfoAsync(id);
+    var tenant = await GetTenantInfoAsync(tenantId);
 
     if (!tenant.IsActive)
     {
@@ -191,31 +213,59 @@ internal class TenantService : ITenantService
 
     await _tenantStore.TryUpdateAsync(tenant);
 
-    return _t[$"Tenant {0} is now Deactivated.", id];
+    var activeSubscriptions = await GetActiveSubscriptions(tenantId);
+    if (activeSubscriptions.Count > 0)
+    {
+      var activeSubscription = activeSubscriptions.First();
+      activeSubscription.DeActivate();
+
+      _tenantDbContext.Update(activeSubscription);
+    }
+
+    return _t[$"Tenant {0} is now Deactivated.", tenantId];
   }
 
-  public async Task<string> RenewSubscription(string subscriptionId, DateTime extendedExpiryDate)
+  public async Task<string> RenewSubscription(Guid subscriptionId, DateTime? extendedExpiryDate)
   {
-    var subscription = await _tenantDbContext.Subscriptions.FindAsync(subscriptionId);
-    if (subscription == null)
+    var tenantSubscription = await _tenantDbContext.TenantSubscriptions.FindAsync(subscriptionId);
+    if (tenantSubscription == null)
     {
       throw new NotFoundException(_t["Subscription not found."]);
     }
 
-    subscription.ExpiryDate = extendedExpiryDate;
-    _tenantDbContext.Update(subscription);
+    if (extendedExpiryDate == null)
+    {
+      var today = DateTime.Now;
+      var subscription =
+        await _tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.Id == tenantSubscription.SubscriptionId);
+      if (subscription == null)
+      {
+        throw new NotFoundException(_t["Subscription {0} not found", tenantSubscription.SubscriptionId]);
+      }
 
-    return _t[$"Subscription {0} renewed. Now Valid till {1}.", subscription.Id, subscription.ExpiryDate];
+      extendedExpiryDate = today.AddDays(subscription.Days);
+    }
+
+    tenantSubscription.Extend(extendedExpiryDate.Value);
+    _tenantDbContext.Update(tenantSubscription);
+    await _tenantDbContext.SaveChangesAsync();
+
+    return _t["Subscription {0} renewed. Now Valid till {1}.", tenantSubscription.Id, tenantSubscription.ExpiryDate];
   }
 
-  public async Task<IEnumerable<TenantSubscriptionDto>> GetActiveSubscriptions(string tenantId)
+  public async Task<bool> HasAValidSubscription(string tenantId) => (await GetActiveSubscriptions(tenantId)).Count > 0;
+
+  public async Task<IReadOnlyList<TenantSubscription>> GetActiveSubscriptions(string tenantId)
   {
-    var subscription = (await _tenantDbContext.Subscriptions
-      .Where(a => a.TenantId == tenantId && a.ExpiryDate > DateTime.Now)
-      .ToListAsync()).Adapt<List<TenantSubscriptionDto>>();
-
-    return subscription;
+    var now = DateTime.Now;
+    return (await _tenantDbContext.TenantSubscriptions
+        .Where(a => a.TenantId == tenantId && a.ExpiryDate >= now && a.StartDate <= now && a.Active && !a.IsDemo)
+        .ToListAsync()
+      ).AsReadOnly();
   }
+
+  public Task<List<TenantSubscription>> GetAllTenantSubscriptions(string tenantId)
+    => _tenantDbContext.TenantSubscriptions.Where(a => a.TenantId == tenantId).ToListAsync();
 
   public async Task<bool> DatabaseExistAsync(string databaseName) =>
     (await _tenantStore.GetAllAsync()).Any(t => t.DatabaseName == databaseName);
@@ -225,11 +275,23 @@ internal class TenantService : ITenantService
     var tenant = await _tenantStore.TryGetAsync(id)
                  ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
 
-    var activeSubscriptions = await _tenantDbContext
-      .Subscriptions
-      .Where(a => a.TenantId == tenant.Id && a.ExpiryDate >= DateTime.Now)
-      .ToListAsync();
+    return tenant;
+  }
 
-    return activeSubscriptions.Count > 0 ? tenant.SetActiveSubscriptions(activeSubscriptions) : tenant;
+  public async Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string id)
+  {
+    var tenant = await _tenantStore.TryGetAsync(id)
+                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+
+    var tenantBranchSpec = new TenantBranchSpec(id);
+    var branches = await _branchRepo.ListAsync(tenantBranchSpec);
+
+    var tenantDto = tenant.Adapt<BasicTenantInfoDto>();
+    tenantDto.Branches = branches.Adapt<List<BranchDto>>();
+
+    var activeSubscription = (await GetActiveSubscriptions(id)).FirstOrDefault(a => !a.IsDemo);
+    tenantDto.CurrentSubscription = activeSubscription?.Adapt<BasicSubscriptionInfoDto>();
+
+    return tenantDto;
   }
 }

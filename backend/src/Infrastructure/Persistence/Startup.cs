@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -6,6 +7,7 @@ using FSH.WebApi.Infrastructure.Persistence.ConnectionString;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.Persistence.Repository;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,7 +45,8 @@ internal static class Startup
       .AddTransient<CustomSeederRunner>()
       .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
       .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
-      .AddRepositories();
+      .AddRepositories()
+      .AddTransient<ITenantSequenceGenerator, TenantSequenceGenerator>();
   }
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
@@ -80,11 +83,16 @@ internal static class Startup
   {
     // Add Repositories
     services.AddScoped(typeof(IRepository<>), typeof(ApplicationDbRepository<>));
+    services.AddScoped(typeof(ITenantRepository<>), typeof(TenantDbRepository<>));
+    services.AddScoped(typeof(IReadTenantRepository<>), typeof(TenantDbRepository<>));
 
-    foreach (var aggregateRootType in
-             typeof(IAggregateRoot).Assembly.GetExportedTypes()
-               .Where(t => typeof(IAggregateRoot).IsAssignableFrom(t) && t.IsClass)
-               .ToList())
+    var aggregateRootTypes = typeof(IAggregateRoot)
+      .Assembly
+      .GetExportedTypes()
+      .Where(t => typeof(IAggregateRoot).IsAssignableFrom(t) && t.IsClass)
+      .ToList();
+
+    foreach (var aggregateRootType in aggregateRootTypes)
     {
       // Add ReadRepositories.
       services.AddScoped(typeof(IReadRepository<>).MakeGenericType(aggregateRootType), sp =>

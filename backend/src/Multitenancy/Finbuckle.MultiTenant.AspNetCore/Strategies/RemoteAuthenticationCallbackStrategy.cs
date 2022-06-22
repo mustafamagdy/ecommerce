@@ -85,7 +85,7 @@ namespace Finbuckle.MultiTenant.Strategies
                         if (properties == null)
                         {
                             if(logger != null)
-                                logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
+                                logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback");
                             return null;
                         }
 

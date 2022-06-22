@@ -3,8 +3,8 @@ namespace FSH.WebApi.Application.Multitenancy;
 public class RenewSubscriptionRequest : IRequest<string>
 {
   public string TenantId { get; set; } = default!;
-  public string SubscriptionId { get; set; } = default!;
-  public DateTime ExtendedExpiryDate { get; set; }
+  public Guid SubscriptionId { get; set; } = default!;
+  public DateTime? ExtendedExpiryDate { get; set; }
 }
 
 public class RenewSubscriptionRequestValidator : CustomValidator<RenewSubscriptionRequest>
