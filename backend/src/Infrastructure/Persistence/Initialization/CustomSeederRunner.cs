@@ -4,16 +4,16 @@ namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
 internal class CustomSeederRunner
 {
-    private readonly ICustomSeeder[] _seeders;
+  private readonly ICustomSeeder[] _seeders;
 
-    public CustomSeederRunner(IServiceProvider serviceProvider) =>
-        _seeders = serviceProvider.GetServices<ICustomSeeder>().ToArray();
+  public CustomSeederRunner(IServiceProvider serviceProvider) =>
+    _seeders = serviceProvider.GetServices<ICustomSeeder>().OrderBy(a => a.Order).ToArray();
 
-    public async Task RunSeedersAsync(CancellationToken cancellationToken)
+  public async Task RunSeedersAsync(CancellationToken cancellationToken)
+  {
+    foreach (var seeder in _seeders)
     {
-        foreach (var seeder in _seeders)
-        {
-            await seeder.InitializeAsync(cancellationToken);
-        }
+      await seeder.InitializeAsync(cancellationToken);
     }
+  }
 }

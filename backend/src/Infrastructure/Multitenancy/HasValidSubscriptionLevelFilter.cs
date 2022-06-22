@@ -1,5 +1,6 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.MultiTenancy;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -27,10 +28,10 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
         if (await _tenantResolver.ResolveAsync(context.HttpContext) is MultiTenantContext<FSHTenantInfo> tenantContext)
         {
           var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id);
-          if (tenant.ActiveSubscriptions?.Count == 0 && subscriptionLevel.Level != SubscriptionLevel.Basic)
-          {
-            throw new FeatureNotAllowedException();
-          }
+          // if (tenant.ActiveSubscription == null)
+          // {
+          //   throw new FeatureNotAllowedException();
+          // }
         }
 
         await next();

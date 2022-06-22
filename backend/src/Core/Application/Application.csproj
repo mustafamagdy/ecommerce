@@ -6,14 +6,24 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Ardalis.Specification" Version="6.0.1" />
+        <PackageReference Include="Dapper" Version="2.0.123" />
+        <PackageReference Include="Dapper.FluentColumnMapping" Version="1.1.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.4.0" />
+        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.1" />
         <PackageReference Include="Mapster" Version="7.3.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
         <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.5" />
+        <PackageReference Include="QuestPDF" Version="2022.6.0-prerelease" />
+        <PackageReference Include="SkiaSharp.QrCode" Version="0.6.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Domain\Domain.csproj" />
         <ProjectReference Include="..\Shared\Shared.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\6.0.4\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

@@ -1,0 +1,367 @@
+{
+	"info": {
+		"_postman_id": "4ae1b915-685c-4c96-a763-6160ead46e7f",
+		"name": "demo-permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth-admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('token', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "manager-auth-for-mot-create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('mot', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Create\",\n  \"scope\": \"1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "manager-auth-for-mot-delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('mot', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Delete\",\n  \"scope\": \"08da48b0-515f-478e-8681-e99a622f6985\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "manager-auth-for-mot-delete (invalid scope)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('mot', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@root.com\",\n  \"password\": \"123Pa$$word!\",\n  \"permission\":\"Permissions.Brands.Delete\",\n  \"scope\": \"1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens/mot",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens",
+						"mot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth-user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.code == 200) {",
+							"    pm.environment.set('user-token', pm.response.json().token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "root",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"demo1@root.com\",\n    \"password\": \"1234@1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/tokens",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "demo-setup",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "tenant",
+						"value": "{{tenant}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/demo/demo1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"demo",
+						"demo1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-delete-brand-not-auth",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "mot",
+						"value": "{{mot}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"brand1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/demo/08da48b0-515f-478e-8681-e99a622f6985",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"demo",
+						"08da48b0-515f-478e-8681-e99a622f6985"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-create-brand-not-auth",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "mot",
+						"value": "{{mot}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"brand11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/demo",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"demo"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Infrastructure.Multitenancy;
+﻿using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Infrastructure.Multitenancy;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 

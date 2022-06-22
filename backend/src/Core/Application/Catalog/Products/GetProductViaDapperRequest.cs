@@ -11,10 +11,10 @@ public class GetProductViaDapperRequest : IRequest<ProductDto>
 
 public class GetProductViaDapperRequestHandler : IRequestHandler<GetProductViaDapperRequest, ProductDto>
 {
-    private readonly IDapperRepository _repository;
+    private readonly IDapperEntityRepository _repository;
     private readonly IStringLocalizer _t;
 
-    public GetProductViaDapperRequestHandler(IDapperRepository repository, IStringLocalizer<GetProductViaDapperRequestHandler> localizer) =>
+    public GetProductViaDapperRequestHandler(IDapperEntityRepository repository, IStringLocalizer<GetProductViaDapperRequestHandler> localizer) =>
         (_repository, _t) = (repository, localizer);
 
     public async Task<ProductDto> Handle(GetProductViaDapperRequest request, CancellationToken cancellationToken)
