@@ -2,6 +2,10 @@ namespace FSH.WebApi.Domain.Operation;
 
 public class PaymentMethod : BaseEntity, IAggregateRoot
 {
+  public PaymentMethod()
+  {
+  }
+
   public PaymentMethod(string name, bool cashDefault)
   {
     Name = name;

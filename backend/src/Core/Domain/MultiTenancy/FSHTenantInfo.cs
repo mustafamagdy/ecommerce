@@ -54,8 +54,7 @@ public class FSHTenantInfo : ITenantInfo
   public string? TechSupportUserId { get; set; }
   public bool IsActive { get; private set; }
 
-  public virtual HashSet<TenantSubscription> Subscriptions { get; set; } = default!;
-  public virtual HashSet<Branch> Branches { get; set; } = default!;
+  public virtual HashSet<TenantSubscription> Subscriptions { get; set; }
 
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.

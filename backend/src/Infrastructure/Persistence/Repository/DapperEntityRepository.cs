@@ -2,7 +2,6 @@ using System.Data;
 using Dapper;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Application.Common.Exceptions;
-using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Persistence.Context;
@@ -78,16 +77,4 @@ public class DapperEntityRepository : IDapperEntityRepository
   }
 
   public string DatabaseName => _dbContext.Connection.Database;
-}
-
-public class DapperDbRepository : IDapperDbRepository
-{
-  public DapperDbRepository(string connectionString)
-  {
-
-  }
-  public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, CancellationToken cancellationToken = default) where T : IDto
-  {
-
-  }
 }
