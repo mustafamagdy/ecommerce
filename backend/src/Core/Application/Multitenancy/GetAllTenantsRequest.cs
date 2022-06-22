@@ -1,4 +1,8 @@
-﻿using FSH.WebApi.Domain.MultiTenancy;
+﻿using Dapper;
+using Dapper.FluentColumnMapping;
+using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Authorization;
 using Mapster;
 
@@ -23,7 +27,6 @@ public class TenantBySearchRequestSpec : EntitiesByPaginationFilterSpec<FSHTenan
       .Include(a => a.Subscriptions)
       .ThenInclude(a => a.Payments)
       .ThenInclude(a => a.PaymentMethod)
-      .Include(a => a.Branches)
       .Where(a => request.Active == null || a.IsActive == request.Active)
       .Where(a => string.IsNullOrEmpty(request.Name) || a.Name.Contains(request.Name))
       .Where(a => string.IsNullOrEmpty(request.PhoneNumber) || a.PhoneNumber.Contains(request.PhoneNumber))
@@ -56,10 +59,10 @@ public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResp
 public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRequest, PaginationResponse<TenantDto>>
 {
   private readonly IReadTenantRepository<FSHTenantInfo> _repository;
-  private readonly IDapperDbRepository _repo;
+  private readonly IDapperTenantConnectionAccessor _repo;
 
 
-  public SearchAllTenantsRequestHandler(IReadTenantRepository<FSHTenantInfo> repository, IDapperDbRepository repo)
+  public SearchAllTenantsRequestHandler(IReadTenantRepository<FSHTenantInfo> repository, IDapperTenantConnectionAccessor repo)
   {
     _repository = repository;
     _repo = repo;
@@ -68,29 +71,130 @@ public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRe
   public async Task<PaginationResponse<TenantDto>> Handle(SearchAllTenantsRequest request,
     CancellationToken cancellationToken)
   {
-    var result = await _repo.QueryAsync<TenantDto>(@"
-select t.id, t.identifier, t.name, t.adminEmail, t.isActive, ts.Id, ts.ExpiryDate, ts.IsDemo,
-       sp.Amount, pm.Name as 'PaymentMethodName', b.Id, b.Name, b.Description
-from tenants t
-         LEFT OUTER JOIN branches b on t.id = b.tenantId
-         LEFT OUTER JOIN tenantsubscriptions ts on t.id = ts.tenantId
-         LEFT OUTER JOIN subscriptions s on s.id = ts.subscriptionId
-         LEFT OUTER JOIN subscriptionpayment sp on sp.TenantSubscriptionId = ts.Id
-         LEFT OUTER JOIN rootpaymentmethods pm on pm.Id = sp.PaymentMethodId
-where (@s1 <> '' or ts.startDate >= @s1)
-   OR (@s1 <> '' or ts.startDate <= @s1)
-group by t.id,ts.id, ts.price
-having (@i = 0 or (ts.Price - sum(sp.amount)) > @i)
-",
-      new
-      {
-        i = 0,
-        s1 = "2022-01-22"
-      },
-      cancellationToken: cancellationToken);
-    // var spec = new TenantBySearchRequestSpec(request);
-    // return _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
+    string sql = @"
+create temporary table if not exists tmp_tenants as
+    (select t.id  as TenantId
+          , t.identifier
+          , t.name as TenantName
+          , t.adminEmail
+          , t.isActive
+          , ts.id as SubscriptionId
+          , ts.ExpiryDate
+          , ts.IsDemo
+          , sp.id as PaymentId
+          , sp.Amount
+          , pm.id as PaymentMethodId
+          , pm.Name as PaymentMethodName
+     from tenants t
+              left join tenantSubscriptions ts on t.id = ts.tenantId
+              left join subscriptions s on s.id = ts.subscriptionId
+              left join subscriptionPayment sp on sp.TenantSubscriptionId = ts.Id
+              left join rootPaymentMethods pm on pm.Id = sp.PaymentMethodId
+     where
+         ((@subStartedFrom is null or ts.startDate >= @subStartedFrom)
+         OR (@subStartedTo is null or ts.startDate <= @subStartedTo))
+       AND ((@subExpiredFrom is null or ts.expiryDate >= @subExpiredFrom)
+         OR (@subExpiredTo is null or ts.expiryDate <= @subExpiredTo))
+       AND (@name is null OR t.name like CONCAT('%', @name, '%'))
+       AND (@phoneNumber is null OR t.phoneNumber like CONCAT('%', @phoneNumber, '%'))
+     AND
+         t.Id in (
+         select t1.Id
+         from tenants t1
+             left join tenantSubscriptions ts1 on t1.id = ts1.tenantId
+             left join subscriptionPayment sp1 on sp1.TenantSubscriptionId = ts1.Id
+         group by t1.id, ts1.Price
+         having  (@balanceFrom is null or (ts1.Price - ifnull(sum(sp1.amount),0)) >= @balanceFrom)
+            AND (@balanceTo is null or (ts1.Price - ifnull(sum(sp1.amount),0)) <= @balanceFrom)
+         )
+     order by t.Id);
 
-    return null;
+select * from tmp_tenants limit @pageSize offset @offset;
+select count(*) from tmp_tenants;
+                       ";
+
+    var param = new
+    {
+      name = request.Name,
+      phoneNumber = request.PhoneNumber,
+      balanceFrom = request.Balance?.From,
+      balanceTo = request.Balance?.To,
+      subStartedFrom = request.SubscriptionStarted?.From,
+      subStartedTo = request.SubscriptionStarted?.To,
+      subExpiredFrom = request.SubscriptionExpired?.From,
+      subExpiredTo = request.SubscriptionExpired?.To,
+      pageSize = request.PageSize,
+      offset = request.PageNumber * request.PageSize
+    };
+
+    using var db = await _repo.GetDbConnection(cancellationToken);
+
+
+    var mappings = new ColumnMappingCollection();
+    mappings.RegisterType<TenantDto>()
+      .MapProperty(x => x.Id).ToColumn("TenantId")
+      .MapProperty(x => x.AdminEmail).ToColumn("adminEmail")
+      .MapProperty(x => x.IsActive).ToColumn("isActive")
+      .MapProperty(x => x.Name).ToColumn("TenantName");
+
+    mappings.RegisterType<TenantSubscriptionDto>()
+      .MapProperty(x => x.Id).ToColumn("SubscriptionId")
+      .MapProperty(x => x.TenantId).ToColumn("TenantId")
+      .MapProperty(x => x.ExpiryDate).ToColumn("ExpiryDate")
+      .MapProperty(x => x.IsDemo).ToColumn("IsDemo");
+
+    mappings.RegisterType<SubscriptionPaymentDto>()
+      .MapProperty(x => x.Amount).ToColumn("Amount")
+      .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
+      .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
+      .MapProperty(x => x.PaymentMethodName).ToColumn("PaymentMethodName");
+
+    mappings.RegisterWithDapper();
+
+    using var multiResult = await db.QueryMultipleAsync(sql, param);
+
+    var result = new Dictionary<string, TenantDto>();
+    var subs = new Dictionary<Guid, TenantSubscriptionDto>();
+    multiResult.Read<TenantDto, TenantSubscriptionDto, SubscriptionPaymentDto, TenantDto>(
+      (t, sub, pmt) =>
+      {
+        if (!result.ContainsKey(t.Id))
+        {
+          result.Add(t.Id, t);
+        }
+
+        var tenant = result[t.Id];
+        if (sub == null || sub.Id == Guid.Empty)
+        {
+          return t;
+        }
+
+        if (!subs.ContainsKey(sub.Id))
+        {
+          subs.Add(sub.Id, sub);
+        }
+
+        var subscription = subs[sub.Id];
+        subscription.TenantId = tenant.Id;
+
+        if (pmt != null && pmt.PaymentMethodId != Guid.Empty)
+        {
+          subscription.Payments.Add(pmt);
+        }
+
+        int subIdx = tenant.Subscriptions.FindIndex(a => a.Id == subscription.Id);
+        if (subIdx == -1)
+          tenant.Subscriptions.Add(subscription);
+        else
+          tenant.Subscriptions[subIdx] = subscription;
+
+        return t;
+      },
+      splitOn: "TenantId, SubscriptionId, PaymentId"
+    );
+
+    int totalCount = multiResult.ReadSingle<int>();
+
+    return new PaginationResponse<TenantDto>(result.Values.ToList(), totalCount, request.PageNumber, request.PageSize);
   }
 }

@@ -14,13 +14,17 @@ public class OrderPayment : Payment
 
 public abstract class Payment : AuditableEntity, IAggregateRoot
 {
+  public Payment()
+  {
+  }
+
   protected Payment(decimal amount, Guid paymentMethodId)
   {
     Amount = amount;
     PaymentMethodId = paymentMethodId;
   }
 
-  public decimal Amount { get; private set; }
-  public Guid PaymentMethodId { get; private set; }
+  public decimal Amount { get; protected set; }
+  public Guid PaymentMethodId { get; protected set; }
   public virtual PaymentMethod PaymentMethod { get; set; } = default!;
 }
