@@ -39,16 +39,6 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .HasMany(a => a.Subscriptions)
       .WithOne(a => a.Tenant)
       .HasForeignKey(a => a.TenantId);
-
-    modelBuilder
-      .Entity<FSHTenantInfo>()
-      .HasMany(a => a.Branches)
-      .WithOne(a => a.Tenant)
-      .HasForeignKey(a => a.TenantId);
-
-    // modelBuilder.Entity<TenantSubscription>().ToTable("TenantSubscriptions", SchemaNames.MultiTenancy);
-    // modelBuilder.Entity<Subscription>().ToTable("Subscriptions", SchemaNames.MultiTenancy);
-    // modelBuilder.Entity<PaymentMethod>().ToTable("RootPaymentMethods", SchemaNames.MultiTenancy);
   }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

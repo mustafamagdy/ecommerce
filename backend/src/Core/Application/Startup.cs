@@ -39,7 +39,13 @@ public class DtoCustomMapping
 
     TypeAdapterConfig<FSHTenantInfo, TenantDto>
       .NewConfig()
-      .Map(dest => dest.ActiveSubscription, src => src.Subscriptions.FirstOrDefault(a => a.Active && !a.IsDemo))
-      .Map(dest => dest.Subscriptions, src => src.Subscriptions.OrderByDescending(a => a.StartDate));
+      .Map(dest => dest.ActiveSubscription, src =>
+        src.Subscriptions != null && src.Subscriptions.Count > 0
+          ? src.Subscriptions.FirstOrDefault(a => a.Active && !a.IsDemo)
+          : null)
+      .Map(dest => dest.Subscriptions, src =>
+        src.Subscriptions != null && src.Subscriptions.Count > 0
+          ? src.Subscriptions.OrderByDescending(a => a.StartDate)
+          : null);
   }
 }

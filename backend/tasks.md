@@ -69,9 +69,11 @@
 - Notification
     - SMS
     - Whatsapp
+- smart enum (specially for subscription types)
 - Pdfs
     - Payment receipt
     - demo watermark
+    - serialize reports to xml
 - Subscriptions
     - ending notification
         - Tenant

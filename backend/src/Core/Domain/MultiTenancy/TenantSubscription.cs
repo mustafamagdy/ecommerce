@@ -2,6 +2,10 @@ namespace FSH.WebApi.Domain.MultiTenancy;
 
 public class TenantSubscription : BaseEntity
 {
+  public TenantSubscription()
+  {
+  }
+
   public TenantSubscription(string tenantId, Guid subscriptionId, DateTime startDate, decimal price, bool isDemo)
   {
     TenantId = tenantId;
