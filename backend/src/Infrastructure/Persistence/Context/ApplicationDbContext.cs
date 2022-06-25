@@ -9,6 +9,7 @@ using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
@@ -31,6 +32,7 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<OrderItem> OrderItems => Set<OrderItem>();
   public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
   public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
+  public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -39,6 +41,8 @@ public class ApplicationDbContext : BaseDbContext
     IgnoreMultiTenantEntities(modelBuilder);
 
     modelBuilder.HasDefaultSchema(SchemaNames.Shared);
+
+    modelBuilder.ConfigureSmartEnum();
   }
 
   private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
