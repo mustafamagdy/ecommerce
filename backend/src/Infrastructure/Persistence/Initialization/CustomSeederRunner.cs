@@ -7,7 +7,9 @@ internal class CustomSeederRunner
   private readonly ICustomSeeder[] _seeders;
 
   public CustomSeederRunner(IServiceProvider serviceProvider) =>
-    _seeders = serviceProvider.GetServices<ICustomSeeder>().OrderBy(a => a.Order).ToArray();
+    _seeders = serviceProvider.GetServices<ICustomSeeder>()
+      .OrderBy(a => a.Order)
+      .ToArray();
 
   public async Task RunSeedersAsync(CancellationToken cancellationToken)
   {

@@ -15,8 +15,8 @@ public class Branch : BaseEntity, IAggregateRoot
 
   public virtual HashSet<CashRegister> CashRegisters { get; set; }
 
-  public string Name { get; private set; }
-  public string? Description { get; private set; }
+  public string Name { get; set; }
+  public string? Description { get; set; }
 
   public Branch(string tenantId, string name, string? description)
   {
