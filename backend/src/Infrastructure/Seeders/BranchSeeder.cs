@@ -36,6 +36,7 @@ public class BranchSeeder : ICustomSeeder
 
       foreach (var item in items)
       {
+        item.Id = Guid.NewGuid();
         await _db.Branches.AddAsync(item, cancellationToken);
       }
 
