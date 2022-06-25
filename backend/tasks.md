@@ -98,3 +98,10 @@ each branch has cash register(s)
 
 /////// Cash Register ///////
 
+Cash register
+    - key, name, main?
+    - any payment to or from go through a cash register
+    - available balance to to pay from is current balance - total held transfer from
+transfer operation works in two steps
+    - create operation (which will hold the transferred amount until the recipient accepts it)
+
