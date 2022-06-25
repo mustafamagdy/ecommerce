@@ -11,10 +11,10 @@ namespace Migrators.MySQL.Migrations.Application
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "Auditing");
+                name: "Shared");
 
             migrationBuilder.EnsureSchema(
-                name: "Shared");
+                name: "Auditing");
 
             migrationBuilder.EnsureSchema(
                 name: "Identity");
@@ -62,13 +62,7 @@ namespace Migrators.MySQL.Migrations.Application
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    LastModifiedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -235,6 +229,31 @@ namespace Migrators.MySQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "CashRegisters",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BranchId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Opened = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CashRegisters", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CashRegisters_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalSchema: "Shared",
+                        principalTable: "Branches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -462,6 +481,72 @@ namespace Migrators.MySQL.Migrations.Application
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ActivePaymentOperation",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CashRegisterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    PaymentMethodId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActivePaymentOperation", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ActivePaymentOperation_CashRegisters_CashRegisterId",
+                        column: x => x.CashRegisterId,
+                        principalSchema: "Shared",
+                        principalTable: "CashRegisters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ActivePaymentOperation_PaymentMethods_PaymentMethodId",
+                        column: x => x.PaymentMethodId,
+                        principalSchema: "Shared",
+                        principalTable: "PaymentMethods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedPaymentOperation",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CashRegisterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    PaymentMethodId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedPaymentOperation", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArchivedPaymentOperation_CashRegisters_CashRegisterId",
+                        column: x => x.CashRegisterId,
+                        principalSchema: "Shared",
+                        principalTable: "CashRegisters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArchivedPaymentOperation_PaymentMethods_PaymentMethodId",
+                        column: x => x.PaymentMethodId,
+                        principalSchema: "Shared",
+                        principalTable: "PaymentMethods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ServiceCatalogs",
                 schema: "Shared",
                 columns: table => new
@@ -576,6 +661,36 @@ namespace Migrators.MySQL.Migrations.Application
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivePaymentOperation_CashRegisterId",
+                schema: "Shared",
+                table: "ActivePaymentOperation",
+                column: "CashRegisterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivePaymentOperation_PaymentMethodId",
+                schema: "Shared",
+                table: "ActivePaymentOperation",
+                column: "PaymentMethodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArchivedPaymentOperation_CashRegisterId",
+                schema: "Shared",
+                table: "ArchivedPaymentOperation",
+                column: "CashRegisterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArchivedPaymentOperation_PaymentMethodId",
+                schema: "Shared",
+                table: "ArchivedPaymentOperation",
+                column: "PaymentMethodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CashRegisters_BranchId",
+                schema: "Shared",
+                table: "CashRegisters",
+                column: "BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_PhoneNumber",
@@ -694,12 +809,16 @@ namespace Migrators.MySQL.Migrations.Application
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuditTrails",
-                schema: "Auditing");
+                name: "ActivePaymentOperation",
+                schema: "Shared");
 
             migrationBuilder.DropTable(
-                name: "Branches",
+                name: "ArchivedPaymentOperation",
                 schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "AuditTrails",
+                schema: "Auditing");
 
             migrationBuilder.DropTable(
                 name: "OrderItems",
@@ -730,6 +849,10 @@ namespace Migrators.MySQL.Migrations.Application
                 schema: "Identity");
 
             migrationBuilder.DropTable(
+                name: "CashRegisters",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
                 name: "ServiceCatalogs",
                 schema: "Shared");
 
@@ -748,6 +871,10 @@ namespace Migrators.MySQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "Users",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Branches",
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Products",
