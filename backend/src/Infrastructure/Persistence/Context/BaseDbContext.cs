@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
@@ -9,6 +10,7 @@ using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
@@ -55,20 +57,13 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     if (_dbSettings.LogSensitiveInfo)
     {
       optionsBuilder.EnableSensitiveDataLogging();
+      optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
+      optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
-    // If you want to see the sql queries that efcore executes:
-
-    // Uncomment the next line to see them in the output window of visual studio
-    // optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
-
-    // Or uncomment the next line if you want to see them in the console
-    // optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
-    if (!string.IsNullOrWhiteSpace(TenantInfo?.DatabaseName))
+    if (!string.IsNullOrWhiteSpace(TenantInfo?.ConnectionString))
     {
-      string connectionString = _csBuilder.BuildConnectionString(TenantInfo.DatabaseName);
-      optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
+      optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo?.ConnectionString!);
     }
   }
 

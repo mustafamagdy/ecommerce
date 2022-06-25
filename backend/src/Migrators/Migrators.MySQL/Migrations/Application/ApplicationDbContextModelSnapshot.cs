@@ -16,7 +16,7 @@ namespace Migrators.MySQL.Migrations.Application
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Catalog")
+                .HasDefaultSchema("Shared")
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
@@ -59,7 +59,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands", "Catalog");
+                    b.ToTable("Brands", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -116,7 +116,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Products", "Catalog");
+                    b.ToTable("Products", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -164,7 +164,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services", "Catalog");
+                    b.ToTable("Services", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -220,7 +220,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServiceCatalogs", "Catalog");
+                    b.ToTable("ServiceCatalogs", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -254,7 +254,7 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("Customers", "Catalog");
+                    b.ToTable("Customers", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -310,7 +310,7 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasIndex("OrderNumber")
                         .IsUnique();
 
-                    b.ToTable("Orders", "Catalog");
+                    b.ToTable("Orders", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -359,7 +359,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("ServiceCatalogId");
 
-                    b.ToTable("OrderItems", "Catalog");
+                    b.ToTable("OrderItems", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -409,7 +409,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("OrderPayments", "Catalog");
+                    b.ToTable("OrderPayments", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -429,7 +429,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods", "Catalog");
+                    b.ToTable("PaymentMethods", "Shared");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
@@ -470,7 +470,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("Branches", "Catalog");
+                    b.ToTable("Branches", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });

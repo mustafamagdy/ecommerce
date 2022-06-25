@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Migrators.MySQL.Migrations.Application
 {
-    public partial class InitialMigration : Migration
+    public partial class App_InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,7 @@ namespace Migrators.MySQL.Migrations.Application
                 name: "Auditing");
 
             migrationBuilder.EnsureSchema(
-                name: "Catalog");
+                name: "Shared");
 
             migrationBuilder.EnsureSchema(
                 name: "Identity");
@@ -53,7 +53,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Branches",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -78,7 +78,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Brands",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -103,7 +103,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Customers",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -123,7 +123,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "PaymentMethods",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -163,7 +163,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Services",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -240,7 +240,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Products",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -267,7 +267,7 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_Products_Brands_BrandId",
                         column: x => x.BrandId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Brands",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -276,7 +276,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Orders",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -301,7 +301,7 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_Orders_Customers_CustomerId",
                         column: x => x.CustomerId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -463,7 +463,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "ServiceCatalogs",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -487,14 +487,14 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_ServiceCatalogs_Products_ProductId",
                         column: x => x.ProductId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ServiceCatalogs_Services_ServiceId",
                         column: x => x.ServiceId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -503,7 +503,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "OrderPayments",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -525,14 +525,14 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_OrderPayments_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderPayments_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "PaymentMethods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -541,7 +541,7 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "OrderItems",
-                schema: "Catalog",
+                schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -563,14 +563,14 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderItems_ServiceCatalogs_ServiceCatalogId",
                         column: x => x.ServiceCatalogId,
-                        principalSchema: "Catalog",
+                        principalSchema: "Shared",
                         principalTable: "ServiceCatalogs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -579,51 +579,51 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_PhoneNumber",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "Customers",
                 column: "PhoneNumber",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "OrderItems",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_ServiceCatalogId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "OrderItems",
                 column: "ServiceCatalogId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderPayments_OrderId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "OrderPayments",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderPayments_PaymentMethodId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "OrderPayments",
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "Orders",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_OrderNumber",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "Orders",
                 column: "OrderNumber",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "Products",
                 column: "BrandId");
 
@@ -642,13 +642,13 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceCatalogs_ProductId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "ServiceCatalogs",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceCatalogs_ServiceId",
-                schema: "Catalog",
+                schema: "Shared",
                 table: "ServiceCatalogs",
                 column: "ServiceId");
 
@@ -699,15 +699,15 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Branches",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "OrderItems",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "OrderPayments",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",
@@ -731,15 +731,15 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "ServiceCatalogs",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Orders",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "PaymentMethods",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Roles",
@@ -751,19 +751,19 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Products",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Services",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Customers",
-                schema: "Catalog");
+                schema: "Shared");
 
             migrationBuilder.DropTable(
                 name: "Brands",
-                schema: "Catalog");
+                schema: "Shared");
         }
     }
 }
