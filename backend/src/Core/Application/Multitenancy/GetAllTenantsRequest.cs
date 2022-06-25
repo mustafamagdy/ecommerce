@@ -1,50 +1,8 @@
 ﻿using Dapper;
 using Dapper.FluentColumnMapping;
 using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Domain.Structure;
-using FSH.WebApi.Shared.Authorization;
-using Mapster;
 
 namespace FSH.WebApi.Application.Multitenancy;
-
-public class Range<T>
-  where T : struct
-{
-  public T From { get; set; }
-  public T To { get; set; }
-
-  public Range<T> Between(T from, T to) => new() { From = from, To = to };
-}
-
-public class TenantBySearchRequestSpec : EntitiesByPaginationFilterSpec<FSHTenantInfo, TenantDto>
-{
-  public TenantBySearchRequestSpec(SearchAllTenantsRequest request)
-    : base(request) =>
-    Query
-      .Include(a => a.Subscriptions)
-      .ThenInclude(a => a.Subscription)
-      .Include(a => a.Subscriptions)
-      .ThenInclude(a => a.Payments)
-      .ThenInclude(a => a.PaymentMethod)
-      .Where(a => request.Active == null || a.IsActive == request.Active)
-      .Where(a => string.IsNullOrEmpty(request.Name) || a.Name.Contains(request.Name))
-      .Where(a => string.IsNullOrEmpty(request.PhoneNumber) || a.PhoneNumber.Contains(request.PhoneNumber))
-      .Where(a => request.SubscriptionStarted == null
-                  || (a.Subscriptions.Any(x => x.StartDate >= request.SubscriptionStarted.From)
-                      && (a.Subscriptions.Any(x => x.StartDate <= request.SubscriptionStarted.To))
-                  ))
-      .Where(a => request.SubscriptionExpired == null
-                  || (a.Subscriptions.Any(x => x.ExpiryDate >= request.SubscriptionExpired.From)
-                      && (a.Subscriptions.Any(x => x.ExpiryDate <= request.SubscriptionExpired.To))
-                  ))
-      .Where(a => request.Balance == null
-                  || (a.Subscriptions.Sum(x => x.Balance) >= request.Balance.From
-                      && a.Subscriptions.Sum(x => x.Balance) <= request.Balance.To
-                  ))
-      .OrderBy(a => a.Id)
-      .AsSplitQuery();
-}
 
 public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResponse<TenantDto>>
 {
@@ -91,6 +49,7 @@ create temporary table if not exists tmp_tenants as
               left join subscriptionPayment sp on sp.TenantSubscriptionId = ts.Id
               left join rootPaymentMethods pm on pm.Id = sp.PaymentMethodId
      where
+         t.Name <> 'root' AND
          ((@subStartedFrom is null or ts.startDate >= @subStartedFrom)
          OR (@subStartedTo is null or ts.startDate <= @subStartedTo))
        AND ((@subExpiredFrom is null or ts.expiryDate >= @subExpiredFrom)

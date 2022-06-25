@@ -5,6 +5,6 @@
         <AssemblyName>FSH.WebApi.Shared</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\Multitenancy\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+      <PackageReference Include="Finbuckle.MultiTenant" Version="6.7.2" />
     </ItemGroup>
 </Project>

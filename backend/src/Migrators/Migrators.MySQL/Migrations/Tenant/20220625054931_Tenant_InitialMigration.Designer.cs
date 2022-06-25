@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20220612170702_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20220625054931_Tenant_InitialMigration")]
+    partial class Tenant_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,8 +40,7 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Property<string>("AdminPhoneNumber")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("DatabaseName")
-                        .IsRequired()
+                    b.Property<string>("ConnectionString")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
@@ -202,48 +201,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.ToTable("RootPaymentMethods");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasColumnType("varchar(64)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Branch");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
@@ -278,21 +235,8 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Navigation("Tenant");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "Tenant")
-                        .WithMany("Branches")
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
                 {
-                    b.Navigation("Branches");
-
                     b.Navigation("Subscriptions");
                 });
 
