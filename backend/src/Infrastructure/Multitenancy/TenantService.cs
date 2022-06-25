@@ -50,7 +50,7 @@ internal class TenantService : ITenantService
   private readonly IStringLocalizer _t;
   private readonly IReadRepository<Branch> _branchRepo;
   private readonly ITenantConnectionStringBuilder _cnBuilder;
-
+  private readonly IHostEnvironment _env;
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
     TenantDbContext tenantDbContext,
@@ -61,7 +61,7 @@ internal class TenantService : ITenantService
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
     IReadRepository<Branch> branchRepo,
-    ITenantConnectionStringBuilder cnBuilder)
+    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -73,6 +73,7 @@ internal class TenantService : ITenantService
     _t = localizer;
     _branchRepo = branchRepo;
     _cnBuilder = cnBuilder;
+    _env = env;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -280,7 +281,9 @@ internal class TenantService : ITenantService
       if (string.IsNullOrEmpty(t.ConnectionString)) return false;
       var cnBuilder = new DbConnectionStringBuilder();
       cnBuilder.ConnectionString = t.ConnectionString;
-      return cnBuilder.TryGetValue("Database", out var dbName) && databaseName.Equals(dbName);
+
+      var _dbName = $"{_env.GetShortenName()}-{databaseName}";
+      return cnBuilder.TryGetValue("initial catalog", out var dbName) && _dbName.Equals(dbName);
     });
   }
 
