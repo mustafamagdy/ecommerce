@@ -31,40 +31,42 @@ public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRe
   {
     string sql = @"
 create temporary table if not exists tmp_tenants as
-    (select t.id  as TenantId
-          , t.identifier
+    (select t.Id  as TenantId
+          , t.Identifier
           , t.name as TenantName
           , t.adminEmail
           , t.isActive
-          , ts.id as SubscriptionId
+          , ts.Id as SubscriptionId
           , ts.ExpiryDate
           , ts.IsDemo
-          , sp.id as PaymentId
+          , sp.Id as PaymentId
           , sp.Amount
-          , pm.id as PaymentMethodId
+          , pm.Id as PaymentMethodId
           , pm.Name as PaymentMethodName
-     from tenants t
-              left join tenantSubscriptions ts on t.id = ts.tenantId
-              left join subscriptions s on s.id = ts.subscriptionId
-              left join subscriptionPayment sp on sp.TenantSubscriptionId = ts.Id
-              left join rootPaymentMethods pm on pm.Id = sp.PaymentMethodId
+          , b.Id as BranchId
+          , b.Name as BranchName
+          , b.Description as BranchDescription
+     from Tenants t
+        left join Branches b on b.TenantId = t.Id
+        left join TenantSubscriptions ts on t.Id = ts.tenantId
+        left join Subscriptions s on s.Id = ts.subscriptionId
+        left join SubscriptionPayment sp on sp.TenantSubscriptionId = ts.Id
+        left join RootPaymentMethods pm on pm.Id = sp.PaymentMethodId
      where
-         t.Name <> 'root' AND
-         ((@subStartedFrom is null or ts.startDate >= @subStartedFrom)
-         OR (@subStartedTo is null or ts.startDate <= @subStartedTo))
-       AND ((@subExpiredFrom is null or ts.expiryDate >= @subExpiredFrom)
-         OR (@subExpiredTo is null or ts.expiryDate <= @subExpiredTo))
-       AND (@name is null OR t.name like CONCAT('%', @name, '%'))
-       AND (@phoneNumber is null OR t.phoneNumber like CONCAT('%', @phoneNumber, '%'))
-     AND
-         t.Id in (
-         select t1.Id
-         from tenants t1
-             left join tenantSubscriptions ts1 on t1.id = ts1.tenantId
-             left join subscriptionPayment sp1 on sp1.TenantSubscriptionId = ts1.Id
-         group by t1.id, ts1.Price
-         having  (@balanceFrom is null or (ts1.Price - ifnull(sum(sp1.amount),0)) >= @balanceFrom)
-            AND (@balanceTo is null or (ts1.Price - ifnull(sum(sp1.amount),0)) <= @balanceFrom)
+        t.Name <> 'root'
+        AND ((@subStartedFrom is null or ts.startDate >= @subStartedFrom) OR (@subStartedTo is null or ts.startDate <= @subStartedTo))
+        AND ((@subExpiredFrom is null or ts.expiryDate >= @subExpiredFrom) OR (@subExpiredTo is null or ts.expiryDate <= @subExpiredTo))
+        AND (@name is null OR t.name like CONCAT('%', @name, '%'))
+        AND (@phoneNumber is null OR t.phoneNumber like CONCAT('%', @phoneNumber, '%'))
+        AND
+             t.Id in (
+             select t1.Id
+             from tenants t1
+                      left join tenantSubscriptions ts1 on t1.Id = ts1.tenantId
+                      left join subscriptionPayment sp1 on sp1.TenantSubscriptionId = ts1.Id
+             group by t1.Id, ts1.Price
+             having  (@balanceFrom is null or (ts1.Price - ifnull(sum(sp1.amount),0)) >= @balanceFrom)
+                AND (@balanceTo is null or (ts1.Price - ifnull(sum(sp1.amount),0)) <= @balanceFrom)
          )
      order by t.Id);
 
@@ -88,7 +90,6 @@ select count(*) from tmp_tenants;
 
     using var db = await _repo.GetDbConnection(cancellationToken);
 
-
     var mappings = new ColumnMappingCollection();
     mappings.RegisterType<TenantDto>()
       .MapProperty(x => x.Id).ToColumn("TenantId")
@@ -108,14 +109,21 @@ select count(*) from tmp_tenants;
       .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
       .MapProperty(x => x.PaymentMethodName).ToColumn("PaymentMethodName");
 
+    mappings.RegisterType<BranchDto>()
+      .MapProperty(x => x.Id).ToColumn("BranchId")
+      .MapProperty(x => x.Name).ToColumn("branchName")
+      .MapProperty(x => x.Description).ToColumn("branchDescription");
+
     mappings.RegisterWithDapper();
 
     using var multiResult = await db.QueryMultipleAsync(sql, param);
 
     var result = new Dictionary<string, TenantDto>();
     var subs = new Dictionary<Guid, TenantSubscriptionDto>();
-    multiResult.Read<TenantDto, TenantSubscriptionDto, SubscriptionPaymentDto, TenantDto>(
-      (t, sub, pmt) =>
+    var branches = new Dictionary<Guid, BranchDto>();
+
+    multiResult.Read<TenantDto, TenantSubscriptionDto, SubscriptionPaymentDto, BranchDto, TenantDto>(
+      (t, sub, pmt, b) =>
       {
         if (!result.ContainsKey(t.Id))
         {
@@ -123,14 +131,22 @@ select count(*) from tmp_tenants;
         }
 
         var tenant = result[t.Id];
-        if (sub == null || sub.Id == Guid.Empty)
+
+        if (b != null && b.Id != Guid.Empty)
         {
-          return t;
+          if (!branches.ContainsKey(b.Id))
+          {
+            branches.Add(b.Id, b);
+            tenant.Branches.Add(b);
+          }
         }
 
-        if (!subs.ContainsKey(sub.Id))
+        if (sub != null && sub.Id != Guid.Empty)
         {
-          subs.Add(sub.Id, sub);
+          if (!subs.ContainsKey(sub.Id))
+          {
+            subs.Add(sub.Id, sub);
+          }
         }
 
         var subscription = subs[sub.Id];
