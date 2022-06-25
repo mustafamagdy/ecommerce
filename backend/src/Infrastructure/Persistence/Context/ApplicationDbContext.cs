@@ -2,6 +2,7 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -35,6 +36,16 @@ public class ApplicationDbContext : BaseDbContext
   {
     base.OnModelCreating(modelBuilder);
 
-    modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
+    IgnoreMultiTenantEntities(modelBuilder);
+
+    modelBuilder.HasDefaultSchema(SchemaNames.Shared);
+  }
+
+  private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Ignore<FSHTenantInfo>();
+    modelBuilder.Ignore<Subscription>();
+    modelBuilder.Ignore<SubscriptionPayment>();
+    modelBuilder.Ignore<TenantSubscription>();
   }
 }

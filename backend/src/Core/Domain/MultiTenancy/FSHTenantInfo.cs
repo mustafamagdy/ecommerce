@@ -11,14 +11,14 @@ public class FSHTenantInfo : ITenantInfo
   {
   }
 
-  public FSHTenantInfo(string id, string name, string? databaseName, string adminEmail, string? phoneNumber,
+  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? phoneNumber,
     string? vatNo, string? email, string? address, string? adminName, string? adminPhoneNumber,
     string? techSupportUserId, string? issuer = null)
   {
     Id = id;
     Identifier = id;
     Name = name;
-    DatabaseName = databaseName ?? string.Empty;
+    ConnectionString = connectionString ?? string.Empty;
     AdminEmail = adminEmail;
     PhoneNumber = phoneNumber;
     VatNo = vatNo;
@@ -42,7 +42,7 @@ public class FSHTenantInfo : ITenantInfo
   public string Identifier { get; set; } = default!;
 
   public string Name { get; set; } = default!;
-  public string DatabaseName { get; set; } = default!;
+  public string? ConnectionString { get; set; }
 
   public string AdminEmail { get; private set; } = default!;
   public string? PhoneNumber { get; set; }
@@ -83,29 +83,9 @@ public class FSHTenantInfo : ITenantInfo
     IsActive = false;
   }
 
+  string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
 
-  string? ITenantInfo.Id
-  {
-    get => Id;
-    set => Id = value ?? throw new InvalidOperationException("Id can't be null.");
-  }
+  string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
 
-  string? ITenantInfo.Identifier
-  {
-    get => Identifier;
-    set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
-  }
-
-  string? ITenantInfo.Name
-  {
-    get => Name;
-    set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
-  }
-
-  string? ITenantInfo.DatabaseName
-  {
-    get => DatabaseName;
-    set => DatabaseName = value ?? throw new InvalidOperationException
-      ("Database Name can't be null.");
-  }
+  string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
 }
