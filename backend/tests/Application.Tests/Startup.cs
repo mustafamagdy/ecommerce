@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FSH.WebApi.Infrastructure.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -11,6 +13,10 @@ public class Startup
 
   public void ConfigureServices(IServiceCollection services, HostBuilderContext context)
   {
-    // services;
+    services.AddDbContext<ApplicationDbContext>((sp, m) =>
+    {
+      m.UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .UseInternalServiceProvider(sp);
+    });
   }
 }
