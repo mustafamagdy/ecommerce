@@ -146,6 +146,7 @@ select count(*) from tmp_tenants;
           if (!subs.ContainsKey(sub.Id))
           {
             subs.Add(sub.Id, sub);
+            tenant.Subscriptions.Add(sub);
           }
         }
 
@@ -157,16 +158,9 @@ select count(*) from tmp_tenants;
           subscription.Payments.Add(pmt);
         }
 
-        int subIdx = tenant.Subscriptions.FindIndex(a => a.Id == subscription.Id);
-        if (subIdx == -1)
-          tenant.Subscriptions.Add(subscription);
-        else
-          tenant.Subscriptions[subIdx] = subscription;
-
         return t;
       },
-      splitOn: "TenantId, SubscriptionId, PaymentId"
-    );
+      splitOn: "TenantId, SubscriptionId, PaymentId, BranchId");
 
     int totalCount = multiResult.ReadSingle<int>();
 
