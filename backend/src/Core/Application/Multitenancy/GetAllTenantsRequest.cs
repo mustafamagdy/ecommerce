@@ -16,13 +16,10 @@ public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResp
 
 public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRequest, PaginationResponse<TenantDto>>
 {
-  private readonly IReadTenantRepository<FSHTenantInfo> _repository;
   private readonly IDapperTenantConnectionAccessor _repo;
 
-
-  public SearchAllTenantsRequestHandler(IReadTenantRepository<FSHTenantInfo> repository, IDapperTenantConnectionAccessor repo)
+  public SearchAllTenantsRequestHandler(IDapperTenantConnectionAccessor repo)
   {
-    _repository = repository;
     _repo = repo;
   }
 
