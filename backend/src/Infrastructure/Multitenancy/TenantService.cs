@@ -1,4 +1,5 @@
-﻿using Finbuckle.MultiTenant;
+﻿using System.Data.Common;
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
@@ -48,7 +49,8 @@ internal class TenantService : ITenantService
   private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
   private readonly IReadRepository<Branch> _branchRepo;
-
+  private readonly ITenantConnectionStringBuilder _cnBuilder;
+  private readonly IHostEnvironment _env;
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
     TenantDbContext tenantDbContext,
@@ -58,7 +60,8 @@ internal class TenantService : ITenantService
     IMailService mailService,
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
-    IReadRepository<Branch> branchRepo)
+    IReadRepository<Branch> branchRepo,
+    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -69,6 +72,8 @@ internal class TenantService : ITenantService
     _templateService = templateService;
     _t = localizer;
     _branchRepo = branchRepo;
+    _cnBuilder = cnBuilder;
+    _env = env;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -93,7 +98,9 @@ internal class TenantService : ITenantService
 
   public async Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    var tenant = new FSHTenantInfo(request.Id, request.Name, request.DatabaseName, request.AdminEmail,
+    string connectionString = string.IsNullOrWhiteSpace(request.DatabaseName) ? string.Empty : _cnBuilder.BuildConnectionString(request.DatabaseName);
+
+    var tenant = new FSHTenantInfo(request.Id, request.Name, connectionString, request.AdminEmail,
       request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
       request.TechSupportUserId, request.Issuer);
 
@@ -267,8 +274,18 @@ internal class TenantService : ITenantService
   public Task<List<TenantSubscription>> GetAllTenantSubscriptions(string tenantId)
     => _tenantDbContext.TenantSubscriptions.Where(a => a.TenantId == tenantId).ToListAsync();
 
-  public async Task<bool> DatabaseExistAsync(string databaseName) =>
-    (await _tenantStore.GetAllAsync()).Any(t => t.DatabaseName == databaseName);
+  public async Task<bool> DatabaseExistAsync(string databaseName)
+  {
+    return (await _tenantStore.GetAllAsync()).Any(t =>
+    {
+      if (string.IsNullOrEmpty(t.ConnectionString)) return false;
+      var cnBuilder = new DbConnectionStringBuilder();
+      cnBuilder.ConnectionString = t.ConnectionString;
+
+      var _dbName = $"{_env.GetShortenName()}-{databaseName}";
+      return cnBuilder.TryGetValue("initial catalog", out var dbName) && _dbName.Equals(dbName);
+    });
+  }
 
   private async Task<FSHTenantInfo> GetTenantInfoAsync(string id)
   {

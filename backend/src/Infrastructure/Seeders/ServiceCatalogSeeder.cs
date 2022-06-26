@@ -20,7 +20,7 @@ public class ServiceCatalogSeeder : ICustomSeeder
     _db = db;
   }
 
-  public string Order => "02.04";
+  public string Order => "02.05";
 
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {
