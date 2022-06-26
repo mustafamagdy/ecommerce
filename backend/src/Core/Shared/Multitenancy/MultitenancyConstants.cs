@@ -22,9 +22,8 @@ public class MultitenancyConstants
 
     public string? Identifier { get => Root.Id; set => throw new InvalidOperationException("You cannot set root tenant Id"); }
     public string? Name { get => Root.Name; set => throw new InvalidOperationException("You cannot set root tenant Name"); }
-    public string? DatabaseName { get => string.Empty; set => throw new NotImplementedException(); }
+    public string? ConnectionString { get => string.Empty; set => throw new NotImplementedException(); }
   }
-
 
   public const string DefaultPassword = "123Pa$$word!";
 

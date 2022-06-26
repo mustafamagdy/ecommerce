@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using MassTransit;
