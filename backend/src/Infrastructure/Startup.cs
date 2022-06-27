@@ -24,6 +24,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: InternalsVisibleTo("Infrastructure.Test")]
+[assembly: InternalsVisibleTo("Application.IntegrationTests")]
 
 namespace FSH.WebApi.Infrastructure;
 
