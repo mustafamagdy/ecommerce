@@ -5,9 +5,19 @@ namespace FSH.WebApi.Domain.Operation;
 
 public class CashRegister : BaseEntity, IAggregateRoot
 {
+  public CashRegister()
+  {
+  }
+
+  public CashRegister(Guid branchId, string name)
+  {
+    BranchId = branchId;
+    Name = name;
+  }
+
   public Guid BranchId { get; set; }
   public virtual Branch Branch { get; set; }
-
+  public string Name { get; set; }
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
 
