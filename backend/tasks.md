@@ -17,12 +17,12 @@
   - Price list
   - activate/deactivate service item in a price list
 - Cash register
-  - Search (search transactions)
-  - Add/Update/Delete (Name, isMain, Color, Branch)
-  - Get basic
-  - Get with balance
-  - Close (zero balance and transfer to main)
-  - open/close history
+  [✅] Search (search transactions)
+  [✅] Add/Update/Delete (Name, isMain, Color, Branch)
+  [✅] Get basic
+  [✅] Get with balance
+  [✅] Close (zero balance and transfer to main)
+  [✅] open/close history
   - Transfer (with hold until recipient accept)
 - Users:
   - predefined roles (activate/deactivate cannot be deleted)

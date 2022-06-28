@@ -53,10 +53,13 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 {
   StaticLogger.EnsureInitialized();
   Log.Fatal(ex, "Unhandled exception");
-}
-finally
+} finally
 {
   StaticLogger.EnsureInitialized();
   Log.Information("Server Shutting down...");
   Log.CloseAndFlush();
+}
+
+public partial class Program
+{
 }
