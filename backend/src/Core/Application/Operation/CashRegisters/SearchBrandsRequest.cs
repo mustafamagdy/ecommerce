@@ -5,6 +5,7 @@ namespace FSH.WebApi.Application.Operation.CashRegisters;
 public class SearchBasicCashRegistersRequest : PaginationFilter, IRequest<PaginationResponse<BasicCashRegisterDto>>
 {
 }
+
 public class BasicCashRegistersBySearchRequestSpec : EntitiesByPaginationFilterSpec<CashRegister, BasicCashRegisterDto>
 {
   public BasicCashRegistersBySearchRequestSpec(SearchBasicCashRegistersRequest request)
@@ -15,13 +16,13 @@ public class BasicCashRegistersBySearchRequestSpec : EntitiesByPaginationFilterS
 public class SearchCashRegistersRequest : PaginationFilter, IRequest<PaginationResponse<CashRegisterWithBalanceDto>>
 {
 }
+
 public class CashRegistersBySearchRequestSpec : EntitiesByPaginationFilterSpec<CashRegister, CashRegisterWithBalanceDto>
 {
   public CashRegistersBySearchRequestSpec(SearchCashRegistersRequest request)
     : base(request) =>
     Query.OrderBy(c => c.Name, !request.HasOrderBy());
 }
-
 
 public class SearchBasicCashRegistersRequestHandler : IRequestHandler<SearchBasicCashRegistersRequest, PaginationResponse<BasicCashRegisterDto>>
 {

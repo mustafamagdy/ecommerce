@@ -9,15 +9,17 @@ public class CashRegister : BaseEntity, IAggregateRoot
   {
   }
 
-  public CashRegister(Guid branchId, string name)
+  public CashRegister(Guid branchId, string name, string color)
   {
     BranchId = branchId;
     Name = name;
+    Color = color;
   }
 
   public Guid BranchId { get; set; }
   public virtual Branch Branch { get; set; }
   public string Name { get; set; }
+  public string Color { get; set; }
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
 
@@ -98,14 +100,16 @@ public class CashRegister : BaseEntity, IAggregateRoot
   }
 }
 
-public abstract class PaymentOperation : BaseEntity
+public abstract class PaymentOperation : BaseEntity, IAggregateRoot
 {
+  public DateTime DateTime { get; set; }
+  public decimal Amount { get; set; }
+  public PaymentOperationType Type { get; set; }
+
   public Guid CashRegisterId { get; set; }
   public virtual CashRegister CashRegister { get; set; }
   public Guid PaymentMethodId { get; set; }
   public virtual PaymentMethod PaymentMethod { get; set; }
-  public decimal Amount { get; set; }
-  public PaymentOperationType Type { get; set; }
 }
 
 public class ActivePaymentOperation : PaymentOperation
