@@ -110,10 +110,37 @@ public abstract class PaymentOperation : BaseEntity, IAggregateRoot
   public virtual CashRegister CashRegister { get; set; }
   public Guid PaymentMethodId { get; set; }
   public virtual PaymentMethod PaymentMethod { get; set; }
+
+  public Guid? PendingTransferId { get; set; }
 }
 
 public class ActivePaymentOperation : PaymentOperation
 {
+  public static (ActivePaymentOperation source, ActivePaymentOperation dest) CreateTransfer(Guid sourceCashRegisterId,
+    Guid destinationCashRegisterId, decimal amount, DateTime opDate)
+  {
+    var src = new ActivePaymentOperation
+    {
+      Id = Guid.NewGuid(),
+      Amount = amount,
+      Type = PaymentOperationType.PendingOut,
+      DateTime = opDate,
+      CashRegisterId = sourceCashRegisterId
+    };
+
+    var dest = new ActivePaymentOperation
+    {
+      Id = Guid.NewGuid(),
+      Amount = amount,
+      Type = PaymentOperationType.PendingIn,
+      DateTime = opDate,
+      CashRegisterId = destinationCashRegisterId,
+      PendingTransferId = src.Id
+    };
+
+    return (src, dest);
+  }
+
   public static implicit operator ArchivedPaymentOperation(ActivePaymentOperation op)
   {
     return new ArchivedPaymentOperation
