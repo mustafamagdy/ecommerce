@@ -9,7 +9,55 @@ public class FinanceController : VersionNeutralApiController
   [HttpPost("cash-register")]
   [MustHavePermission(FSHAction.Create, FSHResource.CashRegisters)]
   [OpenApiOperation("Create a cash register for a branch.", "")]
-  public Task<Guid> CreateBranchAsync(CreateCashRegisterRequest request)
+  public Task<Guid> CreateCashRegister(CreateCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPut("cash-register")]
+  [MustHavePermission(FSHAction.Update, FSHResource.CashRegisters)]
+  [OpenApiOperation("Update a cash register for a branch.", "")]
+  public Task UpdateCashRegister(UpdateCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpDelete("cash-register")]
+  [MustHavePermission(FSHAction.Delete, FSHResource.CashRegisters)]
+  [OpenApiOperation("Delete a cash register for a branch.", "")]
+  public Task DeleteCashRegister(DeleteCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("cash-register/open")]
+  [MustHavePermission(FSHAction.Open, FSHResource.CashRegisters)]
+  [OpenApiOperation("Open a cash register for a branch.", "")]
+  public Task OpenCashRegister(OpenCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("cash-register/close")]
+  [MustHavePermission(FSHAction.Close, FSHResource.CashRegisters)]
+  [OpenApiOperation("Close a cash register for a branch.", "")]
+  public Task CloseCashRegister(CloseCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("cash-register/transfer")]
+  [MustHavePermission(FSHAction.Transfer, FSHResource.CashRegisters)]
+  [OpenApiOperation("Close a cash register for a branch.", "")]
+  public Task TransferFromCashRegister(TransferFromCashRegisterRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("cash-register/approve-transfer")]
+  [MustHavePermission(FSHAction.Approve, FSHResource.CashRegisters)]
+  [OpenApiOperation("Close a cash register for a branch.", "")]
+  public Task<string> CommitTransfer(CommitCashRegisterTransferRequest request)
   {
     return Mediator.Send(request);
   }

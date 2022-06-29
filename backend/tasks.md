@@ -32,7 +32,7 @@
   - Logout all users once role permissions updated
 - Branches:
   [✅] Search
-  - Add/Update
+  [✅] Add/Update
   - Activate/Deactivate (deactivate all cash register in a branch)
 - Tenants:
   [✅] Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
