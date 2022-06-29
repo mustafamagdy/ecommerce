@@ -15,6 +15,7 @@ public static class FSHAction
   public const string ViewBasic = nameof(ViewBasic);
   public const string Open = nameof(Open);
   public const string Close = nameof(Close);
+  public const string Transfer = nameof(Transfer);
   public const string Approve = nameof(Approve);
 
   public const string Clean = nameof(Clean);
