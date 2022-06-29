@@ -2,7 +2,7 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
-public class TransferFromCashRegister : IRequest<string>
+public class TransferFromCashRegisterRequest : IRequest<string>
 {
   public Guid SourceCashRegisterId { get; set; }
   public Guid DestCashRegisterId { get; set; }
@@ -10,7 +10,7 @@ public class TransferFromCashRegister : IRequest<string>
   public DateTime DateTime { get; set; }
 }
 
-public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashRegister, string>
+public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashRegisterRequest, string>
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
   private readonly IRepository<ActivePaymentOperation> _activeOpRepo;
@@ -23,7 +23,7 @@ public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashR
     _activeOpRepo = activeOpRepo;
   }
 
-  public async Task<string> Handle(TransferFromCashRegister request, CancellationToken cancellationToken)
+  public async Task<string> Handle(TransferFromCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var sourceCr = await _repository.GetByIdAsync(request.SourceCashRegisterId, cancellationToken);
     if (sourceCr == null)
