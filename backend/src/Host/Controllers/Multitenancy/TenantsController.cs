@@ -69,12 +69,4 @@ public class TenantsController : VersionNeutralApiController
   {
     return Mediator.Send(new GetBasicTenantInfoRequest(id));
   }
-
-  [HttpPost("branch")]
-  [MustHavePermission(FSHAction.Create, FSHResource.Brands)]
-  [OpenApiOperation("Create a branch for the current tenant.", "")]
-  public Task<Guid> CreateBranchAsync(CreateBranchRequest request)
-  {
-    return Mediator.Send(request);
-  }
 }

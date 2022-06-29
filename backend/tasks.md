@@ -31,11 +31,11 @@
   - User roles
   - Logout all users once role permissions updated
 - Branches:
-  - Search
+  [✅] Search
   - Add/Update
   - Activate/Deactivate (deactivate all cash register in a branch)
 - Tenants:
-  - Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
+  [✅] Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
   - Create, renew subscription 
     [✅] (name, vat no, logo, phone number, email, address, zipcode, admin name, admin email, admin phone number)
     [✅] Current subscription (name, date of subscription)
