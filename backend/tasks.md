@@ -8,8 +8,8 @@
   [✅] Create cash
   [✅] Create with preexisting custer
 - Customers:
-  - Search (name, phone)
-  - Auto complete customer
+  [✅] Search (name, phone)
+  [✅] Auto complete customer
 - Service catalog:
   [✅] Get service catalogs
   [✅] Services
@@ -23,7 +23,7 @@
   [✅] Get with balance
   [✅] Close (zero balance and transfer to main)
   [✅] open/close history
-  - Transfer (with hold until recipient accept)
+  [✅] Transfer (with hold until recipient accept)
 - Users:
   - predefined roles (activate/deactivate cannot be deleted)
   - Role
