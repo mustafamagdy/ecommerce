@@ -52,7 +52,7 @@
 ========================== FRAMEWORK ==========================
 
 [x] refactor the order number generator to use database instead of files, as the backend will be hosted on multiple servers with LB
-[x] refactor invoice to generate the qrcode, brcode, and logo
+[x] refactor invoice to generate the qrcode, barcode, and logo
 - OrdeBr api
   [x] can send multiple payments in the same endpoint
     - BUG: if order with customer call failed, a customer will be added anyway, do validation first
