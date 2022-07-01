@@ -8,7 +8,6 @@ using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
-using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -51,6 +50,7 @@ internal class TenantService : ITenantService
   private readonly IReadRepository<Branch> _branchRepo;
   private readonly ITenantConnectionStringBuilder _cnBuilder;
   private readonly IHostEnvironment _env;
+
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
     TenantDbContext tenantDbContext,
@@ -79,7 +79,6 @@ internal class TenantService : ITenantService
   public async Task<List<TenantDto>> GetAllAsync()
   {
     var tenants = (await _tenantStore.GetAllAsync()).Adapt<List<TenantDto>>();
-
     // tenants.ForEach(t => t.DatabaseName = _csSecurer.MakeSecure(t.DatabaseName));
     return tenants;
   }
@@ -119,7 +118,39 @@ internal class TenantService : ITenantService
       throw;
     }
 
+    if (request.CreateDemoSubscription == true)
+    {
+      await CreateDemoTenantWithSubscription(request, tenant, cancellationToken);
+    }
+
     return tenant.Id;
+  }
+
+  private async Task CreateDemoTenantWithSubscription(CreateTenantRequest request, FSHTenantInfo tenant, CancellationToken cancellationToken)
+  {
+    //TODO: need to relate demo account to the original tenant,
+    var demoTenantName = tenant.Key + "_demo";
+    var demoSubscription = await CreateDemoSubscription(tenant, cancellationToken);
+    SendWelcomeEmail(tenant, request, demoSubscription);
+  }
+
+  private async Task<TenantSubscriptionInfo> CreateDemoSubscription(FSHTenantInfo tenant, CancellationToken cancellationToken)
+  {
+    var subscription = await GetDefaultMonthlySubscription();
+
+    var today = DateTime.Now;
+    var newExpiryDate = today.AddDays(subscription.Days);
+    var tenantSubscription = new TenantSubscription(tenant.Id, subscription.Id, today, subscription.Price, false);
+    tenantSubscription.Extend(newExpiryDate);
+
+    await _tenantDbContext.AddAsync(tenantSubscription, cancellationToken);
+    bool result = (await _tenantDbContext.SaveChangesAsync(cancellationToken)) > 0;
+    if (!result)
+    {
+      throw new DbUpdateException($"Failed to create tenant subscription for {tenant.Name}");
+    }
+
+    return tenantSubscription.Adapt<TenantSubscriptionInfo>();
   }
 
   private void SendWelcomeEmail(FSHTenantInfo tenant, CreateTenantRequest request, TenantSubscriptionInfo subscription)
@@ -146,10 +177,10 @@ internal class TenantService : ITenantService
   private async Task<TenantSubscriptionInfo> TryCreateMonthlySubscription(FSHTenantInfo tenant)
   {
     var subscription = await GetDefaultMonthlySubscription();
+
     var today = DateTime.Now;
-    var newExpiryDate = today.AddMonths(1);
-    var tenantSubscription =
-      new TenantSubscription(tenant.Id, subscription.Id, today, subscription.MonthlyPrice, false);
+    var newExpiryDate = today.AddDays(subscription.Days);
+    var tenantSubscription = new TenantSubscription(tenant.Id, subscription.Id, today, subscription.Price, false);
     tenantSubscription.Extend(newExpiryDate);
 
     await _tenantDbContext.AddAsync(tenantSubscription);
@@ -164,7 +195,8 @@ internal class TenantService : ITenantService
 
   private Task<Subscription> GetDefaultMonthlySubscription()
   {
-    return _tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.DefaultMonthly);
+    return (_tenantDbContext.Subscriptions.FirstOrDefaultAsync(a => a.DefaultMonthly)
+            ?? throw new NotImplementedException("There is no default subscription"))!;
   }
 
   private async Task TryRemoveSubscriptions(string tenantId)
@@ -181,7 +213,7 @@ internal class TenantService : ITenantService
   {
     var tenant = await GetTenantInfoAsync(tenantId);
 
-    if (tenant.IsActive)
+    if (tenant.Active)
     {
       throw new ConflictException(_t["Tenant is already Activated."]);
     }
@@ -211,7 +243,7 @@ internal class TenantService : ITenantService
   {
     var tenant = await GetTenantInfoAsync(tenantId);
 
-    if (!tenant.IsActive)
+    if (!tenant.Active)
     {
       throw new ConflictException(_t["Tenant is already Deactivated."]);
     }

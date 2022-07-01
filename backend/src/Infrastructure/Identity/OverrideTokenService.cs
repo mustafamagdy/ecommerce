@@ -68,7 +68,7 @@ internal class OverrideTokenService : IOverrideTokenService
 
     if (_currentTenant.Id != MultitenancyConstants.Root.Id)
     {
-      if (!_currentTenant.IsActive)
+      if (!_currentTenant.Active)
       {
         throw new UnauthorizedException(_t["Tenant is not Active. Please contact the Application Administrator."]);
       }

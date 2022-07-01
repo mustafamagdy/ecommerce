@@ -39,7 +39,7 @@ public class DtoCustomMapping
 
     TypeAdapterConfig<FSHTenantInfo, TenantDto>
       .NewConfig()
-      .Map(dest => dest.ActiveSubscription, src =>
+      .Map(dest => dest.ProdSubscription, src =>
         src.Subscriptions != null && src.Subscriptions.Count > 0
           ? src.Subscriptions.FirstOrDefault(a => a.Active && !a.IsDemo)
           : null)
