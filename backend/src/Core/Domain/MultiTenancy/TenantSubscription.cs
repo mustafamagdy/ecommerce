@@ -6,12 +6,13 @@ public class SubscriptionHistory : BaseEntity
   {
   }
 
-  public SubscriptionHistory(string tenantId, Guid subscriptionId, DateTime startDate, decimal price)
+  public SubscriptionHistory(string tenantId, Guid subscriptionId, DateTime startDate, int days, decimal price)
   {
     TenantId = tenantId;
     SubscriptionId = subscriptionId;
     StartDate = startDate;
     Price = price;
+    ExpiryDate = startDate.AddDays(days);
   }
 
   public string TenantId { get; set; }
