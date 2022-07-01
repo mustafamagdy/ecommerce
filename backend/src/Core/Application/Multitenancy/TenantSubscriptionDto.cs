@@ -10,8 +10,6 @@ public class TenantSubscriptionDto
   public Guid Id { get; set; } = default!;
   public string TenantId { get; set; } = default!;
   public DateTime ExpiryDate { get; set; }
-  public bool IsDemo { get; set; }
-
   public List<SubscriptionPaymentDto> Payments { get; set; }
 }
 
