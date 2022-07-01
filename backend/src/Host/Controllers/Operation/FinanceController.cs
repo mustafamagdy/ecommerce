@@ -4,7 +4,7 @@ using FSH.WebApi.Application.Operation.Orders;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
-public class FinanceController : VersionNeutralApiController
+public class FinanceController : VersionedApiController
 {
   [HttpPost("cash-register")]
   [MustHavePermission(FSHAction.Create, FSHResource.CashRegisters)]
