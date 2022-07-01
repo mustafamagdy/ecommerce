@@ -1,4 +1,5 @@
 using Finbuckle.MultiTenant;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
@@ -63,11 +64,8 @@ public class FSHTenantInfo : ITenantInfo
   public Guid? TrainSubscriptionId { get; set; }
   public string? TrainConnectionString { get; set; }
 
-
   public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
-
-  public DateTime StartDate { get; private set; }
-  public DateTime ExpiryDate { get; private set; }
+  public virtual HashSet<Branch> Branches { get; set; } = default!;
 
   public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
   public decimal Balance => (ProdSubscription?.SubscriptionHistory.Sum(a => a.Price) ?? 0) - TotalPaid;
