@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 

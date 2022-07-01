@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
 

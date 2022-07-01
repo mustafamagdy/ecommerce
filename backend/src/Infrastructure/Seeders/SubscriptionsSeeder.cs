@@ -5,6 +5,7 @@ using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;

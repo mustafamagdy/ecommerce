@@ -26,7 +26,7 @@ try
       .ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionLevelFilter>(); })
+  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionTypeFilter>(); })
     .AddFluentValidation()
     .AddJsonOptions(opt =>
     {

@@ -40,7 +40,6 @@ public class FSHTenantInfo : ITenantInfo
   public string Identifier { get; set; } = default!;
 
   public string Name { get; set; } = default!;
-  public string? ConnectionString { get; set; }
 
   public string AdminEmail { get; private set; } = default!;
   public string? PhoneNumber { get; set; }
@@ -54,10 +53,16 @@ public class FSHTenantInfo : ITenantInfo
 
   public StandardSubscription? ProdSubscription { get; set; }
   public Guid? ProdSubscriptionId { get; set; }
+  public string? ConnectionString { get; set; }
+
   public DemoSubscription? DemoSubscription { get; set; }
   public Guid? DemoSubscriptionId { get; set; }
+  public string? DemoConnectionString { get; set; }
+
   public TrainSubscription? TrainSubscription { get; set; }
   public Guid? TrainSubscriptionId { get; set; }
+  public string? TrainConnectionString { get; set; }
+
 
   public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
 
@@ -124,9 +129,21 @@ public class FSHTenantInfo : ITenantInfo
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
 
-  string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
+  string? ITenantInfo.Id
+  {
+    get => Id;
+    set => Id = value ?? throw new InvalidOperationException("Id can't be null.");
+  }
 
-  string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
+  string? ITenantInfo.Identifier
+  {
+    get => Identifier;
+    set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
+  }
 
-  string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
+  string? ITenantInfo.Name
+  {
+    get => Name;
+    set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
+  }
 }
