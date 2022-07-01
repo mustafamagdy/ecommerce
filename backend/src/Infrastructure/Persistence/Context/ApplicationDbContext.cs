@@ -49,7 +49,9 @@ public class ApplicationDbContext : BaseDbContext
   {
     modelBuilder.Ignore<FSHTenantInfo>();
     modelBuilder.Ignore<Subscription>();
+    modelBuilder.Ignore<StandardSubscription>();
+    modelBuilder.Ignore<DemoSubscription>();
+    modelBuilder.Ignore<TrainSubscription>();
     modelBuilder.Ignore<SubscriptionPayment>();
-    modelBuilder.Ignore<TenantSubscription>();
   }
 }
