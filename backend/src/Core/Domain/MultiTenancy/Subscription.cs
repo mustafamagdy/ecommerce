@@ -1,4 +1,5 @@
 using Ardalis.SmartEnum;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 

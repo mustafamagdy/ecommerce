@@ -72,12 +72,6 @@ internal class OverrideTokenService : IOverrideTokenService
       {
         throw new UnauthorizedException(_t["Tenant is not Active. Please contact the Application Administrator."]);
       }
-
-      if (_securitySettings.RequireActiveTenantSubscription && !(await HasAValidSubscription(_currentTenant.Id)))
-      {
-        throw new UnauthorizedException(
-          _t["Tenant has no valid subscription. Please contact the Application Administrator."]);
-      }
     }
 
     var managerOverrideScope = new ManagerOverrideToken(request.Permission, JsonSerializer.Serialize(request.Scope));
@@ -96,11 +90,6 @@ internal class OverrideTokenService : IOverrideTokenService
     }
 
     return new ManagerOverrideToken(motPermission, motScopeJson);
-  }
-
-  private async Task<bool> HasAValidSubscription(string tenantId)
-  {
-    return (await _tenantService.GetActiveSubscriptions(tenantId)).Any();
   }
 
   private async Task<OverrideTokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, ManagerOverrideToken mot)

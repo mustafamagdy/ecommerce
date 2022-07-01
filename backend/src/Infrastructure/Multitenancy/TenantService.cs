@@ -8,34 +8,13 @@ using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
-
-public class DemoService : IHostedService
-{
-  private readonly IJobService _jobService;
-
-  public DemoService(IJobService jobService)
-  {
-    _jobService = jobService;
-  }
-
-  public Task StartAsync(CancellationToken cancellationToken)
-  {
-    _jobService.Enqueue(() => Console.WriteLine("This is a demo job is running at startup, it can be anything"));
-    return Task.CompletedTask;
-  }
-
-  public Task StopAsync(CancellationToken cancellationToken)
-  {
-    Console.WriteLine("Stopping async ");
-    return Task.CompletedTask;
-  }
-}
 
 internal class TenantService : ITenantService
 {
@@ -248,7 +227,7 @@ internal class TenantService : ITenantService
       throw new ConflictException(_t["Tenant is already Deactivated."]);
     }
 
-    tenant.Deactivate();
+    tenant.DeActivate();
 
     await _tenantStore.TryUpdateAsync(tenant);
 
@@ -344,3 +323,4 @@ internal class TenantService : ITenantService
     return tenantDto;
   }
 }
+
