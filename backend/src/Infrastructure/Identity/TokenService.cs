@@ -80,7 +80,7 @@ internal class TokenService : ITokenService
 
   private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return _tenantService.HasAValidSubscription(tenantId);
+    return _tenantService.HasAValidProdSubscription(tenantId);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
