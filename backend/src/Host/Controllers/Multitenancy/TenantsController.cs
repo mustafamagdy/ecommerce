@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class TenantsController : VersionNeutralApiController
+public class TenantsController : VersionedApiController
 {
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
