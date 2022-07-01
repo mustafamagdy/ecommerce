@@ -7,6 +7,7 @@ using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,9 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
   IdentityUserToken<string>>
 {
+  private readonly ITenantInfo _currentTenant;
+  private readonly ISubscriptionInfo _currentSubscriptionType;
+  private TenantDbContext _tenantDb;
   protected readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
@@ -27,14 +31,17 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events)
+    IEventPublisher events, ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
     : base(currentTenant, options)
   {
+    _currentTenant = currentTenant;
     _currentUser = currentUser;
     _serializer = serializer;
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
     _events = events;
+    _currentSubscriptionType = currentSubscriptionType;
+    _tenantDb = tenantDb;
   }
 
   // Used by Dapper
@@ -61,7 +68,19 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
       optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
-    if (!string.IsNullOrWhiteSpace(TenantInfo?.ConnectionString))
+    // if (!string.IsNullOrWhiteSpace(TenantInfo?.ConnectionString))
+    var subscriptionType = _currentSubscriptionType.SubscriptionType;
+    var tenantId = _currentTenant.Id;
+    var tenant = _tenantDb.TenantInfo.Find(tenantId);
+    string connectionString = subscriptionType.Name switch
+    {
+      nameof(SubscriptionType.Standard) => tenant.ConnectionString,
+      nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
+      nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
+      _ => ""
+    };
+
+    if (!string.IsNullOrWhiteSpace(connectionString))
     {
       optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo?.ConnectionString!);
     }
