@@ -21,8 +21,11 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
     _dbSettings = dbSettings.Value;
   }
 
-  public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
-  public DbSet<Subscription> Subscriptions => Set<Subscription>();
+  public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
+  public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+  public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
+  public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
+  public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
   public DbSet<PaymentMethod> RootPaymentMethods => Set<PaymentMethod>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,12 +36,6 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .Entity<FSHTenantInfo>()
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
-
-    modelBuilder
-      .Entity<FSHTenantInfo>()
-      .HasMany(a => a.Subscriptions)
-      .WithOne(a => a.Tenant)
-      .HasForeignKey(a => a.TenantId);
   }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

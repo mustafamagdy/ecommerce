@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy
 {
-  public class HasValidSubscriptionLevelFilter : IAsyncActionFilter
+  public class HasValidSubscriptionTypeFilter : IAsyncActionFilter
   {
     private readonly ITenantResolver _tenantResolver;
     private readonly ITenantService _tenantService;
 
-    public HasValidSubscriptionLevelFilter(ITenantResolver tenantResolver, ITenantService tenantService)
+    public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver, ITenantService tenantService)
     {
       _tenantResolver = tenantResolver;
       _tenantService = tenantService;
@@ -21,17 +21,17 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
     {
       var descriptor = context.ActionDescriptor as ControllerActionDescriptor;
       if (descriptor?.MethodInfo
-            .GetCustomAttributes(typeof(HasValidSubscriptionLevelAttribute), true)
+            .GetCustomAttributes(typeof(HasValidSubscriptionTypeAttribute), true)
             .ToList()
-            .FirstOrDefault() is HasValidSubscriptionLevelAttribute subscriptionLevel)
+            .FirstOrDefault() is HasValidSubscriptionTypeAttribute subscriptionLevel)
       {
         if (await _tenantResolver.ResolveAsync(context.HttpContext) is MultiTenantContext<FSHTenantInfo> tenantContext)
         {
           var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id);
-          // if (tenant.ActiveSubscription == null)
-          // {
-          //   throw new FeatureNotAllowedException();
-          // }
+          if (tenant.ProdSubscription == null)
+          {
+            throw new FeatureNotAllowedException();
+          }
         }
 
         await next();
@@ -42,19 +42,13 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
   }
 
   [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-  public class HasValidSubscriptionLevelAttribute : Attribute
+  public class HasValidSubscriptionTypeAttribute : Attribute
   {
-    public SubscriptionLevel Level { get; }
+    public SubscriptionType Type { get; }
 
-    public HasValidSubscriptionLevelAttribute(SubscriptionLevel level)
+    public HasValidSubscriptionTypeAttribute(SubscriptionType type)
     {
-      Level = level;
+      Type = type;
     }
-  }
-
-  public enum SubscriptionLevel
-  {
-    Basic,
-    Full
   }
 }

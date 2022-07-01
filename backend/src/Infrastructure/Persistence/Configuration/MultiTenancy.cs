@@ -9,23 +9,45 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class TenantSubscriptionConfig : IEntityTypeConfiguration<TenantSubscription>
+public abstract class SubscriptionConfig<T> : IEntityTypeConfiguration<T>
+  where T : Subscription
 {
-  public void Configure(EntityTypeBuilder<TenantSubscription> builder)
+  public virtual void Configure(EntityTypeBuilder<T> builder)
   {
+    builder
+      .Property(b => b.Price)
+      .HasPrecision(7, 3);
   }
 }
 
-public class SubscriptionConfig : IEntityTypeConfiguration<Subscription>
+public class StandardSubscriptionConfig : SubscriptionConfig<StandardSubscription>
 {
-  public void Configure(EntityTypeBuilder<Subscription> builder)
+}
+
+public class DemoSubscriptionConfig : SubscriptionConfig<DemoSubscription>
+{
+}
+
+public class TrainSubscriptionConfig : SubscriptionConfig<TrainSubscription>
+{
+}
+
+public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHistory>
+{
+  public void Configure(EntityTypeBuilder<SubscriptionHistory> builder)
   {
     builder
-      .Property(a => a.MonthlyPrice)
+      .Property(b => b.Price)
       .HasPrecision(7, 3);
+  }
+}
 
+public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPayment>
+{
+  public void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
+  {
     builder
-      .Property(a => a.YearlyPrice)
+      .Property(b => b.Amount)
       .HasPrecision(7, 3);
   }
 }
