@@ -158,14 +158,19 @@ public class ArchivedPaymentOperation : PaymentOperation
 {
 }
 
-public sealed class PaymentOperationType : SmartEnum<PaymentOperationType>
+public sealed class PaymentOperationType : SmartEnum<PaymentOperationType, string>
 {
-  public static readonly PaymentOperationType In = new(nameof(In), 1);
-  public static readonly PaymentOperationType PendingIn = new(nameof(PendingIn), 2);
-  public static readonly PaymentOperationType Out = new(nameof(Out), 3);
-  public static readonly PaymentOperationType PendingOut = new(nameof(PendingOut), 4);
+  public static readonly PaymentOperationType In = new(nameof(In), "in");
+  public static readonly PaymentOperationType PendingIn = new(nameof(PendingIn), "pending-in");
+  public static readonly PaymentOperationType Out = new(nameof(Out), "out");
+  public static readonly PaymentOperationType PendingOut = new(nameof(PendingOut), "pending-out");
 
-  public PaymentOperationType(string name, int value)
+  public PaymentOperationType()
+    : base(null, null)
+  {
+  }
+
+  private PaymentOperationType(string name, string value)
     : base(name, value)
   {
   }

@@ -5,6 +5,7 @@ using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
@@ -27,20 +28,39 @@ public class SubscriptionSeeder : ICustomSeeder
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {
     string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    if (!_db.Subscriptions.Any())
+    bool hasStandardSubs = _db.StandardSubscriptions.Any();
+    bool hasDemoSubs = _db.DemoSubscriptions.Any();
+    bool hasTrainSubs = _db.TrainSubscriptions.Any();
+
+    if (hasStandardSubs && hasDemoSubs && hasTrainSubs)
     {
-      _logger.LogInformation("Started to Seed Subscriptions");
-
-      string jsonData = await File.ReadAllTextAsync(path + "/Seeders/subscriptions.json", cancellationToken);
-      var items = _serializerService.Deserialize<List<Subscription>>(jsonData);
-
-      foreach (var item in items)
-      {
-        await _db.Subscriptions.AddAsync(item, cancellationToken);
-      }
-
-      await _db.SaveChangesAsync(cancellationToken);
-      _logger.LogInformation("Seeded Subscriptions");
+      return;
     }
+
+    _logger.LogInformation("Started to Seed Subscriptions");
+
+    string jsonData = await File.ReadAllTextAsync(path + "/Seeders/subscriptions.json", cancellationToken);
+    var items = _serializerService.Deserialize<List<Subscription>>(jsonData);
+    var prod = items.Where(a => a.SubscriptionType == SubscriptionType.Standard).Cast<StandardSubscription>().SingleOrDefault();
+    var demo = items.Where(a => a.SubscriptionType == SubscriptionType.Demo).Cast<DemoSubscription>().SingleOrDefault();
+    var train = items.Where(a => a.SubscriptionType == SubscriptionType.Train).Cast<TrainSubscription>().SingleOrDefault();
+
+    if (!hasStandardSubs && prod != null)
+    {
+      await _db.StandardSubscriptions.AddAsync(prod, cancellationToken);
+    }
+
+    if (!hasDemoSubs && demo != null)
+    {
+      await _db.DemoSubscriptions.AddAsync(demo, cancellationToken);
+    }
+
+    if (!hasTrainSubs && train != null)
+    {
+      await _db.TrainSubscriptions.AddAsync(train, cancellationToken);
+    }
+
+    await _db.SaveChangesAsync(cancellationToken);
+    _logger.LogInformation("Seeded Subscription");
   }
 }

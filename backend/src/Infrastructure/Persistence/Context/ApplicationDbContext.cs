@@ -15,10 +15,10 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
+  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionInfo subscriptionInfo, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, events)
+    IEventPublisher events, TenantDbContext tenantDb)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, events, subscriptionInfo, tenantDb)
   {
   }
 
@@ -49,7 +49,10 @@ public class ApplicationDbContext : BaseDbContext
   {
     modelBuilder.Ignore<FSHTenantInfo>();
     modelBuilder.Ignore<Subscription>();
+    modelBuilder.Ignore<StandardSubscription>();
+    modelBuilder.Ignore<DemoSubscription>();
+    modelBuilder.Ignore<TrainSubscription>();
     modelBuilder.Ignore<SubscriptionPayment>();
-    modelBuilder.Ignore<TenantSubscription>();
+    modelBuilder.Ignore<SubscriptionHistory>();
   }
 }
