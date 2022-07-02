@@ -18,22 +18,37 @@ public class CashRegisterConfig : IEntityTypeConfiguration<CashRegister>
   }
 }
 
-public class ActivePaymentOperationConfig : IEntityTypeConfiguration<ActivePaymentOperation>
+public abstract class BasePaymentOperationConfig<T> : IEntityTypeConfiguration<T>
+  where T : PaymentOperation
+{
+  public void Configure(EntityTypeBuilder<T> builder)
+  {
+    builder.IsMultiTenant();
+    builder
+      .Property(b => b.Amount)
+      .HasPrecision(7, 3);
+
+    builder
+      .Property(b => b.Type)
+      .HasConversion(
+        p => p.Value,
+        p => PaymentOperationType.FromValue(p)
+      );
+  }
+}
+
+public class ActivePaymentOperationConfig : BasePaymentOperationConfig<ActivePaymentOperation>
 {
   public void Configure(EntityTypeBuilder<ActivePaymentOperation> builder)
   {
-    builder.IsMultiTenant();
-
     builder.HasOne(a => a.CashRegister).WithMany(a => a.ActiveOperations).HasForeignKey(a => a.CashRegisterId);
   }
 }
 
-public class ArchivedPaymentOperationConfig : IEntityTypeConfiguration<ArchivedPaymentOperation>
+public class ArchivedPaymentOperationConfig : BasePaymentOperationConfig<ArchivedPaymentOperation>
 {
   public void Configure(EntityTypeBuilder<ArchivedPaymentOperation> builder)
   {
-    builder.IsMultiTenant();
-
     builder.HasOne(a => a.CashRegister).WithMany(a => a.ArchivedOperations).HasForeignKey(a => a.CashRegisterId);
   }
 }
