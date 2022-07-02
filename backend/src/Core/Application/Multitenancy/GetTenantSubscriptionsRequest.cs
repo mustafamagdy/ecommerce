@@ -15,35 +15,54 @@ public class GetTenantSubscriptionsRequest : IRequest<List<TenantSubscriptionDto
   }
 }
 
+public class GetTenantWithActiveSubscriptions : Specification<FSHTenantInfo>, ISingleResultSpecification
+{
+  public GetTenantWithActiveSubscriptions(string tenantId, bool? onlyActiveHistory = null) =>
+    Query
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.SubscriptionHistory
+        .Where(x => x.TenantId == tenantId && (onlyActiveHistory == null || x.ExpiryDate > DateTime.Now)))
+      .Include(a => a.DemoSubscription)
+      .Include(a => a.TrainSubscription)
+      .Include(a => a.Payments)
+      .Where(a => a.Id == tenantId);
+}
+
 public class GetTenantSubscriptionsRequestHandler : IRequestHandler<GetTenantSubscriptionsRequest, List<TenantSubscriptionDto>>
 {
-  private readonly ITenantService _tenantService;
+  private readonly IReadTenantRepository<FSHTenantInfo> _repository;
   private readonly IStringLocalizer _t;
 
-  public GetTenantSubscriptionsRequestHandler(ITenantService tenantService, IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer)
+  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repository)
   {
-    _tenantService = tenantService;
     _t = localizer;
+    _repository = repository;
   }
 
-  public async Task<List<TenantSubscriptionDto>> Handle(GetTenantSubscriptionsRequest request, CancellationToken
-    cancellationToken)
+  public async Task<List<TenantSubscriptionDto>> Handle(GetTenantSubscriptionsRequest request, CancellationToken cancellationToken)
   {
-    List<TenantSubscription> subscriptions = default!;
-    if (request.ActiveSubscription == true)
+    List<TenantSubscriptionDto> subscriptions = default!;
+    var tenant = await _repository.GetBySpecAsync(new GetTenantWithActiveSubscriptions(request.TenantId, request.ActiveSubscription), cancellationToken);
+    if (tenant == null)
     {
-      subscriptions = (await _tenantService.GetActiveSubscriptions(request.TenantId)).ToList();
-    }
-    else if (request.ActiveSubscription == null)
-    {
-      subscriptions = await _tenantService.GetAllTenantSubscriptions(request.TenantId);
+      throw new NotFoundException(_t["Tenant {0} is not found", request.TenantId]);
     }
 
-    if (subscriptions?.Count == 0)
+    if (tenant.ProdSubscription != null)
     {
-      throw new NotFoundException(_t["Tenant has no active subscriptions"]);
+      subscriptions.Add(tenant.ProdSubscription.Adapt<TenantSubscriptionDto>());
     }
 
-    return subscriptions.Adapt<List<TenantSubscriptionDto>>();
+    if (tenant.DemoSubscription != null)
+    {
+      subscriptions.Add(tenant.DemoSubscription.Adapt<TenantSubscriptionDto>());
+    }
+
+    if (tenant.TrainSubscription != null)
+    {
+      subscriptions.Add(tenant.TrainSubscription.Adapt<TenantSubscriptionDto>());
+    }
+
+    return subscriptions;
   }
 }

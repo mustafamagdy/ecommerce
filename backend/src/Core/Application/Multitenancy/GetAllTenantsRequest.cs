@@ -86,81 +86,82 @@ select count(*) from tmp_tenants;
     };
 
     using var db = await _repo.GetDbConnection(cancellationToken);
+    //
+    // var mappings = new ColumnMappingCollection();
+    // mappings.RegisterType<TenantDto>()
+    //   .MapProperty(x => x.Id).ToColumn("TenantId")
+    //   .MapProperty(x => x.AdminEmail).ToColumn("adminEmail")
+    //   .MapProperty(x => x.IsActive).ToColumn("isActive")
+    //   .MapProperty(x => x.Name).ToColumn("TenantName");
+    //
+    // mappings.RegisterType<TenantSubscriptionDto>()
+    //   .MapProperty(x => x.Id).ToColumn("SubscriptionId")
+    //   .MapProperty(x => x.TenantId).ToColumn("TenantId")
+    //   .MapProperty(x => x.ExpiryDate).ToColumn("ExpiryDate")
+    //   .MapProperty(x => x.IsDemo).ToColumn("IsDemo");
+    //
+    // mappings.RegisterType<SubscriptionPaymentDto>()
+    //   .MapProperty(x => x.Amount).ToColumn("Amount")
+    //   .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
+    //   .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
+    //   .MapProperty(x => x.PaymentMethodName).ToColumn("PaymentMethodName");
+    //
+    // mappings.RegisterType<BranchDto>()
+    //   .MapProperty(x => x.Id).ToColumn("BranchId")
+    //   .MapProperty(x => x.Name).ToColumn("branchName")
+    //   .MapProperty(x => x.Description).ToColumn("branchDescription");
+    //
+    // mappings.RegisterWithDapper();
+    //
+    // using var multiResult = await db.QueryMultipleAsync(sql, param);
+    //
+    // var result = new Dictionary<string, TenantDto>();
+    // var subs = new Dictionary<Guid, TenantSubscriptionDto>();
+    // var branches = new Dictionary<Guid, BranchDto>();
+    //
+    // multiResult.Read<TenantDto, TenantSubscriptionDto, SubscriptionPaymentDto, BranchDto, TenantDto>(
+    //   (t, sub, pmt, b) =>
+    //   {
+    //     if (!result.ContainsKey(t.Id))
+    //     {
+    //       result.Add(t.Id, t);
+    //     }
+    //
+    //     var tenant = result[t.Id];
+    //
+    //     if (b != null && b.Id != Guid.Empty)
+    //     {
+    //       if (!branches.ContainsKey(b.Id))
+    //       {
+    //         branches.Add(b.Id, b);
+    //         tenant.Branches.Add(b);
+    //       }
+    //     }
+    //
+    //     if (sub != null && sub.Id != Guid.Empty)
+    //     {
+    //       if (!subs.ContainsKey(sub.Id))
+    //       {
+    //         subs.Add(sub.Id, sub);
+    //         tenant.Subscriptions.Add(sub);
+    //       }
+    //     }
+    //
+    //     var subscription = subs[sub.Id];
+    //     subscription.TenantId = tenant.Id;
+    //
+    //     if (pmt != null && pmt.PaymentMethodId != Guid.Empty)
+    //     {
+    //       subscription.Payments.Add(pmt);
+    //     }
+    //
+    //     return t;
+    //   },
+    //   splitOn: "TenantId, SubscriptionId, PaymentId, BranchId");
 
-    var mappings = new ColumnMappingCollection();
-    mappings.RegisterType<TenantDto>()
-      .MapProperty(x => x.Id).ToColumn("TenantId")
-      .MapProperty(x => x.AdminEmail).ToColumn("adminEmail")
-      .MapProperty(x => x.IsActive).ToColumn("isActive")
-      .MapProperty(x => x.Name).ToColumn("TenantName");
-
-    mappings.RegisterType<TenantSubscriptionDto>()
-      .MapProperty(x => x.Id).ToColumn("SubscriptionId")
-      .MapProperty(x => x.TenantId).ToColumn("TenantId")
-      .MapProperty(x => x.ExpiryDate).ToColumn("ExpiryDate")
-      .MapProperty(x => x.IsDemo).ToColumn("IsDemo");
-
-    mappings.RegisterType<SubscriptionPaymentDto>()
-      .MapProperty(x => x.Amount).ToColumn("Amount")
-      .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
-      .MapProperty(x => x.PaymentMethodId).ToColumn("PaymentMethodId")
-      .MapProperty(x => x.PaymentMethodName).ToColumn("PaymentMethodName");
-
-    mappings.RegisterType<BranchDto>()
-      .MapProperty(x => x.Id).ToColumn("BranchId")
-      .MapProperty(x => x.Name).ToColumn("branchName")
-      .MapProperty(x => x.Description).ToColumn("branchDescription");
-
-    mappings.RegisterWithDapper();
-
-    using var multiResult = await db.QueryMultipleAsync(sql, param);
-
-    var result = new Dictionary<string, TenantDto>();
-    var subs = new Dictionary<Guid, TenantSubscriptionDto>();
-    var branches = new Dictionary<Guid, BranchDto>();
-
-    multiResult.Read<TenantDto, TenantSubscriptionDto, SubscriptionPaymentDto, BranchDto, TenantDto>(
-      (t, sub, pmt, b) =>
-      {
-        if (!result.ContainsKey(t.Id))
-        {
-          result.Add(t.Id, t);
-        }
-
-        var tenant = result[t.Id];
-
-        if (b != null && b.Id != Guid.Empty)
-        {
-          if (!branches.ContainsKey(b.Id))
-          {
-            branches.Add(b.Id, b);
-            tenant.Branches.Add(b);
-          }
-        }
-
-        if (sub != null && sub.Id != Guid.Empty)
-        {
-          if (!subs.ContainsKey(sub.Id))
-          {
-            subs.Add(sub.Id, sub);
-            tenant.Subscriptions.Add(sub);
-          }
-        }
-
-        var subscription = subs[sub.Id];
-        subscription.TenantId = tenant.Id;
-
-        if (pmt != null && pmt.PaymentMethodId != Guid.Empty)
-        {
-          subscription.Payments.Add(pmt);
-        }
-
-        return t;
-      },
-      splitOn: "TenantId, SubscriptionId, PaymentId, BranchId");
-
-    int totalCount = multiResult.ReadSingle<int>();
-
-    return new PaginationResponse<TenantDto>(result.Values.ToList(), totalCount, request.PageNumber, request.PageSize);
+    // int totalCount = multiResult.ReadSingle<int>();
+    //
+    // return new PaginationResponse<TenantDto>(result.Values.ToList(), totalCount, request.PageNumber, request.PageSize);
+    return null;
   }
 }

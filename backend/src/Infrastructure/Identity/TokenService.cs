@@ -63,7 +63,7 @@ internal class TokenService : ITokenService
 
     if (_currentTenant.Id != MultitenancyConstants.Root.Id)
     {
-      if (!_currentTenant.IsActive)
+      if (!_currentTenant.Active)
       {
         throw new UnauthorizedException(_t["Tenant is not Active. Please contact the Application Administrator."]);
       }
@@ -80,7 +80,7 @@ internal class TokenService : ITokenService
 
   private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return _tenantService.HasAValidSubscription(tenantId);
+    return _tenantService.HasAValidProdSubscription(tenantId);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)

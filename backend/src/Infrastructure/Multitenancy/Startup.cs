@@ -27,12 +27,14 @@ internal static class Startup
       })
       .AddMultiTenant<FSHTenantInfo>()
       .WithClaimStrategy(FSHClaims.Tenant)
+      .WithHostStrategy(MultitenancyConstants.TenantIdName)
       .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
       .WithQueryStringStrategy(MultitenancyConstants.TenantIdName)
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
       .AddScoped<ITenantService, TenantService>()
-      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
+      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
+      .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
   }
 
   internal static IApplicationBuilder UseMultiTenancy(this IApplicationBuilder app) =>
