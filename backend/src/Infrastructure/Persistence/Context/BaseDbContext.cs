@@ -68,17 +68,20 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
       optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
-    // if (!string.IsNullOrWhiteSpace(TenantInfo?.ConnectionString))
-    var subscriptionType = _currentSubscriptionType.SubscriptionType;
-    var tenantId = _currentTenant.Id;
-    var tenant = _tenantDb.TenantInfo.Find(tenantId);
-    string connectionString = subscriptionType.Name switch
+    string connectionString = string.Empty;
+    if (_currentTenant != null && _currentSubscriptionType != null)
     {
-      nameof(SubscriptionType.Standard) => tenant.ConnectionString,
-      nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
-      nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
-      _ => ""
-    };
+      var subscriptionType = _currentSubscriptionType.SubscriptionType;
+      var tenantId = _currentTenant.Id;
+      var tenant = _tenantDb.TenantInfo.Find(tenantId);
+      connectionString = subscriptionType.Name switch
+      {
+        nameof(SubscriptionType.Standard) => tenant.ConnectionString,
+        nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
+        nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
+        _ => ""
+      };
+    }
 
     if (!string.IsNullOrWhiteSpace(connectionString))
     {

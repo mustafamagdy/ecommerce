@@ -53,5 +53,6 @@ public class ApplicationDbContext : BaseDbContext
     modelBuilder.Ignore<DemoSubscription>();
     modelBuilder.Ignore<TrainSubscription>();
     modelBuilder.Ignore<SubscriptionPayment>();
+    modelBuilder.Ignore<SubscriptionHistory>();
   }
 }

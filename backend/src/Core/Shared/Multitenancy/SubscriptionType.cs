@@ -9,7 +9,12 @@ public class SubscriptionType : SmartEnum<SubscriptionType, string>
   public static readonly SubscriptionType Demo = new(nameof(Demo), "demo");
   public static readonly SubscriptionType Train = new(nameof(Train), "train");
 
-  public SubscriptionType(string name, string value)
+  public SubscriptionType()
+    : base(null, null)
+  {
+  }
+
+  private SubscriptionType(string name, string value)
     : base(name, value)
   {
   }
