@@ -57,7 +57,11 @@ internal class DatabaseInitializer : IDatabaseInitializer
       await _tenantDbContext.Database.MigrateAsync(cancellationToken);
     }
 
-    await SeedRootTenantAsync(cancellationToken);
+    if (await _tenantDbContext.Database.CanConnectAsync(cancellationToken))
+    {
+      _logger.LogInformation("Connection to main tenant database succeeded");
+      await SeedRootTenantAsync(cancellationToken);
+    }
   }
 
   private async Task SeedRootTenantAsync(CancellationToken cancellationToken)

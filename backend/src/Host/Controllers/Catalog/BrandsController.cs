@@ -1,5 +1,7 @@
 ﻿using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
 
@@ -8,7 +10,6 @@ public class BrandsController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Brands)]
   [OpenApiOperation("Search brands using available filters.", "")]
-  [HasValidSubscriptionLevel(SubscriptionLevel.Basic)]
   public Task<PaginationResponse<BrandDto>> SearchAsync(SearchBrandsRequest request)
   {
     return Mediator.Send(request);

@@ -5,6 +5,7 @@
         <AssemblyName>FSH.WebApi.Shared</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+      <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
       <PackageReference Include="Finbuckle.MultiTenant" Version="6.7.2" />
     </ItemGroup>
 </Project>
