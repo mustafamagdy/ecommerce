@@ -8,6 +8,7 @@ using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Infrastructure.Seeders;
 using QuestPDF.Drawing;
 using Serilog;
 
