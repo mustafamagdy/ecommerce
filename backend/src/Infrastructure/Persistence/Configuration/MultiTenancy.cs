@@ -17,6 +17,13 @@ public abstract class SubscriptionConfig<T> : IEntityTypeConfiguration<T>
     builder
       .Property(b => b.Price)
       .HasPrecision(7, 3);
+
+    builder
+      .Property(b => b.SubscriptionType)
+      .HasConversion(
+        p => p.Value,
+        p => SubscriptionType.FromValue(p)
+      );
   }
 }
 

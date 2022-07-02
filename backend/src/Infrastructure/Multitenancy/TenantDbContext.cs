@@ -8,6 +8,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
@@ -31,6 +32,8 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
+
+    modelBuilder.ConfigureSmartEnum();
 
     modelBuilder
       .Entity<FSHTenantInfo>()
