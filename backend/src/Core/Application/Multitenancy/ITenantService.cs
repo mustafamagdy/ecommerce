@@ -11,7 +11,7 @@ public interface ITenantService
   Task<string> CreateAsync(CreateTenantRequest request, CancellationToken cancellationToken);
   Task<string> ActivateAsync(string tenantId);
   Task<string> DeactivateAsync(string tenantId);
-  Task<string> RenewSubscription(Guid subscriptionId, DateTime? extendedExpiryDate);
+  Task<string> RenewSubscription(Guid subscriptionId, int? days);
   Task<bool> DatabaseExistAsync(string databaseName);
   Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string tenantId);
   Task<bool> HasAValidProdSubscription(string tenantId);
