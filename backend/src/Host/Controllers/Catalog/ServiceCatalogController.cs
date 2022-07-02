@@ -10,7 +10,6 @@ public class ServiceCatalogController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.ServiceCatalog)]
   [OpenApiOperation("Search service catalog using available filters.", "")]
-  [HasValidSubscriptionType(SubscriptionType.Standard)]
   public Task<PaginationResponse<ServiceCatalogDto>> SearchAsync(SearchServiceCatalogRequest request)
   {
     return Mediator.Send(request);

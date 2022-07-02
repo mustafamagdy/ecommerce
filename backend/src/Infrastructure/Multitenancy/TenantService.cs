@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Diagnostics;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
@@ -266,5 +267,17 @@ internal class TenantService : ITenantService
     tenantDto.Branches = branches.Adapt<List<BranchDto>>();
 
     return tenantDto;
+  }
+
+  public Task<bool> HasAValidProdSubscription(string tenantId)
+  {
+    var today = DateTime.Now;
+    return _tenantDbContext.TenantInfo
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.SubscriptionHistory)
+      .AnyAsync(a => a.Id == tenantId
+                     && a.Active
+                     && a.ProdSubscription != null
+                     && a.ProdSubscription.SubscriptionHistory.Any(x => x.TenantId == tenantId && x.ExpiryDate >= today));
   }
 }

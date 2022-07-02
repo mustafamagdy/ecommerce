@@ -10,7 +10,6 @@ public class ServicesController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Services)]
   [OpenApiOperation("Search brands using available filters.", "")]
-  [HasValidSubscriptionType(SubscriptionType.Standard)]
   public Task<PaginationResponse<ServiceDto>> SearchAsync(SearchServiceRequest request)
   {
     return Mediator.Send(request);

@@ -51,5 +51,10 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
     {
       Type = type;
     }
+
+    public HasValidSubscriptionTypeAttribute(string type)
+    {
+      // Type = type;
+    }
   }
 }
