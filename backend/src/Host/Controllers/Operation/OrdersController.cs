@@ -11,7 +11,6 @@ public class OrdersController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Orders)]
   [OpenApiOperation("Search orders using available filters.", "")]
-  [HasValidSubscriptionType(SubscriptionType.Standard)]
   public Task<PaginationResponse<OrderDto>> SearchAsync(SearchOrdersRequest request)
   {
     return Mediator.Send(request);
