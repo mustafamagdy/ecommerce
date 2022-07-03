@@ -27,47 +27,65 @@ public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRe
     CancellationToken cancellationToken)
   {
     string sql = @"
+set @subStartedFrom = null;
+set @subStartedTo = null;
+set @subExpiredFrom = null;
+set @subExpiredTo = null;
+set @name = null;
+set @phoneNumber = null;
+set @balanceFrom = null;
+set @balanceTo = null;
+
 create temporary table if not exists tmp_tenants as
     (select t.Id  as TenantId
           , t.Identifier
           , t.name as TenantName
           , t.adminEmail
-          , t.isActive
-          , ts.Id as SubscriptionId
-          , ts.ExpiryDate
-          , ts.IsDemo
-          , sp.Id as PaymentId
-          , sp.Amount
+          , t.active
+          , std.Id as ProdSubscription_Id
+          , std_sh.Price as ProdSubscription_Price
+          , std_sh.StartDate as ProdSubscription_StartDate
+          , std_sh.ExpiryDate as ProdSubscription_ExpiryDate
+          , demo.Id as DemoSubscription_Id
+          , demo_sh.StartDate as DemoSubscription_StartDate
+          , demo_sh.ExpiryDate as DemoSubscription_ExpiryDate
+          , train.Id as TrainSubscription_Id
+          , train_sh.StartDate as TrainSubscription_StartDate
+          , train_sh.ExpiryDate as TrainSubscription_ExpiryDate
           , pm.Id as PaymentMethodId
           , pm.Name as PaymentMethodName
           , b.Id as BranchId
           , b.Name as BranchName
           , b.Description as BranchDescription
      from Tenants t
-        left join Branches b on b.TenantId = t.Id
-        left join TenantSubscriptions ts on t.Id = ts.tenantId
-        left join Subscriptions s on s.Id = ts.subscriptionId
-        left join SubscriptionPayment sp on sp.TenantSubscriptionId = ts.Id
-        left join RootPaymentMethods pm on pm.Id = sp.PaymentMethodId
+              left join Branches b on b.TenantId = t.Id
+              left join Subscription std on std.Id = t.ProdSubscriptionId
+              left join Subscription demo on demo.Id = t.DemoSubscriptionId
+              left join Subscription train on train.Id = t.TrainSubscriptionId
+              left join SubscriptionHistories std_sh on t.Id = std_sh.tenantId and std.Id = std_sh.StandardSubscriptionId
+              left join SubscriptionHistories demo_sh on t.Id = demo_sh.tenantId and demo.Id = demo_sh.StandardSubscriptionId
+              left join SubscriptionHistories train_sh on t.Id = train_sh.tenantId and train.Id = train_sh.StandardSubscriptionId
+              left join SubscriptionPayments sp on sp.SubscriptionId = std.Id
+              left join RootPaymentMethods pm on pm.Id = sp.PaymentMethodId
      where
-        t.Name <> 'root'
-        AND ((@subStartedFrom is null or ts.startDate >= @subStartedFrom) OR (@subStartedTo is null or ts.startDate <= @subStartedTo))
-        AND ((@subExpiredFrom is null or ts.expiryDate >= @subExpiredFrom) OR (@subExpiredTo is null or ts.expiryDate <= @subExpiredTo))
-        AND (@name is null OR t.name like CONCAT('%', @name, '%'))
-        AND (@phoneNumber is null OR t.phoneNumber like CONCAT('%', @phoneNumber, '%'))
-        AND
+             t.Name <> 'root'
+       AND ((@subStartedFrom is null or std_sh.startDate >= @subStartedFrom) OR (@subStartedTo is null or std_sh.startDate <= @subStartedTo))
+       AND ((@subExpiredFrom is null or std_sh.expiryDate >= @subExpiredFrom) OR (@subExpiredTo is null or std_sh.expiryDate <= @subExpiredTo))
+       AND (@name is null OR t.name like CONCAT('%', @name, '%'))
+       AND (@phoneNumber is null OR t.phoneNumber like CONCAT('%', @phoneNumber, '%'))
+       AND
              t.Id in (
              select t1.Id
              from tenants t1
-                      left join tenantSubscriptions ts1 on t1.Id = ts1.tenantId
-                      left join subscriptionPayment sp1 on sp1.TenantSubscriptionId = ts1.Id
-             group by t1.Id, ts1.Price
-             having  (@balanceFrom is null or (ts1.Price - ifnull(sum(sp1.amount),0)) >= @balanceFrom)
-                AND (@balanceTo is null or (ts1.Price - ifnull(sum(sp1.amount),0)) <= @balanceFrom)
+                      left join Subscription stdSub on t1.ProdSubscriptionId = stdSub.id
+                      left join SubscriptionPayments sp1 on sp1.SubscriptionId = stdSub.Id
+             group by t1.Id, stdSub.Price
+             having  (@balanceFrom is null or (stdSub.Price - ifnull(sum(sp1.amount),0)) >= @balanceFrom)
+                AND (@balanceTo is null or (stdSub.Price - ifnull(sum(sp1.amount),0)) <= @balanceTo)
          )
      order by t.Id);
 
-select * from tmp_tenants limit @pageSize offset @offset;
+select * from tmp_tenants; -- limit @pageSize offset @offset;
 select count(*) from tmp_tenants;
                        ";
 
