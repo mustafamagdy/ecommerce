@@ -39,6 +39,10 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .Entity<FSHTenantInfo>()
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
+
+    modelBuilder.Ignore<ActivePaymentOperation>();
+    modelBuilder.Ignore<ArchivedPaymentOperation>();
+    modelBuilder.Ignore<CashRegister>();
   }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
