@@ -2,13 +2,13 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation.Customers;
 
-public class CreateSimpleCustomerRequest : IRequest<CustomerDto>
+public class SimpleCustomerData
 {
   public string PhoneNumber { get; set; } = default!;
   public string Name { get; set; } = default!;
 }
 
-public class CreateSimpleCustomerRequestValidator : CustomValidator<CreateSimpleCustomerRequest>
+public class CreateSimpleCustomerRequestValidator : CustomValidator<SimpleCustomerData>
 {
   public CreateSimpleCustomerRequestValidator(IReadRepository<Customer> customerRepo, IStringLocalizer<IBaseRequest> t)
   {

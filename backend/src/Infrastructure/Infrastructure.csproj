@@ -9,6 +9,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="2.1.0" />
+        <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0" />
         <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="6.0.1" />
         <PackageReference Include="ClosedXML" Version="0.95.4" />
         <PackageReference Include="Dapper" Version="2.0.123" />
