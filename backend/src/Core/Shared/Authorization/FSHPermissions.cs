@@ -9,6 +9,8 @@ public static class FSHAction
   public const string Create = nameof(Create);
   public const string Update = nameof(Update);
   public const string Delete = nameof(Delete);
+  public const string Activate = nameof(Activate);
+  public const string Deactivate = nameof(Deactivate);
   public const string Cancel = nameof(Cancel);
   public const string Export = nameof(Export);
   public const string Generate = nameof(Generate);

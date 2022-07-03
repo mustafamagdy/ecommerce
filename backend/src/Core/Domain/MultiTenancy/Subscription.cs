@@ -1,10 +1,12 @@
-using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
 using FSH.WebApi.Shared.Multitenancy;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public abstract class Subscription : BaseEntity
+public class Subscription : BaseEntity
 {
+  [JsonConverter(typeof(SmartEnumNameConverter<SubscriptionType, string>))]
   public SubscriptionType SubscriptionType { get; set; }
   public int Days { get; set; }
   public decimal Price { get; set; }

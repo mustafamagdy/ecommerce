@@ -34,9 +34,9 @@ public class AutoCompleteCustomerRequestValidator : CustomValidator<AutoComplete
 
 public class AutoCompleteCustomerRequestHandler : IRequestHandler<AutoCompleteCustomerRequest, BasicCustomerDto>
 {
-  private readonly IRepositoryWithEvents<Customer> _repository;
+  private readonly IReadRepository<Customer> _repository;
 
-  public AutoCompleteCustomerRequestHandler(IRepositoryWithEvents<Customer> repository) => _repository = repository;
+  public AutoCompleteCustomerRequestHandler(IReadRepository<Customer> repository) => _repository = repository;
 
   public async Task<BasicCustomerDto> Handle(AutoCompleteCustomerRequest request, CancellationToken cancellationToken)
   {
