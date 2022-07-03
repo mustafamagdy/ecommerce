@@ -1,14 +1,45 @@
 using System.Reflection;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Multitenancy;
-using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
+
+public class SubscriptionConverterWithSubscriptionType : JsonConverter
+{
+  public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+  {
+    JObject item = JObject.Load(reader);
+    var type = item["SubscriptionType"].Value<string>();
+    var typeVal = SubscriptionType.FromName(type);
+
+    Subscription subscription = typeVal.Name switch
+    {
+      nameof(SubscriptionType.Standard) => new StandardSubscription(),
+      nameof(SubscriptionType.Demo) => new DemoSubscription(),
+      nameof(SubscriptionType.Train) => new TrainSubscription(),
+      _ => throw new ArgumentOutOfRangeException(type)
+    };
+
+    serializer.Populate(item.CreateReader(), subscription);
+    return subscription;
+  }
+
+  public override bool CanConvert(Type objectType)
+  {
+    return typeof(Subscription).IsAssignableFrom(objectType);
+  }
+
+  public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+  {
+    throw new NotImplementedException();
+  }
+}
 
 public class SubscriptionSeeder : ICustomSeeder
 {
@@ -40,10 +71,10 @@ public class SubscriptionSeeder : ICustomSeeder
     _logger.LogInformation("Started to Seed Subscriptions");
 
     string jsonData = await File.ReadAllTextAsync(path + "/Seeders/subscriptions.json", cancellationToken);
-    var items = _serializerService.Deserialize<List<Subscription>>(jsonData);
-    var prod = items.Where(a => a.SubscriptionType == SubscriptionType.Standard).Cast<StandardSubscription>().SingleOrDefault();
-    var demo = items.Where(a => a.SubscriptionType == SubscriptionType.Demo).Cast<DemoSubscription>().SingleOrDefault();
-    var train = items.Where(a => a.SubscriptionType == SubscriptionType.Train).Cast<TrainSubscription>().SingleOrDefault();
+    var items = JsonConvert.DeserializeObject<List<Subscription>>(jsonData, new SubscriptionConverterWithSubscriptionType());
+    var prod = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Standard) as StandardSubscription;
+    var demo = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Demo) as DemoSubscription;
+    var train = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Train) as TrainSubscription;
 
     if (!hasStandardSubs && prod != null)
     {
