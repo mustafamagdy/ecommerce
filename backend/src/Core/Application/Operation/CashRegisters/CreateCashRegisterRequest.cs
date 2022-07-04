@@ -2,16 +2,16 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
-public sealed class CashRegisterByNameSpec : Specification<CashRegister>, ISingleResultSpecification
-{
-  public CashRegisterByNameSpec(string name) => Query.Where(b => b.Name == name);
-}
-
 public class CreateCashRegisterRequest : IRequest<Guid>
 {
   public Guid BranchId { get; set; }
   public string Name { get; set; }
   public string Color { get; set; }
+}
+
+public sealed class CashRegisterByNameSpec : Specification<CashRegister>, ISingleResultSpecification
+{
+  public CashRegisterByNameSpec(string name) => Query.Where(b => b.Name == name);
 }
 
 public class CreateCashRegisterRequestValidator : CustomValidator<CreateCashRegisterRequest>

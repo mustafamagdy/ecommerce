@@ -30,13 +30,6 @@ namespace FSH.WebApi.Application.Operation.Orders
 
     protected override void RenderHeader(IContainer container)
     {
-      // container.Row(row =>
-      // {
-      //   row.RelativeItem().Column(col =>
-      //   {
-      //     col.Item().BorderColor(Colors.Black).Border(1, Unit.Point).AlignCenter().Text("LOGO").FontSize(10);
-      //   });
-      // });
       _qrCode = _qrGenerator.GenerateQrCode(Model.Base64QrCode, 100, 100);
       string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
       byte[] logo = File.ReadAllBytes(appPath + "/Files/logos/tenant_logo.png");
@@ -70,30 +63,6 @@ namespace FSH.WebApi.Application.Operation.Orders
         col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("فاتورة ضريبية مبسطة").FontSize(10);
         col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("Simplified Tax Invoice").FontSize(10);
       });
-
-      // container.Row(row =>
-      // {
-      //   row.RelativeItem().Column(Column =>
-      //   {
-      //     Column
-      //       .Item().Text($"Order #{Model.OrderNumber}")
-      //       .FontSize(10).SemiBold().FontColor(Colors.Purple.Accent4);
-      //
-      //     Column.Item().Text(text =>
-      //     {
-      //       text.Span("Order date: ").SemiBold();
-      //       text.Span($"{Model.OrderDate: yyyy-MM-dd}");
-      //     });
-      //
-      //     Column.Item().Text(text =>
-      //     {
-      //       text.Span("Order time: ").SemiBold();
-      //       text.Span($"{Model.OrderDate:hh:mm:ss tt}");
-      //     });
-      //   });
-      //
-      //   // row.ConstantItem(100).Height(100).Image(_qrImage, ImageScaling.Resize);
-      // });
     }
 
     protected override void Body(IContainer container)
@@ -106,9 +75,6 @@ namespace FSH.WebApi.Application.Operation.Orders
 
         var totalPrice = Model.TotalAmount;
         column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:N2}").SemiBold();
-
-        // if (!string.IsNullOrWhiteSpace(Model.Comments))
-        //   column.Item().PaddingTop(25).Element(ComposeComments);
       });
     }
 
@@ -149,7 +115,6 @@ namespace FSH.WebApi.Application.Operation.Orders
           header.Cell().AlignRight().Text("Item").Style(headerStyle);
         });
 
-        // string text = "كلام طويل وملوش اخر صدقني انا بقولك انه مش عارف اخره فين ولذلك هقولك كمان شوية";
         foreach (var item in Model.OrderItems)
         {
           table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text($"{item.Price:F0}");
@@ -157,39 +122,8 @@ namespace FSH.WebApi.Application.Operation.Orders
           table.Cell().Element(CellStyle).AlignRight().AlignTop().Text(item.ItemName);
 
           static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
-
-          // .BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
         }
       });
     }
   }
-
-  // public class AddressComponent : IComponent
-  // {
-  //   private string Title { get; }
-  //   private Address Address { get; }
-  //
-  //   public AddressComponent(string title, Address address)
-  //   {
-  //     Title = title;
-  //     Address = address;
-  //   }
-  //
-  //   public void Compose(IContainer container)
-  //   {
-  //     container.ShowEntire().Column(column =>
-  //     {
-  //       column.Spacing(2);
-  //
-  //       column.Item().Text(Title).SemiBold();
-  //       column.Item().PaddingBottom(5).LineHorizontal(1);
-  //
-  //       column.Item().Text(Address.CompanyName);
-  //       column.Item().Text(Address.Street);
-  //       column.Item().Text($"{Address.City}, {Address.State}");
-  //       column.Item().Text(Address.Email);
-  //       column.Item().Text(Address.Phone);
-  //     });
-  //   }
-  // }
 }

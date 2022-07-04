@@ -26,7 +26,7 @@
   [✅] Transfer (with hold until recipient accept)
 - Users:
   [✅] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
-  - Role
+  [✅] Role
   - Users (admin cannot be deleted, activate/deactivate user)
   - User roles
   - Logout all users once role permissions updated
