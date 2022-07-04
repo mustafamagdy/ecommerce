@@ -15,7 +15,7 @@ public class CreateOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 
 public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<CreateOrderRequest>
 {
-  public CreateOrderRequestValidator(IReadRepository<Order> repository, IStringLocalizer<IBaseRequest> t)
+  public CreateOrderRequestValidator(IStringLocalizer<IBaseRequest> t)
     : base(t)
   {
     RuleFor(p => p.CustomerId)
