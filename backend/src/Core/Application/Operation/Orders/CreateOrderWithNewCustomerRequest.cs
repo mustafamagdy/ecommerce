@@ -9,7 +9,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<OrderDto>
 {
-  public SimpleCustomerData Customer { get; set; } = default!;
+  public CreateSimpleCustomerRequest Customer { get; set; } = default!;
   public List<OrderPaymentAmount> Payments { get; set; }
 }
 
