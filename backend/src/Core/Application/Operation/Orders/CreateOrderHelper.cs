@@ -12,6 +12,15 @@ public interface ICreateOrderHelper : ITransientService
   Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken);
 }
 
+public class GetServiceCatalogDetailByIdSpec : Specification<ServiceCatalog, ServiceCatalogDto>, ISingleResultSpecification
+{
+  public GetServiceCatalogDetailByIdSpec(Guid serviceCatalogId) =>
+    Query
+      .Include(a => a.Product)
+      .Include(a => a.Service)
+      .Where(a => a.Id == serviceCatalogId);
+}
+
 public class CreateOrderHelper : ICreateOrderHelper
 {
   private readonly IRepositoryWithEvents<Order> _repository;
@@ -20,6 +29,7 @@ public class CreateOrderHelper : ICreateOrderHelper
   private readonly IVatQrCodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
   private readonly IStringLocalizer _t;
+
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
     IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer)
