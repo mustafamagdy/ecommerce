@@ -10,6 +10,12 @@ public class PaymentOperationDto : IDto
   public string PaymentMethodName { get; set; }
 }
 
+public class CashRegisterTransactionSearchRequest : PaginationFilter, IRequest<PaginationResponse<PaymentOperationDto>>
+{
+  public Guid Id { get; set; }
+  public Range<DateTime> OperationDateTime { get; set; }
+}
+
 public sealed class CashRegisterTransactionsByIdSpec : EntitiesByPaginationFilterSpec<CashRegister, PaymentOperationDto>
 {
   public CashRegisterTransactionsByIdSpec(CashRegisterTransactionSearchRequest request)
@@ -25,12 +31,6 @@ public sealed class CashRegisterTransactionsByIdSpec : EntitiesByPaginationFilte
     .Where(a => request.OperationDateTime.To == null
                 || a.ActiveOperations.Any(x => x.DateTime <= request.OperationDateTime.To)
                 || a.ArchivedOperations.Any(x => x.DateTime <= request.OperationDateTime.To));
-}
-
-public class CashRegisterTransactionSearchRequest : PaginationFilter, IRequest<PaginationResponse<PaymentOperationDto>>
-{
-  public Guid Id { get; set; }
-  public Range<DateTime> OperationDateTime { get; set; }
 }
 
 public class CashRegisterTransactionSearchRequestValidator : CustomValidator<CashRegisterTransactionSearchRequest>
