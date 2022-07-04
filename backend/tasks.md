@@ -25,7 +25,7 @@
   [✅] open/close history
   [✅] Transfer (with hold until recipient accept)
 - Users:
-  - predefined roles (activate/deactivate cannot be deleted)
+  [✅] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
   - Role
   - Users (admin cannot be deleted, activate/deactivate user)
   - User roles
