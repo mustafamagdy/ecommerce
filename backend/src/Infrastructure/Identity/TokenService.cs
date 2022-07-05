@@ -116,8 +116,9 @@ internal class TokenService : ITokenService
   private string GenerateJwt(ApplicationUser user, string ipAddress) =>
     GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
 
-  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress) =>
-    new List<Claim>
+  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+  {
+    var claims = new List<Claim>
     {
       new(ClaimTypes.NameIdentifier, user.Id),
       new(ClaimTypes.Email, user.Email),
@@ -129,6 +130,14 @@ internal class TokenService : ITokenService
       new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
     };
+
+    if (user.MustChangePassword)
+    {
+      claims.Add(new(FSHClaims.MustChangePassword, string.Empty));
+    }
+
+    return claims;
+  }
 
   private string GenerateRefreshToken()
   {
