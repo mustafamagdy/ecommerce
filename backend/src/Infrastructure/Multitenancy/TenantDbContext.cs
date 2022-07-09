@@ -8,6 +8,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
@@ -21,24 +22,27 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
     _dbSettings = dbSettings.Value;
   }
 
-  public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
-  public DbSet<Subscription> Subscriptions => Set<Subscription>();
+  public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
+  public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+  public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
+  public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
+  public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
   public DbSet<PaymentMethod> RootPaymentMethods => Set<PaymentMethod>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
 
+    modelBuilder.ConfigureSmartEnum();
+
     modelBuilder
       .Entity<FSHTenantInfo>()
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
 
-    modelBuilder
-      .Entity<FSHTenantInfo>()
-      .HasMany(a => a.Subscriptions)
-      .WithOne(a => a.Tenant)
-      .HasForeignKey(a => a.TenantId);
+    modelBuilder.Ignore<ActivePaymentOperation>();
+    modelBuilder.Ignore<ArchivedPaymentOperation>();
+    modelBuilder.Ignore<CashRegister>();
   }
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

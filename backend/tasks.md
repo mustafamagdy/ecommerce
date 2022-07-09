@@ -8,8 +8,8 @@
   [✅] Create cash
   [✅] Create with preexisting custer
 - Customers:
-  - Search (name, phone)
-  - Auto complete customer
+  [✅] Search (name, phone)
+  [✅] Auto complete customer
 - Service catalog:
   [✅] Get service catalogs
   [✅] Services
@@ -17,25 +17,25 @@
   - Price list
   - activate/deactivate service item in a price list
 - Cash register
-  - Search (search transactions)
-  - Add/Update/Delete (Name, isMain, Color, Branch)
-  - Get basic
-  - Get with balance
-  - Close (zero balance and transfer to main)
-  - open/close history
-  - Transfer (with hold until recipient accept)
+  [✅] Search (search transactions)
+  [✅] Add/Update/Delete (Name, isMain, Color, Branch)
+  [✅] Get basic
+  [✅] Get with balance
+  [✅] Close (zero balance and transfer to main)
+  [✅] open/close history
+  [✅] Transfer (with hold until recipient accept)
 - Users:
-  - predefined roles (activate/deactivate cannot be deleted)
-  - Role
+  [✅] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
+  [✅] Role
   - Users (admin cannot be deleted, activate/deactivate user)
   - User roles
   - Logout all users once role permissions updated
 - Branches:
-  - Search
-  - Add/Update
+  [✅] Search
+  [✅] Add/Update
   - Activate/Deactivate (deactivate all cash register in a branch)
 - Tenants:
-  - Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
+  [✅] Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
   - Create, renew subscription 
     [✅] (name, vat no, logo, phone number, email, address, zipcode, admin name, admin email, admin phone number)
     [✅] Current subscription (name, date of subscription)
@@ -52,7 +52,7 @@
 ========================== FRAMEWORK ==========================
 
 [x] refactor the order number generator to use database instead of files, as the backend will be hosted on multiple servers with LB
-[x] refactor invoice to generate the qrcode, brcode, and logo
+[x] refactor invoice to generate the qrcode, barcode, and logo
 - OrdeBr api
   [x] can send multiple payments in the same endpoint
     - BUG: if order with customer call failed, a customer will be added anyway, do validation first
@@ -97,4 +97,11 @@ Tenant has branches
 each branch has cash register(s)
 
 /////// Cash Register ///////
+
+Cash register
+    - key, name, main?
+    - any payment to or from go through a cash register
+    - available balance to to pay from is current balance - total held transfer from
+transfer operation works in two steps
+    - create operation (which will hold the transferred amount until the recipient accepts it)
 

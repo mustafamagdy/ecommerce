@@ -13,6 +13,14 @@ public class SubscriptionPayment : Payment
   {
   }
 
+  public Guid SubscriptionId { get; set; }
+
+  public SubscriptionPayment SetSubscription(Guid subscriptionId)
+  {
+    SubscriptionId = subscriptionId;
+    return this;
+  }
+
   public SubscriptionPayment SetAmount(decimal amount)
   {
     Amount = amount;

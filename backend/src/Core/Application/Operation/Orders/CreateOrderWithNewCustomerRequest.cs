@@ -34,6 +34,7 @@ public class CreateOrderWithNewCustomerRequestHandler : IRequestHandler<CreateOr
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly ICreateOrderHelper _orderHelper;
   private readonly IStringLocalizer _t;
+
   public CreateOrderWithNewCustomerRequestHandler(ICreateOrderHelper orderHelper, IReadRepository<PaymentMethod> paymentMethodRepo, IRepositoryWithEvents<Customer> customerRepo, IStringLocalizer<CreateOrderWithNewCustomerRequestHandler> localizer)
   {
     _orderHelper = orderHelper;

@@ -1,6 +1,8 @@
 ﻿using FSH.WebApi.Application.Operation;
 using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
@@ -9,7 +11,6 @@ public class OrdersController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Orders)]
   [OpenApiOperation("Search orders using available filters.", "")]
-  [HasValidSubscriptionLevel(SubscriptionLevel.Basic)]
   public Task<PaginationResponse<OrderDto>> SearchAsync(SearchOrdersRequest request)
   {
     return Mediator.Send(request);

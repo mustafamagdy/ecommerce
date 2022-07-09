@@ -4,7 +4,6 @@ public class TenantDto : IDto
 {
   public TenantDto()
   {
-    Subscriptions = new List<TenantSubscriptionDto>();
     Branches = new List<BranchDto>();
   }
 
@@ -12,10 +11,11 @@ public class TenantDto : IDto
   public string Name { get; set; } = default!;
   public string? DatabaseName { get; set; }
   public string AdminEmail { get; set; } = default!;
-  public bool IsActive { get; set; }
+  public bool Active { get; set; }
   public string? Issuer { get; set; }
 
-  public TenantSubscriptionDto? ActiveSubscription { get; set; }
-  public List<TenantSubscriptionDto> Subscriptions { get; set; }
+  public ProdTenantSubscriptionDto? ProdSubscription { get; set; }
+  public DemoTenantSubscriptionDto? DemoSubscription { get; set; }
+  public TrainTenantSubscriptionDto? TrainSubscription { get; set; }
   public List<BranchDto> Branches { get; set; } = default!;
 }

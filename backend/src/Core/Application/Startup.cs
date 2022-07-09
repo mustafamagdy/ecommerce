@@ -34,18 +34,6 @@ public class DtoCustomMapping
     TypeAdapterConfig<Order, OrderExportDto>
       .NewConfig()
       .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
-      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
-      ;
-
-    TypeAdapterConfig<FSHTenantInfo, TenantDto>
-      .NewConfig()
-      .Map(dest => dest.ActiveSubscription, src =>
-        src.Subscriptions != null && src.Subscriptions.Count > 0
-          ? src.Subscriptions.FirstOrDefault(a => a.Active && !a.IsDemo)
-          : null)
-      .Map(dest => dest.Subscriptions, src =>
-        src.Subscriptions != null && src.Subscriptions.Count > 0
-          ? src.Subscriptions.OrderByDescending(a => a.StartDate)
-          : null);
+      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber);
   }
 }

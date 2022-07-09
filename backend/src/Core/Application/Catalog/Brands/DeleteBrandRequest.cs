@@ -11,14 +11,12 @@ public class DeleteBrandRequest : IRequest<Guid>
 
 public class DeleteBrandRequestHandler : IRequestHandler<DeleteBrandRequest, Guid>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Brand> _brandRepo;
   private readonly IReadRepository<Product> _productRepo;
   private readonly IStringLocalizer _t;
 
   public DeleteBrandRequestHandler(IRepositoryWithEvents<Brand> brandRepo, IReadRepository<Product> productRepo,
-    IStringLocalizer<DeleteBrandRequestHandler> localizer) =>
-    (_brandRepo, _productRepo, _t) = (brandRepo, productRepo, localizer);
+    IStringLocalizer<DeleteBrandRequestHandler> localizer) => (_brandRepo, _productRepo, _t) = (brandRepo, productRepo, localizer);
 
   public async Task<Guid> Handle(DeleteBrandRequest request, CancellationToken cancellationToken)
   {

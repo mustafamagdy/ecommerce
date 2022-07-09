@@ -9,10 +9,16 @@ public static class FSHAction
   public const string Create = nameof(Create);
   public const string Update = nameof(Update);
   public const string Delete = nameof(Delete);
+  public const string Activate = nameof(Activate);
+  public const string Deactivate = nameof(Deactivate);
   public const string Cancel = nameof(Cancel);
   public const string Export = nameof(Export);
   public const string Generate = nameof(Generate);
   public const string ViewBasic = nameof(ViewBasic);
+  public const string Open = nameof(Open);
+  public const string Close = nameof(Close);
+  public const string Transfer = nameof(Transfer);
+  public const string Approve = nameof(Approve);
 
   public const string Clean = nameof(Clean);
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
@@ -35,6 +41,7 @@ public static class FSHResource
   public const string Orders = nameof(Orders);
   public const string Customers = nameof(Customers);
   public const string Branches = nameof(Branches);
+  public const string CashRegisters = nameof(CashRegisters);
 }
 
 public static class FSHPermissions

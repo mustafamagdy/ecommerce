@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
@@ -6,9 +7,11 @@ using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
@@ -17,6 +20,9 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
   IdentityUserToken<string>>
 {
+  private readonly ITenantInfo _currentTenant;
+  private readonly ISubscriptionInfo _currentSubscriptionType;
+  private TenantDbContext _tenantDb;
   protected readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
@@ -25,14 +31,17 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events)
+    IEventPublisher events, ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
     : base(currentTenant, options)
   {
+    _currentTenant = currentTenant;
     _currentUser = currentUser;
     _serializer = serializer;
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
     _events = events;
+    _currentSubscriptionType = currentSubscriptionType;
+    _tenantDb = tenantDb;
   }
 
   // Used by Dapper
@@ -55,20 +64,28 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     if (_dbSettings.LogSensitiveInfo)
     {
       optionsBuilder.EnableSensitiveDataLogging();
+      optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
+      optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
-    // If you want to see the sql queries that efcore executes:
-
-    // Uncomment the next line to see them in the output window of visual studio
-    // optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
-
-    // Or uncomment the next line if you want to see them in the console
-    // optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
-    if (!string.IsNullOrWhiteSpace(TenantInfo?.DatabaseName))
+    string connectionString = string.Empty;
+    if (_currentTenant != null && _currentSubscriptionType != null)
     {
-      string connectionString = _csBuilder.BuildConnectionString(TenantInfo.DatabaseName);
-      optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
+      var subscriptionType = _currentSubscriptionType.SubscriptionType;
+      var tenantId = _currentTenant.Id;
+      var tenant = _tenantDb.TenantInfo.Find(tenantId);
+      connectionString = subscriptionType.Name switch
+      {
+        nameof(SubscriptionType.Standard) => tenant.ConnectionString,
+        nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
+        nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
+        _ => ""
+      };
+    }
+
+    if (!string.IsNullOrWhiteSpace(connectionString))
+    {
+      optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo?.ConnectionString!);
     }
   }
 
