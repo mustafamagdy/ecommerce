@@ -19,8 +19,8 @@ public class CreateTenantRequestValidator : CustomValidator<CreateTenantRequest>
 
     RuleFor(t => t.DatabaseName).Cascade(CascadeMode.Stop)
       .NotEmpty()
-      .MustAsync(async (cs, _) => !await tenantService.DatabaseExistAsync(cs!))
-      .WithMessage((_, cs) => T["Database {0} already exists.", cs!]);
+      .MustAsync(async (dbName, _) => !await tenantService.DatabaseExistAsync(dbName!))
+      .WithMessage((_, dbName) => T["Database {0} already exists.", dbName!]);
 
     RuleFor(t => t.AdminEmail).Cascade(CascadeMode.Stop)
       .NotEmpty()

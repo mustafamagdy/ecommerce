@@ -19,7 +19,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services, HostBuilderContext context) =>
         services
-            .AddTransient<IMemoryCache, MemoryCache>()
+            .AddLazyCache()
             .AddTransient<LocalCacheService>()
             .AddTransient<IDistributedCache, MemoryDistributedCache>()
             .AddTransient<ISerializerService, NewtonSoftService>()

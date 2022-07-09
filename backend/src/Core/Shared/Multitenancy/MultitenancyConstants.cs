@@ -16,17 +16,18 @@ public class MultitenancyConstants
 
   public static RootTenantInfo RootTenant { get => _rootTenant; }
 
-  public class RootTenantInfo : ITenantInfo
+  public class RootTenantInfo : IFSHTenantInfo
   {
     public string? Id { get => Root.Id; set => throw new InvalidOperationException("You cannot set root tenant Id"); }
 
     public string? Identifier { get => Root.Id; set => throw new InvalidOperationException("You cannot set root tenant Id"); }
     public string? Name { get => Root.Name; set => throw new InvalidOperationException("You cannot set root tenant Name"); }
-    public string? DatabaseName { get => string.Empty; set => throw new NotImplementedException(); }
+    public string? ConnectionString { get => string.Empty; set => throw new NotImplementedException(); }
+    public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.Standard;
   }
 
-
   public const string DefaultPassword = "123Pa$$word!";
+  public const string TempPassword = "123Pa$$word!";
 
   public const string TenantIdName = "tenant";
 }

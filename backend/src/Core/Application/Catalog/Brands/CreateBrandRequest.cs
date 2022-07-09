@@ -6,6 +6,11 @@ public class CreateBrandRequest : IRequest<Guid>
   public string? Description { get; set; }
 }
 
+public sealed class BrandByNameSpec : Specification<Brand>, ISingleResultSpecification
+{
+  public BrandByNameSpec(string name) => Query.Where(b => b.Name == name);
+}
+
 public class CreateBrandRequestValidator : CustomValidator<CreateBrandRequest>
 {
   public CreateBrandRequestValidator(

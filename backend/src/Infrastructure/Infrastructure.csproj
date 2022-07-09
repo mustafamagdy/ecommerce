@@ -8,9 +8,13 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="2.1.0" />
+        <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0" />
         <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="6.0.1" />
         <PackageReference Include="ClosedXML" Version="0.95.4" />
         <PackageReference Include="Dapper" Version="2.0.123" />
+        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.7.2" />
+        <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.7.2" />
         <PackageReference Include="Hangfire" Version="1.7.28" />
         <PackageReference Include="Hangfire.Console" Version="1.4.2" />
         <PackageReference Include="Hangfire.Console.Extensions" Version="1.0.5" />
@@ -19,6 +23,7 @@
         <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
         <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
         <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.1" />
+        <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
         <PackageReference Include="MailKit" Version="3.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.5" />
@@ -68,9 +73,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Core\Application\Application.csproj" />
         <ProjectReference Include="..\Core\Domain\Domain.csproj" />
-        <ProjectReference Include="..\Multitenancy\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" />
-        <ProjectReference Include="..\Multitenancy\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
-        <ProjectReference Include="..\Multitenancy\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Update="Catalog\*.json" CopyToOutputDirectory="PreserveNewest" />
@@ -102,6 +104,9 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Seeders\subscriptions.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Seeders\branch.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

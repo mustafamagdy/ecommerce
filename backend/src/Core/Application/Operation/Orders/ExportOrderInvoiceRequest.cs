@@ -5,9 +5,36 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public class ExportOrderInvoiceRequest : IRequest<(string, Stream)>
 {
-  // todo: add validation at least one of those prop need to be filled
   public Guid? OrderId { get; set; }
   public string? OrderNumber { get; set; } = default;
+}
+
+public class ExportOrderInvoiceRequestValidator : CustomValidator<ExportOrderInvoiceRequest>
+{
+  public ExportOrderInvoiceRequestValidator()
+  {
+    RuleFor(a => a.OrderId).NotEmpty().When(a => string.IsNullOrEmpty(a.OrderNumber));
+    RuleFor(a => a.OrderNumber).NotEmpty().When(a => a.OrderId == null);
+  }
+}
+
+public class ExportOrderInvoiceWithBrandsSpec : Specification<Order, OrderExportDto>, ISingleResultSpecification
+{
+  public ExportOrderInvoiceWithBrandsSpec(ExportOrderInvoiceRequest request) =>
+    Query
+      .Include(a => a.Customer)
+      .Include(a => a.OrderPayments)
+      .ThenInclude(a => a.PaymentMethod)
+      .Include(a => a.OrderItems)
+      .ThenInclude(a => a.ServiceCatalog)
+      .ThenInclude(a => a.Product)
+      .Include(a => a.OrderItems)
+      .ThenInclude(a => a.ServiceCatalog)
+      .ThenInclude(a => a.Product)
+      .Where(a => request.OrderId == null
+                  || a.Id == request.OrderId
+                  || request.OrderNumber == null
+                  || a.OrderNumber == request.OrderNumber);
 }
 
 public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoiceRequest, (string OrderNumber, Stream PdfInvoice)>
@@ -39,21 +66,4 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     var invoice = new InvoiceDocument(order, _vatQrCodeGenerator);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
-}
-
-public class ExportOrderInvoiceWithBrandsSpec : Specification<Order, OrderExportDto>, ISingleResultSpecification
-{
-  public ExportOrderInvoiceWithBrandsSpec(ExportOrderInvoiceRequest request) =>
-    Query
-      .Include(a => a.Customer)
-      .Include(a => a.OrderPayments)
-      .ThenInclude(a => a.PaymentMethod)
-      .Include(a => a.OrderItems)
-      .ThenInclude(a => a.ServiceCatalog)
-      .ThenInclude(a => a.Product)
-      .Include(a => a.OrderItems)
-      .ThenInclude(a => a.ServiceCatalog)
-      .ThenInclude(a => a.Product)
-      .Where(a => (request.OrderId == null || a.Id == request.OrderId)
-                  || (request.OrderNumber == null || a.OrderNumber == request.OrderNumber));
 }

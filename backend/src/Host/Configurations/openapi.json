@@ -1,14 +1,14 @@
 {
   "SwaggerSettings": {
     "Enable": true,
-    "Title": ".NET 6.0 WebAPI - Clean Architecture",
+    "Title": "Backend API",
     "Version": "v1",
     "Description": "Clean Architecture Template for .NET 6.0 WebApi built with Multitenancy Support.",
-    "ContactName": "Mukesh Murugan",
-    "ContactEmail": "hello@codewithmukesh.com",
-    "ContactUrl": "https://linkedin.com/in/iammukeshm",
+    "ContactName": "Mustafa Magdy",
+    "ContactEmail": "mustafa.magdy1@gmail.com",
+    "ContactUrl": "https://linkedin.com/in/mmagdy",
     "License": true,
     "LicenseName": "MIT License",
-    "LicenseUrl": "https://github.com/fullstackhero/dotnet-webapi-boilerplate/blob/main/LICENSE"
+    "LicenseUrl": "https://github.com/mustafamagdy/ecommerce/blob/main/backend/LICENSE"
   }
 }
