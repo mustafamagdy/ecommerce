@@ -8,6 +8,7 @@ using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Infrastructure.Seeders;
 using QuestPDF.Drawing;
 using Serilog;
 
@@ -26,7 +27,7 @@ try
       .ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionLevelFilter>(); })
+  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionTypeFilter>(); })
     .AddFluentValidation()
     .AddJsonOptions(opt =>
     {
@@ -53,10 +54,13 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 {
   StaticLogger.EnsureInitialized();
   Log.Fatal(ex, "Unhandled exception");
-}
-finally
+} finally
 {
   StaticLogger.EnsureInitialized();
   Log.Information("Server Shutting down...");
   Log.CloseAndFlush();
+}
+
+public partial class Program
+{
 }

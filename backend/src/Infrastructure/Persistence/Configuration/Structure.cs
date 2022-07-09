@@ -10,5 +10,7 @@ public class BranchConfig : IEntityTypeConfiguration<Branch>
   public void Configure(EntityTypeBuilder<Branch> builder)
   {
     builder.IsMultiTenant();
+
+    builder.HasMany(a => a.CashRegisters).WithOne(a => a.Branch).HasForeignKey(a => a.BranchId);
   }
 }

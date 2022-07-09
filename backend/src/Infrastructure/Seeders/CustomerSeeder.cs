@@ -20,7 +20,7 @@ public class CustomerSeeder : ICustomSeeder
     _db = db;
   }
 
-  public string Order => "02.02";
+  public string Order => "02.06";
 
   public async Task InitializeAsync(CancellationToken cancellationToken)
   {

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
@@ -11,14 +10,14 @@ public class FSHTenantInfo : ITenantInfo
   {
   }
 
-  public FSHTenantInfo(string id, string name, string? databaseName, string adminEmail, string? phoneNumber,
+  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? phoneNumber,
     string? vatNo, string? email, string? address, string? adminName, string? adminPhoneNumber,
     string? techSupportUserId, string? issuer = null)
   {
     Id = id;
     Identifier = id;
     Name = name;
-    DatabaseName = databaseName ?? string.Empty;
+    ConnectionString = connectionString ?? string.Empty;
     AdminEmail = adminEmail;
     PhoneNumber = phoneNumber;
     VatNo = vatNo;
@@ -27,7 +26,7 @@ public class FSHTenantInfo : ITenantInfo
     AdminName = adminName;
     AdminPhoneNumber = adminPhoneNumber;
     TechSupportUserId = techSupportUserId;
-    IsActive = true;
+    Active = true;
     Issuer = issuer;
   }
 
@@ -42,7 +41,6 @@ public class FSHTenantInfo : ITenantInfo
   public string Identifier { get; set; } = default!;
 
   public string Name { get; set; } = default!;
-  public string DatabaseName { get; set; } = default!;
 
   public string AdminEmail { get; private set; } = default!;
   public string? PhoneNumber { get; set; }
@@ -52,9 +50,75 @@ public class FSHTenantInfo : ITenantInfo
   public string? AdminName { get; set; }
   public string? AdminPhoneNumber { get; set; }
   public string? TechSupportUserId { get; set; }
-  public bool IsActive { get; private set; }
+  public bool Active { get; private set; }
 
-  public virtual HashSet<TenantSubscription> Subscriptions { get; set; }
+  public StandardSubscription? ProdSubscription { get; set; }
+  public Guid? ProdSubscriptionId { get; set; }
+  public string? ConnectionString { get; set; }
+
+  public DemoSubscription? DemoSubscription { get; set; }
+  public Guid? DemoSubscriptionId { get; set; }
+  public string? DemoConnectionString { get; set; }
+
+  public TrainSubscription? TrainSubscription { get; set; }
+  public Guid? TrainSubscriptionId { get; set; }
+  public string? TrainConnectionString { get; set; }
+
+  public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
+  public virtual HashSet<Branch> Branches { get; set; } = default!;
+
+  public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
+  public decimal Balance => (ProdSubscription?.SubscriptionHistory.Sum(a => a.Price) ?? 0) - TotalPaid;
+
+  public void Pay(decimal amount, Guid paymentMethodId)
+  {
+    if (ProdSubscriptionId == null)
+    {
+      throw new NullReferenceException("No valid prod subscription to renew");
+    }
+
+    Payments.Add(new SubscriptionPayment(amount, paymentMethodId).SetSubscription(ProdSubscriptionId.Value));
+  }
+
+  public FSHTenantInfo Renew()
+  {
+    if (ProdSubscription == null)
+    {
+      throw new NullReferenceException("No valid prod subscription to renew");
+    }
+
+    var today = DateTime.Now;
+    ProdSubscription.SubscriptionHistory.Add(new SubscriptionHistory
+    {
+      TenantId = Id,
+      Price = ProdSubscription.Price,
+      StartDate = today,
+      ExpiryDate = today.AddDays(ProdSubscription.Days)
+    });
+    return Activate();
+  }
+
+  public FSHTenantInfo Activate()
+  {
+    if (Id == MultitenancyConstants.Root.Id)
+    {
+      throw new InvalidOperationException("Invalid Tenant");
+    }
+
+    Active = true;
+    return this;
+  }
+
+  public FSHTenantInfo DeActivate()
+  {
+    if (Id == MultitenancyConstants.Root.Id)
+    {
+      throw new InvalidOperationException("Invalid Tenant");
+    }
+
+    Active = false;
+    return this;
+  }
 
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
@@ -62,27 +126,6 @@ public class FSHTenantInfo : ITenantInfo
   public string? Issuer { get; set; }
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
-
-  public void Activate()
-  {
-    if (Id == MultitenancyConstants.Root.Id)
-    {
-      throw new InvalidOperationException("Invalid Tenant");
-    }
-
-    IsActive = true;
-  }
-
-  public void Deactivate()
-  {
-    if (Id == MultitenancyConstants.Root.Id)
-    {
-      throw new InvalidOperationException("Invalid Tenant");
-    }
-
-    IsActive = false;
-  }
-
 
   string? ITenantInfo.Id
   {
@@ -100,12 +143,5 @@ public class FSHTenantInfo : ITenantInfo
   {
     get => Name;
     set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
-  }
-
-  string? ITenantInfo.DatabaseName
-  {
-    get => DatabaseName;
-    set => DatabaseName = value ?? throw new InvalidOperationException
-      ("Database Name can't be null.");
   }
 }

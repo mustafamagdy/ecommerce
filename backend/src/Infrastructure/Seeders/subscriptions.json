@@ -1,9 +1,23 @@
 [
   {
+    "SubscriptionType": "Standard",
     "Id": "56325915-a650-46fb-ab10-6f7a03030823",
-    "Name": "اشتراك شهري",
-    "DefaultMonthly": true,
+    "Name": "Monthly - شهري",
     "Days": 30,
-    "MonthlyPrice": 99.0
+    "Price": 99.0
+  },
+  {
+    "SubscriptionType": "Demo",
+    "Id": "e82bf492-29ee-4301-bf18-e0c6157293e1",
+    "Name": "Demo - تجريبي",
+    "Days": 365,
+    "Price": 0.0
+  },
+  {
+    "SubscriptionType": "Train",
+    "Id": "6ff44bcb-4b23-4eac-a15e-f587a80972de",
+    "Name": "Train - تدريبي",
+    "Days": 365,
+    "Price": 0.0
   }
 ]

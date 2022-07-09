@@ -1,9 +1,10 @@
 ﻿using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Domain.Structure;
 
-public class Branch : AuditableEntity, IAggregateRoot
+public class Branch : BaseEntity, IAggregateRoot
 {
   public Branch()
   {
@@ -11,8 +12,11 @@ public class Branch : AuditableEntity, IAggregateRoot
 
   public string TenantId { get; set; }
   public FSHTenantInfo Tenant { get; set; }
-  public string Name { get; private set; }
-  public string? Description { get; private set; }
+
+  public virtual HashSet<CashRegister> CashRegisters { get; set; }
+
+  public string Name { get; set; }
+  public string? Description { get; set; }
 
   public Branch(string tenantId, string name, string? description)
   {
