@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class TenantsController : VersionNeutralApiController
+public class TenantsController : VersionedApiController
 {
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
@@ -68,13 +68,5 @@ public class TenantsController : VersionNeutralApiController
   public Task<BasicTenantInfoDto> GetBasicAsync(string id)
   {
     return Mediator.Send(new GetBasicTenantInfoRequest(id));
-  }
-
-  [HttpPost("branch")]
-  [MustHavePermission(FSHAction.Create, FSHResource.Brands)]
-  [OpenApiOperation("Create a branch for the current tenant.", "")]
-  public Task<Guid> CreateBranchAsync(CreateBranchRequest request)
-  {
-    return Mediator.Send(request);
   }
 }

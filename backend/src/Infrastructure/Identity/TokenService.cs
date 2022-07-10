@@ -63,7 +63,7 @@ internal class TokenService : ITokenService
 
     if (_currentTenant.Id != MultitenancyConstants.Root.Id)
     {
-      if (!_currentTenant.IsActive)
+      if (!_currentTenant.Active)
       {
         throw new UnauthorizedException(_t["Tenant is not Active. Please contact the Application Administrator."]);
       }
@@ -80,7 +80,7 @@ internal class TokenService : ITokenService
 
   private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return _tenantService.HasAValidSubscription(tenantId);
+    return _tenantService.HasAValidProdSubscription(tenantId);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
@@ -116,8 +116,9 @@ internal class TokenService : ITokenService
   private string GenerateJwt(ApplicationUser user, string ipAddress) =>
     GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
 
-  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress) =>
-    new List<Claim>
+  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+  {
+    var claims = new List<Claim>
     {
       new(ClaimTypes.NameIdentifier, user.Id),
       new(ClaimTypes.Email, user.Email),
@@ -129,6 +130,14 @@ internal class TokenService : ITokenService
       new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
     };
+
+    if (user.MustChangePassword)
+    {
+      claims.Add(new(FSHClaims.MustChangePassword, string.Empty));
+    }
+
+    return claims;
+  }
 
   private string GenerateRefreshToken()
   {

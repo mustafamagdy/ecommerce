@@ -16,7 +16,7 @@ public class CreateCashOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 
 public class CreateCashOrderRequestValidator : CreateOrderRequestBaseValidator<CreateCashOrderRequest>
 {
-  public CreateCashOrderRequestValidator(IReadRepository<Order> repository, IStringLocalizer<IBaseRequest> t)
+  public CreateCashOrderRequestValidator(IStringLocalizer<IBaseRequest> t)
     : base(t)
   {
   }
@@ -24,7 +24,6 @@ public class CreateCashOrderRequestValidator : CreateOrderRequestBaseValidator<C
 
 public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequest, OrderDto>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IReadRepository<Customer> _customerRepo;
   private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly IStringLocalizer _t;

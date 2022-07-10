@@ -29,8 +29,7 @@ public class SearchOrdersRequestHandler : IRequestHandler<SearchOrdersRequest, P
 
   public SearchOrdersRequestHandler(IReadRepository<Order> repository) => _repository = repository;
 
-  public async Task<PaginationResponse<OrderDto>> Handle(SearchOrdersRequest request, CancellationToken
-    cancellationToken)
+  public async Task<PaginationResponse<OrderDto>> Handle(SearchOrdersRequest request, CancellationToken cancellationToken)
   {
     var spec = new OrdersBySearchRequestSpec(request);
     return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
