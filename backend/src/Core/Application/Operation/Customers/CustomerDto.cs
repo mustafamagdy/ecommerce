@@ -1,7 +1,5 @@
 namespace FSH.WebApi.Application.Operation.Customers;
 
-public class CustomerDto : IDto
+public class CustomerDto : BasicCustomerDto
 {
-  public string PhoneNumber { get; set; } = default!;
-  public string Name { get; set; } = default!;
 }

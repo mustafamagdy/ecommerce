@@ -1,15 +1,11 @@
 using System.Security.Claims;
+using System.Text.Json;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Infrastructure.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Localization;
-using Newtonsoft.Json;
 using ObjectsComparer;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-
 
 namespace FSH.WebApi.Infrastructure.Auth.Permissions;
 
@@ -17,6 +13,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
 {
   private readonly IUserService _userService;
   private readonly IOverrideTokenService _overrideTokenService;
+
   public PermissionAuthorizationHandler(IUserService userService, IOverrideTokenService overrideTokenService)
   {
     _userService = userService;
@@ -79,7 +76,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
             string body = await reader.ReadToEndAsync();
             request.Body.Seek(0, SeekOrigin.Begin);
 
-            object? model = JsonConvert.DeserializeObject(body, p1Type);
+            object? model = JsonSerializer.Deserialize(body, p1Type);
             if (comparer.Compare(model, mot.Scope))
             {
               context.Succeed(requirement);

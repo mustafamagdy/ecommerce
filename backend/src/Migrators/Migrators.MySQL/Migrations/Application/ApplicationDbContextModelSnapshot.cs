@@ -237,7 +237,13 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Property<Guid>("CashRegisterId")
                         .HasColumnType("char(36)");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("PendingTransferId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("TenantId")
@@ -271,7 +277,13 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Property<Guid>("CashRegisterId")
                         .HasColumnType("char(36)");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("PendingTransferId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("TenantId")
@@ -304,6 +316,14 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.Property<Guid>("BranchId")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("Opened")
                         .HasColumnType("tinyint(1)");
