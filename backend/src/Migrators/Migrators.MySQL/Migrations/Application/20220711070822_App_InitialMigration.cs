@@ -201,6 +201,7 @@ namespace Migrators.MySQL.Migrations.Application
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ObjectId = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    MustChangePassword = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -493,8 +494,9 @@ namespace Migrators.MySQL.Migrations.Application
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(7,3)", precision: 7, scale: 3, nullable: false),
+                    Type = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CashRegisterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     PaymentMethodId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     PendingTransferId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
@@ -528,8 +530,9 @@ namespace Migrators.MySQL.Migrations.Application
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(7,3)", precision: 7, scale: 3, nullable: false),
+                    Type = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CashRegisterId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     PaymentMethodId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     PendingTransferId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")

@@ -106,14 +106,15 @@ public static class FSHPermissions
     new("Update Branches", FSHAction.Update, FSHResource.Branches),
 
     // Service Catalogs
-    new("Search Service Catalog", FSHAction.Search, FSHResource.ServiceCatalog),
     new("View Service Catalog", FSHAction.View, FSHResource.ServiceCatalog),
+    new("Search Service Catalog", FSHAction.Search, FSHResource.ServiceCatalog),
     new("Create Service Catalog", FSHAction.Create, FSHResource.ServiceCatalog),
     new("Update Service Catalog", FSHAction.Update, FSHResource.ServiceCatalog),
     new("Delete Service Catalog", FSHAction.Delete, FSHResource.ServiceCatalog),
 
     // Services
     new("View Services", FSHAction.View, FSHResource.Services),
+    new("View Services", FSHAction.Search, FSHResource.Services),
     new("Create Service", FSHAction.Create, FSHResource.Services),
     new("Update Services", FSHAction.Update, FSHResource.Services),
     new("Delete Services", FSHAction.Delete, FSHResource.Services),
