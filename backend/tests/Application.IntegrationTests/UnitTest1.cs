@@ -1,15 +1,11 @@
 using System.Net.Http.Json;
 using FSH.WebApi.Application.Catalog.Products;
+using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Tokens;
-using FSH.WebApi.Infrastructure.Persistence.Context;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Xunit;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
 namespace Application.IntegrationTests;
 
@@ -27,7 +23,16 @@ public class UnitTest1
     var client = application.CreateClient();
 
     client.DefaultRequestHeaders.Add("tenant", "root");
-    var token = await client.PostAsJsonAsync("/api/tokens", new TokenRequest("admin@root.com", "123Pa$$word!"), CancellationToken.None);
-    var products = await client.PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest());
+    var response = await client.PostAsJsonAsync("/api/tokens", new TokenRequest("admin@root.com", "123Pa$$word!"), CancellationToken.None);
+    var content = await response.Content.ReadAsStringAsync();
+    var tokenResult = JsonConvert.DeserializeObject<TokenResponse>(content);
+
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenResult.Token}");
+    response = await client.PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest());
+    if (response.IsSuccessStatusCode)
+    {
+      content = await response.Content.ReadAsStringAsync();
+      var productResult = JsonConvert.DeserializeObject<PaginationResponse<ProductDto>>(content);
+    }
   }
 }
