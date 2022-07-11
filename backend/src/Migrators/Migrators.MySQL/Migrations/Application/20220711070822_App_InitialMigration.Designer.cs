@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220702052013_App_InitialMigration")]
+    [Migration("20220711070822_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -234,7 +234,8 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
                     b.Property<Guid>("CashRegisterId")
                         .HasColumnType("char(36)");
@@ -253,8 +254,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -274,7 +276,8 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
                     b.Property<Guid>("CashRegisterId")
                         .HasColumnType("char(36)");
@@ -293,8 +296,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -726,6 +730,9 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
