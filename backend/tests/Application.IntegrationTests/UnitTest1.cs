@@ -1,7 +1,9 @@
 using System.Net.Http.Json;
+using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Tokens;
+using FSH.WebApi.Application.Multitenancy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,5 +99,40 @@ public class ExampleTests1 : TestFixture
     {
       var productResult = await response.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     }
+  }
+}
+
+public class SubscriptionTests : TestFixture
+{
+  public SubscriptionTests(HostFixture host, ITestOutputHelper output)
+    : base(host, output)
+  {
+  }
+
+  [Fact]
+  public async Task admin_can_create_new_tenant()
+  {
+    var response = await PostAsJsonAsync("/api/tokens",
+      new TokenRequest("admin@root.com", "123Pa$$word!"),
+      new Dictionary<string, string> { { "tenant", "root" } });
+
+    response.EnsureSuccessStatusCode();
+
+    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
+
+    var tenant = new CreateTenantRequest
+    {
+      Id = "tenant01",
+      Email = "email@tenant01.com",
+      AdminEmail = "admin@tenant01.com",
+      Name = "Tenant 01",
+      DatabaseName = "tenant01-db",
+    };
+
+    response = await PostAsJsonAsync("/api/tenants", tenant, new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
+    response.EnsureSuccessStatusCode();
+
+    var tenantId = await response.Content.ReadAsStringAsync();
+    tenantId.Should().BeEquivalentTo(tenant.Id);
   }
 }
