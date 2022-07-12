@@ -2,13 +2,13 @@
 
 public class PaginationResponse<T>
 {
-    public PaginationResponse(List<T> data, int count, int page, int pageSize)
+    public PaginationResponse(List<T> data, int totalCount, int currentPage, int pageSize)
     {
         Data = data;
-        CurrentPage = page;
+        CurrentPage = currentPage;
         PageSize = pageSize;
-        TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-        TotalCount = count;
+        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        TotalCount = totalCount;
     }
 
     public List<T> Data { get; set; }
