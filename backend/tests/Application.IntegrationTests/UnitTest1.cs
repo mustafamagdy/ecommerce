@@ -24,15 +24,13 @@ public class UnitTest1
 
     client.DefaultRequestHeaders.Add("tenant", "root");
     var response = await client.PostAsJsonAsync("/api/tokens", new TokenRequest("admin@root.com", "123Pa$$word!"), CancellationToken.None);
-    var content = await response.Content.ReadAsStringAsync();
-    var tokenResult = JsonConvert.DeserializeObject<TokenResponse>(content);
+    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokenResult.Token}");
     response = await client.PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest());
     if (response.IsSuccessStatusCode)
     {
-      content = await response.Content.ReadAsStringAsync();
-      var productResult = JsonConvert.DeserializeObject<PaginationResponse<ProductDto>>(content);
+      var productResult = await response.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     }
   }
 }
