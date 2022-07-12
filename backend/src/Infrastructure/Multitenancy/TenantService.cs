@@ -86,7 +86,7 @@ internal class TenantService : ITenantService
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
-    var subscription = await TryCreateSubscription<StandardSubscription>(tenant, SubscriptionType.Standard);
+    var subscription = await TryCreateSubscription<StandardSubscription, ProdTenantSubscriptionDto>(tenant, SubscriptionType.Standard);
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
@@ -123,8 +123,9 @@ internal class TenantService : ITenantService
     _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
   }
 
-  private async Task<TenantSubscriptionDto> TryCreateSubscription<T>(FSHTenantInfo tenant, SubscriptionType subscriptionType)
+  private async Task<TDto> TryCreateSubscription<T, TDto>(FSHTenantInfo tenant, SubscriptionType subscriptionType)
     where T : Subscription
+    where TDto : TenantSubscriptionDto, new()
   {
     T subscription = await GetSubscription<T>(subscriptionType);
     tenant.ProdSubscriptionId = subscription.Id;
@@ -139,7 +140,14 @@ internal class TenantService : ITenantService
       throw new DbUpdateException($"Failed to create tenant subscription for {tenant.Name}");
     }
 
-    return subHistory.Adapt<TenantSubscriptionDto>();
+    var historyDto = subscription.Adapt<SubscriptionHistoryDto>();
+    return new TDto
+    {
+      History = new List<SubscriptionHistoryDto> { historyDto },
+      Id = subHistory.Id,
+      ExpiryDate = historyDto.ExpireDate,
+      TenantId = tenant.Id
+    };
   }
 
   private async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
