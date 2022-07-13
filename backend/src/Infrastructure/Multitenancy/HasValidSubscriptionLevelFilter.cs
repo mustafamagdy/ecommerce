@@ -21,15 +21,25 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
       var descriptor = context.ActionDescriptor as ControllerActionDescriptor;
-      if (descriptor?.MethodInfo
-            .GetCustomAttributes(typeof(HasValidSubscriptionTypeAttribute), true)
-            .ToList()
-            .FirstOrDefault() is HasValidSubscriptionTypeAttribute subscriptionLevel)
+      var allowWithNoSubscription = typeof(AllowWithNoSubscriptionAttribute);
+      var hasSkipAtt = descriptor.MethodInfo.GetCustomAttributes(allowWithNoSubscription, true).Length > 0;
+      if (hasSkipAtt)
       {
-        if (await _tenantResolver.ResolveAsync(context.HttpContext) is MultiTenantContext<FSHTenantInfo> tenantContext)
+        await next();
+      }
+      else
+      {
+        var hasSubscription = typeof(HasValidSubscriptionTypeAttribute);
+        var controllerInfo = descriptor.ControllerTypeInfo;
+
+        var hasControllerLevel = controllerInfo.GetCustomAttributes(hasSubscription, true).Length > 0;
+        var hasMethodLevel = descriptor.MethodInfo.GetCustomAttributes(hasSubscription, true).Length > 0;
+
+        if (hasControllerLevel || hasMethodLevel)
         {
-          var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id);
-          if (tenant.ProdSubscription == null)
+          var tenantContext = await _tenantResolver.ResolveAsync(context.HttpContext) as MultiTenantContext<FSHTenantInfo> ?? throw new FeatureNotAllowedException();
+          var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id) ?? throw new FeatureNotAllowedException();
+          if (tenant.Id != MultitenancyConstants.Root.Id && tenant.ProdSubscriptionId == null && tenant.DemoSubscriptionId == null && tenant.TrainSubscriptionId == null)
           {
             throw new FeatureNotAllowedException();
           }
@@ -37,12 +47,10 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
 
         await next();
       }
-
-      await next();
     }
   }
 
-  [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+  [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
   public class HasValidSubscriptionTypeAttribute : Attribute
   {
     public SubscriptionType Type { get; }
@@ -56,5 +64,9 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
     {
       // Type = type;
     }
+  }
+
+  public class AllowWithNoSubscriptionAttribute : Attribute
+  {
   }
 }

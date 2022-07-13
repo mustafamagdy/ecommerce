@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Domain.MultiTenancy;
 using Mapster;
+using Microsoft.Extensions.Internal;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
@@ -17,11 +18,11 @@ public class GetTenantSubscriptionsRequest : IRequest<List<TenantSubscriptionDto
 
 public class GetTenantWithActiveSubscriptions : Specification<FSHTenantInfo>, ISingleResultSpecification
 {
-  public GetTenantWithActiveSubscriptions(string tenantId, bool? onlyActiveHistory = null) =>
+  public GetTenantWithActiveSubscriptions(string tenantId, ISystemTime systemTime, bool? onlyActiveHistory = null) =>
     Query
       .Include(a => a.ProdSubscription)
       .ThenInclude(a => a.SubscriptionHistory
-        .Where(x => x.TenantId == tenantId && (onlyActiveHistory == null || x.ExpiryDate > DateTime.Now)))
+        .Where(x => x.TenantId == tenantId && (onlyActiveHistory == null || x.ExpiryDate > systemTime.Now)))
       .Include(a => a.DemoSubscription)
       .Include(a => a.TrainSubscription)
       .Include(a => a.Payments)
@@ -32,17 +33,18 @@ public class GetTenantSubscriptionsRequestHandler : IRequestHandler<GetTenantSub
 {
   private readonly IReadTenantRepository<FSHTenantInfo> _repository;
   private readonly IStringLocalizer _t;
-
-  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repository)
+  private readonly ISystemTime _systemTime;
+  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repository, ISystemTime systemTime)
   {
     _t = localizer;
     _repository = repository;
+    _systemTime = systemTime;
   }
 
   public async Task<List<TenantSubscriptionDto>> Handle(GetTenantSubscriptionsRequest request, CancellationToken cancellationToken)
   {
     List<TenantSubscriptionDto> subscriptions = default!;
-    var tenant = await _repository.GetBySpecAsync(new GetTenantWithActiveSubscriptions(request.TenantId, request.ActiveSubscription), cancellationToken);
+    var tenant = await _repository.GetBySpecAsync(new GetTenantWithActiveSubscriptions(request.TenantId,_systemTime, request.ActiveSubscription), cancellationToken);
     if (tenant == null)
     {
       throw new NotFoundException(_t["Tenant {0} is not found", request.TenantId]);
