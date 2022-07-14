@@ -2,7 +2,7 @@ using System.Net.Http.Json;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Application.IntegrationTests;
+namespace Application.IntegrationTests.Infra;
 
 [Collection(nameof(TestConstants.WebHostTests))]
 public abstract class TestFixture

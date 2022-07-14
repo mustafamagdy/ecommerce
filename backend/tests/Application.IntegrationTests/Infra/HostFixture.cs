@@ -1,9 +1,6 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Xunit.Abstractions;
 
-namespace Application.IntegrationTests;
+namespace Application.IntegrationTests.Infra;
 
 public class HostFixture : IDisposable
 {
@@ -12,23 +9,14 @@ public class HostFixture : IDisposable
 
   public HostFixture()
   {
-    var dbName = "multi-tenant-09";
-    _factory = new TestWebApplicationFactory()
-        // .WithWebHostBuilder(builder =>
-        // {
-        //   builder.ConfigureAppConfiguration((context, configBuilder) =>
-        //   {
-        //     configBuilder.AddInMemoryCollection(
-        //       new Dictionary<string, string>
-        //       {
-        //         ["DatabaseSettings:ConnectionString"] = $"Data Source=127.0.0.1;Initial Catalog={dbName};User Id=root;Password=DeV12345",
-        //         ["HangfireSettings:Storage:ConnectionString"] = $"Data Source=127.0.0.1;Initial Catalog={dbName};User Id=root;Password=DeV12345;Allow User Variables=true"
-        //       });
-        //     // var path = AppDomain.CurrentDomain.BaseDirectory;
-        //     // configBuilder.AddJsonFile($"{path}/tests-appsettings.json", optional: false, reloadOnChange: true);
-        //   });
-        // })
-      ;
+    var db_name = $"main_{Guid.NewGuid()}";
+    using var _ = Program.OverrideConfig(new Dictionary<string, string>
+    {
+      ["DatabaseSettings:ConnectionString"] = $"Data Source=127.0.0.1;Initial Catalog={db_name};User Id=root;Password=DeV12345",
+      ["HangfireSettings:Storage:ConnectionString"] = $"Data Source=127.0.0.1;Initial Catalog={db_name};User Id=root;Password=DeV12345;Allow User Variables=true"
+    });
+
+    _factory = new TestWebApplicationFactory();
   }
 
   public HttpClient CreateClient() => _factory.CreateClient();

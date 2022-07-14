@@ -1,6 +1,6 @@
 using FSH.WebApi.Application.Common.Interfaces;
 
-namespace Application.IntegrationTests;
+namespace Application.IntegrationTests.Infra;
 
 public class TestSystemTime : ISystemTime
 {
