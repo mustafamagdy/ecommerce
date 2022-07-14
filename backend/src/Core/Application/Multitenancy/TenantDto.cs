@@ -15,7 +15,10 @@ public class TenantDto : IDto
   public string? Issuer { get; set; }
 
   public ProdTenantSubscriptionDto? ProdSubscription { get; set; }
+  public Guid? ProdSubscriptionId { get; set; }
   public DemoTenantSubscriptionDto? DemoSubscription { get; set; }
+  public Guid? DemoSubscriptionId { get; set; }
   public TrainTenantSubscriptionDto? TrainSubscription { get; set; }
+  public Guid? TrainSubscriptionId { get; set; }
   public List<BranchDto> Branches { get; set; } = default!;
 }
