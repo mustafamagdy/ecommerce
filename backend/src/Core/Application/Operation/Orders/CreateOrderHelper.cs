@@ -29,10 +29,11 @@ public class CreateOrderHelper : ICreateOrderHelper
   private readonly IVatQrCodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
   private readonly IStringLocalizer _t;
+  private readonly ISystemTime _systemTime;
 
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
-    IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer)
+    IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer, ISystemTime systemTime)
   {
     _repository = repository;
     _serviceCatalogRepo = serviceCatalogRepo;
@@ -40,6 +41,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     _barcodeGenerator = barcodeGenerator;
     _vatSettingProvider = vatSettingProvider;
     _t = localizer;
+    _systemTime = systemTime;
   }
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
@@ -77,7 +79,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     }
 
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
-    var order = new Order(customer.Id, orderNumber, DateTime.Now);
+    var order = new Order(customer.Id, orderNumber, _systemTime.Now);
     order.OrderItems = orderItems.Select(a => a.SetOrderId(order.Id)).ToHashSet();
 
     var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(

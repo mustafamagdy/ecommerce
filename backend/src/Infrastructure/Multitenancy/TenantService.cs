@@ -1,6 +1,4 @@
 ﻿using System.Data.Common;
-using System.Diagnostics;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
@@ -9,7 +7,6 @@ using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Structure;
-using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
@@ -32,6 +29,7 @@ internal class TenantService : ITenantService
   private readonly IReadRepository<Branch> _branchRepo;
   private readonly ITenantConnectionStringBuilder _cnBuilder;
   private readonly IHostEnvironment _env;
+  private readonly ISystemTime _systemTime;
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
@@ -43,7 +41,7 @@ internal class TenantService : ITenantService
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
     IReadRepository<Branch> branchRepo,
-    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env)
+    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env, ISystemTime systemTime)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -56,6 +54,7 @@ internal class TenantService : ITenantService
     _branchRepo = branchRepo;
     _cnBuilder = cnBuilder;
     _env = env;
+    _systemTime = systemTime;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -86,7 +85,7 @@ internal class TenantService : ITenantService
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
-    var subscription = await TryCreateSubscription<StandardSubscription>(tenant, SubscriptionType.Standard);
+    var subscription = await TryCreateSubscription<StandardSubscription, ProdTenantSubscriptionDto>(tenant, SubscriptionType.Standard);
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
@@ -123,13 +122,14 @@ internal class TenantService : ITenantService
     _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
   }
 
-  private async Task<TenantSubscriptionDto> TryCreateSubscription<T>(FSHTenantInfo tenant, SubscriptionType subscriptionType)
+  private async Task<TDto> TryCreateSubscription<T, TDto>(FSHTenantInfo tenant, SubscriptionType subscriptionType)
     where T : Subscription
+    where TDto : TenantSubscriptionDto, new()
   {
     T subscription = await GetSubscription<T>(subscriptionType);
     tenant.ProdSubscriptionId = subscription.Id;
 
-    var today = DateTime.Now;
+    var today = _systemTime.Now;
     var subHistory = new SubscriptionHistory(tenant.Id, subscription.Id, today, subscription.Days, subscription.Price);
 
     await _tenantDbContext.AddAsync(subHistory);
@@ -139,7 +139,14 @@ internal class TenantService : ITenantService
       throw new DbUpdateException($"Failed to create tenant subscription for {tenant.Name}");
     }
 
-    return subHistory.Adapt<TenantSubscriptionDto>();
+    var historyDto = subscription.Adapt<SubscriptionHistoryDto>();
+    return new TDto
+    {
+      History = new List<SubscriptionHistoryDto> { historyDto },
+      Id = subHistory.Id,
+      ExpiryDate = historyDto.ExpireDate,
+      TenantId = tenant.Id
+    };
   }
 
   private async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
@@ -217,7 +224,7 @@ internal class TenantService : ITenantService
       throw new NotFoundException(_t["Subscription not found."]);
     }
 
-    var today = DateTime.Now;
+    var today = _systemTime.Now;
     var newHistoryRecord = new SubscriptionHistory(subRecord.TenantId,
       subRecord.SubscriptionId,
       today,
@@ -272,7 +279,7 @@ internal class TenantService : ITenantService
 
   public Task<bool> HasAValidProdSubscription(string tenantId)
   {
-    var today = DateTime.Now;
+    var today = _systemTime.Now;
     return _tenantDbContext.TenantInfo
       .Include(a => a.ProdSubscription)
       .ThenInclude(a => a.SubscriptionHistory)

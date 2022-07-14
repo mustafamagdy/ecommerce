@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.Extensions.Internal;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
@@ -80,14 +81,13 @@ public class FSHTenantInfo : ITenantInfo
     Payments.Add(new SubscriptionPayment(amount, paymentMethodId).SetSubscription(ProdSubscriptionId.Value));
   }
 
-  public FSHTenantInfo Renew()
+  public FSHTenantInfo Renew(DateTime today)
   {
     if (ProdSubscription == null)
     {
       throw new NullReferenceException("No valid prod subscription to renew");
     }
 
-    var today = DateTime.Now;
     ProdSubscription.SubscriptionHistory.Add(new SubscriptionHistory
     {
       TenantId = Id,
