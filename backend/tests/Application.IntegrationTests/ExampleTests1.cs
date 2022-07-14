@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Common.Models;

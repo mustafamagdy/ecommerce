@@ -1,4 +1,4 @@
-namespace Application.IntegrationTests;
+namespace Application.IntegrationTests.Infra;
 
 public class TestConstants
 {
