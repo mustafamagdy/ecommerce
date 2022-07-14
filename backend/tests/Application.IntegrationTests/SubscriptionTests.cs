@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
@@ -29,7 +30,7 @@ public class SubscriptionTests : TestFixture
       new TokenRequest("admin@root.com", "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", "root" } });
 
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
@@ -43,15 +44,19 @@ public class SubscriptionTests : TestFixture
     };
 
     response = await PostAsJsonAsync("/api/tenants", tenant, new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().BeEquivalentTo(tenant.Id);
+    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
 
     response = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", tenantId } });
-    response.EnsureSuccessStatusCode();
+
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var tenant_admin_token = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    tenant_admin_token.Token.Should().NotBeEmpty();
   }
 
   [Fact]
@@ -62,7 +67,7 @@ public class SubscriptionTests : TestFixture
       new TokenRequest("admin@root.com", "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", "root" } });
 
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
@@ -76,15 +81,15 @@ public class SubscriptionTests : TestFixture
     };
 
     response = await PostAsJsonAsync("/api/tenants", tenant, new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().BeEquivalentTo(tenant.Id);
+    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
 
     response = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", tenantId } });
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
     tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
     HostFixture.SYSTEM_TIME.DaysOffset = 100;
@@ -93,6 +98,6 @@ public class SubscriptionTests : TestFixture
       new SearchProductsRequest(),
       new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } }
     );
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

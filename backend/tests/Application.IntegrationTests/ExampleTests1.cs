@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
@@ -24,6 +25,8 @@ public class ExampleTests1 : TestFixture
       new TokenRequest("admin@root.com", "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", "root" } });
 
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
+
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
     _output.WriteLine("Token is " + tokenResult.Token);
@@ -33,7 +36,7 @@ public class ExampleTests1 : TestFixture
       new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } }
     );
 
-    response.EnsureSuccessStatusCode();
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var productResult = await response.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     productResult.Should().NotBeNull();
