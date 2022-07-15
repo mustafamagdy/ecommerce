@@ -35,6 +35,13 @@ jobs:
       dockerComposeCommand: 'up -d'
 
   - task: DotNetCoreCLI@2
+    displayName: Install ReportGenerator tool
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
+  
+  - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
