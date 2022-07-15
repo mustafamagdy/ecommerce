@@ -72,7 +72,7 @@
                     </div>
                 </template>
             </q-table>
-            <!-- page loading indicator template -->
+            <!-- page loading indicator template   test -->
             <template v-if="loading">
                 <q-inner-loading :showing="loading">
                     <q-spinner color="primary" size="30px"></q-spinner>
