@@ -20,7 +20,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  appProjectDir: 'backend/src/Host'
+  appProjectDir: 'backend/src'
   coverageReportDir: '$(Build.SourcesDirectory)/$(appProjectDir)/coverlet/reports'
 
 jobs:
@@ -33,6 +33,11 @@ jobs:
       containerregistrytype: Container Registry
       dockerComposeFile: backend/docker-compose.yml
       dockerComposeCommand: 'up -d'
+  - task: UseDotNet@2
+    displayName: Installing .NET SDK
+    inputs:
+      packageType: 'sdk'
+      version: '6.0.x'
 
   - task: DotNetCoreCLI@2
     displayName: Install ReportGenerator tool
@@ -41,6 +46,19 @@ jobs:
       custom: tool
       arguments: install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
   
+  - task: DotNetCoreCLI@2
+    displayName: Restore
+    inputs:
+      command: restore
+      projects: 'backend/**/*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: Build
+    inputs:
+      command: build
+      projects: $(appProjectDir)/Host/Host.csproj
+      arguments: '-c $(buildConfiguration) --no-restore'
+
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
