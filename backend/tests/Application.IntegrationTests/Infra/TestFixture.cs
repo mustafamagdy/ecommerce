@@ -20,6 +20,12 @@ public abstract class TestFixture
     _output.WriteLine("New http client created");
   }
 
+  public void RemoveThisDbAfterFinish(string db)
+  {
+    var dbName = $"{TestWebApplicationFactory.ENV}-{db}-db";
+    HostFixture.DATABASES.Add(dbName);
+  }
+
   public Task<HttpResponseMessage> PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
   {
     _client.DefaultRequestHeaders.Clear();

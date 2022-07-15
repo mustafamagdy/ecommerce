@@ -50,6 +50,8 @@ public class SubscriptionTests : TestFixture
     var newTenantId = await response.Content.ReadAsStringAsync();
     newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
 
+    RemoveThisDbAfterFinish(newTenantId);
+
     response = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", tenantId } });
@@ -87,6 +89,8 @@ public class SubscriptionTests : TestFixture
 
     var newTenantId = await response.Content.ReadAsStringAsync();
     newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
+
+    RemoveThisDbAfterFinish(newTenantId);
 
     response = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
