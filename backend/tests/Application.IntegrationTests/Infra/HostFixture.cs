@@ -22,7 +22,6 @@ public class HostFixture : IDisposable
       ["DatabaseSettings:ConnectionString"] = string.Format(_cnStringTemplate, db_name),
       ["HangfireSettings:Storage:ConnectionString"] = string.Format($"{_cnStringTemplate};Allow User Variables=true", db_name)
     });
-    var x = Program.InMemoryConfig;
 
     _factory = new TestWebApplicationFactory();
   }

@@ -14,5 +14,8 @@ public class GeneralBasicTests : TestFixture
    * can_query_with_advanced_search
    * can_query_with_advanced_filters
    * can_query_with_pagination
+   * server_respond_with_404_for_not_found
+   * server_respond_with_403_for_unauthorized_access
+   * server_respond_with_400_for_invalid_or_missing_inputs
    */
 }
