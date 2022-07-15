@@ -34,14 +34,6 @@
     <ProjectReference Include="..\..\src\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="tests-appsettings.json">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
   <PropertyGroup>
     <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>

@@ -24,5 +24,5 @@ public class RenewSubscriptionRequestHandler : IRequestHandler<RenewSubscription
   public RenewSubscriptionRequestHandler(ITenantService tenantService) => _tenantService = tenantService;
 
   public Task<string> Handle(RenewSubscriptionRequest request, CancellationToken cancellationToken) =>
-    _tenantService.RenewSubscription(request.SubscriptionId, request.Days);
+    _tenantService.RenewSubscription(request.SubscriptionId, request.TenantId, request.Days);
 }
