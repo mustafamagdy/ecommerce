@@ -72,7 +72,7 @@ internal class TenantService : ITenantService
 
   public async Task<TenantDto> GetByIdAsync(string id)
   {
-    var tenant = await GetTenantInfoAsync(id);
+    var tenant = await GetTenantById(id);
     return tenant.Adapt<TenantDto>();
   }
 
@@ -182,7 +182,7 @@ internal class TenantService : ITenantService
 
   public async Task<string> ActivateAsync(string tenantId)
   {
-    var tenant = await GetTenantInfoAsync(tenantId);
+    var tenant = await GetTenantById(tenantId);
 
     if (tenant.Active)
     {
@@ -198,7 +198,7 @@ internal class TenantService : ITenantService
 
   public async Task<string> DeactivateAsync(string tenantId)
   {
-    var tenant = await GetTenantInfoAsync(tenantId);
+    var tenant = await GetTenantById(tenantId);
 
     if (!tenant.Active)
     {
@@ -212,12 +212,12 @@ internal class TenantService : ITenantService
     return _t[$"Tenant {0} is now Deactivated.", tenantId];
   }
 
-  public async Task<string> RenewSubscription(Guid subHistoryId, int? days = null)
+  public async Task<string> RenewSubscription(Guid subscriptionId, string tenantId, int? days = null)
   {
     var subRecord = await _tenantDbContext
       .SubscriptionHistories
       .Include(a => a.Subscription)
-      .FirstOrDefaultAsync(a => a.Id == subHistoryId);
+      .FirstOrDefaultAsync(a => a.SubscriptionId == subscriptionId && a.TenantId == tenantId);
 
     if (subRecord == null)
     {
@@ -226,7 +226,7 @@ internal class TenantService : ITenantService
 
     var today = _systemTime.Now;
     var newHistoryRecord = new SubscriptionHistory(subRecord.TenantId,
-      subRecord.SubscriptionId,
+      subscriptionId,
       today,
       days ?? subRecord.Subscription.Days,
       subRecord.Price);
@@ -250,23 +250,9 @@ internal class TenantService : ITenantService
     });
   }
 
-  private async Task<FSHTenantInfo> GetTenantInfoAsync(string id)
-  {
-    var tenant = await _tenantStore.TryGetAsync(id)
-                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
-
-    return tenant;
-  }
-
   public async Task<BasicTenantInfoDto> GetBasicInfoByIdAsync(string id)
   {
-    var tenant = await _tenantDbContext.TenantInfo
-                   .Include(a => a.ProdSubscription)
-                   .Include(a => a.DemoSubscription)
-                   .Include(a => a.TrainSubscription)
-                   .Include(a => a.Branches)
-                   .FirstOrDefaultAsync(a => a.Id == id)
-                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+    var tenant = await GetTenantById(id);
 
     var tenantBranchSpec = new TenantBranchSpec(id);
     var branches = await _branchRepo.ListAsync(tenantBranchSpec);
@@ -275,6 +261,18 @@ internal class TenantService : ITenantService
     tenantDto.Branches = branches.Adapt<List<BranchDto>>();
 
     return tenantDto;
+  }
+
+  private async Task<FSHTenantInfo> GetTenantById(string id)
+  {
+    var tenant = await _tenantDbContext.TenantInfo
+                   .Include(a => a.ProdSubscription)
+                   .Include(a => a.DemoSubscription)
+                   .Include(a => a.TrainSubscription)
+                   .Include(a => a.Branches)
+                   .FirstOrDefaultAsync(a => a.Id == id)
+                 ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+    return tenant;
   }
 
   public Task<bool> HasAValidProdSubscription(string tenantId)
