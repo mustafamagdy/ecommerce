@@ -8,11 +8,10 @@ namespace Application.IntegrationTests.Infra;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-  public static string ENV = "test";
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
-    builder.UseEnvironment(ENV);
+    builder.UseEnvironment(TestConstants.TestEnvironmentName);
     builder.ConfigureServices(services =>
     {
       services.Replace(ServiceDescriptor.Transient<ISystemTime>(sp => HostFixture.SYSTEM_TIME));
