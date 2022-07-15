@@ -14,6 +14,7 @@ COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 COPY ["src/Migrators/Migrators.MySQL/Migrators.MySQL.csproj", "src/Migrators/Migrators.MySQL/"]
 
 RUN dotnet restore "src/Host/Host.csproj" --disable-parallel
+#RUN dotnet tool install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
 
 # Copy everything else and build
 COPY . .
