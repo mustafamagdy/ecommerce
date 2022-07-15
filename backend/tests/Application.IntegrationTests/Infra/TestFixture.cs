@@ -30,4 +30,15 @@ public abstract class TestFixture
 
     return _client.PostAsJsonAsync(requestUri, value, cancellationToken);
   }
+
+  public Task<HttpResponseMessage> GetAsync(string? requestUri, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+  {
+    _client.DefaultRequestHeaders.Clear();
+    foreach ((string? key, string? val) in headers)
+    {
+      _client.DefaultRequestHeaders.Add(key, val);
+    }
+
+    return _client.GetAsync(requestUri, cancellationToken);
+  }
 }
