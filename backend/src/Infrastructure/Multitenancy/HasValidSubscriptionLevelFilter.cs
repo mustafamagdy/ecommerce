@@ -1,4 +1,5 @@
 using Finbuckle.MultiTenant;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
@@ -11,11 +12,13 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
   {
     private readonly ITenantResolver _tenantResolver;
     private readonly ITenantService _tenantService;
+    private readonly ISystemTime _systemTime;
 
-    public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver, ITenantService tenantService)
+    public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver, ITenantService tenantService, ISystemTime systemTime)
     {
       _tenantResolver = tenantResolver;
       _tenantService = tenantService;
+      _systemTime = systemTime;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -39,9 +42,18 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
         {
           var tenantContext = await _tenantResolver.ResolveAsync(context.HttpContext) as MultiTenantContext<FSHTenantInfo> ?? throw new FeatureNotAllowedException();
           var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id) ?? throw new FeatureNotAllowedException();
-          if (tenant.Id != MultitenancyConstants.Root.Id && tenant.ProdSubscriptionId == null && tenant.DemoSubscriptionId == null && tenant.TrainSubscriptionId == null)
+          if (tenant.Id != MultitenancyConstants.Root.Id)
           {
-            throw new FeatureNotAllowedException();
+            if (tenant.ProdSubscriptionId == null && tenant.DemoSubscriptionId == null && tenant.TrainSubscriptionId == null)
+            {
+              throw new FeatureNotAllowedException();
+            }
+
+            var subscription = tenant.ProdSubscription;
+            if (subscription.ExpiryDate < _systemTime.Now)
+            {
+              throw new SubscriptionExpiredException(subscription.ExpiryDate, "Subscription expired");
+            }
           }
         }
 

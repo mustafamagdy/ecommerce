@@ -1,4 +1,5 @@
-﻿using Finbuckle.MultiTenant.Stores;
+﻿using System.Diagnostics;
+using Finbuckle.MultiTenant.Stores;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Persistence;
@@ -7,6 +8,7 @@ using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SmartEnum.EFCore;
 
@@ -52,6 +54,8 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
     if (_dbSettings.LogSensitiveInfo)
     {
       optionsBuilder.EnableSensitiveDataLogging();
+      optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
+      optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
       optionsBuilder.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
     }
   }
