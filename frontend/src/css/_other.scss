@@ -9,3 +9,9 @@
 .q-item__section--main{
     min-width: unset;
 }
+
+.q-pagination{
+    .q-field{
+        min-width: 100px;
+    }
+}

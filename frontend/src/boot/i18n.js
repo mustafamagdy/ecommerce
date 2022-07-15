@@ -5,7 +5,7 @@ import { StorageService } from '../services/storage';
 
 
 export default boot(async ({ app }) => {
-	const locale = StorageService.getLocale() || 'en';
+	const locale = StorageService.getLocale() || 'en-US';
 
 	try {
 		await import(`quasar/lang/${locale}`).then(lang => {
@@ -18,5 +18,5 @@ export default boot(async ({ app }) => {
 
 	app.config.globalProperties.$i18n = i18n;
 	app.config.globalProperties.$t = $t;
-	
+
 });

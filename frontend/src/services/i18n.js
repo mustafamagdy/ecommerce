@@ -1,6 +1,6 @@
 import { StorageService } from 'src/services/storage';
 
-const locale = StorageService.getLocale() || "en";
+const locale = StorageService.getLocale() || "en-US";
 let messages = {};
 try {
 	messages = require(`src/i18n/${locale}`).default;
