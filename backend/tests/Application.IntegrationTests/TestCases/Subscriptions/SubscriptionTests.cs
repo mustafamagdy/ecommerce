@@ -6,13 +6,10 @@ using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Infrastructure.Middleware;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
-using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
-namespace Application.IntegrationTests;
+namespace Application.IntegrationTests.TestCases.Subscriptions;
 
 public class SubscriptionTests : TestFixture
 {
@@ -63,7 +60,7 @@ public class SubscriptionTests : TestFixture
   }
 
   [Fact]
-  public async Task expired_subscription_cannot_perform_any_operations()
+  public async Task expired_subscription_cannot_perform_any_operations_unless_renewed()
   {
     var tenantId = Guid.NewGuid().ToString();
     var response = await PostAsJsonAsync("/api/tokens",
@@ -102,8 +99,8 @@ public class SubscriptionTests : TestFixture
 
     response = await PostAsJsonAsync("/api/v1/products/search",
       new SearchProductsRequest(),
-      new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } }
-    );
+      new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
+
     response.StatusCode.Should().NotBe(HttpStatusCode.OK);
     response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     var errorResult = await response.Content.ReadFromJsonAsync<ErrorResult>();
@@ -123,4 +120,13 @@ public class SubscriptionTests : TestFixture
     }, root_admin_headers);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
+
+  [Fact]
+  public async Task demo_operations_are_reset_after_24hours()
+  {
+  }
+
+  /*
+   *
+   */
 }

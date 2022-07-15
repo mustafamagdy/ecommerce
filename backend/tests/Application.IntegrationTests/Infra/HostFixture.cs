@@ -28,7 +28,6 @@ public class HostFixture : IDisposable
   }
 
   public HttpClient CreateClient() => _factory.CreateClient();
-  public string Environment => TestWebApplicationFactory.ENV;
 
   public void Dispose()
   {

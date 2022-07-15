@@ -22,7 +22,7 @@ public abstract class TestFixture
 
   public void RemoveThisDbAfterFinish(string db)
   {
-    var dbName = $"{TestWebApplicationFactory.ENV}-{db}-db";
+    var dbName = $"{TestConstants.TestEnvironmentName}-{db}-db";
     HostFixture.DATABASES.Add(dbName);
   }
 
