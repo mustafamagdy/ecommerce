@@ -86,30 +86,6 @@ export const crud = {
                 });
             });
         },
-        fetchRecords: ({ commit }, payload) => {
-            return new Promise((resolve, reject) => {
-                let url = payload.url;
-                let merge = payload.merge;
-                ApiService.get(url).then(resp => {
-                    let data = resp?.data;
-                    if (data?.records) {
-                        let records = data.records;
-                        if (merge) {
-                            commit("mergeRecords", records);
-                        } else {
-                            commit("setRecords", records);
-                        }
-                        resolve(data);
-                    } else {
-                        // if json data received does not have record object
-                        // or is invalid
-                        reject("Unknown record form");
-                    }
-                }).catch(err => {
-                    reject(err);
-                });
-            });
-        },
         fetchRecord: ({ commit }, url) => {
             return new Promise((resolve, reject) => {
                 ApiService.get(url).then(resp => {
@@ -153,7 +129,7 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let id = data.id;
-                ApiService.get(url).then(resp => {
+                ApiService.delete(url).then(resp => {
                     commit("deleteRecord", id);
                     resolve(resp);
                 })

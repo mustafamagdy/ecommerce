@@ -36,7 +36,7 @@
                             <q-separator class="q-my-sm"/>
                             <div class="row justify-center">
                                 <q-btn icon="mdi-delete-outline" :label="$t('btn_delete')" padding="xs"
-                                       class="delete"/>
+                                       class="delete" @click="deleteItem(props.row.id)"/>
                                 <q-btn icon="mdi-playlist-edit" :label="$t('btn_edit')" padding="xs" class="edit"/>
                                 <q-btn icon="mdi-cog-outline" :label="$t('btn_actions')" padding="xs" class="settings"
                                 >
@@ -149,7 +149,8 @@ const {
 //page methods
 const {
     load,
-    isCurrentRecord
+    isCurrentRecord,
+    deleteItem
 } = page.methods;
 const pageTitle = computed({
     get: function () {

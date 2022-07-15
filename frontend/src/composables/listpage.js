@@ -64,6 +64,41 @@ export const useListPage = (props, options, filters) => {
         }
     }
 
+    async function deleteItem(id) {
+        if (Array.isArray(id)) {
+            id = id.map((value) => value[primaryKey]);
+        }
+        if (id) {
+            let title = $t("delete_confirmation_dialog_title");
+            let msg = $t("delete_confirmation_dialog_message");
+            $q.dialog({
+                title: title,
+                message: msg,
+                cancel: true,
+                persistent: true,
+            })
+                .onOk(async () => {
+                    let url = `${pageName}/${id.toString()}`;
+                    let payload = {id, url};
+                    try {
+                        await store.dispatch(
+                            `${pageName}/deleteRecord`,
+                            payload
+                        );
+                        app.flashMsg($t("after_delete_message"));
+                    } catch (e) {
+                        app.showPageRequestError(e);
+                    }
+                })
+                .onCancel(() => {
+                    // console.log('>>>> Cancel')
+                })
+                .onDismiss(() => {
+                    // console.log('I am triggered on both OK and Cancel')
+                });
+        }
+    }
+
     function isCurrentRecord(row) {
         return row === currentRecord;
     }
@@ -74,7 +109,8 @@ export const useListPage = (props, options, filters) => {
     };
     const methods = {
         load,
-        isCurrentRecord
+        isCurrentRecord,
+        deleteItem,
     };
     return {
         state,
