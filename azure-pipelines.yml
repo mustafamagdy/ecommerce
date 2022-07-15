@@ -31,7 +31,7 @@ jobs:
     displayName: Start dependencies (docker-compose)
     inputs:
       containerregistrytype: Container Registry
-      dockerComposeFile: docker-compose.yml
+      dockerComposeFile: backend/docker-compose.yml
       dockerComposeCommand: 'up -d'
 
   - task: DotNetCoreCLI@2
