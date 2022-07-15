@@ -1,4 +1,6 @@
-//import en from './en'
+import en from "./en-US";
+import ar from "./ar"
 export default {
-  //en: en
+    en,
+    ar
 }

@@ -1,42 +1,23 @@
-module.exports = function(req, res) {
+const faker = require("@faker-js/faker").faker;
+module.exports = function (req, res) {
+    let arr = [];
+    for (let i = 0; i < 10; i++) {
+        arr.push({
+            "id": faker.datatype.uuid(),
+            "name": faker.fake(`اسم الخدمة {{random.numeric(3)}}`),
+            "description": faker.lorem.words(20),
+            "imageUrl": faker.image.abstract(300, 300)
+        });
+    }
+    const totalCount = 174;
+    const totalPages = totalCount > req.body.pageSize ? Math.ceil(totalCount / req.body.pageSize) : 1;
     res.send({
-        "data": [
-            {
-                "id": "5feb8468-c647-478f-905e-42f537d7bd08",
-                "name": "غسيل",
-                "description": " ,وصف الخدمة",
-                "imageUrl": "https://fakeimg.pl/300/"
-            },
-            {
-                "id": "5feb8468-c647-478f-905e-42f537d7bd09",
-                "name": "كي",
-                "description": "وصف الخدمة",
-                "imageUrl": "https://fakeimg.pl/300/"
-            },
-            {
-                "id": "5feb8468-c647-478f-905e-42f537d7bd18",
-                "name": "غسيل وكي",
-                "description": "وصف الخدمة",
-                "imageUrl": "https://fakeimg.pl/300/"
-            },
-            {
-                "id": "5feb8468-c647-478f-905e-42f537d7bd28",
-                "name": "غسيل مستعجل",
-                "description": "وصف الخدمة",
-                "imageUrl": "https://fakeimg.pl/300/"
-            },
-            {
-                "id": "5feb8468-c647-478f-905e-42f537d7bd38",
-                "name": "غسيل فائق",
-                "description": "وصف الخدمة",
-                "imageUrl": "https://fakeimg.pl/300/"
-            }
-        ],
-        "currentPage": 1,
-        "totalPages": 1,
-        "totalCount": 4,
-        "pageSize": 10,
-        "hasPreviousPage": false,
-        "hasNextPage": false
+        "data": arr,
+        "currentPage": req.body.pageNumber,
+        "totalPages": totalPages,
+        "totalCount": totalCount,
+        "pageSize": req.pageSize,
+        "hasPreviousPage": req.body.pageNumber !== 1,
+        "hasNextPage": req.body.pageNumber !== totalPages
     });
 };
