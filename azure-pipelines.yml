@@ -20,8 +20,9 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  appProjectDir: 'backend/src'
-  coverageReportDir: '$(Build.SourcesDirectory)/$(appProjectDir)/coverlet/reports'
+  appDir: 'backend'
+  srcDir: '$(appDir)/src'
+  coverageReportDir: '$(Build.SourcesDirectory)/$(srcDir)/coverlet/reports'
 
 jobs:
 - job:
@@ -31,7 +32,7 @@ jobs:
     displayName: Start dependencies (docker-compose)
     inputs:
       containerregistrytype: Container Registry
-      dockerComposeFile: backend/docker-compose.yml
+      dockerComposeFile: $(appDir)/docker-compose.yml
       dockerComposeCommand: 'up -d'
   - task: UseDotNet@2
     displayName: Installing .NET SDK
@@ -50,20 +51,20 @@ jobs:
     displayName: Restore
     inputs:
       command: restore
-      projects: 'backend/**/*.csproj'
+      projects: '$(appDir)/**/*.csproj'
 
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
       command: build
-      projects: $(appProjectDir)/Host/Host.csproj
+      projects: $(srcDir)/Host/Host.csproj
       arguments: '-c $(buildConfiguration) --no-restore'
 
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
-      projects: 'backend/tests/**/*.csproj'
+      projects: '$(appDir)/tests/**/*.csproj'
       arguments: '-c $(buildConfiguration) --no-restore --collect:"XPlat Code Coverage"'
 
   - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(coverageReportDir) -reporttypes:"Cobertura"
