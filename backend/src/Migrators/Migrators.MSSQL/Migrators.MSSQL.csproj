@@ -7,10 +7,6 @@
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Migrations\Application" />
-      <Folder Include="Migrations\Tenant" />
-    </ItemGroup>
-    <ItemGroup>
       <PackageReference Update="Roslynator.Analyzers" Version="4.1.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
