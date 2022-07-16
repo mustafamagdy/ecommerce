@@ -22,6 +22,7 @@ variables:
   buildConfiguration: 'Release'
   appDir: 'backend'
   srcDir: '$(appDir)/src'
+  sln: 'FSH.WebApi.sln'
   coverageReportDir: '$(Build.SourcesDirectory)/$(srcDir)/coverlet/reports'
 
 jobs:
@@ -40,18 +41,11 @@ jobs:
       packageType: 'sdk'
       version: '6.0.x'
 
-  - task: DotNetCoreCLI@2
-    displayName: Install ReportGenerator tool
+  - task: NuGetCommand@2
+    displayName: Restore NuGet packages
     inputs:
-      command: custom
-      custom: tool
-      arguments: install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
-  
-  - task: DotNetCoreCLI@2
-    displayName: Restore
-    inputs:
-      command: restore
-      projects: '$(appDir)/**/*.csproj'
+      restoreSolution: $(sln)
+      includeNuGetOrg: true
 
   - task: DotNetCoreCLI@2
     displayName: Build
@@ -61,17 +55,24 @@ jobs:
       arguments: '-c $(buildConfiguration) --no-restore'
 
   - task: DotNetCoreCLI@2
+    displayName: Install ReportGenerator tool
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
+  
+  - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
       projects: '$(appDir)/tests/**/*.csproj'
       arguments: '-c $(buildConfiguration) --no-restore --collect:"XPlat Code Coverage"'
 
-  - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(coverageReportDir) -reporttypes:"Cobertura"
-    displayName: Create coverage reports
+  # - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(coverageReportDir) -reporttypes:"Cobertura"
+  #   displayName: Create coverage reports
 
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish code coverage'
-    inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: $(coverageReportDir)/Cobertura.xml
+  # - task: PublishCodeCoverageResults@1
+  #   displayName: 'Publish code coverage'
+  #   inputs:
+  #     codeCoverageTool: Cobertura
+  #     summaryFileLocation: $(coverageReportDir)/Cobertura.xml
