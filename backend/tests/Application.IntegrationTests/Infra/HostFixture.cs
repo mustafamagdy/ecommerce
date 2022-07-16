@@ -1,22 +1,24 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using MySqlConnector;
+using Xunit;
 
 namespace Application.IntegrationTests.Infra;
 
-public class HostFixture : IDisposable
+public class HostFixture : IAsyncLifetime
 {
-  private readonly WebApplicationFactory<Program> _factory;
+  private WebApplicationFactory<Program> _factory;
   public static readonly TestSystemTime SYSTEM_TIME = new();
   public static readonly List<string> DATABASES = new();
-  private readonly IDisposable _memoryConfigs;
-  private readonly string _cnStringTemplate;
+  private IDisposable _memoryConfigs;
+  private readonly string _cnStringTemplate = "Data Source=localhost;Initial Catalog={0};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true";
 
-  public HostFixture()
+  public HttpClient CreateClient() => _factory.CreateClient();
+
+  public Task InitializeAsync()
   {
     var db_name = $"main_{Guid.NewGuid()}";
     DATABASES.Add(db_name);
 
-    _cnStringTemplate = "Data Source=localhost;Initial Catalog={0};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true";
     _memoryConfigs = Program.OverrideConfig(new Dictionary<string, string>
     {
       ["DatabaseSettings:ConnectionString"] = string.Format(_cnStringTemplate, db_name),
@@ -24,28 +26,27 @@ public class HostFixture : IDisposable
     });
 
     _factory = new TestWebApplicationFactory();
+    return Task.CompletedTask;
   }
 
-  public HttpClient CreateClient() => _factory.CreateClient();
-
-  public void Dispose()
+  public async Task DisposeAsync()
   {
-    _factory.Dispose();
+    await _factory.DisposeAsync();
     _memoryConfigs.Dispose();
 
     var cs = string.Format(_cnStringTemplate, "sys");
     var cmdStr = "drop schema if exists `{0}`;";
-    using var cn = new MySqlConnection(cs);
-    cn.Open();
+    await using var cn = new MySqlConnection(cs);
+    await cn.OpenAsync();
 
     foreach (var db in DATABASES)
     {
-      using var cmd = cn.CreateCommand();
+      await using var cmd = cn.CreateCommand();
       cmd.CommandText = string.Format(cmdStr, db);
-      cmd.ExecuteNonQuery();
+      await cmd.ExecuteNonQueryAsync();
     }
 
     cn.Clone();
-    cn.Dispose();
+    await cn.DisposeAsync();
   }
 }
