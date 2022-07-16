@@ -16,7 +16,7 @@ public class HostFixture : IDisposable
     var db_name = $"main_{Guid.NewGuid()}";
     DATABASES.Add(db_name);
 
-    _cnStringTemplate = "Data Source=127.0.0.1;Initial Catalog={0};User Id=root;Password=DeV12345";
+    _cnStringTemplate = "Data Source=localhost;Initial Catalog={0};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true";
     _memoryConfigs = Program.OverrideConfig(new Dictionary<string, string>
     {
       ["DatabaseSettings:ConnectionString"] = string.Format(_cnStringTemplate, db_name),
