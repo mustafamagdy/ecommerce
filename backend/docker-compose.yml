@@ -27,7 +27,7 @@ services:
       - application-tests
     ports:
       - "3306:3306"
-    image: "mysql/mysql-server:8.0.0"
+    image: "amd64/mysql:8.0-oracle"
     container_name: mysql-db
     restart: always
     environment:
