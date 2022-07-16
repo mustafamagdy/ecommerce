@@ -43,8 +43,12 @@ try
 
   await app.Services.InitializeDatabasesAsync();
 
-  string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-  FontManager.RegisterFont(File.OpenRead(appPath + "/Files/fonts/LibreBarcode39-Regular.ttf"));
+  var env = app.Environment.EnvironmentName;
+  if (!env.Contains("test"))
+  {
+    string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    FontManager.RegisterFont(File.OpenRead(appPath + "/Files/fonts/LibreBarcode39-Regular.ttf"));
+  }
 
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
