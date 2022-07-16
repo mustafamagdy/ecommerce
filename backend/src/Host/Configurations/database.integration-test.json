@@ -1,5 +1,5 @@
 {
   "DatabaseSettings": {
-    "LogSensitiveInfo": true
+    "LogSensitiveInfo": false
   }
 }
