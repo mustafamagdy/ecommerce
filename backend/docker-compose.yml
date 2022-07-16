@@ -23,6 +23,10 @@ services:
   #      - db
   #    restart: on-failure
   mysql-db:
+    networks:
+      - application-tests
+    ports:
+      - "3306:3306"
     image: "mysql/mysql-server:8.0.29"
     container_name: mysql-db
     restart: always
