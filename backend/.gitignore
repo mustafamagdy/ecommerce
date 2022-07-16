@@ -456,3 +456,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 Logs/
+.store/
+reportgenerator
