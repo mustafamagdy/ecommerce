@@ -24,14 +24,6 @@ public class SubscriptionTests : TestFixture
     HostFixture.SYSTEM_TIME.DaysOffset = 10;
 
     var tenantId = Guid.NewGuid().ToString();
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } });
-
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
-
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
@@ -41,7 +33,7 @@ public class SubscriptionTests : TestFixture
       DatabaseName = $"{tenantId}-db",
     };
 
-    response = await PostAsJsonAsync("/api/tenants", tenant, new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
+    var response = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newTenantId = await response.Content.ReadAsStringAsync();
@@ -63,13 +55,6 @@ public class SubscriptionTests : TestFixture
   public async Task expired_subscription_cannot_perform_any_operations_unless_renewed()
   {
     var tenantId = Guid.NewGuid().ToString();
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } });
-
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var root_token_response = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
     var tenant = new CreateTenantRequest
     {
@@ -80,8 +65,7 @@ public class SubscriptionTests : TestFixture
       DatabaseName = $"{tenantId}-db",
     };
 
-    var root_admin_headers = new Dictionary<string, string> { { "Authorization", $"Bearer {root_token_response.Token}" } };
-    response = await PostAsJsonAsync("/api/tenants", tenant, root_admin_headers);
+    var response = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newTenantId = await response.Content.ReadAsStringAsync();
@@ -106,18 +90,18 @@ public class SubscriptionTests : TestFixture
     var errorResult = await response.Content.ReadFromJsonAsync<ErrorResult>();
     errorResult.Exception.Should().Contain("Subscription expired");
 
-    response = await GetAsync($"/api/tenants/{tenantId}", root_admin_headers);
+    response = await RootAdmin_GetAsync($"/api/tenants/{tenantId}");
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tenantInfo = await response.Content.ReadFromJsonAsync<TenantDto>();
     tenantInfo.Should().NotBeNull();
     tenantInfo.ProdSubscriptionId.Should().NotBeEmpty();
 
-    response = await PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
+    response = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
     {
       TenantId = tenantId,
       SubscriptionId = tenantInfo.ProdSubscriptionId!.Value
-    }, root_admin_headers);
+    });
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
