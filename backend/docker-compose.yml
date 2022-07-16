@@ -33,5 +33,5 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "DeV12345"
       MYSQL_PASSWORD: "DeV12345"
-      MYSQL_USER: "mysql-test"
-#      MYSQL_DATABASE: "root-db"
+      MYSQL_USER: "root"
+      MYSQL_DATABASE: "root-db"
