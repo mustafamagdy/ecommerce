@@ -41,16 +41,16 @@ jobs:
       packageType: 'sdk'
       version: '6.0.x'
 
-  - task: NuGetCommand@2
-    displayName: Restore NuGet packages
+  - task: DotNetCoreCLI@2
+    displayName: Restore
     inputs:
-      restoreSolution: $(sln)
-      includeNuGetOrg: true
+      command: restore      
+      projects: '$(appDir)/**/*.csproj'
 
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
-      command: build
+      command: build      
       projects: $(srcDir)/Host/Host.csproj
       arguments: '-c $(buildConfiguration) --no-restore'
 
