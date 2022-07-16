@@ -21,21 +21,8 @@ public class AdministrativeTests : TestFixture
   public async Task admin_of_root_tenant_can_list_all_products()
   {
     _output.WriteLine("Start testing ..");
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } });
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
-
-    _output.WriteLine("Token is " + tokenResult.Token);
-
-    response = await PostAsJsonAsync("/api/v1/products/search",
-      new SearchProductsRequest(),
-      new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } }
-    );
-
+    var response = await RootAdmin_PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest());
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var productResult = await response.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
