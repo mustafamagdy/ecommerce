@@ -28,11 +28,8 @@ services:
     ports:
       - "3306:3306"
     image: "amd64/mysql:8.0-oracle"
-#    image: "arm64v8/mysql:oracle"
     container_name: mysql-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "DeV12345"
       MYSQL_PASSWORD: "DeV12345"
-#      MYSQL_USER: "root"
-#      MYSQL_DATABASE: "root-db"
