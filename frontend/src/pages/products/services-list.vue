@@ -5,12 +5,12 @@
                 grid
                 card-container-class="q-col-gutter-md justify-start"
                 :bordered="false"
-                :columns="$menus.SampletableTableHeaderItems"
                 :rows="records"
-                binary-state-sort
                 selection="single"
                 row-key="id"
                 :loading="loading"
+                hide-pagination
+                :pagination="{rowsPerPage:0}"
             >
                 <template v-slot:top>
                     <div class="col-grow row justify-between">
@@ -92,7 +92,7 @@
         <div class="row justify-end q-mt-md">
             <q-btn icon="mdi-plus" :label="$t('btn_add_new')" padding="xs" class="add" @click="showAdd=true"/>
         </div>
-        <q-dialog v-model="showAdd">
+        <q-dialog v-model="showAdd" persistent>
             <ServicesAdd/>
         </q-dialog>
     </div>
@@ -109,30 +109,13 @@ import ServicesAdd from "./services-add";
 const options = reactive({
     apiPath: "services",
     pageName: "services",
-    pageSize: 20,
+    pageSize: 10,
     filter: {},
     orderBy: [],
 })
-const props = defineProps({
-    search: {
-        type: String,
-        default: ""
-    },
-    fieldName: null,
-    fieldValue: null,
-    sortBy: {
-        type: String,
-        default: ""
-    },
-    sortType: {
-        type: String,
-        default: "" //desc or asc
-    }
-});
 const app = useApp();
-const filters = reactive({});
 //init list page hook
-const page = useListPage(props, options, filters);
+const page = useListPage(options);
 //page state
 const {
     totalRecords, // total records from api - Number
@@ -140,10 +123,10 @@ const {
     currentPage,
     totalPages
 } = toRefs(page.state);
-const showAdd = ref(false);
 //page computed properties
 const {
     records,
+    showAdd,
     currentRecord,
 } = page.computedProps;
 //page methods
