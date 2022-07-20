@@ -1,11 +1,12 @@
-import { ApiService } from "src/services/api";
+import {ApiService} from "src/services/api";
 
 export const crud = {
     namespaced: true,
     state: () => ({
         currentRecord: null,
         records: [],
-        requestError: null
+        requestError: null,
+        showAdd: false
     }),
     getters: {
         records(state) {
@@ -13,7 +14,10 @@ export const crud = {
         },
         currentRecord(state) {
             return state.currentRecord;
-        }
+        },
+        showAdd(state) {
+            return state.showAdd;
+        },
     },
     mutations: {
         setRecords(state, records) {
@@ -58,15 +62,18 @@ export const crud = {
         },
         setError(state, error) {
             state.requestError = error;
-        }
+        },
+        setShowAdd(state, value) {
+            state.showAdd = value;
+        },
     },
     actions: {
-        search: ({ commit }, payload) => {
+        search: ({commit}, payload) => {
             return new Promise((resolve, reject) => {
                 let url = payload.url;
                 let body = payload.criteria;
                 let merge = payload.merge;
-                ApiService.post(url,body).then(resp => {
+                ApiService.post(url, body).then(resp => {
                     let data = resp?.data;
                     if (data?.data) {
                         let records = data.data;
@@ -86,7 +93,7 @@ export const crud = {
                 });
             });
         },
-        fetchRecord: ({ commit }, url) => {
+        fetchRecord: ({commit}, url) => {
             return new Promise((resolve, reject) => {
                 ApiService.get(url).then(resp => {
                     commit("setCurrentRecord", resp.data);
@@ -97,13 +104,11 @@ export const crud = {
                     });
             });
         },
-        saveRecord: ({ commit }, data) => {
+        saveRecord: ({commit}, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
                 ApiService.post(url, payload).then(resp => {
-                    let record = resp.data;
-                    commit("addRecord", record);
                     resolve(resp);
                 })
                     .catch(err => {
@@ -111,7 +116,7 @@ export const crud = {
                     });
             });
         },
-        updateRecord: ({ commit }, data) => {
+        updateRecord: ({commit}, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
@@ -125,7 +130,7 @@ export const crud = {
                     });
             });
         },
-        deleteRecord: ({ commit }, data) => {
+        deleteRecord: ({commit}, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let id = data.id;

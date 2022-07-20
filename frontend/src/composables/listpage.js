@@ -2,19 +2,17 @@ import {reactive, computed, onMounted, watch, watchEffect} from "vue";
 import {utils} from "src/utils";
 import {useApp} from "src/composables/app";
 import {useStore} from "vuex";
-import {useRoute} from "vue-router";
 import {useQuasar} from "quasar";
 import {$t} from "src/services/i18n";
 
-export const useListPage = (props, options, filters) => {
+export const useListPage = (options) => {
     const {
         primaryKey = "id",
         apiPath = "",
         pageName = "",
-        pageSize = 20
+        pageSize = 10
     } = options;
     const app = useApp();
-    const route = useRoute();
     const store = useStore();
     const $q = useQuasar();
     const state = reactive({
@@ -39,6 +37,14 @@ export const useListPage = (props, options, filters) => {
             store.commit(`${pageName}/setCurrentRecord`, value);
         }
     });
+    const showAdd = computed({
+        get() {
+            return store.getters[`${pageName}/showAdd`];
+        },
+        set(value) {
+            store.commit(`${pageName}/setShowAdd`, value);
+        }
+    });
 
     async function load() {
         state.loading = true;
@@ -47,7 +53,7 @@ export const useListPage = (props, options, filters) => {
         let payload = {
             url,
             criteria: {pageNumber: state.currentPage, pageSize: pageSize},
-            merge: props.mergeRecords
+            //merge: props.mergeRecords
         };
         try {
             let response = await store.dispatch(
@@ -57,7 +63,6 @@ export const useListPage = (props, options, filters) => {
             state.loading = false;
             state.totalRecords = response.totalCount;
             state.totalPages = response.totalPages;
-            state.recordCount = response.totalPages * response.pageSize;
         } catch (e) {
             state.loading = false;
             app.showPageRequestError(e);
@@ -106,6 +111,7 @@ export const useListPage = (props, options, filters) => {
     const computedProps = {
         records,
         currentRecord,
+        showAdd
     };
     const methods = {
         load,
