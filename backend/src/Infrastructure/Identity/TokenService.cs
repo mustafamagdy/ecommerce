@@ -21,6 +21,7 @@ internal class TokenService : ITokenService
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly IStringLocalizer _t;
+  private readonly IdentitySettings _identitySettings;
   private readonly SecuritySettings _securitySettings;
   private readonly JwtSettings _jwtSettings;
   private readonly FSHTenantInfo? _currentTenant;
@@ -29,6 +30,7 @@ internal class TokenService : ITokenService
   public TokenService(
     UserManager<ApplicationUser> userManager,
     IOptions<JwtSettings> jwtSettings,
+    IOptions<IdentitySettings> identitySettings,
     IStringLocalizer<TokenService> localizer,
     FSHTenantInfo? currentTenant,
     IOptions<SecuritySettings> securitySettings,
@@ -36,6 +38,7 @@ internal class TokenService : ITokenService
   {
     _userManager = userManager;
     _t = localizer;
+    _identitySettings = identitySettings.Value;
     _jwtSettings = jwtSettings.Value;
     _currentTenant = currentTenant;
     _tenantService = tenantService;
@@ -56,7 +59,7 @@ internal class TokenService : ITokenService
       throw new UnauthorizedException(_t["User Not Active. Please contact the administrator."]);
     }
 
-    if (_securitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
+    if (_identitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
     {
       throw new UnauthorizedException(_t["E-Mail not confirmed."]);
     }

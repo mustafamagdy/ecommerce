@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
+using StackExchange.Redis;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,18 +43,25 @@ public abstract class TestFixture
 
   public async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } }, cancellationToken);
-
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
-    _output.WriteLine("Token is " + tokenResult.Token);
-
-    headers = headers == null ? new Dictionary<string, string>() : headers;
-
-    headers.Add("Authorization", $"Bearer {tokenResult.Token}");
+    headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await PostAsJsonAsync(requestUri, value, headers, cancellationToken);
+  }
+
+  public Task<HttpResponseMessage> PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+  {
+    _client.DefaultRequestHeaders.Clear();
+    foreach ((string? key, string? val) in headers)
+    {
+      _client.DefaultRequestHeaders.Add(key, val);
+    }
+
+    return _client.PutAsJsonAsync(requestUri, value, cancellationToken);
+  }
+
+  public async Task<HttpResponseMessage> RootAdmin_PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  {
+    headers = await LoginAsRootAdmin(headers, cancellationToken);
+    return await PutAsJsonAsync(requestUri, value, headers, cancellationToken);
   }
 
   public Task<HttpResponseMessage> GetAsync(string? requestUri, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
@@ -69,16 +77,27 @@ public abstract class TestFixture
 
   public async Task<HttpResponseMessage> RootAdmin_GetAsync(string? requestUri, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } }, cancellationToken);
+    headers = await LoginAsRootAdmin(headers, cancellationToken);
+    return await GetAsync(requestUri, headers, cancellationToken);
+  }
+
+  public async Task<Dictionary<string, string>> LoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
+  {
+    var tenantHeader = tenant == null ? new Dictionary<string, string>() : new Dictionary<string, string> { { "tenant", "root" } };
+    var response = await PostAsJsonAsync("/api/tokens", new TokenRequest(username, passwrod), tenantHeader, cancellationToken);
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
     _output.WriteLine("Token is " + tokenResult.Token);
 
     headers = headers == null ? new Dictionary<string, string>() : headers;
+
     headers.Add("Authorization", $"Bearer {tokenResult.Token}");
-    return await GetAsync(requestUri, headers, cancellationToken);
+    return headers;
+  }
+
+  private Task<Dictionary<string, string>> LoginAsRootAdmin(Dictionary<string, string> headers, CancellationToken cancellationToken)
+  {
+    return LoginAs("admin@root.com", "123Pa$$word!", headers, "root", cancellationToken);
   }
 }

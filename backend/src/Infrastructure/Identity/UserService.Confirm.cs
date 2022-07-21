@@ -9,7 +9,7 @@ namespace FSH.WebApi.Infrastructure.Identity;
 
 internal partial class UserService
 {
-    private async Task<string> GetEmailVerificationUriAsync(ApplicationUser user, string origin)
+    private async Task<string>  GetEmailVerificationUriAsync(ApplicationUser user, string origin)
     {
         EnsureValidTenant();
 

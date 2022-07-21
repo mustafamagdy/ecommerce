@@ -45,7 +45,7 @@ public class UsersController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Users)]
   [OpenApiOperation("Creates a new user.", "")]
-  public Task<string> CreateAsync(CreateUserRequest request)
+  public Task<UserDetailsDto> CreateAsync(CreateUserRequest request)
   {
     // TODO: check if registering anonymous users is actually allowed (should probably be an appsetting)
     // and return UnAuthorized when it isn't
@@ -58,7 +58,7 @@ public class UsersController : VersionNeutralApiController
   [AllowAnonymous]
   [OpenApiOperation("Anonymous user creates a user.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
-  public Task<string> SelfRegisterAsync(CreateUserRequest request)
+  public Task<UserDetailsDto> SelfRegisterAsync(CreateUserRequest request)
   {
     // TODO: check if registering anonymous users is actually allowed (should probably be an appsetting)
     // and return UnAuthorized when it isn't

@@ -48,7 +48,7 @@ public class RolesController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Roles)]
   [OpenApiOperation("Create or update a role.", "")]
-  public Task<string> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
+  public Task<RoleDto> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
   {
     return _roleService.CreateOrUpdateAsync(request);
   }

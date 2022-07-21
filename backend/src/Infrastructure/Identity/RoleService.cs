@@ -71,7 +71,7 @@ internal class RoleService : IRoleService
     return role;
   }
 
-  public async Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request)
+  public async Task<RoleDto> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request)
   {
     if (string.IsNullOrEmpty(request.Id))
     {
@@ -86,7 +86,7 @@ internal class RoleService : IRoleService
 
       await _events.PublishAsync(new ApplicationRoleCreatedEvent(role.Id, role.Name));
 
-      return string.Format(_t["Role {0} Created."], request.Name);
+      return role.Adapt<RoleDto>();
     }
     else
     {
@@ -112,7 +112,7 @@ internal class RoleService : IRoleService
 
       await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name));
 
-      return string.Format(_t["Role {0} Updated."], role.Name);
+      return role.Adapt<RoleDto>();
     }
   }
 
