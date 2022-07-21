@@ -18,6 +18,8 @@ internal static class Startup
         .AddJsonFile($"{configurationsDirectory}/cache.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
         .AddJsonFile($"{configurationsDirectory}/cors.json", optional: false, reloadOnChange: true)
         .AddJsonFile($"{configurationsDirectory}/cors.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"{configurationsDirectory}/identity.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"{configurationsDirectory}/identity.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
         .AddJsonFile($"{configurationsDirectory}/database.json", optional: false, reloadOnChange: true)
         .AddJsonFile($"{configurationsDirectory}/database.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
         .AddJsonFile($"{configurationsDirectory}/mail.json", optional: false, reloadOnChange: true)

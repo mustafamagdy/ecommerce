@@ -22,6 +22,7 @@ namespace FSH.WebApi.Infrastructure.Identity;
 internal class OverrideTokenService : IOverrideTokenService
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly IdentitySettings _identitySettings;
   private readonly IStringLocalizer _t;
   private readonly SecuritySettings _securitySettings;
   private readonly JwtSettings _jwtSettings;
@@ -32,6 +33,7 @@ internal class OverrideTokenService : IOverrideTokenService
   public OverrideTokenService(
     UserManager<ApplicationUser> userManager,
     IOptions<JwtSettings> jwtSettings,
+    IOptions<IdentitySettings> identitySettings,
     IStringLocalizer<OverrideTokenService> localizer,
     FSHTenantInfo? currentTenant,
     IOptions<SecuritySettings> securitySettings,
@@ -39,6 +41,7 @@ internal class OverrideTokenService : IOverrideTokenService
   {
     _userManager = userManager;
     _t = localizer;
+    _identitySettings = identitySettings.Value;
     _jwtSettings = jwtSettings.Value;
     _currentTenant = currentTenant;
     _tenantService = tenantService;
@@ -61,7 +64,7 @@ internal class OverrideTokenService : IOverrideTokenService
       throw new UnauthorizedException(_t["User Not Active. Please contact the administrator."]);
     }
 
-    if (_securitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
+    if (_identitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
     {
       throw new UnauthorizedException(_t["E-Mail not confirmed."]);
     }

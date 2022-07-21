@@ -1,0 +1,6 @@
+{
+  "IdentitySettings": {
+    "SignInRequireConfirmedEmail": false,
+    "RequireConfirmedAccount": false
+  }
+}

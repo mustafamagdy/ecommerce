@@ -1,7 +1,6 @@
 {
   "SecuritySettings": {
     "Provider": "Jwt",
-    "RequireConfirmedAccount": true,
     "RequireActiveTenantSubscription": false,
     "JwtSettings": {
       "key": "PNVVBO55MUYQ8BO33SGAJCQF8U",
