@@ -5,7 +5,9 @@ using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Roles;
+using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Identity.Users.Password;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Xunit.Abstractions;
@@ -17,13 +19,12 @@ public class AdministrativeTests : TestFixture
   public AdministrativeTests(HostFixture host, ITestOutputHelper output)
     : base(host, output)
   {
+    _output.WriteLine("Start testing ..");
   }
 
   [Fact]
   public async Task admin_of_root_tenant_can_list_all_products()
   {
-    _output.WriteLine("Start testing ..");
-
     var response = await RootAdmin_PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest());
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -34,6 +35,38 @@ public class AdministrativeTests : TestFixture
 
   [Fact]
   public async Task admin_can_create_role_and_add_permissions()
+  {
+    var roleName = Guid.NewGuid().ToString();
+    var _ = await RootAdmin_PostAsJsonAsync("/api/roles", new CreateOrUpdateRoleRequest
+    {
+      Name = roleName,
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var role = await _.Content.ReadFromJsonAsync<RoleDto>();
+
+    //update role permissions
+    var newRolePermissionsRequest = new UpdateRolePermissionsRequest
+    {
+      RoleId = role.Id,
+      Permissions = new List<string>
+      {
+        "Permissions.Products.Search"
+      }
+    };
+    _ = await RootAdmin_PutAsJsonAsync($"/api/roles/{role.Id}/permissions", newRolePermissionsRequest);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await RootAdmin_GetAsync($"/api/roles/{role.Id}/permissions");
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var rolePermissions = await _.Content.ReadFromJsonAsync<RoleDto>();
+    rolePermissions.Permissions
+      .Should()
+      .NotBeNull().And
+      .BeEquivalentTo(newRolePermissionsRequest.Permissions);
+  }
+
+  [Fact]
+  public async Task user_cannot_do_operation_unless_has_the_permission_to_do_it()
   {
     var roleName = Guid.NewGuid().ToString();
     var _ = await RootAdmin_PostAsJsonAsync("/api/roles", new CreateOrUpdateRoleRequest
@@ -57,7 +90,7 @@ public class AdministrativeTests : TestFixture
     };
     _ = await RootAdmin_PostAsJsonAsync("/api/users", newUser);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var user = await _.Content.ReadFromJsonAsync<UserDetailsDto>();
+    var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
     //add user to this role
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/roles", new UserRolesRequest
@@ -102,17 +135,172 @@ public class AdministrativeTests : TestFixture
     productResult.TotalCount.Should().BeGreaterThan(1);
   }
 
-  /*
-   *
-   * admin_can_create_user_with_predefined_role_and_that_user_can_login
-   * disabled_user_cannot_login
-   * users_cannot_create_themselves_when_this_feature_is_disabled
-   * admin_can_reset_any_user_password
-   * only_admins_can_reset_admins_password
-   * admin_can_change_his_own_password
-   * user_can_change_his_password
-   * user_can_reset_his_password
-   * user_cannot_access_resource_unless_he_has_permission
-   *
-   */
+  [Fact]
+  public async Task admin_can_create_user_with_predefined_role_and_that_user_can_login()
+  {
+    var _ = await RootAdmin_GetAsync($"/api/roles");
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var roles = await _.Content.ReadFromJsonAsync<List<RoleDto>>();
+    roles.Should().NotBeNull().And.NotBeEmpty();
+    roles.Should().NotContain(a => a.Permissions != null);
+  }
+
+  [Fact]
+  public async Task disabled_user_cannot_login()
+  {
+    var password = "Ran60m@pass";
+    var username = Guid.NewGuid().ToString();
+    var newUser = new CreateUserRequest()
+    {
+      Email = $"{username}@email.com",
+      Password = password,
+      ConfirmPassword = password,
+      FirstName = username,
+      LastName = username,
+      UserName = username,
+    };
+    var _ = await RootAdmin_PostAsJsonAsync("/api/users", newUser);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
+
+    var loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
+    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+
+    _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/toggle-status", new ToggleUserStatusRequest
+    {
+      ActivateUser = false,
+      UserId = user.Id.ToString()
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(user.Email, password, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+  }
+
+  [Fact]
+  public async Task users_cannot_create_themselves_when_this_feature_is_disabled()
+  {
+    //Todo: self created user feature disable togggle
+  }
+
+  [Fact]
+  public async Task admin_can_reset_any_user_password_in_his_tenant()
+  {
+    var originalPassword = "Ran60m@pass";
+    var username = Guid.NewGuid().ToString();
+    var newUser = new CreateUserRequest()
+    {
+      Email = $"{username}@email.com",
+      Password = originalPassword,
+      ConfirmPassword = originalPassword,
+      FirstName = username,
+      LastName = username,
+      UserName = username,
+    };
+    var _ = await RootAdmin_PostAsJsonAsync("/api/users", newUser);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
+
+    var loginHeader = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+
+    //reset
+    var newPassword = "NEW@p@ssword";
+    _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/reset-password", new UserResetPasswordRequest(user.Id, newPassword));
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    //login with old password, should not work
+    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+    //login with new password, should work
+    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Fact]
+  public async Task root_admin_can_reset_any_user_password_in_any_tenant()
+  {
+    //Todo: find a solution for the multitenant scope
+  }
+
+  [Fact]
+  public async Task only_admins_can_reset_admins_password()
+  {
+    //Todo: is this right?
+  }
+
+  [Fact]
+  public async Task admin_can_change_his_own_password()
+  {
+    var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var newPassword = RootAdminPassword + "1";
+    _ = await RootAdmin_PutAsJsonAsync("/api/personal/change-password", new ChangePasswordRequest
+    {
+      Password = RootAdminPassword,
+      NewPassword = newPassword,
+      ConfirmNewPassword = newPassword
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+    _ = await TryLoginAs(RootAdminEmail, newPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    // Update new password for subsequent tests
+    RootAdminPassword = newPassword;
+  }
+
+  [Fact]
+  public async Task user_can_change_his_password()
+  {
+    var originalPassword = "Ran60m@pass";
+    var username = Guid.NewGuid().ToString();
+    var newUser = new CreateUserRequest()
+    {
+      Email = $"{username}@email.com",
+      Password = originalPassword,
+      ConfirmPassword = originalPassword,
+      FirstName = username,
+      LastName = username,
+      UserName = username,
+    };
+    var _ = await RootAdmin_PostAsJsonAsync("/api/users", newUser);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
+
+    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var loginHeaders = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+
+    var newPassword = originalPassword + "1";
+    _ = await PutAsJsonAsync("/api/personal/change-password", new ChangePasswordRequest
+    {
+      Password = originalPassword,
+      NewPassword = newPassword,
+      ConfirmNewPassword = newPassword
+    }, loginHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Fact]
+  public async Task user_can_reset_his_password()
+  {
+  }
+
+  [Fact]
+  public async Task user_cannot_access_resource_unless_he_has_permission()
+  {
+  }
 }

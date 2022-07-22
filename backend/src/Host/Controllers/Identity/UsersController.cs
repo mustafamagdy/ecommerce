@@ -53,6 +53,14 @@ public class UsersController : VersionNeutralApiController
     return _userService.CreateAsync(request, GetOriginFromRequest());
   }
 
+  [HttpPost("{id}/reset-password")]
+  [OpenApiOperation("Reset a user's password.", "")]
+  [MustHavePermission(FSHAction.ResetPassword, FSHResource.Users)]
+  public Task<string> ResetPasswordForUserAsync(string id, UserResetPasswordRequest request)
+  {
+    return _userService.ResetUserPasswordAsync(request);
+  }
+
   [HttpPost("self-register")]
   [TenantIdHeader]
   [AllowAnonymous]

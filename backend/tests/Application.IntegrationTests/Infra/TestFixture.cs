@@ -14,6 +14,8 @@ public abstract class TestFixture
   private readonly HostFixture _host;
   private readonly HttpClient _client;
   protected readonly ITestOutputHelper _output;
+  protected static string RootAdminPassword = "123Pa$$word!";
+  protected static string RootAdminEmail = "admin@root.com";
 
   public TestFixture(HostFixture host, ITestOutputHelper output)
   {
@@ -81,10 +83,15 @@ public abstract class TestFixture
     return await GetAsync(requestUri, headers, cancellationToken);
   }
 
-  public async Task<Dictionary<string, string>> LoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
+  public Task<HttpResponseMessage> TryLoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
   {
     var tenantHeader = tenant == null ? new Dictionary<string, string>() : new Dictionary<string, string> { { "tenant", "root" } };
-    var response = await PostAsJsonAsync("/api/tokens", new TokenRequest(username, passwrod), tenantHeader, cancellationToken);
+    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, passwrod), tenantHeader, cancellationToken);
+  }
+
+  public async Task<Dictionary<string, string>> LoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
+  {
+    var response = await TryLoginAs(username, passwrod, headers, tenant, cancellationToken);
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
@@ -98,6 +105,6 @@ public abstract class TestFixture
 
   private Task<Dictionary<string, string>> LoginAsRootAdmin(Dictionary<string, string> headers, CancellationToken cancellationToken)
   {
-    return LoginAs("admin@root.com", "123Pa$$word!", headers, "root", cancellationToken);
+    return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", cancellationToken);
   }
 }
