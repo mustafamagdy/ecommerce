@@ -19,6 +19,7 @@ public static class FSHAction
   public const string Close = nameof(Close);
   public const string Transfer = nameof(Transfer);
   public const string Approve = nameof(Approve);
+  public const string ResetPassword = nameof(ResetPassword);
 
   public const string Clean = nameof(Clean);
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
@@ -58,6 +59,7 @@ public static class FSHPermissions
     new("Update Users", FSHAction.Update, FSHResource.Users),
     new("Delete Users", FSHAction.Delete, FSHResource.Users),
     new("Export Users", FSHAction.Export, FSHResource.Users),
+    new("ResetPassword For User", FSHAction.ResetPassword, FSHResource.Users),
 
     // User Roles
     new("View UserRoles", FSHAction.View, FSHResource.UserRoles),

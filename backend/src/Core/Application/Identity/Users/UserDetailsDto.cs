@@ -16,5 +16,4 @@ public class UserDetailsDto
 public class CreateUserResponseDto : UserDetailsDto
 {
   public string? CreateUserMessages { get; set; }
-  public string EmailConfirmationCode { get; set; }
 }
