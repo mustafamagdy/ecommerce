@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 using Xunit;
 
@@ -28,6 +29,9 @@ public class HostFixture : IAsyncLifetime
     _factory = new TestWebApplicationFactory();
     return Task.CompletedTask;
   }
+
+  public T GetRequiredService<T>()
+    where T : notnull => _factory.Services.GetRequiredService<T>();
 
   public async Task DisposeAsync()
   {

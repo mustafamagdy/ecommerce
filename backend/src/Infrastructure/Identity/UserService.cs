@@ -11,7 +11,6 @@ using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Specification;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Identity;
-using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using Mapster;
@@ -31,7 +30,6 @@ internal partial class UserService : IUserService
     private readonly IStringLocalizer _t;
     private readonly IJobService _jobService;
     private readonly IMailService _mailService;
-    private readonly SecuritySettings _securitySettings;
     private readonly IdentitySettings _identitySettings;
     private readonly IEmailTemplateService _templateService;
     private readonly IFileStorageService _fileStorage;
@@ -54,7 +52,6 @@ internal partial class UserService : IUserService
         ICacheService cache,
         ICacheKeyService cacheKeys,
         ITenantInfo currentTenant,
-        IOptions<SecuritySettings> securitySettings,
         IOptions<IdentitySettings> identitySettings )
     {
         _signInManager = signInManager;
@@ -70,7 +67,6 @@ internal partial class UserService : IUserService
         _cache = cache;
         _cacheKeys = cacheKeys;
         _currentTenant = currentTenant;
-        _securitySettings = securitySettings.Value;
         _identitySettings = identitySettings.Value;
     }
 

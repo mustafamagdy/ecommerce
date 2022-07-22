@@ -26,6 +26,9 @@ public abstract class TestFixture
     _output.WriteLine("New http client created");
   }
 
+  public T GetRequiredService<T>()
+    where T : notnull => _host.GetRequiredService<T>();
+
   public void RemoveThisDbAfterFinish(string db)
   {
     var dbName = $"{TestConstants.TestEnvironmentName}-{db}-db";
