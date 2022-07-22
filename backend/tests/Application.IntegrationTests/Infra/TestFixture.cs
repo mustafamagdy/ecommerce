@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
+using netDumbster.smtp;
 using StackExchange.Redis;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,10 +25,18 @@ public abstract class TestFixture
 
     _client = _host.CreateClient();
     _output.WriteLine("New http client created");
+    _host.MessageReceived += HostOnMessageReceived;
   }
 
-  public T GetRequiredService<T>()
-    where T : notnull => _host.GetRequiredService<T>();
+  protected TaskCompletionSource<SmtpMessage> MailReceivedTask;
+
+  private void HostOnMessageReceived(object? sender, MessageReceivedArgs e)
+  {
+    if (MailReceivedTask != null)
+    {
+      MailReceivedTask.SetResult(e.Message);
+    }
+  }
 
   public void RemoveThisDbAfterFinish(string db)
   {

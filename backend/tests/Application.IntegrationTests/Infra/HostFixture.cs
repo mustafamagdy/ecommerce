@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
+using netDumbster.smtp;
 using Xunit;
 
 namespace Application.IntegrationTests.Infra;
@@ -13,7 +14,10 @@ public class HostFixture : IAsyncLifetime
   private IDisposable _memoryConfigs;
   private readonly string _cnStringTemplate = "Data Source=localhost;Initial Catalog={0};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true";
 
+  private SimpleSmtpServer _smtpServer;
+
   public HttpClient CreateClient() => _factory.CreateClient();
+  public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
 
   public Task InitializeAsync()
   {
@@ -27,16 +31,27 @@ public class HostFixture : IAsyncLifetime
     });
 
     _factory = new TestWebApplicationFactory();
+
+    // Port 5221 is configured in mail app settings json file
+    _smtpServer = SimpleSmtpServer.Start(5221);
+    _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
+
     return Task.CompletedTask;
   }
 
-  public T GetRequiredService<T>()
-    where T : notnull => _factory.Services.GetRequiredService<T>();
+  private void SmtpServerOnMessageReceived(object? sender, MessageReceivedArgs e)
+  {
+    if (MessageReceived != null)
+    {
+      MessageReceived.Invoke(sender, e);
+    }
+  }
 
   public async Task DisposeAsync()
   {
     await _factory.DisposeAsync();
     _memoryConfigs.Dispose();
+    _smtpServer.Dispose();
 
     var cs = string.Format(_cnStringTemplate, "sys");
     var cmdStr = "drop schema if exists `{0}`;";

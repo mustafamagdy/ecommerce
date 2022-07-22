@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
@@ -11,6 +12,7 @@ using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
 using Microsoft.AspNetCore.Mvc;
+using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -317,6 +319,9 @@ public class AdministrativeTests : TestFixture
     _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
+
+    MailReceivedTask = new TaskCompletionSource<SmtpMessage>();
+
     //forgot password, should give user the reset password token by email
     var headers = new Dictionary<string, string> { ["tenant"] = "root" };
     _ = await PostAsJsonAsync("/api/users/forgot-password", new ForgotPasswordRequest
@@ -327,19 +332,26 @@ public class AdministrativeTests : TestFixture
 
     //user can use this token to reset his password
 
-    //task completion + timeout
-    // var tcs = new TaskCompletionSource<MailRequest>();
-    // var mailService = GetRequiredService<IMailService>() as TestMailService;
-    // mailService.SetCompletionTaskSource(tcs);
-    //
-    // var mail = await tcs.Task;
+    var message = await MailReceivedTask.Task;
+    message.Should().NotBeNull();
+    message.Subject.Should().Be("Reset Password");
+    message.MessageParts.Should().Contain(a => a.BodyData.Contains("Your Password Reset Token is"));
+    var messageBody = message.MessageParts[0].BodyData;
+    var tokenRegex = new Regex("\'.*\'");
+    var tokenMatch = tokenRegex.Match(messageBody);
+    tokenMatch.Success.Should().BeTrue();
+    var token = tokenMatch.Value.Replace("\'", string.Empty);
 
-    // _ = await PostAsJsonAsync("/api/users/reset-password", new ResetPasswordRequest
-    // {
-    //   Email = user.Email,
-    //   Password = originalPassword + "1",
-    //   Token = ""
-    // }, headers);
-    // _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var newPassword = originalPassword + "1";
+    _ = await PostAsJsonAsync("/api/users/reset-password", new ResetPasswordRequest
+    {
+      Email = user.Email,
+      Password = newPassword,
+      Token = token
+    }, headers);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

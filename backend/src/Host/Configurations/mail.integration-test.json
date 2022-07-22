@@ -1,0 +1,10 @@
+{
+  "MailSettings": {
+    "DisplayName": "Integration Test",
+    "From": "info@integration-test.com",
+    "Host": "localhost",
+    "Port": 5221,
+    "UserName": "info@integration-test.com",
+    "UseTLS": false
+  }
+}
