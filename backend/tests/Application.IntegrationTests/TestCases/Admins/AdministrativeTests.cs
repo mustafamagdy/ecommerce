@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Mail;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
+using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Roles;
 using FSH.WebApi.Application.Identity.Tokens;
@@ -297,10 +299,47 @@ public class AdministrativeTests : TestFixture
   [Fact]
   public async Task user_can_reset_his_password()
   {
-  }
+    var originalPassword = "Ran60m@pass";
+    var username = Guid.NewGuid().ToString();
+    var newUser = new CreateUserRequest()
+    {
+      Email = $"{username}@email.com",
+      Password = originalPassword,
+      ConfirmPassword = originalPassword,
+      FirstName = username,
+      LastName = username,
+      UserName = username,
+    };
+    var _ = await RootAdmin_PostAsJsonAsync("/api/users", newUser);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-  [Fact]
-  public async Task user_cannot_access_resource_unless_he_has_permission()
-  {
+    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    //forgot password, should give user the reset password token by email
+    var headers = new Dictionary<string, string> { ["tenant"] = "root" };
+    _ = await PostAsJsonAsync("/api/users/forgot-password", new ForgotPasswordRequest
+    {
+      Email = user.Email
+    }, headers);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    //user can use this token to reset his password
+
+    //task completion + timeout
+    // var tcs = new TaskCompletionSource<MailRequest>();
+    // var mailService = GetRequiredService<IMailService>() as TestMailService;
+    // mailService.SetCompletionTaskSource(tcs);
+    //
+    // var mail = await tcs.Task;
+
+    // _ = await PostAsJsonAsync("/api/users/reset-password", new ResetPasswordRequest
+    // {
+    //   Email = user.Email,
+    //   Password = originalPassword + "1",
+    //   Token = ""
+    // }, headers);
+    // _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }
