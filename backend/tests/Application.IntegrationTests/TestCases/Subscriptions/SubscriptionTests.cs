@@ -42,7 +42,7 @@ public class SubscriptionTests : TestFixture
     RemoveThisDbAfterFinish(newTenantId);
 
     response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
+      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword),
       new Dictionary<string, string> { { "tenant", tenantId } });
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);

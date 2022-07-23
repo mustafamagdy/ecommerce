@@ -46,6 +46,8 @@ public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHi
     builder
       .Property(b => b.Price)
       .HasPrecision(7, 3);
+
+    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
   }
 }
 
@@ -56,5 +58,7 @@ public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPa
     builder
       .Property(b => b.Amount)
       .HasPrecision(7, 3);
+
+    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
   }
 }

@@ -16,6 +16,7 @@ public class SubscriptionHistory : BaseEntity
   }
 
   public string TenantId { get; set; }
+  public FSHTenantInfo Tenant { get; set; }
   public decimal Price { get; set; }
   public DateTime StartDate { get; set; }
   public DateTime ExpiryDate { get; set; }
