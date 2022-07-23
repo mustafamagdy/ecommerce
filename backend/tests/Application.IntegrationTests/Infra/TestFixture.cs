@@ -55,7 +55,10 @@ public abstract class TestFixture
     return _client.PostAsJsonAsync(requestUri, value, cancellationToken);
   }
 
-  public async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  public Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+    => RootAdmin_PostAsJsonAsync(requestUri, (object)value, headers, cancellationToken);
+
+  public async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync(string? requestUri, object value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await PostAsJsonAsync(requestUri, value, headers, cancellationToken);
@@ -95,17 +98,17 @@ public abstract class TestFixture
     return await GetAsync(requestUri, headers, cancellationToken);
   }
 
-  public Task<HttpResponseMessage> TryLoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
+  public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant, CancellationToken cancellationToken)
   {
-    var tenantHeader = tenant == null ? new Dictionary<string, string>() : new Dictionary<string, string> { { "tenant", "root" } };
-    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, passwrod), tenantHeader, cancellationToken);
+    var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
+    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password), tenantHeader, cancellationToken);
   }
 
-  public async Task<Dictionary<string, string>> LoginAs(string username, string passwrod, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken)
+  public async Task<Dictionary<string, string>> LoginAs(string username, string password, Dictionary<string, string>? headers, string? tenant, CancellationToken cancellationToken)
   {
-    var response = await TryLoginAs(username, passwrod, headers, tenant, cancellationToken);
-
+    var response = await TryLoginAs(username, password, tenant, cancellationToken);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
+
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
     _output.WriteLine("Token is " + tokenResult.Token);
 

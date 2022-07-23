@@ -20,6 +20,8 @@ public static class FSHAction
   public const string Transfer = nameof(Transfer);
   public const string Approve = nameof(Approve);
   public const string ResetPassword = nameof(ResetPassword);
+  public const string ViewMy = nameof(ViewMy);
+  public const string ViewAdvanced = nameof(ViewAdvanced);
 
   public const string Clean = nameof(Clean);
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
@@ -101,6 +103,8 @@ public static class FSHPermissions
     new("Create Tenant Subscription", FSHAction.Create, FSHResource.Subscriptions, IsRoot: true),
     new("Renew Tenant Subscription", FSHAction.Update, FSHResource.Subscriptions, IsRoot: true),
     new("View Basic Tenants Info", FSHAction.ViewBasic, FSHResource.Tenants),
+    new("View My Tenant Info", FSHAction.ViewMy, FSHResource.Subscriptions),
+    new("View My Tenant History & Payments", FSHAction.ViewAdvanced, FSHResource.Subscriptions),
 
     // Branches
     new("View Branches", FSHAction.View, FSHResource.Branches),

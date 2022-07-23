@@ -14,6 +14,7 @@ public class SubscriptionPayment : Payment
   }
 
   public Guid SubscriptionId { get; set; }
+  public StandardSubscription Subscription { get; set; }
 
   public SubscriptionPayment SetSubscription(Guid subscriptionId)
   {

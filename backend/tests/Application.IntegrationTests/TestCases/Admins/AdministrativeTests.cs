@@ -1,17 +1,13 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Net.Mail;
 using System.Text.RegularExpressions;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
-using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Roles;
-using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
-using Microsoft.AspNetCore.Mvc;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -48,7 +44,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var role = await _.Content.ReadFromJsonAsync<RoleDto>();
 
-    //update role permissions
+    // update role permissions
     var newRolePermissionsRequest = new UpdateRolePermissionsRequest
     {
       RoleId = role.Id,
@@ -80,7 +76,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var role = await _.Content.ReadFromJsonAsync<RoleDto>();
 
-    //create user
+    // create user
     var password = "Ran60m@pass";
     var username = Guid.NewGuid().ToString();
     var newUser = new CreateUserRequest()
@@ -96,7 +92,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    //add user to this role
+    // add user to this role
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/roles", new UserRolesRequest
     {
       UserRoles = new List<UserRoleDto>
@@ -111,14 +107,14 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var roleResult = await _.Content.ReadAsStringAsync();
 
-    //login with the user and execute action => should fail
+    // login with the user and execute action => should fail
     var loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
     var productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     productResult.Should().NotBeNull();
     productResult.TotalCount.Should().BeGreaterThan(1);
 
-    //update role permissions
+    // update role permissions
     _ = await RootAdmin_PutAsJsonAsync($"/api/roles/{role.Id}/permissions", new UpdateRolePermissionsRequest
     {
       RoleId = role.Id,
@@ -130,9 +126,9 @@ public class AdministrativeTests : TestFixture
 
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    //login again with the user
+    // login again with the user
     loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
-    //execute the same action => should succeed
+    // execute the same action => should succeed
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
     productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     productResult.Should().NotBeNull();
@@ -177,14 +173,14 @@ public class AdministrativeTests : TestFixture
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, password, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, password, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
 
   [Fact]
   public async Task users_cannot_create_themselves_when_this_feature_is_disabled()
   {
-    //Todo: self created user feature disable togggle
+    // Todo: self created user feature disable toggle
   }
 
   [Fact]
@@ -208,36 +204,36 @@ public class AdministrativeTests : TestFixture
     var loginHeader = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
     loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
-    //reset
+    // reset
     var newPassword = "NEW@p@ssword";
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/reset-password", new UserResetPasswordRequest(user.Id, newPassword));
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    //login with old password, should not work
-    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    // login with old password, should not work
+    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-    //login with new password, should work
-    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    // login with new password, should work
+    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
   public async Task root_admin_can_reset_any_user_password_in_any_tenant()
   {
-    //Todo: find a solution for the multitenant scope
+    // Todo: find a solution for the multitenant scope
   }
 
   [Fact]
   public async Task only_admins_can_reset_admins_password()
   {
-    //Todo: is this right?
+    // Todo: is this right?
   }
 
   [Fact]
   public async Task admin_can_change_his_own_password()
   {
-    var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, null, "root", CancellationToken.None);
+    var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newPassword = RootAdminPassword + "1";
@@ -249,10 +245,10 @@ public class AdministrativeTests : TestFixture
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-    _ = await TryLoginAs(RootAdminEmail, newPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(RootAdminEmail, newPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     // Update new password for subsequent tests
@@ -277,7 +273,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var loginHeaders = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
@@ -291,10 +287,10 @@ public class AdministrativeTests : TestFixture
     }, loginHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
@@ -316,13 +312,12 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    _ = await TryLoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
 
     MailReceivedTask = new TaskCompletionSource<SmtpMessage>();
 
-    //forgot password, should give user the reset password token by email
+    // forgot password, should give user the reset password token by email
     var headers = new Dictionary<string, string> { ["tenant"] = "root" };
     _ = await PostAsJsonAsync("/api/users/forgot-password", new ForgotPasswordRequest
     {
@@ -330,8 +325,7 @@ public class AdministrativeTests : TestFixture
     }, headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    //user can use this token to reset his password
-
+    // wait for the forgot password email to be received and extract the token from it
     var message = await MailReceivedTask.Task;
     message.Should().NotBeNull();
     message.Subject.Should().Be("Reset Password");
@@ -342,6 +336,7 @@ public class AdministrativeTests : TestFixture
     tokenMatch.Success.Should().BeTrue();
     var token = tokenMatch.Value.Replace("\'", string.Empty);
 
+    // user can use this token to reset his password
     var newPassword = originalPassword + "1";
     _ = await PostAsJsonAsync("/api/users/reset-password", new ResetPasswordRequest
     {
@@ -351,7 +346,7 @@ public class AdministrativeTests : TestFixture
     }, headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, newPassword, null, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

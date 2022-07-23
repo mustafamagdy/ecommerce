@@ -267,6 +267,7 @@ internal class TenantService : ITenantService
   {
     var tenant = await _tenantDbContext.TenantInfo
                    .Include(a => a.ProdSubscription)
+                   .ThenInclude(a => a.SubscriptionHistory)
                    .Include(a => a.DemoSubscription)
                    .Include(a => a.TrainSubscription)
                    .Include(a => a.Branches)
