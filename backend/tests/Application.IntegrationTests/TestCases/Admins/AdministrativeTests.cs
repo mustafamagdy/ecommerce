@@ -327,6 +327,7 @@ public class AdministrativeTests : TestFixture
 
     // wait for the forgot password email to be received and extract the token from it
     var message = await MailReceivedTask.Task;
+
     message.Should().NotBeNull();
     message.Subject.Should().Be("Reset Password");
     message.MessageParts.Should().Contain(a => a.BodyData.Contains("Your Password Reset Token is"));
