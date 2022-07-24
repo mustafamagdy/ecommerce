@@ -4,6 +4,7 @@ import {useApp} from "src/composables/app";
 import {useStore} from "vuex";
 import {useQuasar} from "quasar";
 import {$t} from "src/services/i18n";
+import {useShowAddEdit} from "src/composables/showAddEdit";
 
 export const useListPage = (options) => {
     const {
@@ -37,14 +38,7 @@ export const useListPage = (options) => {
             store.commit(`${pageName}/setCurrentRecord`, value);
         }
     });
-    const showAdd = computed({
-        get() {
-            return store.getters[`${pageName}/showAdd`];
-        },
-        set(value) {
-            store.commit(`${pageName}/setShowAdd`, value);
-        }
-    });
+    const {showAdd, showEdit, showAddOrEdit} = useShowAddEdit(pageName);
 
     async function load() {
         state.loading = true;
@@ -111,7 +105,9 @@ export const useListPage = (options) => {
     const computedProps = {
         records,
         currentRecord,
-        showAdd
+        showAdd,
+        showEdit,
+        showAddOrEdit
     };
     const methods = {
         load,

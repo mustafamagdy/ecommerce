@@ -6,7 +6,9 @@ export const crud = {
         currentRecord: null,
         records: [],
         requestError: null,
-        showAdd: false
+        showAdd: false,
+        showEdit: false,
+        editId: null
     }),
     getters: {
         records(state) {
@@ -17,6 +19,12 @@ export const crud = {
         },
         showAdd(state) {
             return state.showAdd;
+        },
+        showEdit(state) {
+            return state.showEdit;
+        },
+        editId(state) {
+            return state.editId;
         },
     },
     mutations: {
@@ -65,6 +73,17 @@ export const crud = {
         },
         setShowAdd(state, value) {
             state.showAdd = value;
+            if (value === true) {
+                state.showEdit = false;
+                state.editId = null;
+            }
+        },
+        setShowEdit(state, value) {
+            const {show = false, editId = null} = value;
+            state.showEdit = show;
+            if (editId) state.editId = editId;
+            if (!show) state.editId = null;
+            if (show === true) state.showAdd = false;
         },
     },
     actions: {

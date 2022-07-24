@@ -1,6 +1,7 @@
 <template>
     <div class="col-grow column">
         <div class="col-grow">
+
             <q-table
                 grid
                 card-container-class="q-col-gutter-md justify-start"
@@ -37,7 +38,8 @@
                             <div class="row justify-center">
                                 <q-btn icon="mdi-delete-outline" :label="$t('btn_delete')" padding="xs"
                                        class="delete" @click="deleteItem(props.row.id)"/>
-                                <q-btn icon="mdi-playlist-edit" :label="$t('btn_edit')" padding="xs" class="edit"/>
+                                <q-btn icon="mdi-playlist-edit" :label="$t('btn_edit')" padding="xs" class="edit"
+                                       @click="showEdit={show:true,editId:props.row.id}"/>
                                 <q-btn icon="mdi-cog-outline" :label="$t('btn_actions')" padding="xs" class="settings"
                                 >
                                     <q-menu auto-close>
@@ -92,7 +94,7 @@
         <div class="row justify-end q-mt-md">
             <q-btn icon="mdi-plus" :label="$t('btn_add_new')" padding="xs" class="add" @click="showAdd=true"/>
         </div>
-        <q-dialog v-model="showAdd" persistent>
+        <q-dialog v-model="showAddOrEdit" persistent>
             <ServicesAdd/>
         </q-dialog>
     </div>
@@ -127,6 +129,8 @@ const {
 const {
     records,
     showAdd,
+    showEdit,
+    showAddOrEdit,
     currentRecord,
 } = page.computedProps;
 //page methods
