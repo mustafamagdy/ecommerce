@@ -58,21 +58,21 @@ export function useEditPage(props, formData, v$, onFormSubmited) {
 		}
 	}
 
-	async function load() {
-		state.loading = true;
-		state.item = null;
-		let url = apiUrl.value;
-		try{
-			await store.dispatch(`${props.pageName}/fetchRecord`, url);
-			state.loading = false;
-			Object.assign(formData, currentRecord.value); //update form data
-		}
-		catch(e){
-			console.error(e);
-			state.loading = false;
-			app.showPageRequestError(e);
-		}
-	}
+	// async function load() {
+	// 	state.loading = true;
+	// 	state.item = null;
+	// 	let url = apiUrl.value;
+	// 	try{
+	// 		await store.dispatch(`${props.pageName}/fetchRecord`, url);
+	// 		state.loading = false;
+	// 		Object.assign(formData, currentRecord.value); //update form data
+	// 	}
+	// 	catch(e){
+	// 		console.error(e);
+	// 		state.loading = false;
+	// 		app.showPageRequestError(e);
+	// 	}
+	// }
 
 	function mapOptionField (options, fieldname){
 		if(formData){
@@ -115,7 +115,7 @@ export function useEditPage(props, formData, v$, onFormSubmited) {
 	  },
 	  { deep: true, immediate: true }
   	);
-	
+
 	onMounted(()=>{
 		load();
 	});
@@ -132,7 +132,7 @@ export function useEditPage(props, formData, v$, onFormSubmited) {
 		getFieldError,
 		mapOptionField
 	}
-	
+
 	return {
 		state,
 		computedProps,
