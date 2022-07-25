@@ -34,13 +34,13 @@
     </q-card>
 </template>
 <script setup>
-import {computed, ref, reactive, toRefs} from "vue";
+import {computed, ref, reactive, toRefs, onMounted} from "vue";
 import useVuelidate from "@vuelidate/core";
 import {required, maxLength} from "@vuelidate/validators";
 import {useMeta} from "quasar";
 import {useApp} from "src/composables/app.js";
 import {$t} from "src/services/i18n";
-import {useAddPage} from "src/composables/addpage.js";
+import {useAddEditPage} from "src/composables/addEditPage.js";
 
 const options = reactive({
     apiPath: "services",
@@ -50,51 +50,52 @@ const options = reactive({
         description: ""
     },
 });
-const app = useApp();// application state and methods
+const app = useApp();
 const formData = reactive({...options.formInputs});
-// perform custom validation before submit form
-// set custom form fields
-// return false if validation fails
+
 function beforeSubmit() {
     return true;
 }
 
-// after form submited to api
-// reset form data.
-// redirect to another page
 const onFormSubmitted = (data) => {
-    let record = {id: data, ...formData};
-    addRecordToList(record)
+    if (showAdd.value) {
+        let record = {id: data, ...formData};
+        addRecordToList(record);
+    } else if (showEdit.value) {
+        updateRecordInList(formData);
+    }
 }
 
-//form validation rules
 const rules = {
     name: {required: required, maxLength: maxLength(75)},
 };
 const v$ = useVuelidate(rules, formData); // form validation
-// page form hook
-const page = useAddPage(options, formData, v$, onFormSubmitted, beforeSubmit);
-//page state
+
+const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
+
 const {
-    submitted, // form submitted state - Boolean
-    saving // form api submiting state - Boolean
+    saving
 } = toRefs(page.state);
-//page methods
+const {showAdd, showEdit} = page.computedProps
 const {
-    submitForm, //submit form data to api
-    getFieldErrorsMsg, //  get validation error message - args(fieldname)
-    addRecordToList
+    submitForm,
+    getFieldErrorsMsg,
+    addRecordToList,
+    updateRecordInList,
+    load
 } = page.methods;
+
 useMeta(() => {
     return {
-        //set browser title
         title: $t("addNewSampletable")
     };
 });
-// expose page object for other components access
+
+onMounted(() => {
+    load();
+});
+
 defineExpose({
     page
 });
 </script>
-<style scoped>
-</style>

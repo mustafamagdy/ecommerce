@@ -5,7 +5,7 @@ import {useStore} from 'vuex';
 import {$t} from 'src/services/i18n';
 import {useShowAddEdit} from "src/composables/showAddEdit";
 
-export function useAddPage(options, formData, v$, onFormSubmitted, beforeSubmit) {
+export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit) {
     const {
         apiPath = "",
         pageName = "",
@@ -30,7 +30,8 @@ export function useAddPage(options, formData, v$, onFormSubmitted, beforeSubmit)
         }
     });
     const addRecordToList = (record) => store.commit(`${pageName}/addRecord`, record);
-    const {showAddOrEdit} = useShowAddEdit(pageName);
+    const updateRecordInList = (record) => store.commit(`${pageName}/updateRecord`, record)
+    const {showAddOrEdit, showAdd, showEdit, editId} = useShowAddEdit(pageName);
     const validateForm = () => {
         state.submitted = true;
         v$.value.$validate();
@@ -53,33 +54,44 @@ export function useAddPage(options, formData, v$, onFormSubmitted, beforeSubmit)
         let url = apiPath;
         let data = {url, payload: formData}
         try {
-            let response = await store.dispatch(`${pageName}/saveRecord`, data);
+            let response;
+            if (showAdd.value) {
+                response = await store.dispatch(`${pageName}/saveRecord`, data);
+                app.flashMsg($t("msg_after_add"));
+            } else if (showEdit.value) {
+                response = await store.dispatch(`${pageName}/updateRecord`, data);
+                app.flashMsg($t("msg_after_update"));
+            } else {
+                throw new Error($t("msg_default_error"));
+            }
+            onFormSubmitted(response.data);
             state.saving = false;
             state.submitted = false;
-            app.flashMsg($t("msg_after_add"));
-            onFormSubmitted(response.data);
-            //Object.assign(formData, formInputs);
-            //store.commit(`${pageName}/setShowAdd`, false);
             showAddOrEdit.value = false;
         } catch (e) {
             state.saving = false;
             app.showPageRequestError(e);
         }
     }
+
     async function load() {
+        if (!showEdit.value) return;
         state.loading = true;
         state.item = null;
-        try{
-            await store.dispatch(`${pageName}/fetchRecord`, apiPath);
+        try {
+            let url = apiPath;
+            let id = editId.value;
+            let data = {id, url};
+            await store.dispatch(`${pageName}/fetchRecord`, data);
             state.loading = false;
-            Object.assign(formData, currentRecord.value); //update form data
-        }
-        catch(e){
+            Object.assign(formData, currentRecord.value);
+        } catch (e) {
             console.error(e);
             state.loading = false;
             app.showPageRequestError(e);
         }
     }
+
     const resetForm = () => {
         if (Array.isArray(formData)) {
             formData = [{...formInputs}];  //reset form data
@@ -97,21 +109,23 @@ export function useAddPage(options, formData, v$, onFormSubmitted, beforeSubmit)
         return null
     }
 
-    // watch(() => props.formInputs, (current) => {
-    // 	Object.assign(formData, current);
-    //   },
-    //   { deep: true, immediate: true }
-    // );
+    const computedProps = {
+        showAdd,
+        showEdit
+    }
     const methods = {
         submitForm,
         getFieldErrorsMsg: getFieldErrorsMsg,
-        addRecordToList
+        addRecordToList,
+        updateRecordInList,
+        load
     }
     return {
         validateForm,
         resetForm,
         formData,
         state,
+        computedProps,
         methods
     }
 }
