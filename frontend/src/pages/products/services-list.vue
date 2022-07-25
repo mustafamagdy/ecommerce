@@ -95,7 +95,7 @@
             <q-btn icon="mdi-plus" :label="$t('btn_add_new')" padding="xs" class="add" @click="showAdd=true"/>
         </div>
         <q-dialog v-model="showAddOrEdit" persistent>
-            <ServicesAdd/>
+            <ServicesAddEdit/>
         </q-dialog>
     </div>
 </template>
@@ -106,12 +106,12 @@ import {useApp} from "src/composables/app.js";
 import {utils} from "src/utils";
 import {$t} from "src/services/i18n";
 import {useListPage} from "src/composables/listpage.js";
-import ServicesAdd from "./services-add";
+import ServicesAddEdit from "./services-add-edit";
 
 const options = reactive({
     apiPath: "services",
     pageName: "services",
-    pageSize: 10,
+    pageSize: 5,
     filter: {},
     orderBy: [],
 })

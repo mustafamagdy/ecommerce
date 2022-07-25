@@ -79,11 +79,18 @@ export const crud = {
             }
         },
         setShowEdit(state, value) {
-            const {show = false, editId = null} = value;
+            let {show = false, editId = null} = value;
+            if (!show && value === true) show = true;
+            if (!show) editId = null;
             state.showEdit = show;
-            if (editId) state.editId = editId;
-            if (!show) state.editId = null;
+            state.editId = editId;
             if (show === true) state.showAdd = false;
+        },
+        setEditId(state, value) {
+            state.eitId = value;
+            if (!value || value === "" || value === 0) {
+                state.showEdit = false;
+            }
         },
     },
     actions: {
@@ -112,9 +119,11 @@ export const crud = {
                 });
             });
         },
-        fetchRecord: ({commit}, url) => {
+        fetchRecord: ({commit}, data) => {
+            let url = data.url;
+            let id = data.id;
             return new Promise((resolve, reject) => {
-                ApiService.get(url).then(resp => {
+                ApiService.get(`${url}/${id.toString()}`).then(resp => {
                     commit("setCurrentRecord", resp.data);
                     resolve(resp);
                 })
@@ -139,9 +148,7 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
-                ApiService.post(url, payload).then(resp => {
-                    let record = resp.data;
-                    commit("updateRecord", record);
+                ApiService.put(url, payload).then(resp => {
                     resolve(resp);
                 })
                     .catch(err => {
@@ -153,7 +160,7 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let id = data.id;
-                ApiService.delete(url).then(resp => {
+                ApiService.delete(`${url}/${id.toString()}`).then(resp => {
                     commit("deleteRecord", id);
                     resolve(resp);
                 })

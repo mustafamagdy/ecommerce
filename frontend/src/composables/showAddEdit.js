@@ -30,9 +30,18 @@ export const useShowAddEdit = (pageName) => {
             }
         }
     });
+    const editId = computed({
+        get() {
+            return store.getters[`${pageName}/editId`];
+        },
+        set(value) {
+            store.commit(`${pageName}/setEditId`, value);
+        }
+    })
     return {
         showAdd,
         showEdit,
+        editId,
         showAddOrEdit
     }
 }

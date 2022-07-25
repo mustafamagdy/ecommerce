@@ -33,7 +33,7 @@ export const ApiService = {
     },
 
     put(apiPath, data) {
-        return axios.put(apiPath, formData);
+        return axios.put(apiPath, data);
     },
 
     delete(apiPath) {

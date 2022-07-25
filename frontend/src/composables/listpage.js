@@ -77,13 +77,10 @@ export const useListPage = (options) => {
                 persistent: true,
             })
                 .onOk(async () => {
-                    let url = `${pageName}/${id.toString()}`;
-                    let payload = {id, url};
+                    let url = apiPath;
+                    let data = {id, url};
                     try {
-                        await store.dispatch(
-                            `${pageName}/deleteRecord`,
-                            payload
-                        );
+                        await store.dispatch(`${pageName}/deleteRecord`, data);
                         app.flashMsg($t("after_delete_message"));
                     } catch (e) {
                         app.showPageRequestError(e);
