@@ -3,13 +3,13 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using netDumbster.smtp;
-using StackExchange.Redis;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.Infra;
 
 [Collection(nameof(TestConstants.WebHostTests))]
+// public abstract class TestFixture : IClassFixture<HostFixture>
 public abstract class TestFixture
 {
   private readonly HostFixture _host;
@@ -18,7 +18,7 @@ public abstract class TestFixture
   protected static string RootAdminPassword = "123Pa$$word!";
   protected static string RootAdminEmail = "admin@root.com";
 
-  public TestFixture(HostFixture host, ITestOutputHelper output)
+  protected TestFixture(HostFixture host, ITestOutputHelper output)
   {
     _host = host;
     _output = output;
@@ -28,20 +28,12 @@ public abstract class TestFixture
     _host.MessageReceived += HostOnMessageReceived;
   }
 
-  protected TaskCompletionSource<SmtpMessage> MailReceivedTask;
+  protected TaskCompletionSource<SmtpMessage> GetMailReceivedTaskCompletionSource() => _mailReceivedTask = new TaskCompletionSource<SmtpMessage>();
+  private TaskCompletionSource<SmtpMessage> _mailReceivedTask;
 
   private void HostOnMessageReceived(object? sender, MessageReceivedArgs e)
   {
-    if (MailReceivedTask != null)
-    {
-      MailReceivedTask.SetResult(e.Message);
-    }
-  }
-
-  public void RemoveThisDbAfterFinish(string db)
-  {
-    var dbName = $"{TestConstants.TestEnvironmentName}-{db}-db";
-    HostFixture.DATABASES.Add(dbName);
+    _mailReceivedTask.SetResult(e.Message);
   }
 
   public Task<HttpResponseMessage> PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
