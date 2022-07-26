@@ -1,3 +1,5 @@
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
@@ -8,6 +10,15 @@ namespace Application.IntegrationTests.Infra;
 
 public class HostFixture : IAsyncLifetime
 {
+  private TestcontainersContainer _dbContainer = new TestcontainersBuilder<TestcontainersContainer>()
+    .WithImage("amd64/mysql:8.0-oracle")
+    .WithName("mysql-db")
+    .WithEnvironment("MYSQL_ROOT_PASSWORD", "DeV12345")
+    .WithEnvironment("MYSQL_PASSWORD", "DeV12345")
+    .WithPortBinding(3306, 3306)
+    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
+    .Build();
+
   private WebApplicationFactory<Program> _factory;
   public static readonly TestSystemTime SYSTEM_TIME = new();
   public static readonly List<string> DATABASES = new();
@@ -19,8 +30,9 @@ public class HostFixture : IAsyncLifetime
   public HttpClient CreateClient() => _factory.CreateClient();
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
 
-  public Task InitializeAsync()
+  public async Task InitializeAsync()
   {
+    await _dbContainer.StartAsync();
     var db_name = $"main_{Guid.NewGuid()}";
     DATABASES.Add(db_name);
 
@@ -35,8 +47,6 @@ public class HostFixture : IAsyncLifetime
     // Port 5221 is configured in mail app settings json file
     _smtpServer = SimpleSmtpServer.Start(5221);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
-
-    return Task.CompletedTask;
   }
 
   private void SmtpServerOnMessageReceived(object? sender, MessageReceivedArgs e)
@@ -49,23 +59,24 @@ public class HostFixture : IAsyncLifetime
 
   public async Task DisposeAsync()
   {
+    await _dbContainer.StopAsync();
     await _factory.DisposeAsync();
     _memoryConfigs.Dispose();
     _smtpServer.Dispose();
 
-    var cs = string.Format(_cnStringTemplate, "sys");
-    var cmdStr = "drop schema if exists `{0}`;";
-    await using var cn = new MySqlConnection(cs);
-    await cn.OpenAsync();
-
-    foreach (var db in DATABASES)
-    {
-      await using var cmd = cn.CreateCommand();
-      cmd.CommandText = string.Format(cmdStr, db);
-      await cmd.ExecuteNonQueryAsync();
-    }
-
-    cn.Clone();
-    await cn.DisposeAsync();
+    // var cs = string.Format(_cnStringTemplate, "sys");
+    // var cmdStr = "drop schema if exists `{0}`;";
+    // await using var cn = new MySqlConnection(cs);
+    // await cn.OpenAsync();
+    //
+    // foreach (var db in DATABASES)
+    // {
+    //   await using var cmd = cn.CreateCommand();
+    //   cmd.CommandText = string.Format(cmdStr, db);
+    //   await cmd.ExecuteNonQueryAsync();
+    // }
+    //
+    // cn.Clone();
+    // await cn.DisposeAsync();
   }
 }
