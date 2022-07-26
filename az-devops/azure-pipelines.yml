@@ -29,12 +29,6 @@ jobs:
 - job:
   displayName: Build App
   steps:
-  - task: DockerCompose@0
-    displayName: Start dependencies (docker-compose)
-    inputs:
-      containerregistrytype: Container Registry
-      dockerComposeFile: $(appDir)/docker-compose.yml
-      dockerComposeCommand: 'up -d'
   - task: UseDotNet@2
     displayName: Installing .NET SDK
     inputs:
