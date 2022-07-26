@@ -28,12 +28,11 @@ public abstract class TestFixture
     _host.MessageReceived += HostOnMessageReceived;
   }
 
-  protected TaskCompletionSource<SmtpMessage> GetMailReceivedTaskCompletionSource() => _mailReceivedTask = new TaskCompletionSource<SmtpMessage>();
-  private TaskCompletionSource<SmtpMessage> _mailReceivedTask;
+  protected TaskCompletionSource<SmtpMessage>? MailReceivedTask;
 
   private void HostOnMessageReceived(object? sender, MessageReceivedArgs e)
   {
-    _mailReceivedTask.SetResult(e.Message);
+    MailReceivedTask?.SetResult(e.Message);
   }
 
   public Task<HttpResponseMessage> PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
