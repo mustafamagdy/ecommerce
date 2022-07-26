@@ -315,7 +315,8 @@ public class AdministrativeTests : TestFixture
     _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    MailReceivedTask = new TaskCompletionSource<SmtpMessage>();
+    var mailReceivedTask = new TaskCompletionSource<SmtpMessage>();
+    MailReceivedTask = mailReceivedTask;
 
     // forgot password, should give user the reset password token by email
     var headers = new Dictionary<string, string> { ["tenant"] = "root" };
@@ -326,7 +327,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     // wait for the forgot password email to be received and extract the token from it
-    var message = await MailReceivedTask.Task;
+    var message = await mailReceivedTask.Task;
 
     message.Should().NotBeNull();
     message.Subject.Should().Be("Reset Password");

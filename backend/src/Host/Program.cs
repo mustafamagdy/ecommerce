@@ -52,7 +52,8 @@ try
 
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
-  app.Run();
+
+  await app.RunAsync();
 }
 catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", StringComparison.Ordinal))
 {
