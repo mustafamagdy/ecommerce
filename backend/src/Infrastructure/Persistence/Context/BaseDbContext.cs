@@ -10,6 +10,7 @@ using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,8 +21,8 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
   IdentityUserToken<string>>
 {
-  private readonly ITenantInfo _currentTenant;
-  private readonly ISubscriptionInfo _currentSubscriptionType;
+  private readonly ITenantInfo? _currentTenant;
+  private readonly ISubscriptionInfo? _currentSubscriptionType;
   private TenantDbContext _tenantDb;
   protected readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
@@ -63,9 +64,11 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   {
     if (_dbSettings.LogSensitiveInfo)
     {
+      optionsBuilder.EnableDetailedErrors();
       optionsBuilder.EnableSensitiveDataLogging();
       optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
       optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+      optionsBuilder.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
     }
 
     string connectionString = string.Empty;
@@ -79,7 +82,7 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
         nameof(SubscriptionType.Standard) => tenant.ConnectionString,
         nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
         nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
-        _ => ""
+        _ => throw new ArgumentOutOfRangeException(subscriptionType.Name)
       };
     }
 

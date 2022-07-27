@@ -1,10 +1,11 @@
+using FSH.WebApi.Shared.Multitenancy;
+
 namespace FSH.WebApi.Application.Multitenancy;
 
 public class RenewSubscriptionRequest : IRequest<string>
 {
   public string TenantId { get; set; } = default!;
-  public Guid SubscriptionId { get; set; } = default!;
-  public int? Days { get; set; }
+  public SubscriptionType SubscriptionType { get; set; }
 }
 
 public class RenewSubscriptionRequestValidator : CustomValidator<RenewSubscriptionRequest>
@@ -12,8 +13,7 @@ public class RenewSubscriptionRequestValidator : CustomValidator<RenewSubscripti
   public RenewSubscriptionRequestValidator()
   {
     RuleFor(t => t.TenantId).NotEmpty();
-    RuleFor(t => t.SubscriptionId).NotEmpty();
-    RuleFor(a => a.Days).GreaterThan(0).LessThan(1000);
+    RuleFor(t => t.SubscriptionType).NotNull();
   }
 }
 
@@ -24,5 +24,5 @@ public class RenewSubscriptionRequestHandler : IRequestHandler<RenewSubscription
   public RenewSubscriptionRequestHandler(ITenantService tenantService) => _tenantService = tenantService;
 
   public Task<string> Handle(RenewSubscriptionRequest request, CancellationToken cancellationToken) =>
-    _tenantService.RenewSubscription(request.SubscriptionId, request.TenantId, request.Days);
+    _tenantService.RenewSubscription(request.SubscriptionType, request.TenantId);
 }
