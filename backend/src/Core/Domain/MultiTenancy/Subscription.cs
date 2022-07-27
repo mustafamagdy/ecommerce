@@ -8,6 +8,7 @@ public class Subscription : BaseEntity
 {
   [JsonConverter(typeof(SmartEnumNameConverter<SubscriptionType, string>))]
   public SubscriptionType SubscriptionType { get; set; }
+
   public int Days { get; set; }
   public decimal Price { get; set; }
 }
@@ -19,10 +20,7 @@ public class StandardSubscription : Subscription
     SubscriptionType = SubscriptionType.Standard;
     Days = 30;
     Price = 0.0m;
-    SubscriptionHistory = new HashSet<SubscriptionHistory>();
   }
-
-  public HashSet<SubscriptionHistory> SubscriptionHistory { get; set; }
 }
 
 public class DemoSubscription : Subscription

@@ -85,17 +85,23 @@ internal class TenantService : ITenantService
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
-    var subscription = await TryCreateSubscription<StandardSubscription, ProdTenantSubscriptionDto>(tenant, SubscriptionType.Standard);
+    var prodSubscription = await TryCreateProdSubscription(tenant);
+
+    bool result = (await _tenantDbContext.SaveChangesAsync(cancellationToken)) > 0;
+    if (!result)
+    {
+      throw new DbUpdateException($"Failed to create tenant & subscription for {tenant.Name}");
+    }
+
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
 
-      SendWelcomeEmail(tenant, request, subscription);
+      SendWelcomeEmail(tenant, request, prodSubscription);
     }
     catch
     {
       await _tenantStore.TryRemoveAsync(request.Id);
-      await TryRemoveSubscriptions(tenant.Id);
       throw;
     }
 
@@ -122,31 +128,17 @@ internal class TenantService : ITenantService
     _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
   }
 
-  private async Task<TDto> TryCreateSubscription<T, TDto>(FSHTenantInfo tenant, SubscriptionType subscriptionType)
-    where T : Subscription
-    where TDto : TenantSubscriptionDto, new()
+  private async Task<ProdTenantSubscriptionDto> TryCreateProdSubscription(FSHTenantInfo tenant)
   {
-    T subscription = await GetSubscription<T>(subscriptionType);
-    tenant.ProdSubscriptionId = subscription.Id;
+    var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
 
+    var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant.Id);
     var today = _systemTime.Now;
-    var subHistory = new SubscriptionHistory(tenant.Id, subscription.Id, today, subscription.Days, subscription.Price);
+    tenantProdSubscription.Renew(today);
+    await _tenantDbContext.TenantProdSubscriptions.AddAsync(tenantProdSubscription);
 
-    await _tenantDbContext.AddAsync(subHistory);
-    bool result = (await _tenantDbContext.SaveChangesAsync()) > 0;
-    if (!result)
-    {
-      throw new DbUpdateException($"Failed to create tenant subscription for {tenant.Name}");
-    }
-
-    var historyDto = subscription.Adapt<SubscriptionHistoryDto>();
-    return new TDto
-    {
-      History = new List<SubscriptionHistoryDto> { historyDto },
-      Id = subHistory.Id,
-      ExpiryDate = historyDto.ExpireDate,
-      TenantId = tenant.Id
-    };
+    tenant.ProdSubscription = tenantProdSubscription;
+    return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
   }
 
   private async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
@@ -154,11 +146,11 @@ internal class TenantService : ITenantService
   {
     return subscriptionType.Name switch
     {
-      nameof(SubscriptionType.Standard) => await _tenantDbContext.StandardSubscriptions.SingleOrDefaultAsync() as T
+      nameof(SubscriptionType.Standard) => await _tenantDbContext.StandardSubscriptions.FirstOrDefaultAsync() as T
                                            ?? throw new NotFoundException("No standard subscription found"),
-      nameof(SubscriptionType.Demo) => await _tenantDbContext.DemoSubscriptions.SingleOrDefaultAsync() as T
+      nameof(SubscriptionType.Demo) => await _tenantDbContext.DemoSubscriptions.FirstOrDefaultAsync() as T
                                        ?? throw new NotFoundException("No demo subscription found"),
-      nameof(SubscriptionType.Train) => await _tenantDbContext.TrainSubscriptions.SingleOrDefaultAsync() as T
+      nameof(SubscriptionType.Train) => await _tenantDbContext.TrainSubscriptions.FirstOrDefaultAsync() as T
                                         ?? throw new NotFoundException("No train subscription found"),
       _ => throw new ArgumentOutOfRangeException()
     };
@@ -168,16 +160,6 @@ internal class TenantService : ITenantService
   {
     return (await _tenantDbContext.StandardSubscriptions.SingleOrDefaultAsync()
             ?? throw new NotImplementedException("There is no standard subscription configured"))!;
-  }
-
-  private async Task TryRemoveSubscriptions(string tenantId)
-  {
-    var history = await _tenantDbContext.SubscriptionHistories.Where(a => a.TenantId == tenantId).ToArrayAsync();
-    if (history.Length > 0)
-    {
-      _tenantDbContext.RemoveRange(history);
-      await _tenantDbContext.SaveChangesAsync();
-    }
   }
 
   public async Task<string> ActivateAsync(string tenantId)
@@ -212,29 +194,20 @@ internal class TenantService : ITenantService
     return _t[$"Tenant {0} is now Deactivated.", tenantId];
   }
 
-  public async Task<string> RenewSubscription(Guid subscriptionId, string tenantId, int? days = null)
+  public async Task<string> RenewSubscription(SubscriptionType subscriptionType, string tenantId)
   {
-    var subRecord = await _tenantDbContext
-      .SubscriptionHistories
-      .Include(a => a.Subscription)
-      .FirstOrDefaultAsync(a => a.SubscriptionId == subscriptionId && a.TenantId == tenantId);
-
-    if (subRecord == null)
+    var tenant = await GetTenantById(tenantId);
+    var newExpiryDate = subscriptionType.Name switch
     {
-      throw new NotFoundException(_t["Subscription not found."]);
-    }
+      nameof(SubscriptionType.Standard) => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      nameof(SubscriptionType.Demo) => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      nameof(SubscriptionType.Train) => tenant.TrainSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      _ => null
+    };
 
-    var today = _systemTime.Now;
-    var newHistoryRecord = new SubscriptionHistory(subRecord.TenantId,
-      subscriptionId,
-      today,
-      days ?? subRecord.Subscription.Days,
-      subRecord.Price);
-
-    await _tenantDbContext.SubscriptionHistories.AddAsync(newHistoryRecord);
     await _tenantDbContext.SaveChangesAsync();
 
-    return _t["Subscription {0} renewed. Now Valid till {1}.", subRecord.Id, subRecord.ExpiryDate];
+    return _t["Subscription {0} renewed. Now Valid till {1}.", subscriptionType, newExpiryDate];
   }
 
   public async Task<bool> DatabaseExistAsync(string databaseName)
@@ -242,11 +215,13 @@ internal class TenantService : ITenantService
     return (await _tenantStore.GetAllAsync()).Any(t =>
     {
       if (string.IsNullOrEmpty(t.ConnectionString)) return false;
-      var cnBuilder = new DbConnectionStringBuilder();
-      cnBuilder.ConnectionString = t.ConnectionString;
+      var cnBuilder = new DbConnectionStringBuilder
+      {
+        ConnectionString = t.ConnectionString
+      };
 
-      var _dbName = $"{_env.GetShortenName()}-{databaseName}";
-      return cnBuilder.TryGetValue("initial catalog", out var dbName) && _dbName.Equals(dbName);
+      var newDbName = $"{_env.GetShortenName()}-{databaseName}";
+      return cnBuilder.TryGetValue("initial catalog", out var dbName) && newDbName.Equals(dbName);
     });
   }
 
@@ -285,6 +260,6 @@ internal class TenantService : ITenantService
       .AnyAsync(a => a.Id == tenantId
                      && a.Active
                      && a.ProdSubscription != null
-                     && a.ProdSubscription.SubscriptionHistory.Any(x => x.TenantId == tenantId && x.ExpiryDate >= today));
+                     && a.ProdSubscription.ExpiryDate >= today);
   }
 }

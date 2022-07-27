@@ -8,29 +8,12 @@ public class SubscriptionPayment : Payment
   {
   }
 
-  public SubscriptionPayment(decimal amount, Guid paymentMethodId)
+  public SubscriptionPayment(Guid tenantProdSubscriptionId, decimal amount, Guid paymentMethodId)
     : base(amount, paymentMethodId)
   {
+    TenantProdSubscriptionId = tenantProdSubscriptionId;
   }
 
-  public Guid SubscriptionId { get; set; }
-  public StandardSubscription Subscription { get; set; }
-
-  public SubscriptionPayment SetSubscription(Guid subscriptionId)
-  {
-    SubscriptionId = subscriptionId;
-    return this;
-  }
-
-  public SubscriptionPayment SetAmount(decimal amount)
-  {
-    Amount = amount;
-    return this;
-  }
-
-  public SubscriptionPayment SetPaymentMethodId(Guid paymentMethodId)
-  {
-    PaymentMethodId = paymentMethodId;
-    return this;
-  }
+  public Guid TenantProdSubscriptionId { get; set; }
+  public virtual TenantProdSubscription TenantProdSubscription { get; set; }
 }

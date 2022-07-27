@@ -39,6 +39,35 @@ public class TrainSubscriptionConfig : SubscriptionConfig<TrainSubscription>
 {
 }
 
+public class TenantProdSubscriptionConfig : IEntityTypeConfiguration<TenantProdSubscription>
+{
+  public virtual void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
+  {
+    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
+    builder.HasMany(a => a.SubscriptionHistory).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
+    builder.HasMany(a => a.Payments).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
+    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
+  }
+}
+
+public class TenantDemoSubscriptionConfig : IEntityTypeConfiguration<TenantDemoSubscription>
+{
+  public virtual void Configure(EntityTypeBuilder<TenantDemoSubscription> builder)
+  {
+    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
+    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
+  }
+}
+
+public class TenantTrainSubscriptionConfig : IEntityTypeConfiguration<TenantTrainSubscription>
+{
+  public virtual void Configure(EntityTypeBuilder<TenantTrainSubscription> builder)
+  {
+    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
+    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
+  }
+}
+
 public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHistory>
 {
   public void Configure(EntityTypeBuilder<SubscriptionHistory> builder)
@@ -47,7 +76,7 @@ public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHi
       .Property(b => b.Price)
       .HasPrecision(7, 3);
 
-    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
+    builder.HasOne(a => a.TenantProdSubscription).WithMany().HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }
 
@@ -59,6 +88,6 @@ public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPa
       .Property(b => b.Amount)
       .HasPrecision(7, 3);
 
-    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
+    builder.HasOne(a => a.TenantProdSubscription).WithMany().HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }

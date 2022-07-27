@@ -53,50 +53,19 @@ public class FSHTenantInfo : ITenantInfo
   public string? TechSupportUserId { get; set; }
   public bool Active { get; private set; }
 
-  public StandardSubscription? ProdSubscription { get; set; }
+  public TenantProdSubscription? ProdSubscription { get; set; }
   public Guid? ProdSubscriptionId { get; set; }
   public string? ConnectionString { get; set; }
 
-  public DemoSubscription? DemoSubscription { get; set; }
+  public TenantDemoSubscription? DemoSubscription { get; set; }
   public Guid? DemoSubscriptionId { get; set; }
   public string? DemoConnectionString { get; set; }
 
-  public TrainSubscription? TrainSubscription { get; set; }
+  public TenantTrainSubscription? TrainSubscription { get; set; }
   public Guid? TrainSubscriptionId { get; set; }
   public string? TrainConnectionString { get; set; }
 
-  public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
   public virtual HashSet<Branch> Branches { get; set; } = default!;
-
-  public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
-  public decimal Balance => (ProdSubscription?.SubscriptionHistory.Sum(a => a.Price) ?? 0) - TotalPaid;
-
-  public void Pay(decimal amount, Guid paymentMethodId)
-  {
-    if (ProdSubscriptionId == null)
-    {
-      throw new NullReferenceException("No valid prod subscription to renew");
-    }
-
-    Payments.Add(new SubscriptionPayment(amount, paymentMethodId).SetSubscription(ProdSubscriptionId.Value));
-  }
-
-  public FSHTenantInfo Renew(DateTime today)
-  {
-    if (ProdSubscription == null)
-    {
-      throw new NullReferenceException("No valid prod subscription to renew");
-    }
-
-    ProdSubscription.SubscriptionHistory.Add(new SubscriptionHistory
-    {
-      TenantId = Id,
-      Price = ProdSubscription.Price,
-      StartDate = today,
-      ExpiryDate = today.AddDays(ProdSubscription.Days)
-    });
-    return Activate();
-  }
 
   public FSHTenantInfo Activate()
   {

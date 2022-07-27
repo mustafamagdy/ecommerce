@@ -26,6 +26,9 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
   public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
   public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+  public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
+  public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
+  public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();
   public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
   public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
   public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
@@ -42,6 +45,18 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .ToTable("Tenants", SchemaNames.MultiTenancy)
       .HasKey(a => a.Id);
 
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .HasOne(a => a.ProdSubscription).WithMany().HasForeignKey(a => a.ProdSubscriptionId);
+
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .HasOne(a => a.DemoSubscription).WithMany().HasForeignKey(a => a.DemoSubscriptionId);
+
+    modelBuilder
+      .Entity<FSHTenantInfo>()
+      .HasOne(a => a.TrainSubscription).WithMany().HasForeignKey(a => a.TrainSubscriptionId);
+
     modelBuilder.Ignore<ActivePaymentOperation>();
     modelBuilder.Ignore<ArchivedPaymentOperation>();
     modelBuilder.Ignore<CashRegister>();
@@ -53,6 +68,7 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
     if (_dbSettings.LogSensitiveInfo)
     {
+      optionsBuilder.EnableDetailedErrors();
       optionsBuilder.EnableSensitiveDataLogging();
       optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
       optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);

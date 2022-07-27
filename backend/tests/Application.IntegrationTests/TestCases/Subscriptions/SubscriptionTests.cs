@@ -94,12 +94,12 @@ public class SubscriptionTests : TestFixture
     tenantInfo.Should().NotBeNull();
     tenantInfo.ProdSubscriptionId.Should().NotBeEmpty();
 
-    response = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
-    {
-      TenantId = tenantId,
-      SubscriptionId = tenantInfo.ProdSubscriptionId!.Value
-    });
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    // response = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
+    // {
+    //   TenantId = tenantId,
+    //   SubscriptionId = tenantInfo.ProdSubscriptionId!.Value
+    // });
+    // response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
