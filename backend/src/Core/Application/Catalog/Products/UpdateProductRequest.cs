@@ -48,7 +48,7 @@ public class UpdateProductRequestHandler : IRequestHandler<UpdateProductRequest,
         var updatedProduct = product.Update(request.Name, request.Description, request.Rate, request.BrandId, productImagePath);
 
         // Add Domain Events to be raised after the commit
-        product.DomainEvents.Add(EntityUpdatedEvent.WithEntity(product));
+        product.AddDomainEvent(EntityUpdatedEvent.WithEntity(product));
 
         await _repository.UpdateAsync(updatedProduct, cancellationToken);
 

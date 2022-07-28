@@ -4,16 +4,17 @@ namespace FSH.WebApi.Domain.MultiTenancy;
 
 public class SubscriptionPayment : Payment
 {
-  public SubscriptionPayment()
+  private SubscriptionPayment()
   {
   }
 
-  public SubscriptionPayment(Guid tenantProdSubscriptionId, decimal amount, Guid paymentMethodId)
+  public SubscriptionPayment(TenantProdSubscription tenantProdSubscription, decimal amount, Guid paymentMethodId)
     : base(amount, paymentMethodId)
   {
-    TenantProdSubscriptionId = tenantProdSubscriptionId;
+    TenantProdSubscription = tenantProdSubscription;
+    TenantProdSubscriptionId = tenantProdSubscription.Id;
   }
 
   public Guid TenantProdSubscriptionId { get; set; }
-  public virtual TenantProdSubscription TenantProdSubscription { get; set; }
+  public TenantProdSubscription TenantProdSubscription { get; set; }
 }

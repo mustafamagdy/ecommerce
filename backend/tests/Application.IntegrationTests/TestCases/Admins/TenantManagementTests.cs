@@ -168,23 +168,113 @@ public class TenantManagementTests : TestFixture
     var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
-    // _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
-    // _.StatusCode.Should().Be(HttpStatusCode.OK);
-    // var basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
-    // basicTenantInfo.Should().NotBeNull();
-    // basicTenantInfo.ProdSubscription
-    //   .Should().NotBeNull()
-    //   .And.Subject.As<BasicSubscriptionInfoDto>()
-    //   .ExpiryDate.Should().BeAfter(today);
+    _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    basicTenantInfo.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.ExpiryDate.Should().BeAfter(today);
   }
 
   [Fact]
   public async Task can_get_tenant_subscription_history()
   {
+    var today = HostFixture.SYSTEM_TIME.Now;
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+      DatabaseName = $"{tenantId}-db",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
+
+    _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    basicTenantInfo.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.ExpiryDate.Should().BeAfter(today);
+
+    _ = await PostAsJsonAsync("/api/v1/my/subscription", new MyTenantSubscriptionSearchRequest
+      {
+        SubscriptionId = basicTenantInfo.ProdSubscription.Id
+      },
+      tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var subscriptionInfo = await _.Content.ReadFromJsonAsync<ProdTenantSubscriptionDto>();
+    subscriptionInfo.Should().NotBeNull();
+    subscriptionInfo.ExpiryDate.Should().BeAfter(today);
+    subscriptionInfo.History.Should().NotBeNullOrEmpty();
   }
 
   [Fact]
   public async Task can_get_tenant_subscription_with_payments()
   {
+    var today = HostFixture.SYSTEM_TIME.Now;
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+      DatabaseName = $"{tenantId}-db",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
+
+    _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    basicTenantInfo.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.Should().NotBeNull();
+    basicTenantInfo.ProdSubscription.ExpiryDate.Should().BeAfter(today);
+    basicTenantInfo.TotalDue.Should().BeGreaterThan(0);
+    basicTenantInfo.TotalPaid.Should().Be(0);
+    basicTenantInfo.Active.Should().Be(true);
+
+    _ = await PostAsJsonAsync("/api/v1/my/payments", new MyTenantSubscriptionAndPaymentsSearchRequest
+      {
+        SubscriptionId = basicTenantInfo.ProdSubscription.Id
+      },
+      tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var subscriptionInfo = await _.Content.ReadFromJsonAsync<ProdTenantSubscriptionWithPaymentDto>();
+    subscriptionInfo.Should().NotBeNull();
+    subscriptionInfo.ExpiryDate.Should().BeAfter(today);
+    subscriptionInfo.History.Should().NotBeNullOrEmpty();
+    subscriptionInfo.Payments.Should().BeEmpty();
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/tenants/pay", new PayForSubscriptionRequest
+    {
+      Amount = 100,
+      PaymentMethodId = null,
+      SubscriptionId = subscriptionInfo.SubscriptionId
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    basicTenantInfo.TotalDue.Should().NotBe(0);
+    basicTenantInfo.TotalPaid.Should().BeGreaterThan(0);
   }
 }

@@ -9,10 +9,9 @@ public class MyController : VersionedApiController
   [HttpGet]
   [MustHavePermission(FSHAction.ViewBasic, FSHResource.Tenants)]
   [OpenApiOperation("View my tenant basic information", "")]
-  public Task<BasicTenantInfoDto> ViewTenantBasicInfo([FromServices] FSHTenantInfo currentTenant)
+  public Task<BasicTenantInfoDto> ViewTenantBasicInfo()
   {
-    string tenantId = currentTenant.Id;
-    return Mediator.Send(new GetBasicTenantInfoRequest(tenantId));
+    return Mediator.Send(new GetMyTenantBasicInfoRequest());
   }
 
   [HttpPost("subscription")]
@@ -23,10 +22,10 @@ public class MyController : VersionedApiController
     return Mediator.Send(request);
   }
 
-  [HttpPost("subscription")]
+  [HttpPost("payments")]
   [MustHavePermission(FSHAction.ViewAdvanced, FSHResource.Subscriptions)]
   [OpenApiOperation("View my tenant production subscription details & payments.", "")]
-  public Task<ProdTenantSubscriptionDto> ViewProdSubscriptionDetailsAndPayments(MyTenantSubscriptionAndPaymentsSearchRequest request)
+  public Task<ProdTenantSubscriptionWithPaymentDto> ViewProdSubscriptionDetailsAndPayments(MyTenantSubscriptionAndPaymentsSearchRequest request)
   {
     return Mediator.Send(request);
   }

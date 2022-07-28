@@ -17,7 +17,11 @@ public abstract class TenantSubscriptionDto
 
 public class ProdTenantSubscriptionDto : TenantSubscriptionDto
 {
-  public ProdTenantSubscriptionDto()
+}
+
+public class ProdTenantSubscriptionWithPaymentDto : ProdTenantSubscriptionDto
+{
+  public ProdTenantSubscriptionWithPaymentDto()
   {
     Payments = new();
   }

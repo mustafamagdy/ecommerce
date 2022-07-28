@@ -4,6 +4,7 @@ namespace FSH.WebApi.Shared.Multitenancy;
 
 public class MultitenancyConstants
 {
+  public static decimal MaxOneTimePaymentAmountForSubscription = 100000;
   private static readonly RootTenantInfo _rootTenant = new();
   public const string JobRunnerUserName = "JobRunner";
 

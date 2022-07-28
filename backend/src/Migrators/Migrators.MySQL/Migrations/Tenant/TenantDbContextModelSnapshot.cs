@@ -367,7 +367,7 @@ namespace Migrators.MySQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
-                        .WithMany("SubscriptionHistory")
+                        .WithMany("History")
                         .HasForeignKey("TenantProdSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -469,9 +469,9 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("History");
 
-                    b.Navigation("SubscriptionHistory");
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

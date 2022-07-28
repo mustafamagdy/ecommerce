@@ -21,7 +21,7 @@ public class GetTenantWithActiveSubscriptionsSpec : Specification<FSHTenantInfo>
   public GetTenantWithActiveSubscriptionsSpec(string tenantId, ISystemTime systemTime, bool? onlyActiveHistory = null) =>
     Query
       .Include(a => a.ProdSubscription)
-      .ThenInclude(a => a.SubscriptionHistory.Where(x => onlyActiveHistory == null || x.ExpiryDate >= systemTime.Now))
+      .ThenInclude(a => a.History.Where(x => onlyActiveHistory == null || x.ExpiryDate >= systemTime.Now))
       .Include(a => a.ProdSubscription)
       .ThenInclude(a => a.Payments)
       .Include(a => a.DemoSubscription)

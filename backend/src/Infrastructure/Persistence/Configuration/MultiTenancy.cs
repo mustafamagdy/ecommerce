@@ -44,7 +44,7 @@ public class TenantProdSubscriptionConfig : IEntityTypeConfiguration<TenantProdS
   public virtual void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
   {
     builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
-    builder.HasMany(a => a.SubscriptionHistory).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
+    builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
     builder.HasMany(a => a.Payments).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
     builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
   }

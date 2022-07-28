@@ -67,6 +67,9 @@ public class FSHTenantInfo : ITenantInfo
 
   public virtual HashSet<Branch> Branches { get; set; } = default!;
 
+  public decimal TotalDue => ProdSubscription?.TotalDue ?? 0;
+  public decimal TotalPaid => ProdSubscription?.TotalPaid ?? 0;
+
   public FSHTenantInfo Activate()
   {
     if (Id == MultitenancyConstants.Root.Id)
