@@ -5,11 +5,14 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
@@ -30,6 +33,7 @@ internal class TenantService : ITenantService
   private readonly ITenantConnectionStringBuilder _cnBuilder;
   private readonly IHostEnvironment _env;
   private readonly ISystemTime _systemTime;
+  private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
@@ -41,7 +45,7 @@ internal class TenantService : ITenantService
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
     IReadRepository<Branch> branchRepo,
-    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env, ISystemTime systemTime)
+    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env, ISystemTime systemTime, IReadRepository<PaymentMethod> paymentMethodRepo)
   {
     _tenantStore = tenantStore;
     _tenantDbContext = tenantDbContext;
@@ -55,6 +59,7 @@ internal class TenantService : ITenantService
     _cnBuilder = cnBuilder;
     _env = env;
     _systemTime = systemTime;
+    _paymentMethodRepo = paymentMethodRepo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -132,8 +137,8 @@ internal class TenantService : ITenantService
   {
     var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
 
-    var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant.Id);
     var today = _systemTime.Now;
+    var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant);
     tenantProdSubscription.Renew(today);
     await _tenantDbContext.TenantProdSubscriptions.AddAsync(tenantProdSubscription);
 
@@ -141,7 +146,24 @@ internal class TenantService : ITenantService
     return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
   }
 
-  private async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
+  public async Task<Unit> PayForSubscription(Guid subscriptionId, decimal amount, Guid? paymentMethodId)
+  {
+    paymentMethodId ??= await GetCashPaymentMethod();
+    var subscription = await _tenantDbContext.TenantProdSubscriptions.FindAsync(subscriptionId);
+    subscription.Pay(amount, paymentMethodId.Value);
+
+    await _tenantDbContext.SaveChangesAsync();
+    return Unit.Value;
+  }
+
+  private async Task<Guid> GetCashPaymentMethod()
+  {
+    var spec = new GetDefaultCashPaymentMethodSpec();
+    var pm = await _paymentMethodRepo.FirstOrDefaultAsync(spec) ?? throw new ArgumentOutOfRangeException($"No default cash payment method register");
+    return pm.Id;
+  }
+
+  public async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
     where T : Subscription
   {
     return subscriptionType.Name switch
@@ -194,10 +216,9 @@ internal class TenantService : ITenantService
     return _t[$"Tenant {0} is now Deactivated.", tenantId];
   }
 
-  public async Task<string> RenewSubscription(SubscriptionType subscriptionType, string tenantId)
+  public async Task<string> RenewSubscription(FSHTenantInfo tenant, Subscription subscription)
   {
-    var tenant = await GetTenantById(tenantId);
-    var newExpiryDate = subscriptionType.Name switch
+    var newExpiryDate = subscription.SubscriptionType.Name switch
     {
       nameof(SubscriptionType.Standard) => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
       nameof(SubscriptionType.Demo) => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
@@ -207,7 +228,7 @@ internal class TenantService : ITenantService
 
     await _tenantDbContext.SaveChangesAsync();
 
-    return _t["Subscription {0} renewed. Now Valid till {1}.", subscriptionType, newExpiryDate];
+    return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.SubscriptionType.Name, newExpiryDate];
   }
 
   public async Task<bool> DatabaseExistAsync(string databaseName)
@@ -238,11 +259,13 @@ internal class TenantService : ITenantService
     return tenantDto;
   }
 
-  private async Task<FSHTenantInfo> GetTenantById(string id)
+  public async Task<FSHTenantInfo> GetTenantById(string id)
   {
     var tenant = await _tenantDbContext.TenantInfo
                    .Include(a => a.ProdSubscription)
-                   .ThenInclude(a => a.SubscriptionHistory)
+                   .ThenInclude(a => a.History)
+                   .Include(a => a.ProdSubscription)
+                   .ThenInclude(a => a.Payments)
                    .Include(a => a.DemoSubscription)
                    .Include(a => a.TrainSubscription)
                    .Include(a => a.Branches)
@@ -256,7 +279,7 @@ internal class TenantService : ITenantService
     var today = _systemTime.Now;
     return _tenantDbContext.TenantInfo
       .Include(a => a.ProdSubscription)
-      .ThenInclude(a => a.SubscriptionHistory)
+      .ThenInclude(a => a.History)
       .AnyAsync(a => a.Id == tenantId
                      && a.Active
                      && a.ProdSubscription != null

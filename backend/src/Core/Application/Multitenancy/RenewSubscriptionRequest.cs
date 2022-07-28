@@ -1,3 +1,4 @@
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Application.Multitenancy;
@@ -23,6 +24,10 @@ public class RenewSubscriptionRequestHandler : IRequestHandler<RenewSubscription
 
   public RenewSubscriptionRequestHandler(ITenantService tenantService) => _tenantService = tenantService;
 
-  public Task<string> Handle(RenewSubscriptionRequest request, CancellationToken cancellationToken) =>
-    _tenantService.RenewSubscription(request.SubscriptionType, request.TenantId);
+  public async Task<string> Handle(RenewSubscriptionRequest request, CancellationToken cancellationToken)
+  {
+    var subscription = await _tenantService.GetSubscription<Subscription>(request.SubscriptionType);
+    var tenant = await _tenantService.GetTenantById(request.TenantId);
+    return await _tenantService.RenewSubscription(tenant, subscription);
+  }
 }

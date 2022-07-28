@@ -142,7 +142,7 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ImagePath")
+                    b.Property<string>("ImageUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("varchar(2048)");
 

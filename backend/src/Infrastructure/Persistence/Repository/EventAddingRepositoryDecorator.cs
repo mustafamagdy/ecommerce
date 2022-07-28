@@ -21,7 +21,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityCreatedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityCreatedEvent.WithEntity(entity));
     return _decorated.AddAsync(entity, cancellationToken);
   }
 
@@ -29,7 +29,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityCreatedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityCreatedEvent.WithEntity(entity));
     }
 
     return _decorated.AddRangeAsync(entities, cancellationToken);
@@ -37,7 +37,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityUpdatedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityUpdatedEvent.WithEntity(entity));
     return _decorated.UpdateAsync(entity, cancellationToken);
   }
 
@@ -45,7 +45,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityUpdatedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityUpdatedEvent.WithEntity(entity));
     }
 
     return _decorated.UpdateRangeAsync(entities, cancellationToken);
@@ -53,7 +53,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityDeletedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityDeletedEvent.WithEntity(entity));
     return _decorated.DeleteAsync(entity, cancellationToken);
   }
 
@@ -61,7 +61,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityDeletedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityDeletedEvent.WithEntity(entity));
     }
 
     return _decorated.DeleteRangeAsync(entities, cancellationToken);

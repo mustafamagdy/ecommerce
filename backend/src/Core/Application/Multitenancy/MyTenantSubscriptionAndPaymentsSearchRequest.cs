@@ -5,7 +5,7 @@ using Mapster;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class MyTenantSubscriptionAndPaymentsSearchRequest : IRequest<ProdTenantSubscriptionDto>
+public class MyTenantSubscriptionAndPaymentsSearchRequest : IRequest<ProdTenantSubscriptionWithPaymentDto>
 {
   public Guid SubscriptionId { get; set; }
 }
@@ -16,7 +16,7 @@ public class MyTenantSubscriptionAndPaymentsSearchRequestValidator : CustomValid
     RuleFor(t => t.SubscriptionId).NotEmpty();
 }
 
-public class MyTenantSubscriptionAndPaymentsSearchRequestHandler : IRequestHandler<MyTenantSubscriptionAndPaymentsSearchRequest, ProdTenantSubscriptionDto>
+public class MyTenantSubscriptionAndPaymentsSearchRequestHandler : IRequestHandler<MyTenantSubscriptionAndPaymentsSearchRequest, ProdTenantSubscriptionWithPaymentDto>
 {
   private readonly FSHTenantInfo _currentTenant;
   private readonly IStringLocalizer _t;
@@ -31,7 +31,7 @@ public class MyTenantSubscriptionAndPaymentsSearchRequestHandler : IRequestHandl
     _systemTime = systemTime;
   }
 
-  public async Task<ProdTenantSubscriptionDto> Handle(MyTenantSubscriptionAndPaymentsSearchRequest request, CancellationToken cancellationToken)
+  public async Task<ProdTenantSubscriptionWithPaymentDto> Handle(MyTenantSubscriptionAndPaymentsSearchRequest request, CancellationToken cancellationToken)
   {
     var tenantId = _currentTenant.Id;
     var tenant = await _repo.GetBySpecAsync(new GetTenantWithActiveSubscriptionsSpec(tenantId, _systemTime), cancellationToken);
@@ -45,6 +45,6 @@ public class MyTenantSubscriptionAndPaymentsSearchRequestHandler : IRequestHandl
       throw new NotFoundException(_t["Subscription {0} not found for the current tenant", request.SubscriptionId]);
     }
 
-    return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
+    return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionWithPaymentDto>();
   }
 }

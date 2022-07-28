@@ -2,9 +2,9 @@ namespace FSH.WebApi.Domain.MultiTenancy;
 
 public class TenantDemoSubscription : BaseEntity
 {
-  public TenantDemoSubscription()
+  private TenantDemoSubscription()
   {
-    // SubscriptionHistory = new HashSet<SubscriptionHistory>();
+    // SubscriptionHistory = new List<SubscriptionHistory>();
   }
 
   public DateTime ExpiryDate { get; private set; }
@@ -14,7 +14,7 @@ public class TenantDemoSubscription : BaseEntity
   public virtual FSHTenantInfo Tenant { get; set; }
   public string TenantId { get; set; }
 
-  // public HashSet<SubscriptionHistory> SubscriptionHistory { get; set; }
+  // public List<SubscriptionHistory> SubscriptionHistory { get; set; }
 
   public TenantDemoSubscription Renew(DateTime today)
   {
@@ -26,9 +26,9 @@ public class TenantDemoSubscription : BaseEntity
 
 public class TenantTrainSubscription : BaseEntity
 {
-  public TenantTrainSubscription()
+  private TenantTrainSubscription()
   {
-    // SubscriptionHistory = new HashSet<SubscriptionHistory>();
+    // SubscriptionHistory = new List<SubscriptionHistory>();
   }
 
   public DateTime ExpiryDate { get; private set; }
@@ -38,7 +38,7 @@ public class TenantTrainSubscription : BaseEntity
   public virtual FSHTenantInfo Tenant { get; set; }
   public string TenantId { get; set; }
 
-  // public HashSet<SubscriptionHistory> SubscriptionHistory { get; set; }
+  // public List<SubscriptionHistory> SubscriptionHistory { get; set; }
 
   public TenantTrainSubscription Renew(DateTime today)
   {
@@ -48,67 +48,69 @@ public class TenantTrainSubscription : BaseEntity
   }
 }
 
-public class TenantProdSubscription : BaseEntity
+public sealed class TenantProdSubscription : BaseEntity
 {
-  public TenantProdSubscription()
+  private readonly List<SubscriptionHistory> _history = new();
+  private readonly List<SubscriptionPayment> _payments = new();
+
+  private TenantProdSubscription()
   {
   }
 
-  public TenantProdSubscription(StandardSubscription subscription, string tenantId)
+  public TenantProdSubscription(StandardSubscription subscription, FSHTenantInfo tenant)
   {
-    TenantId = tenantId;
     Subscription = subscription;
+    Tenant = tenant;
     SubscriptionId = subscription.Id;
-
-    SubscriptionHistory = new HashSet<SubscriptionHistory>();
-    Payments = new HashSet<SubscriptionPayment>();
+    TenantId = tenant.Id;
   }
 
-  public DateTime ExpiryDate { get; private set; }
-  public virtual StandardSubscription Subscription { get; set; }
+  public StandardSubscription Subscription { get; set; }
   public Guid SubscriptionId { get; set; }
 
-  public virtual FSHTenantInfo Tenant { get; set; }
+  public FSHTenantInfo Tenant { get; set; }
   public string TenantId { get; set; }
 
-  public HashSet<SubscriptionHistory> SubscriptionHistory { get; set; }
-  public virtual HashSet<SubscriptionPayment> Payments { get; set; } = default!;
+  public DateTime ExpiryDate { get; private set; }
+
+  public IReadOnlyList<SubscriptionHistory> History => _history.AsReadOnly();
+  public IReadOnlyList<SubscriptionPayment> Payments => _payments.AsReadOnly();
 
   public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
-  public decimal Balance => SubscriptionHistory.Sum(a => a.Price) - TotalPaid;
+  public decimal TotalDue => History.Sum(a => a.Price) - TotalPaid;
 
-  public TenantProdSubscription Pay(decimal amount, Guid paymentMethodId)
+  public void Pay(decimal amount, Guid paymentMethodId)
   {
-    Payments.Add(new SubscriptionPayment(Id, amount, paymentMethodId));
-    return this;
+    _payments.Add(new SubscriptionPayment(this, amount, paymentMethodId));
   }
 
   public TenantProdSubscription Renew(DateTime today)
   {
-    SubscriptionHistory.Add(new SubscriptionHistory(Id, today, Subscription.Days, Subscription.Price));
+    _history.Add(new SubscriptionHistory(this, today, Subscription.Days, Subscription.Price));
     ExpiryDate = today.AddDays(Subscription.Days);
     return this;
   }
 }
 
-public class SubscriptionHistory : BaseEntity
+public sealed class SubscriptionHistory : BaseEntity
 {
-  public SubscriptionHistory()
+  private SubscriptionHistory()
   {
   }
 
-  public SubscriptionHistory(Guid tenantProdSubscriptionId, DateTime startDate, int days, decimal price)
+  public SubscriptionHistory(TenantProdSubscription tenantProdSubscription, DateTime startDate, int days, decimal price)
   {
-    TenantProdSubscriptionId = tenantProdSubscriptionId;
+    TenantProdSubscription = tenantProdSubscription;
+    TenantProdSubscriptionId = tenantProdSubscription.Id;
     StartDate = startDate;
     Price = price;
     ExpiryDate = startDate.AddDays(days);
   }
 
-  public decimal Price { get; set; }
-  public DateTime StartDate { get; set; }
-  public DateTime ExpiryDate { get; set; }
+  public decimal Price { get; private set; }
+  public DateTime StartDate { get; private set; }
+  public DateTime ExpiryDate { get; private set; }
 
-  public virtual TenantProdSubscription TenantProdSubscription { get; set; }
+  public TenantProdSubscription TenantProdSubscription { get; set; }
   public Guid TenantProdSubscriptionId { get; set; }
 }

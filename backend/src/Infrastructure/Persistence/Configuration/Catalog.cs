@@ -68,7 +68,7 @@ public class ServiceConfig : IEntityTypeConfiguration<Service>
       .HasMaxLength(1024);
 
     builder
-      .Property(p => p.ImagePath)
+      .Property(p => p.ImageUrl)
       .HasMaxLength(2048);
   }
 }

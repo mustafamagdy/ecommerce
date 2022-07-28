@@ -32,11 +32,13 @@ internal static class Startup
       .ValidateDataAnnotations()
       .ValidateOnStart();
 
+    services.AddScoped<DomainEventDispatcher>();
     return services
-      .AddDbContext<ApplicationDbContext>((sp, m) =>
+      .AddDbContext<ApplicationDbContext>((sp, dbOptions) =>
       {
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+        dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
       .AddTransient<ApplicationDbInitializer>()

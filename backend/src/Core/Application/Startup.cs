@@ -36,10 +36,15 @@ public class DtoCustomMapping
       .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber);
 
-    TypeAdapterConfig<TenantProdSubscription, TenantSubscriptionDto>
+    TypeAdapterConfig<TenantProdSubscription, ProdTenantSubscriptionDto>
       .NewConfig()
       .Map(dest => dest.SubscriptionId, src => src.Id)
-      .Map(dest => dest.History, src => src.SubscriptionHistory)
+      .Map(dest => dest.History, src => src.History)
       ;
+
+    TypeAdapterConfig<TenantProdSubscription, ProdTenantSubscriptionWithPaymentDto>
+      .NewConfig()
+      .Map(dest => dest.SubscriptionId, src => src.Id)
+      .Map(dest => dest.History, src => src.History);
   }
 }

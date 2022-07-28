@@ -4,15 +4,13 @@ public class CreateServiceRequest : IRequest<Guid>
 {
   public string Name { get; set; } = default!;
   public string? Description { get; set; }
-  public string? ImageUrl { get; set; }
+  public FileUploadRequest ImageFile { get; set; }
 }
 
 public class CreateServiceRequestValidator : CustomValidator<CreateServiceRequest>
 {
-  public CreateServiceRequestValidator(
-    IReadRepository<Service> repository,
-    IStringLocalizer<CreateServiceRequestValidator> T) =>
-    RuleFor(p => p.Name)
+  public CreateServiceRequestValidator(IReadRepository<Service> repository, IStringLocalizer<CreateServiceRequestValidator> T)
+    => RuleFor(p => p.Name)
       .NotEmpty()
       .MaximumLength(75)
       .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new ServiceByNameSpec(name), ct) is null)
@@ -23,13 +21,18 @@ public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest,
 {
   // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Service> _repository;
+  private readonly IFileStorageService _fileStorage;
 
-  public CreateServiceRequestHandler(IRepositoryWithEvents<Service> repository) => _repository =
-    repository;
+  public CreateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IFileStorageService fileStorage)
+  {
+    _repository = repository;
+    _fileStorage = fileStorage;
+  }
 
   public async Task<Guid> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
   {
-    var service = new Service(request.Name, request.Description, request.ImageUrl);
+    var imageUrl = await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken);
+    var service = new Service(request.Name, request.Description, imageUrl);
 
     await _repository.AddAsync(service, cancellationToken);
 

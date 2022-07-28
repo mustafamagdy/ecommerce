@@ -5,8 +5,8 @@ public class UpdateServiceRequest : IRequest<Guid>
   public Guid Id { get; set; }
   public string Name { get; set; } = default!;
   public string? Description { get; set; }
-  public string? ImageUrl { get; set; }
-  public string? IconUrl { get; set; }
+  public FileUploadRequest? ImageFile { get; set; }
+  public bool DeleteCurrentImage { get; set; }
 }
 
 public class UpdateServiceRequestValidator : CustomValidator<UpdateServiceRequest>
@@ -26,20 +26,32 @@ public class UpdateServiceRequestHandler : IRequestHandler<UpdateServiceRequest,
   // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Service> _repository;
   private readonly IStringLocalizer _t;
+  private readonly IFileStorageService _fileStorage;
 
-  public UpdateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IStringLocalizer<UpdateServiceRequestHandler> localizer) =>
-    (_repository, _t) = (repository, localizer);
+  public UpdateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IStringLocalizer<UpdateServiceRequestHandler> localizer, IFileStorageService fileStorage)
+  {
+    _repository = repository;
+    _fileStorage = fileStorage;
+    _t = localizer;
+  }
 
   public async Task<Guid> Handle(UpdateServiceRequest request, CancellationToken cancellationToken)
   {
     var service = await _repository.GetByIdAsync(request.Id, cancellationToken);
-
     _ = service ?? throw new NotFoundException(_t["Service {0} Not Found.", request.Id]);
 
-    service.Update(request.Name, request.Description, request.ImageUrl);
+    if (request.ImageFile != null || request.DeleteCurrentImage)
+    {
+      service.ImageUrl = await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken);
+      var currentImage = service.ImageUrl ?? string.Empty;
+      if (request.DeleteCurrentImage && !string.IsNullOrEmpty(currentImage))
+      {
+        string root = Directory.GetCurrentDirectory();
+        _fileStorage.Remove(Path.Combine(root, currentImage));
+      }
+    }
 
     await _repository.UpdateAsync(service, cancellationToken);
-
     return request.Id;
   }
 }

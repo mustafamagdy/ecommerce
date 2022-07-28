@@ -1,7 +1,6 @@
 using System.Data;
 using System.Diagnostics;
 using Finbuckle.MultiTenant;
-using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
@@ -11,28 +10,25 @@ using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string,
-  IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
-  IdentityUserToken<string>>
+public abstract class BaseDbContext
+  : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
   private readonly ITenantInfo? _currentTenant;
   private readonly ISubscriptionInfo? _currentSubscriptionType;
-  private TenantDbContext _tenantDb;
-  protected readonly ICurrentUser _currentUser;
+  private readonly TenantDbContext _tenantDb;
+  private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
   private readonly DatabaseSettings _dbSettings;
-  private readonly IEventPublisher _events;
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events, ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
+    ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;
@@ -40,7 +36,6 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     _serializer = serializer;
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
-    _events = events;
     _currentSubscriptionType = currentSubscriptionType;
     _tenantDb = tenantDb;
   }
@@ -99,8 +94,6 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     int result = await base.SaveChangesAsync(cancellationToken);
 
     await HandleAuditingAfterSaveChangesAsync(auditEntries, cancellationToken);
-
-    await SendDomainEventsAsync();
 
     return result;
   }
@@ -203,8 +196,7 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     return trailEntries.Where(e => e.HasTemporaryProperties).ToList();
   }
 
-  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries,
-    CancellationToken cancellationToken = new())
+  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries, CancellationToken cancellationToken = new())
   {
     if (trailEntries == null || trailEntries.Count == 0)
     {
@@ -229,23 +221,5 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     }
 
     return SaveChangesAsync(cancellationToken);
-  }
-
-  private async Task SendDomainEventsAsync()
-  {
-    var entitiesWithEvents = ChangeTracker.Entries<IEntity>()
-      .Select(e => e.Entity)
-      .Where(e => e.DomainEvents.Count > 0)
-      .ToArray();
-
-    foreach (var entity in entitiesWithEvents)
-    {
-      var domainEvents = entity.DomainEvents.ToArray();
-      entity.DomainEvents.Clear();
-      foreach (var domainEvent in domainEvents)
-      {
-        await _events.PublishAsync(domainEvent);
-      }
-    }
   }
 }

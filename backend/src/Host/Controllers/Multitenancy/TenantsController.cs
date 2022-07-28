@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Multitenancy;
+using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
@@ -58,6 +59,14 @@ public class TenantsController : VersionNeutralApiController
   [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
   [OpenApiOperation("Renew subscription for a tenant", "")]
   public Task<string> RenewSubscription(RenewSubscriptionRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("pay")]
+  [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
+  [OpenApiOperation("Pay for tenant subscription", "")]
+  public Task<Unit> RenewSubscription(PayForSubscriptionRequest request)
   {
     return Mediator.Send(request);
   }

@@ -9,10 +9,13 @@ public class BasicTenantInfoDto
   public BasicSubscriptionInfoDto? DemoSubscription { get; set; }
   public BasicSubscriptionInfoDto? TrainSubscription { get; set; }
   public List<BranchDto> Branches { get; set; } = default!;
+  public bool Active { get; set; }
+  public decimal TotalDue { get; set; }
+  public decimal TotalPaid { get; set; }
 }
 
 public class BasicSubscriptionInfoDto
 {
-  public string Id { get; set; } = default!;
+  public Guid Id { get; set; } = default!;
   public DateTime ExpiryDate { get; set; }
 }

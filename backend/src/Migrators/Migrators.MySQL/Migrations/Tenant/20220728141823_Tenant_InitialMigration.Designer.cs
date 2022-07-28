@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20220726185606_Tenant_InitialMigration")]
+    [Migration("20220728141823_Tenant_InitialMigration")]
     partial class Tenant_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -369,7 +369,7 @@ namespace Migrators.MySQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
-                        .WithMany("SubscriptionHistory")
+                        .WithMany("History")
                         .HasForeignKey("TenantProdSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -471,9 +471,9 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("History");
 
-                    b.Navigation("SubscriptionHistory");
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

@@ -47,10 +47,6 @@ public class MyTenantSubscriptionSearchRequestHandler : IRequestHandler<MyTenant
       throw new NotFoundException(_t["Subscription {0} not found for the current tenant", request.SubscriptionId]);
     }
 
-    var historySpec = new SubscriptionHistorySpec(tenantId);
-    var prodSubscriptionHistories = await _subscriptionHistoryRepo.ListAsync(historySpec);
-
-
-    return tenant.ProdSubscription.Adapt<TenantSubscriptionDto>();
+    return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
   }
 }
