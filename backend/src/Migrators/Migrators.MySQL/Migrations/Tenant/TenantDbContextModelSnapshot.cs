@@ -153,12 +153,25 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("TenantProdSubscriptionId")
+                    b.Property<Guid?>("TenantDemoSubscriptionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("TenantProdSubscriptionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("TenantSubscriptionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("TenantTrainSubscriptionId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantDemoSubscriptionId");
+
                     b.HasIndex("TenantProdSubscriptionId");
+
+                    b.HasIndex("TenantTrainSubscriptionId");
 
                     b.ToTable("SubscriptionHistories");
                 });
@@ -366,13 +379,17 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", null)
                         .WithMany("History")
-                        .HasForeignKey("TenantProdSubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TenantDemoSubscriptionId");
 
-                    b.Navigation("TenantProdSubscription");
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", null)
+                        .WithMany("History")
+                        .HasForeignKey("TenantProdSubscriptionId");
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", null)
+                        .WithMany("History")
+                        .HasForeignKey("TenantTrainSubscriptionId");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
@@ -467,11 +484,21 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Navigation("Branches");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
+                {
+                    b.Navigation("History");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
                 {
                     b.Navigation("History");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }
