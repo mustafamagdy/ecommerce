@@ -17,29 +17,45 @@ public class HostFixture : IAsyncLifetime
   private WebApplicationFactory<Program> _factory;
   public static readonly TestSystemTime SYSTEM_TIME = new();
   private IDisposable _memoryConfigs;
-  private readonly string _cnStringTemplate = "Data Source=localhost;Port={0};Initial Catalog={1};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true";
+
+  private readonly string dbProvider = "mysql";
+  private string _cnStringTemplate = "";
 
   private SimpleSmtpServer _smtpServer;
 
   public HttpClient CreateClient() => _factory.CreateClient();
-  // public HttpClient CreateClient() => _factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri($"http://localhost:{_hostPort}") });
 
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
 
   public async Task InitializeAsync()
   {
+    _cnStringTemplate = dbProvider switch
+    {
+      "postgresql" => "Server=127.0.0.1;Port={0};Database={1};Uid=postgres;Pwd=DeV12345",
+      "mysql" => "Data Source=127.0.0.1;Port={0};Initial Catalog={1};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true;Allow User Variables=true;",
+      _ => throw new ArgumentOutOfRangeException()
+    };
+
     _dbContainer = BuildContainer();
     await _dbContainer.StartAsync();
 
     var db_name = $"main_{Guid.NewGuid()}";
-    var tenantConnectionStringTemplate = "Data Source=127.0.0.1;Port=" + _dbPort + ";Initial Catalog={0};User Id=root;Password=DeV12345";
+    var connectionString = string.Format(_cnStringTemplate, _dbPort, db_name);
+    var tenantDbConnectionStringTemplate = dbProvider switch
+    {
+      "postgresql" => $"Server=127.0.0.1;Port={_dbPort};Database={{0}};Uid=postgres;Pwd=DeV12345",
+      "mysql" => $"Data Source=127.0.0.1;Port={_dbPort};Initial Catalog={{0}};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true;Allow User Variables=true;",
+      _ => throw new ArgumentOutOfRangeException()
+    };
     var mailPort = GetFreeTcpPort();
 
     _memoryConfigs = Program.OverrideConfig(new Dictionary<string, string>
     {
-      ["DatabaseSettings:ConnectionString"] = string.Format(_cnStringTemplate, _dbPort, db_name),
-      ["DatabaseSettings:ConnectionStringTemplate"] = tenantConnectionStringTemplate,
-      ["HangfireSettings:Storage:ConnectionString"] = string.Format($"{_cnStringTemplate};Allow User Variables=true", _dbPort, db_name),
+      ["DatabaseSettings:DBProvider"] = dbProvider,
+      ["DatabaseSettings:ConnectionString"] = connectionString,
+      ["DatabaseSettings:ConnectionStringTemplate"] = tenantDbConnectionStringTemplate,
+      ["HangfireSettings:Storage:ConnectionString"] = connectionString,
+      ["HangfireSettings:Storage:StorageProvider"] = dbProvider,
       ["MailSettings:Port"] = mailPort.ToString()
     });
 
@@ -52,13 +68,29 @@ public class HostFixture : IAsyncLifetime
   private TestcontainersContainer BuildContainer()
   {
     _dbPort = GetFreeTcpPort();
-    return new TestcontainersBuilder<TestcontainersContainer>()
-      .WithImage("amd64/mysql:8.0-oracle")
-      .WithEnvironment("MYSQL_ROOT_PASSWORD", "DeV12345")
-      .WithEnvironment("MYSQL_PASSWORD", "DeV12345")
-      .WithPortBinding(_dbPort, 3306)
-      .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(3306))
-      .Build();
+    var internalPort = dbProvider switch
+    {
+      "postgresql" => 5432,
+      "mysql" => 3306,
+      _ => throw new ArgumentOutOfRangeException()
+    };
+
+    ITestcontainersBuilder<TestcontainersContainer> builder = new TestcontainersBuilder<TestcontainersContainer>();
+    builder = dbProvider switch
+    {
+      "postgresql" => builder.WithImage("postgres:alpine")
+        .WithEnvironment("POSTGRES_PASSWORD", "DeV12345"),
+
+      "mysql" => builder.WithImage("amd64/mysql:8.0-oracle")
+        .WithEnvironment("MYSQL_ROOT_PASSWORD", "DeV12345")
+        .WithEnvironment("MYSQL_PASSWORD", "DeV12345"),
+      _ => throw new ArgumentOutOfRangeException()
+    };
+
+    builder = builder.WithPortBinding(_dbPort, internalPort)
+      .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(internalPort));
+
+    return builder.Build();
   }
 
   private static int GetFreeTcpPort()

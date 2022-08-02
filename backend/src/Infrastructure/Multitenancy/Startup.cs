@@ -1,7 +1,9 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Persistence;
+using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Builder;
@@ -20,10 +22,16 @@ internal static class Startup
   internal static IServiceCollection AddMultitenancy(this IServiceCollection services, IConfiguration config)
   {
     return services
-      .AddDbContext<TenantDbContext>((p, m) =>
+      .AddDbContext<TenantDbContext>((sp, dbOptions) =>
       {
-        var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
+        var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql, StringComparison.CurrentCultureIgnoreCase))
+        {
+          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ?? throw new NotSupportedException("Fix database datetime kind for postgres not registered"));
+        }
+
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+        dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddMultiTenant<FSHTenantInfo>()
       .WithClaimStrategy(FSHClaims.Tenant)
