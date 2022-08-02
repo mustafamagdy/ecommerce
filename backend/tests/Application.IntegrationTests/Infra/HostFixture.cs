@@ -18,7 +18,7 @@ public class HostFixture : IAsyncLifetime
   public static readonly TestSystemTime SYSTEM_TIME = new();
   private IDisposable _memoryConfigs;
 
-  private readonly string dbProvider = "mysql";
+  private readonly string dbProvider = "postgresql"; // postgresql // mysql
   private string _cnStringTemplate = "";
 
   private SimpleSmtpServer _smtpServer;
