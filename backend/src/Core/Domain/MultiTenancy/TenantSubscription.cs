@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public class TenantDemoSubscription : TenantSubscription<DemoSubscription>
+public sealed class TenantDemoSubscription : TenantSubscription<DemoSubscription>
 {
   private TenantDemoSubscription()
   {
@@ -12,7 +12,7 @@ public class TenantDemoSubscription : TenantSubscription<DemoSubscription>
   }
 }
 
-public class TenantTrainSubscription : TenantSubscription<TrainSubscription>
+public sealed class TenantTrainSubscription : TenantSubscription<TrainSubscription>
 {
   private TenantTrainSubscription()
   {

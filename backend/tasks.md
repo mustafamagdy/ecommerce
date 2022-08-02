@@ -28,7 +28,7 @@
   [✅] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
   [✅] Role
   - Users (admin cannot be deleted, activate/deactivate user)
-  - User roles
+  [✅] User roles
   - Logout all users once role permissions updated
 - Branches:
   [✅] Search
@@ -39,15 +39,20 @@
   - Create, renew subscription 
     [✅] (name, vat no, logo, phone number, email, address, zipcode, admin name, admin email, admin phone number)
     [✅] Current subscription (name, date of subscription)
-    - Subscription history
+    [✅] Subscription history
     - Technical support
   - Demo account
   - Reset admin account
-  - activate/deactivate
+  [✅] activate/deactivate
   - Invoices (payments, balances)
     - number, date, subscription from to, package, amount, paid, remaining
     - send reminder for payment
     - print invoice, print history
+
+General
+- refactor domain models
+- update events for all models
+- tests
 
 ========================== FRAMEWORK ==========================
 
