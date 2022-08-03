@@ -1,3 +1,4 @@
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Common.Contracts;
@@ -11,6 +12,7 @@ using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Serilog;
@@ -54,7 +56,21 @@ internal static class Startup
       .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
       .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
       .AddRepositories()
-      .AddTransient<ITenantSequenceGenerator, TenantSequenceGenerator>();
+      .AddTransient<ITenantSequenceGenerator>(sp =>
+      {
+        var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        var config = sp.GetService<IConfiguration>();
+        var currentTenant = sp.GetService<ITenantInfo>();
+        var env = sp.GetService<IHostEnvironment>();
+        var counterRepo = sp.GetService<IDapperEntityRepository>();
+
+        return databaseSettings.DBProvider.ToLower() switch
+        {
+          DbProviderKeys.MySql => new MySqlTenantSequenceGenerator(config, currentTenant, env, counterRepo),
+          DbProviderKeys.Npgsql => new NpgsqlTenantSequenceGenerator(config, currentTenant, env, counterRepo),
+          _ => throw new NotSupportedException($"Provider {databaseSettings.DBProvider} doesn't have a sequence generator")
+        };
+      });
   }
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)

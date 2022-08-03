@@ -276,5 +276,18 @@ public class TenantManagementTests : TestFixture
     basicTenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
     basicTenantInfo.TotalDue.Should().NotBe(0);
     basicTenantInfo.TotalPaid.Should().BeGreaterThan(0);
+
+    _ = await PostAsJsonAsync("/api/v1/my/payments", new MyTenantSubscriptionAndPaymentsSearchRequest
+      {
+        SubscriptionId = basicTenantInfo.ProdSubscription.Id
+      },
+      tenantAdminLoginHeaders, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    subscriptionInfo = await _.Content.ReadFromJsonAsync<ProdTenantSubscriptionWithPaymentDto>();
+    subscriptionInfo.Should().NotBeNull();
+    subscriptionInfo.ExpiryDate.Should().BeAfter(today);
+    subscriptionInfo.History.Should().NotBeEmpty();
+    subscriptionInfo.Payments.Should().NotBeEmpty();
   }
 }

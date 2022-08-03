@@ -24,7 +24,7 @@ public class BranchController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Branches)]
   [OpenApiOperation("Search for a branch.", "")]
-  public Task<BranchDto> GetListAsync(SearchBranchRequest request)
+  public Task<List<BranchDto>> GetListAsync(SearchBranchRequest request)
   {
     return Mediator.Send(request);
   }

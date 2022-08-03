@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
+using FSH.WebApi.Application.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -87,6 +88,28 @@ public abstract class TestFixture
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await GetAsync(requestUri, headers, cancellationToken);
+  }
+
+  protected async Task<Dictionary<string, string>> CreateTenantAndLogin()
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+      DatabaseName = $"{tenantId}-db",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
+    return tenantAdminLoginHeaders;
   }
 
   public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant, CancellationToken cancellationToken)
