@@ -4,5 +4,9 @@ export default {
     btn_edit: "تعديل",
     btn_actions: "وظائف",
     btn_add_new: "إضافة جديد",
-    btn_save: "حفظ"
+    btn_save: "حفظ",
+    btn_close:"إغلاق",
+    btn_choose:"اختر",
+    btn_browse:"استعراض",
+    btn_capture:"تصوير"
 }
