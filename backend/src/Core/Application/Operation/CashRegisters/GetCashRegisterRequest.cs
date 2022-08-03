@@ -23,7 +23,6 @@ public class GetCashRegisterRequestHandler : IRequestHandler<GetCashRegisterRequ
   public GetCashRegisterRequestHandler(IRepository<CashRegister> repository, IStringLocalizer<GetCashRegisterRequestHandler> localizer) => (_repository, _t) = (repository, localizer);
 
   public async Task<BasicCashRegisterDto> Handle(GetCashRegisterRequest request, CancellationToken cancellationToken) =>
-    await _repository.GetBySpecAsync(
-      (ISpecification<CashRegister, BasicCashRegisterDto>)new CashRegisterByIdSpec(request.Id), cancellationToken)
+    await _repository.GetBySpecAsync(new CashRegisterByIdSpec(request.Id), cancellationToken)
     ?? throw new NotFoundException(_t["Cash Register {0} Not Found.", request.Id]);
 }

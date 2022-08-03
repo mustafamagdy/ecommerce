@@ -1,16 +1,15 @@
 using System.Data;
 using Dapper;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using MySqlConnector;
+using Npgsql;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class TenantSequenceGenerator : ITenantSequenceGenerator
+public class NpgsqlTenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
   private readonly IHostEnvironment _env;
@@ -19,7 +18,7 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
   private bool? _counterTableExist;
   private readonly string? _connectionString;
 
-  public TenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env, IDapperEntityRepository counterRepo)
+  public NpgsqlTenantSequenceGenerator(IConfiguration config, ITenantInfo currentTenant, IHostEnvironment env, IDapperEntityRepository counterRepo)
   {
     _currentTenant = currentTenant;
     _env = env;
@@ -30,14 +29,15 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
 
   private async Task CheckCounterTableExist(string tableName)
   {
-    var sql = @$"SELECT count(*) AS tableCount FROM information_schema.TABLES
+    var sql = @"SELECT count(*) AS tableCount FROM information_schema.TABLES
                  WHERE (TABLE_SCHEMA = @dbName) AND  (TABLE_NAME = @tableName);";
     dynamic result = await _counterRepo.QueryFirstOrDefaultAsync(sql, new { dbName = _counterRepo.DatabaseName, tableName });
     _counterTableExist = result.tableCount > 0;
 
     if (!_counterTableExist.Value)
     {
-      sql = @$"CREATE TABLE {Escape(_counterRepo.DatabaseName)}.{Escape(tableName)} (`entityName` VARCHAR(100) NOT NULL, `current` BIGINT NOT NULL DEFAULT 0, PRIMARY KEY (`entityName`));";
+      sql = $"CREATE TABLE {Escape(tableName)} (\"entityName\" VARCHAR(100) NOT NULL, \"current\" BIGINT NOT NULL "
+            + $"DEFAULT 0, CONSTRAINT \"PK_{tableName}\" PRIMARY KEY (\"entityName\"));";
       await _counterRepo.ExecuteAsync(sql);
     }
   }
@@ -50,7 +50,7 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
 
   private string Escape(string str)
   {
-    return $"`{str}`";
+    return $"\"{str}\"";
   }
 
   public async Task<long> Next(string entityName)
@@ -64,28 +64,29 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
     string sequenceName = $"{_env.GetShortenName()}-{_currentTenant.Identifier}-{entityName}";
 
     IDbTransaction trx = null;
-    MySqlConnection cnn = null;
+    NpgsqlConnection cnn = null;
     try
     {
-      cnn = new MySqlConnection(_connectionString);
+      cnn = new NpgsqlConnection(_connectionString);
       cnn.Open();
       trx = await cnn.BeginTransactionAsync();
 
-      string sql = @$"SELECT `current` from {Escape(_counterRepo.DatabaseName)}.{Escape(_sequenceTableName)}  where `entityName` = @entityName for update;";
+      string sql = $"SELECT \"current\" from {Escape(_sequenceTableName)}  where \"entityName\" = @entityName"
+                   + " for update;";
       dynamic result = await cnn.QueryFirstOrDefaultAsync(sql, new { entityName = sequenceName }, trx);
 
       int i;
       if (result == null)
       {
         next = 1;
-        sql = $"insert into {Escape(_counterRepo.DatabaseName)}.{Escape(_sequenceTableName)} (`entityName`, `current`) values(@entityName, @next);";
+        sql = $"insert into {Escape(_sequenceTableName)} (\"entityName\", \"current\") values(@entityName, @next);";
         i = await cnn.ExecuteAsync(sql, new { next, entityName = sequenceName }, trx);
       }
       else
       {
         next = Convert.ToInt64(result.current);
         next++;
-        sql = $"update {Escape(_counterRepo.DatabaseName)}.{Escape(_sequenceTableName)} set `current` = @next where `entityName` = @entityName";
+        sql = $"update {Escape(_sequenceTableName)} set \"current\" = @next where \"entityName\" = @entityName";
         i = await cnn.ExecuteAsync(sql, new { next, entityName = sequenceName }, trx);
       }
 

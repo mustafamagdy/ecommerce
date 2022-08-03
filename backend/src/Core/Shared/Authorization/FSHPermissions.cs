@@ -107,9 +107,16 @@ public static class FSHPermissions
     new("View My Tenant History & Payments", FSHAction.ViewAdvanced, FSHResource.Subscriptions),
 
     // Branches
+    new("Search Branches", FSHAction.Search, FSHResource.Branches),
     new("View Branches", FSHAction.View, FSHResource.Branches),
     new("Create Branches", FSHAction.Create, FSHResource.Branches),
     new("Update Branches", FSHAction.Update, FSHResource.Branches),
+
+    // CashRegisters
+    new("Search Cash Registers", FSHAction.Search, FSHResource.CashRegisters),
+    new("View Cash Registers", FSHAction.View, FSHResource.CashRegisters),
+    new("Create Cash Registers", FSHAction.Create, FSHResource.CashRegisters),
+    new("Update Cash Registers", FSHAction.Update, FSHResource.CashRegisters),
 
     // Service Catalogs
     new("View Service Catalog", FSHAction.View, FSHResource.ServiceCatalog),
