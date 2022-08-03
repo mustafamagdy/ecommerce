@@ -16,6 +16,7 @@
     "chart.js": "^2.9.3",
     "quasar": "^2.6.0",
     "vue": "3.2.31",
+    "vue-advanced-cropper": "^2.8.3",
     "vue-i18n": "^9.0.0",
     "vue-router": "^4.0.0",
     "vuex": "^4.0.1"

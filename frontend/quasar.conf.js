@@ -45,8 +45,10 @@ module.exports = configure(function (ctx) {
             vueRouterMode: "hash", // available values: 'hash', 'history'
             env: {
                 APP_NAME: "RadLab",
-                API_URL: "http://localhost:3000/api/v1/",
-                API_PATH: "http://localhost:3000/api/v1/",
+                // API_URL: "http://localhost:3000/api/v1/",
+                // API_PATH: "http://localhost:3000/api/v1/",
+                API_URL: "http://192.168.1.21:3000/api/v1/",
+                API_PATH: "http://192.168.1.21:3000/api/v1/",
             },
             // transpile: false,
             // publicPath: '/',

@@ -5,5 +5,8 @@ export default {
     btn_actions: "Actions",
     btn_add_new: "Add New",
     btn_save: "Save",
-    btn_close:"Close"
+    btn_close:"Close",
+    btn_choose:"Choose",
+    btn_browse:"Browse",
+    btn_capture:"Capture"
 }

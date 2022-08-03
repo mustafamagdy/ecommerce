@@ -2,6 +2,9 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="text-h6 q-mb-md">{{ $t("addNewSampletable") }}</div>
         <q-form ref="observer" @submit.prevent="submitForm()">
+            <div>
+                <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile"/>
+            </div>
             <div class="col-12 row">
                 <div class="col-sm-3 col-12">
                     {{ $t("service_add_name") }} *
@@ -37,24 +40,31 @@
 import {computed, ref, reactive, toRefs, onMounted} from "vue";
 import useVuelidate from "@vuelidate/core";
 import {required, maxLength} from "@vuelidate/validators";
-import {useMeta} from "quasar";
+import {uid, useMeta} from "quasar";
 import {useApp} from "src/composables/app.js";
 import {$t} from "src/services/i18n";
+import ImagePicker from "src/components/image-picker";
 import {useAddEditPage} from "src/composables/addEditPage.js";
 
 const options = reactive({
     apiPath: "services",
     pageName: "services",
     formInputs: {
+        id: "",
         name: "",
-        description: ""
+        description: "",
+        imageFile: {},
+        imageUrl: ""
     },
 });
 const app = useApp();
 const formData = reactive({...options.formInputs});
 
 function beforeSubmit() {
-    return true;
+    delete formData.imageUrl;
+    formData.imageFile.name = uid();
+    if (showAdd.value) delete formData.id;
+    return true
 }
 
 const onFormSubmitted = (data) => {

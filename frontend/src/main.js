@@ -1,17 +1,5 @@
 
 import { boot } from 'quasar/wrappers'
-import AutoCompleteSelect from 'components/AutoCompleteSelect.vue';
-import PageSearch from 'components/PageSearch.vue';
-import QUploaderInput from 'components/QUploaderInput.vue';
-import ApiDataSource from 'components/ApiDataSource.vue';
-import InlineEdit from 'components/InlineEdit.vue';
-import RecordCount from 'components/RecordCount.vue';
-import CheckDuplicate from 'components/CheckDuplicate.vue';
-import ImageViewer from 'components/ImageViewer.vue';
-import FileViewer from 'components/FileViewer.vue';
-import FullQEditor from 'components/FullQEditor.vue';
-import ImportData from 'components/ImportData.vue';
-import LangSwitcher from 'components/LangSwitcher.vue';
 
 import { utils } from './utils';
 import { ApiService } from './services/api';
@@ -22,7 +10,7 @@ export default boot(async ({ app }) => {
 
 
 
-	
+
 
 	app.config.globalProperties.$appName = process.env.APP_NAME;
 
@@ -42,18 +30,6 @@ export default boot(async ({ app }) => {
 	app.config.globalProperties.$menus = AppMenus;
 
 	app.config.globalProperties.$utils = utils;
-	
-	app.component('AutoCompleteSelect', AutoCompleteSelect);
-	app.component('PageSearch', PageSearch);
-	app.component('InlineEdit', InlineEdit);
-	app.component('ApiDataSource', ApiDataSource);
-	app.component('QUploaderInput', QUploaderInput);
-	app.component('RecordCount', RecordCount);
-	app.component('CheckDuplicate', CheckDuplicate);
-	app.component('FileViewer', FileViewer);
-	app.component('ImageViewer', ImageViewer);
-	app.component('FullQEditor', FullQEditor);
-	app.component('ImportData', ImportData);
-	app.component('LangSwitcher', LangSwitcher);
+
 
 });
