@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace System;
+namespace FSH.WebApi.Infrastructure.Common.Extensions;
 
 public static class EnvironmentExtensions
 {

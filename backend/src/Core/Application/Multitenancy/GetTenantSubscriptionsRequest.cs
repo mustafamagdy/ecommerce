@@ -1,6 +1,5 @@
 ﻿using FSH.WebApi.Domain.MultiTenancy;
 using Mapster;
-using Microsoft.Extensions.Internal;
 
 namespace FSH.WebApi.Application.Multitenancy;
 

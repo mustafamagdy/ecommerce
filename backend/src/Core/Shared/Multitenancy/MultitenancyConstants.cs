@@ -5,8 +5,8 @@ namespace FSH.WebApi.Shared.Multitenancy;
 public class MultitenancyConstants
 {
   public static decimal MaxOneTimePaymentAmountForSubscription = 100000;
-  private static readonly RootTenantInfo _rootTenant = new();
   public const string JobRunnerUserName = "JobRunner";
+  public static string CashRegisterHeaderName = "cash-register";
 
   public static class Root
   {
@@ -15,7 +15,7 @@ public class MultitenancyConstants
     public const string EmailAddress = "admin@root.com";
   }
 
-  public static RootTenantInfo RootTenant { get => _rootTenant; }
+  public static RootTenantInfo RootTenant { get; } = new();
 
   public class RootTenantInfo : IFSHTenantInfo
   {

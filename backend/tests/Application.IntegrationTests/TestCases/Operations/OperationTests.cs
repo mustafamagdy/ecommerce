@@ -39,7 +39,7 @@ public class OperationsTests : TestFixture
     branches.Should().Contain(a => a.Name == newBranch.Name);
     var branch = branches.First(a => a.Name == newBranch.Name);
 
-    _ = await PostAsJsonAsync("/api/v1/finance/cash-register", new CreateCashRegisterRequest()
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
@@ -71,16 +71,42 @@ public class OperationsTests : TestFixture
     catalog.Data.Should().NotBeNullOrEmpty();
 
     var randomItem = catalog.Data[1];
-    _ = await PostAsJsonAsync("/api/v1/finance/cash-register", new CreateCashRegisterRequest()
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadAsStringAsync();
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
 
-    adminHeaders.Add("cash-register", cashRegisterId);
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new CloseCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+    _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = randomItem.Id,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.FailedDependency);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    // try to create the order again
     _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
     {
       Items = new List<OrderItemRequest>()
@@ -93,23 +119,141 @@ public class OperationsTests : TestFixture
       }
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    // todo: complete cash register tests
   }
 
   [Fact]
   public async Task can_open_cash_register()
   {
+    var adminHeaders = await CreateTenantAndLogin();
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
   public async Task can_close_cash_register()
   {
+    var adminHeaders = await CreateTenantAndLogin();
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
   public async Task any_payment_should_have_record_in_cash_register()
   {
+    var adminHeaders = await CreateTenantAndLogin();
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    var item = new OrderItemRequest()
+    {
+      ItemId = randomItem.Id,
+      Qty = 1
+    };
+    _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        item
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest()
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    operations.Should().NotBeNull();
+    operations.Data.Should().NotBeNullOrEmpty();
+    operations.Data.Count.Should().Be(1);
+    var operation = operations.Data[0];
+    operation.Should().NotBeNull();
+    operation.Amount.Should().Be(randomItem.Price * item.Qty);
   }
 
   [Fact]

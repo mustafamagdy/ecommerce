@@ -45,14 +45,10 @@ public class CreateOrderHelper : ICreateOrderHelper
   }
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
-  {
-    return CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, true, cancellationToken);
-  }
+    => CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, true, cancellationToken);
 
   public Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
-  {
-    return CreateOrder(items, customer, payments, false, cancellationToken);
-  }
+    => CreateOrder(items, customer, payments, false, cancellationToken);
 
   private async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
     List<OrderPaymentAmount> payments, bool cashOrder, CancellationToken cancellationToken)
@@ -72,6 +68,9 @@ public class CreateOrderHelper : ICreateOrderHelper
 
     decimal orderItemsTotal = orderItems.Sum(a => a.ItemTotal);
     decimal totalPaid = cashOrder ? orderItemsTotal : payments.Sum(a => a.Amount);
+
+
+
     if (totalPaid < orderItemsTotal)
     {
       throw new InvalidOperationException(_t["Total paid amount {0} doesn't match order net amount {1}", totalPaid, orderItemsTotal]);

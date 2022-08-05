@@ -115,8 +115,12 @@ public static class FSHPermissions
     // CashRegisters
     new("Search Cash Registers", FSHAction.Search, FSHResource.CashRegisters),
     new("View Cash Registers", FSHAction.View, FSHResource.CashRegisters),
+    new("View Cash Registers Basic Info", FSHAction.ViewBasic, FSHResource.CashRegisters),
     new("Create Cash Registers", FSHAction.Create, FSHResource.CashRegisters),
     new("Update Cash Registers", FSHAction.Update, FSHResource.CashRegisters),
+    new("Open Cash Register", FSHAction.Open, FSHResource.CashRegisters),
+    new("Close Cash Registers", FSHAction.Close, FSHResource.CashRegisters),
+    new("Approve Cash Registers transfer", FSHAction.Approve, FSHResource.CashRegisters),
 
     // Service Catalogs
     new("View Service Catalog", FSHAction.View, FSHResource.ServiceCatalog),
