@@ -7,6 +7,7 @@ using FSH.WebApi.Host.Configurations;
 using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
+using FSH.WebApi.Infrastructure.Finance;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Seeders;
 using QuestPDF.Drawing;
@@ -27,7 +28,11 @@ try
       .ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionTypeFilter>(); })
+  builder.Services.AddControllers(opt =>
+    {
+      opt.Filters.Add<HasValidSubscriptionTypeFilter>();
+      opt.Filters.Add<RequireOpenCashRegisterFilter>();
+    })
     .AddFluentValidation()
     .AddJsonOptions(opt =>
     {

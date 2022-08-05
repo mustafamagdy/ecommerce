@@ -9,6 +9,7 @@ using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Domain.Structure;
+using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Shared.Multitenancy;
 using Mapster;

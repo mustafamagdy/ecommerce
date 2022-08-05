@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

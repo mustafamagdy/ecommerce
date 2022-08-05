@@ -5,7 +5,7 @@ namespace FSH.WebApi.Application.Operation.CashRegisters;
 public abstract class CashRegisterRequest : IRequest<string>
 {
   public Guid Id { get; set; }
-  public string Notes { get; set; }
+  public string? Notes { get; set; }
 }
 
 public class OpenCashRegisterRequest : CashRegisterRequest

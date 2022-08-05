@@ -1,5 +1,6 @@
 using System.Reflection;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Orders;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
@@ -46,5 +47,15 @@ public class DtoCustomMapping
       .NewConfig()
       .Map(dest => dest.SubscriptionId, src => src.Id)
       .Map(dest => dest.History, src => src.History);
+
+    TypeAdapterConfig<ActivePaymentOperation, CashRegisterOperationDto>
+      .NewConfig()
+      .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
+      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
+
+    TypeAdapterConfig<ArchivedPaymentOperation, CashRegisterOperationDto>
+      .NewConfig()
+      .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
+      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
   }
 }

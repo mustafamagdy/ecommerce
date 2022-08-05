@@ -1,8 +1,5 @@
-﻿using FSH.WebApi.Application.Operation;
-using FSH.WebApi.Application.Operation.Orders;
-using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Infrastructure.Multitenancy;
-using FSH.WebApi.Shared.Multitenancy;
+﻿using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Infrastructure.Finance;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
@@ -18,6 +15,7 @@ public class OrdersController : VersionedApiController
 
   [HttpPost("cash")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
+  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
   public Task<OrderDto> CreateAsync(CreateCashOrderRequest request)
   {
@@ -26,6 +24,7 @@ public class OrdersController : VersionedApiController
 
   [HttpPost("with-customer")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
+  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
   public Task<OrderDto> CreateAsync(CreateOrderWithNewCustomerRequest request)
   {
@@ -34,6 +33,7 @@ public class OrdersController : VersionedApiController
 
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
+  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
   public Task<OrderDto> CreateAsync(CreateOrderRequest request)
   {
@@ -59,6 +59,7 @@ public class OrdersController : VersionedApiController
 
   [HttpPut("cancel/{id:guid}")]
   [MustHavePermission(FSHAction.Cancel, FSHResource.Orders)]
+  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Cancel a order with its all payments.", "")]
   public Task CancelAsync(Guid id)
   {

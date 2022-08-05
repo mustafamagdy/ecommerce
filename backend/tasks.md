@@ -103,6 +103,15 @@ each branch has cash register(s)
 
 /////// Cash Register ///////
 
+order helper 
+    => register the payment in cash register 
+        => cash register service 
+            => get the current cash register from header 
+                => (todo: validate branch and user) 
+                    => validate cash register is open
+                        => register the payment operation
+
+
 Cash register
     - key, name, main?
     - any payment to or from go through a cash register

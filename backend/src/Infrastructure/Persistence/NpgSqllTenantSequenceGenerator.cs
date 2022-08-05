@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
