@@ -34,6 +34,14 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
       .HasMaxLength(64);
 
     builder.HasIndex(a => a.OrderNumber).IsUnique();
+
+    // builder.HasMany(a => a.OrderItems).WithOne(a => a.Order).HasForeignKey(a => a.OrderId);
+    // builder.HasMany(a => a.OrderPayments).WithOne(a => a.Order).HasForeignKey(a => a.OrderId);
+
+    var orderItems = builder.Metadata.FindNavigation(nameof(Order.OrderItems));
+    orderItems?.SetPropertyAccessMode(PropertyAccessMode.Field);
+    var orderPayments = builder.Metadata.FindNavigation(nameof(Order.OrderPayments));
+    orderPayments?.SetPropertyAccessMode(PropertyAccessMode.Field);
   }
 }
 
@@ -60,6 +68,8 @@ public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
     builder
       .Property(b => b.VatPercent)
       .HasPrecision(7, 3);
+
+    builder.HasOne(a => a.Order).WithMany(a => a.OrderItems).HasForeignKey(a => a.OrderId);
   }
 }
 
@@ -72,5 +82,7 @@ public class OrderPaymentConfig : IEntityTypeConfiguration<OrderPayment>
     builder
       .Property(a => a.Amount)
       .HasPrecision(7, 3);
+
+    builder.HasOne(a => a.Order).WithMany(a => a.OrderPayments).HasForeignKey(a => a.OrderId);
   }
 }

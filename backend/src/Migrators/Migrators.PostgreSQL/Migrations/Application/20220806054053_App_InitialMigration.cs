@@ -99,7 +99,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    CashDefault = table.Column<bool>(type: "boolean", nullable: false)
+                    CashDefault = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,7 +191,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Name = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false),
                     Opened = table.Column<bool>(type: "boolean", nullable: false),
-                    Balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    Balance = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -392,7 +393,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ActivePaymentOperation",
+                name: "ActivePaymentOperations",
                 schema: "Shared",
                 columns: table => new
                 {
@@ -407,16 +408,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ActivePaymentOperation", x => x.Id);
+                    table.PrimaryKey("PK_ActivePaymentOperations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ActivePaymentOperation_CashRegisters_CashRegisterId",
+                        name: "FK_ActivePaymentOperations_CashRegisters_CashRegisterId",
                         column: x => x.CashRegisterId,
                         principalSchema: "Shared",
                         principalTable: "CashRegisters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ActivePaymentOperation_PaymentMethods_PaymentMethodId",
+                        name: "FK_ActivePaymentOperations_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
                         principalSchema: "Shared",
                         principalTable: "PaymentMethods",
@@ -425,7 +426,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArchivedPaymentOperation",
+                name: "ArchivedPaymentOperations",
                 schema: "Shared",
                 columns: table => new
                 {
@@ -440,16 +441,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArchivedPaymentOperation", x => x.Id);
+                    table.PrimaryKey("PK_ArchivedPaymentOperations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ArchivedPaymentOperation_CashRegisters_CashRegisterId",
+                        name: "FK_ArchivedPaymentOperations_CashRegisters_CashRegisterId",
                         column: x => x.CashRegisterId,
                         principalSchema: "Shared",
                         principalTable: "CashRegisters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ArchivedPaymentOperation_PaymentMethods_PaymentMethodId",
+                        name: "FK_ArchivedPaymentOperations_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
                         principalSchema: "Shared",
                         principalTable: "PaymentMethods",
@@ -565,27 +566,27 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActivePaymentOperation_CashRegisterId",
+                name: "IX_ActivePaymentOperations_CashRegisterId",
                 schema: "Shared",
-                table: "ActivePaymentOperation",
+                table: "ActivePaymentOperations",
                 column: "CashRegisterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActivePaymentOperation_PaymentMethodId",
+                name: "IX_ActivePaymentOperations_PaymentMethodId",
                 schema: "Shared",
-                table: "ActivePaymentOperation",
+                table: "ActivePaymentOperations",
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArchivedPaymentOperation_CashRegisterId",
+                name: "IX_ArchivedPaymentOperations_CashRegisterId",
                 schema: "Shared",
-                table: "ArchivedPaymentOperation",
+                table: "ArchivedPaymentOperations",
                 column: "CashRegisterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArchivedPaymentOperation_PaymentMethodId",
+                name: "IX_ArchivedPaymentOperations_PaymentMethodId",
                 schema: "Shared",
-                table: "ArchivedPaymentOperation",
+                table: "ArchivedPaymentOperations",
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
@@ -711,11 +712,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ActivePaymentOperation",
+                name: "ActivePaymentOperations",
                 schema: "Shared");
 
             migrationBuilder.DropTable(
-                name: "ArchivedPaymentOperation",
+                name: "ArchivedPaymentOperations",
                 schema: "Shared");
 
             migrationBuilder.DropTable(

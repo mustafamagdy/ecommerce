@@ -1,4 +1,5 @@
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Catalog;
@@ -32,10 +33,14 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
   public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
+  public DbSet<ActivePaymentOperation> ActivePaymentOperations => Set<ActivePaymentOperation>();
+  public DbSet<ArchivedPaymentOperation> ArchivedPaymentOperations => Set<ArchivedPaymentOperation>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<PaymentMethod>().IsMultiTenant();
 
     IgnoreMultiTenantEntities(modelBuilder);
 

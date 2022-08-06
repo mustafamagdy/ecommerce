@@ -253,7 +253,7 @@ public class OperationsTests : TestFixture
     operations.Data.Count.Should().Be(1);
     var operation = operations.Data[0];
     operation.Should().NotBeNull();
-    operation.Amount.Should().Be(randomItem.Price * item.Qty);
+    operation.Amount.Should().Be((randomItem.Price * item.Qty) * (1 + TEMPHelper.VatPercent()));
   }
 
   [Fact]

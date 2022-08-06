@@ -1,8 +1,12 @@
-﻿using System.Security.AccessControl;
+﻿using System.Diagnostics;
+using System.Security.AccessControl;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
+using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -30,10 +34,14 @@ public class CreateOrderHelper : ICreateOrderHelper
   private readonly IVatSettingProvider _vatSettingProvider;
   private readonly IStringLocalizer _t;
   private readonly ISystemTime _systemTime;
+  private readonly ICashRegisterService _cashRegisterService;
+  private readonly ICashRegisterResolver _cashRegisterResolver;
+  private readonly IHttpContextAccessor _httpContextAccessor;
 
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
-    IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer, ISystemTime systemTime)
+    IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer, ISystemTime systemTime,
+    ICashRegisterService cashRegisterService, ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor)
   {
     _repository = repository;
     _serviceCatalogRepo = serviceCatalogRepo;
@@ -42,13 +50,16 @@ public class CreateOrderHelper : ICreateOrderHelper
     _vatSettingProvider = vatSettingProvider;
     _t = localizer;
     _systemTime = systemTime;
+    _cashRegisterService = cashRegisterService;
+    _cashRegisterResolver = cashRegisterResolver;
+    _httpContextAccessor = httpContextAccessor;
   }
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
-    => CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, true, cancellationToken);
+    => CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, cashOrder: true, cancellationToken);
 
   public Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
-    => CreateOrder(items, customer, payments, false, cancellationToken);
+    => CreateOrder(items, customer, payments, cashOrder: false, cancellationToken);
 
   private async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
     List<OrderPaymentAmount> payments, bool cashOrder, CancellationToken cancellationToken)
@@ -66,10 +77,14 @@ public class CreateOrderHelper : ICreateOrderHelper
         serviceItem.Price, TEMPHelper.VatPercent(), Guid.Empty));
     }
 
+    if (cashOrder)
+    {
+      Debug.Assert(payments is { Count: 1 }, "Cash orders should have only one payment item");
+      payments[0].Amount = orderItems.Sum(a => a.ItemTotal);
+    }
+
     decimal orderItemsTotal = orderItems.Sum(a => a.ItemTotal);
-    decimal totalPaid = cashOrder ? orderItemsTotal : payments.Sum(a => a.Amount);
-
-
+    decimal totalPaid = payments.Sum(a => a.Amount);
 
     if (totalPaid < orderItemsTotal)
     {
@@ -78,7 +93,8 @@ public class CreateOrderHelper : ICreateOrderHelper
 
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(customer.Id, orderNumber, _systemTime.Now);
-    order.OrderItems = orderItems.Select(a => a.SetOrderId(order.Id)).ToHashSet();
+
+    orderItems.ForEach(order.AddItem);
 
     var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(
       _vatSettingProvider.LegalEntityName,
@@ -90,10 +106,12 @@ public class CreateOrderHelper : ICreateOrderHelper
     string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
     order.SetInvoiceQrCode(invoiceQrCode);
 
+    var cashRegister = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
     foreach (var payment in payments)
     {
-      var cashPayment = new OrderPayment(order.Id, payment.PaymentMethodId, order.NetAmount);
-      order.OrderPayments.Add(cashPayment);
+      await _cashRegisterService.RegisterPayment(new ActivePaymentOperation(cashRegister, payment.PaymentMethodId, payment.Amount, _systemTime.Now, PaymentOperationType.In));
+      var cashPayment = new OrderPayment(order.Id, payment.PaymentMethodId, payment.Amount);
+      order.AddPayment(cashPayment);
     }
 
     await _repository.AddAsync(order, cancellationToken);

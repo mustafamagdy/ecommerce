@@ -262,7 +262,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("ActivePaymentOperation", "Shared");
+                    b.ToTable("ActivePaymentOperations", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -304,7 +304,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("ArchivedPaymentOperation", "Shared");
+                    b.ToTable("ArchivedPaymentOperations", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -316,7 +316,8 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
                     b.Property<Guid>("BranchId")
                         .HasColumnType("char(36)");
@@ -548,9 +549,16 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
                     b.HasKey("Id");
 
                     b.ToTable("PaymentMethods", "Shared");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
