@@ -1,3 +1,5 @@
+using FSH.WebApi.Shared.Persistence;
+
 namespace FSH.WebApi.Application.Catalog.Brands;
 
 public class CreateBrandRequest : IRequest<Guid>
@@ -25,17 +27,21 @@ public class CreateBrandRequestValidator : CustomValidator<CreateBrandRequest>
 
 public class CreateBrandRequestHandler : IRequestHandler<CreateBrandRequest, Guid>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Brand> _repository;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CreateBrandRequestHandler(IRepositoryWithEvents<Brand> repository) => _repository = repository;
+  public CreateBrandRequestHandler(IRepositoryWithEvents<Brand> repository, IApplicationUnitOfWork uow)
+  {
+    _repository = repository;
+    _uow = uow;
+  }
 
   public async Task<Guid> Handle(CreateBrandRequest request, CancellationToken cancellationToken)
   {
     var brand = new Brand(request.Name, request.Description);
 
     await _repository.AddAsync(brand, cancellationToken);
-
+    await _uow.CommitAsync(cancellationToken);
     return brand.Id;
   }
 }

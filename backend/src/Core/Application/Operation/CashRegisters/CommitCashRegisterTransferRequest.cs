@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
@@ -12,13 +13,15 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
   private readonly IReadRepository<CashRegister> _cashRegisterRepo;
   private readonly IRepositoryWithEvents<ActivePaymentOperation> _repository;
   private readonly IStringLocalizer<TransferFromCashRegisterHandler> _t;
+  private readonly IApplicationUnitOfWork _uow;
 
   public CommitCashRegisterTransferHandler(IReadRepository<CashRegister> cashRegisterRepo,
-    IStringLocalizer<TransferFromCashRegisterHandler> localizer, IRepositoryWithEvents<ActivePaymentOperation> repository)
+    IStringLocalizer<TransferFromCashRegisterHandler> localizer, IRepositoryWithEvents<ActivePaymentOperation> repository, IApplicationUnitOfWork uow)
   {
     _cashRegisterRepo = cashRegisterRepo;
     _t = localizer;
     _repository = repository;
+    _uow = uow;
   }
 
   public async Task<string> Handle(CommitCashRegisterTransferRequest request, CancellationToken cancellationToken)
@@ -57,6 +60,7 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
 
     sourceCr.CommitPendingOut(pendingOut);
     await _repository.UpdateAsync(tr, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
 
     return _t["Transfer committed"];
   }

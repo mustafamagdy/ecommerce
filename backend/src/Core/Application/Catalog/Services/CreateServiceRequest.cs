@@ -1,3 +1,5 @@
+using FSH.WebApi.Shared.Persistence;
+
 namespace FSH.WebApi.Application.Catalog.Services;
 
 public class CreateServiceRequest : IRequest<Guid>
@@ -19,14 +21,15 @@ public class CreateServiceRequestValidator : CustomValidator<CreateServiceReques
 
 public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest, Guid>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Service> _repository;
   private readonly IFileStorageService _fileStorage;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CreateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IFileStorageService fileStorage)
+  public CreateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IFileStorageService fileStorage, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _fileStorage = fileStorage;
+    _uow = uow;
   }
 
   public async Task<Guid> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
@@ -35,7 +38,7 @@ public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest,
     var service = new Service(request.Name, request.Description, imageUrl);
 
     await _repository.AddAsync(service, cancellationToken);
-
+    await _uow.CommitAsync(cancellationToken);
     return service.Id;
   }
 }

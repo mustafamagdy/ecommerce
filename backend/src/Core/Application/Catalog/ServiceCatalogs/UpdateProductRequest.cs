@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Common.Events;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Catalog.ServiceCatalogs;
 
@@ -16,9 +17,15 @@ public class UpdateServiceCatalogRequestHandler : IRequestHandler<UpdateServiceC
   private readonly IRepository<ServiceCatalog> _repository;
   private readonly IStringLocalizer _t;
   private readonly IFileStorageService _file;
+  private readonly IApplicationUnitOfWork _uwo;
 
-  public UpdateServiceCatalogRequestHandler(IRepository<ServiceCatalog> repository, IStringLocalizer<UpdateServiceCatalogRequestHandler> localizer, IFileStorageService file) =>
-    (_repository, _t, _file) = (repository, localizer, file);
+  public UpdateServiceCatalogRequestHandler(IRepository<ServiceCatalog> repository, IStringLocalizer<UpdateServiceCatalogRequestHandler> localizer, IFileStorageService file, IApplicationUnitOfWork uwo)
+  {
+    _repository = repository;
+    _file = file;
+    _uwo = uwo;
+    _t = localizer;
+  }
 
   public async Task<Guid> Handle(UpdateServiceCatalogRequest request, CancellationToken cancellationToken)
   {
@@ -32,7 +39,7 @@ public class UpdateServiceCatalogRequestHandler : IRequestHandler<UpdateServiceC
     serviceCatalog.AddDomainEvent(EntityUpdatedEvent.WithEntity(serviceCatalog));
 
     await _repository.UpdateAsync(updatedServiceCatalog, cancellationToken);
-
+    await _uwo.CommitAsync(cancellationToken);
     return request.Id;
   }
 }

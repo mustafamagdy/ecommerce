@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Customers;
@@ -32,11 +33,13 @@ public class CreateSimpleCustomerRequestHandler : IRequestHandler<CreateSimpleCu
 {
   private readonly IRepositoryWithEvents<Customer> _customerRepo;
   private readonly IStringLocalizer _t;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CreateSimpleCustomerRequestHandler(IRepositoryWithEvents<Customer> customerRepo, IStringLocalizer<CreateSimpleCustomerRequestHandler> localizer)
+  public CreateSimpleCustomerRequestHandler(IRepositoryWithEvents<Customer> customerRepo, IStringLocalizer<CreateSimpleCustomerRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _customerRepo = customerRepo;
     _t = localizer;
+    _uow = uow;
   }
 
   public async Task<BasicCustomerDto> Handle(CreateSimpleCustomerRequest request, CancellationToken cancellationToken)
@@ -48,6 +51,7 @@ public class CreateSimpleCustomerRequestHandler : IRequestHandler<CreateSimpleCu
       throw new InternalServerException(_t["Failed to save new customer data"]);
     }
 
+    await _uow.CommitAsync(cancellationToken);
     return customer.Adapt<BasicCustomerDto>();
   }
 }

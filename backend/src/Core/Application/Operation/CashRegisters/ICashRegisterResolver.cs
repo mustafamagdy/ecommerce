@@ -4,5 +4,5 @@ namespace FSH.WebApi.Shared.Finance;
 
 public interface ICashRegisterResolver : ITransientService
 {
-  Task<CashRegister> Resolve(object context);
+  Task<Guid> Resolve(object context);
 }

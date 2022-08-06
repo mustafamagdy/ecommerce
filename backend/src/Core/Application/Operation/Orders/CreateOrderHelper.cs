@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Application.Operation.Orders;
@@ -29,19 +30,21 @@ public class CreateOrderHelper : ICreateOrderHelper
 {
   private readonly IRepositoryWithEvents<Order> _repository;
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
+  private readonly IRepositoryWithEvents<CashRegister> _cashRegisterRepo;
   private readonly ITenantSequenceGenerator _sequenceGenerator;
   private readonly IVatQrCodeGenerator _barcodeGenerator;
   private readonly IVatSettingProvider _vatSettingProvider;
   private readonly IStringLocalizer _t;
   private readonly ISystemTime _systemTime;
-  private readonly ICashRegisterService _cashRegisterService;
   private readonly ICashRegisterResolver _cashRegisterResolver;
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IApplicationUnitOfWork _uow;
 
   public CreateOrderHelper(IRepositoryWithEvents<Order> repository, IReadRepository<ServiceCatalog> serviceCatalogRepo,
     ITenantSequenceGenerator sequenceGenerator, IVatQrCodeGenerator barcodeGenerator,
     IVatSettingProvider vatSettingProvider, IStringLocalizer<CreateOrderHelper> localizer, ISystemTime systemTime,
-    ICashRegisterService cashRegisterService, ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor)
+    ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor,
+    IApplicationUnitOfWork uow, IRepositoryWithEvents<CashRegister> cashRegisterRepo)
   {
     _repository = repository;
     _serviceCatalogRepo = serviceCatalogRepo;
@@ -50,9 +53,10 @@ public class CreateOrderHelper : ICreateOrderHelper
     _vatSettingProvider = vatSettingProvider;
     _t = localizer;
     _systemTime = systemTime;
-    _cashRegisterService = cashRegisterService;
     _cashRegisterResolver = cashRegisterResolver;
     _httpContextAccessor = httpContextAccessor;
+    _uow = uow;
+    _cashRegisterRepo = cashRegisterRepo;
   }
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
@@ -106,15 +110,19 @@ public class CreateOrderHelper : ICreateOrderHelper
     string invoiceQrCode = _barcodeGenerator.ToBase64(barcodeInfo);
     order.SetInvoiceQrCode(invoiceQrCode);
 
-    var cashRegister = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
+    var cashRegisterId = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
+    var cashRegister = await _cashRegisterRepo.GetByIdAsync(cashRegisterId, cancellationToken);
+
     foreach (var payment in payments)
     {
-      await _cashRegisterService.RegisterPayment(new ActivePaymentOperation(cashRegister, payment.PaymentMethodId, payment.Amount, _systemTime.Now, PaymentOperationType.In));
+      cashRegister.AddOperation(_uow, new ActivePaymentOperation(cashRegister, payment.PaymentMethodId, payment.Amount, _systemTime.Now, PaymentOperationType.In));
       var cashPayment = new OrderPayment(order.Id, payment.PaymentMethodId, payment.Amount);
       order.AddPayment(cashPayment);
     }
 
     await _repository.AddAsync(order, cancellationToken);
+
+    await _uow.CommitAsync(cancellationToken);
     return order;
   }
 }

@@ -1,24 +1,21 @@
 ﻿using Ardalis.Specification;
-using Ardalis.Specification.EntityFrameworkCore;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Common.Contracts;
-using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;
+using FSH.WebApi.Shared.Persistence;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-// Inherited from Ardalis.Specification's RepositoryBase<T>
 public class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
   where T : class, IAggregateRoot
 {
-  private readonly ApplicationDbContext _dbContext;
+  private readonly ApplicationUnitOfWork _uow;
 
-  public ApplicationDbRepository(ApplicationDbContext dbContext)
-    : base(dbContext)
+  public ApplicationDbRepository(ApplicationUnitOfWork uow)
+    : base(uow)
   {
-    _dbContext = dbContext;
+    _uow = uow;
   }
 
   // We override the default behavior when mapping to a dto.
@@ -33,35 +30,7 @@ public class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>,
   public async Task<List<T>> AddRangeAsync(List<T> entities,
     CancellationToken cancellationToken = default(CancellationToken))
   {
-    await _dbContext.Set<T>().AddRangeAsync(entities, cancellationToken);
-    await SaveChangesAsync(cancellationToken);
-
-    return entities;
-  }
-}
-
-public class TenantDbRepository<TEntity> : RepositoryBase<TEntity>,
-  IReadTenantRepository<TEntity>, ITenantRepository<TEntity>
-  where TEntity : class
-{
-  private readonly TenantDbContext _dbContext;
-
-  public TenantDbRepository(TenantDbContext dbContext)
-    : base(dbContext)
-  {
-    _dbContext = dbContext;
-  }
-
-  protected override IQueryable<TResult> ApplySpecification<TResult>(ISpecification<TEntity, TResult> specification) =>
-    specification.Selector is not null
-      ? base.ApplySpecification(specification)
-      : ApplySpecification(specification, false)
-        .ProjectToType<TResult>();
-
-  public async Task<List<TEntity>> AddRangeAsync(List<TEntity> entities,
-    CancellationToken cancellationToken = default(CancellationToken))
-  {
-    await _dbContext.Set<TEntity>().AddRangeAsync(entities, cancellationToken);
+    await _uow.Set<T>().AddRangeAsync(entities, cancellationToken);
     await SaveChangesAsync(cancellationToken);
 
     return entities;

@@ -1,5 +1,6 @@
 using Ardalis.SmartEnum;
 using FSH.WebApi.Domain.Structure;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Domain.Operation;
 
@@ -52,13 +53,14 @@ public class CashRegister : BaseEntity, IAggregateRoot
     _activeOperations = _activeOperations.Except(committedOperations).ToList();
   }
 
-  public void AddOperation(ActivePaymentOperation operation)
+  public async Task AddOperation(IApplicationUnitOfWork uow, ActivePaymentOperation operation)
   {
     if (!Opened)
     {
       throw new InvalidOperationException("Cash register is not opened");
     }
 
+    await uow.Set<ActivePaymentOperation>().AddAsync(operation);
     _activeOperations.Add(operation);
 
     UpdateBalance(operation);
