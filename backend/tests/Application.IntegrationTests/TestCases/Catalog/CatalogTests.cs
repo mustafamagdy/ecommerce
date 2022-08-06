@@ -47,8 +47,7 @@ public class CatalogTests : TestFixture
     brands.Should().NotBeNull();
     brands.Data.Should().NotBeNullOrEmpty();
     var newItemCount = brands.TotalCount;
-    newItemCount.Should().BeGreaterThan(0);
-    newItemCount.Should().BeGreaterThan(itemCount);
+    newItemCount.Should().Be(itemCount + 1);
     brands.Data.Should().Contain(a => a.Name == newBrand.Name);
   }
 
