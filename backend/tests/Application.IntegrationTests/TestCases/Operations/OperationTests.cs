@@ -240,6 +240,8 @@ public class OperationsTests : TestFixture
       }
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var order = await _.Content.ReadFromJsonAsync<OrderDto>();
+    order.Should().NotBeNull();
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest()
     {
@@ -253,7 +255,7 @@ public class OperationsTests : TestFixture
     operations.Data.Count.Should().Be(1);
     var operation = operations.Data[0];
     operation.Should().NotBeNull();
-    operation.Amount.Should().Be((randomItem.Price * item.Qty) * (1 + TEMPHelper.VatPercent()));
+    operation.Amount.Should().Be(order.NetAmount);
   }
 
   [Fact]
