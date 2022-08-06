@@ -1,4 +1,6 @@
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Exceptions;
 using FSH.WebApi.Shared.Finance;
@@ -17,12 +19,15 @@ public class RequireOpenCashRegisterHeaderAttribute : Attribute
 public class RequireOpenCashRegisterFilter : IAsyncActionFilter
 {
   private readonly ICashRegisterResolver _cashRegisterResolver;
+  private readonly IReadRepository<CashRegister> _cashRegisterRepo;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
-  public RequireOpenCashRegisterFilter(ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor)
+  public RequireOpenCashRegisterFilter(ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor,
+    IReadRepository<CashRegister> cashRegisterRepo)
   {
     _cashRegisterResolver = cashRegisterResolver;
     _httpContextAccessor = httpContextAccessor;
+    _cashRegisterRepo = cashRegisterRepo;
   }
 
   public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -36,8 +41,8 @@ public class RequireOpenCashRegisterFilter : IAsyncActionFilter
     }
     else
     {
-      var cashRegister = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
-
+      var cashRegisterId = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
+      var cashRegister = await _cashRegisterRepo.GetByIdAsync(cashRegisterId);
       if (!cashRegister.Opened)
       {
         throw new InvalidCashRegisterOperation("Cash register is not opened for operations");

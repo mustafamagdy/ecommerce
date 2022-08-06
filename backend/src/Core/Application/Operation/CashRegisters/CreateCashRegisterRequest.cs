@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
@@ -29,13 +30,20 @@ public class CreateCashRegisterRequestValidator : CustomValidator<CreateCashRegi
 public class CreateCashRegisterRequestHandler : IRequestHandler<CreateCashRegisterRequest, Guid>
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CreateCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository) => _repository = repository;
+  public CreateCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository, IApplicationUnitOfWork uow)
+  {
+    _repository = repository;
+    _uow = uow;
+  }
 
   public async Task<Guid> Handle(CreateCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var cr = new CashRegister(request.BranchId, request.Name, request.Color);
     await _repository.AddAsync(cr, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
+
     return cr.Id;
   }
 }

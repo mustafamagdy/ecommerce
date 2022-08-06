@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
@@ -20,11 +21,13 @@ public class OpenCashRegisterRequestHandler : IRequestHandler<OpenCashRegisterRe
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
   private readonly IStringLocalizer<OpenCashRegisterRequestHandler> _t;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public OpenCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository, IStringLocalizer<OpenCashRegisterRequestHandler> localizer)
+  public OpenCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository, IStringLocalizer<OpenCashRegisterRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _t = localizer;
+    _uow = uow;
   }
 
   public async Task<string> Handle(OpenCashRegisterRequest request, CancellationToken cancellationToken)
@@ -38,6 +41,7 @@ public class OpenCashRegisterRequestHandler : IRequestHandler<OpenCashRegisterRe
     cr.Open();
 
     await _repository.UpdateAsync(cr, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
     return _t["Cash register opened"];
   }
 }
@@ -46,11 +50,13 @@ public class CloseCashRegisterRequestHandler : IRequestHandler<CloseCashRegister
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
   private readonly IStringLocalizer<CloseCashRegisterRequestHandler> _t;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CloseCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository, IStringLocalizer<CloseCashRegisterRequestHandler> localizer)
+  public CloseCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository, IStringLocalizer<CloseCashRegisterRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _t = localizer;
+    _uow = uow;
   }
 
   public async Task<string> Handle(CloseCashRegisterRequest request, CancellationToken cancellationToken)
@@ -64,6 +70,7 @@ public class CloseCashRegisterRequestHandler : IRequestHandler<CloseCashRegister
     cr.Close();
 
     await _repository.UpdateAsync(cr, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
     return _t["Cash register closed"];
   }
 }

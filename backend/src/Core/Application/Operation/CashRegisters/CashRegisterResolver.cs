@@ -16,7 +16,7 @@ public class CashRegisterResolver : ICashRegisterResolver
     _cashRegisterRepo = cashRegisterRepo;
   }
 
-  public async Task<CashRegister> Resolve(object context)
+  public async Task<Guid> Resolve(object context)
   {
     if (context is not HttpContext && context is not NameValueCollection)
     {
@@ -42,6 +42,6 @@ public class CashRegisterResolver : ICashRegisterResolver
       throw new NotFoundException("Cash register provided in header is not valid");
     }
 
-    return cashRegister;
+    return cashRegisterId;
   }
 }

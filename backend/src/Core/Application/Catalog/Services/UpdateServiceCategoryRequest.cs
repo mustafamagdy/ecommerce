@@ -1,3 +1,5 @@
+using FSH.WebApi.Shared.Persistence;
+
 namespace FSH.WebApi.Application.Catalog.Services;
 
 public class UpdateServiceRequest : IRequest<Guid>
@@ -23,15 +25,16 @@ public class UpdateServiceRequestValidator : CustomValidator<UpdateServiceReques
 
 public class UpdateServiceRequestHandler : IRequestHandler<UpdateServiceRequest, Guid>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Service> _repository;
   private readonly IStringLocalizer _t;
   private readonly IFileStorageService _fileStorage;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public UpdateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IStringLocalizer<UpdateServiceRequestHandler> localizer, IFileStorageService fileStorage)
+  public UpdateServiceRequestHandler(IRepositoryWithEvents<Service> repository, IStringLocalizer<UpdateServiceRequestHandler> localizer, IFileStorageService fileStorage, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _fileStorage = fileStorage;
+    _uow = uow;
     _t = localizer;
   }
 
@@ -52,6 +55,7 @@ public class UpdateServiceRequestHandler : IRequestHandler<UpdateServiceRequest,
     }
 
     await _repository.UpdateAsync(service, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
     return request.Id;
   }
 }

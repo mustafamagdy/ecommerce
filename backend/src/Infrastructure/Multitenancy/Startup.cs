@@ -6,6 +6,7 @@ using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,7 @@ internal static class Startup
         dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
         dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
+      .AddTenantUnitOfWork()
       .AddMultiTenant<FSHTenantInfo>()
       .WithClaimStrategy(FSHClaims.Tenant)
       .WithHostStrategy(MultitenancyConstants.TenantIdName)
@@ -44,6 +46,11 @@ internal static class Startup
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
       .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
   }
+
+  private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)
+    => services
+      .AddScoped<ITenantUnitOfWork, TenantUnitOfWork>()
+      .AddScoped<TenantUnitOfWork>();
 
   internal static IApplicationBuilder UseMultiTenancy(this IApplicationBuilder app) =>
     app.UseMultiTenant();

@@ -9,6 +9,7 @@ using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.Persistence.Repository;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +49,7 @@ internal static class Startup
         dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
         dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
+      .AddApplicationUnitOfWork()
       .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
       .AddTransient<ApplicationDbInitializer>()
       .AddTransient<ApplicationDbSeeder>()
@@ -72,6 +74,11 @@ internal static class Startup
         };
       });
   }
+
+  private static IServiceCollection AddApplicationUnitOfWork(this IServiceCollection services)
+    => services
+      .AddScoped<IApplicationUnitOfWork, ApplicationUnitOfWork>()
+      .AddScoped<ApplicationUnitOfWork>();
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
   {

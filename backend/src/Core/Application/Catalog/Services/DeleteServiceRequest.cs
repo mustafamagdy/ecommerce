@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Catalog.ServiceCatalogs;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Catalog.Services;
 
@@ -15,10 +16,16 @@ public class DeleteServiceRequestHandler : IRequestHandler<DeleteServiceRequest,
   private readonly IReadRepository<ServiceCatalog> _serviceCatalogRepo;
   private readonly IRepositoryWithEvents<Service> _serviceRepo;
   private readonly IStringLocalizer _t;
+  private readonly IApplicationUnitOfWork _uow;
 
   public DeleteServiceRequestHandler(IReadRepository<ServiceCatalog> serviceCatalogRepo, IRepositoryWithEvents<Service> serviceRepo,
-    IStringLocalizer<DeleteServiceRequestHandler> localizer) =>
-    (_serviceCatalogRepo, _serviceRepo, _t) = (serviceCatalogRepo, serviceRepo, localizer);
+    IStringLocalizer<DeleteServiceRequestHandler> localizer, IApplicationUnitOfWork uow)
+  {
+    _serviceCatalogRepo = serviceCatalogRepo;
+    _serviceRepo = serviceRepo;
+    _uow = uow;
+    _t = localizer;
+  }
 
   public async Task<Guid> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
   {
@@ -32,7 +39,7 @@ public class DeleteServiceRequestHandler : IRequestHandler<DeleteServiceRequest,
     _ = service ?? throw new NotFoundException(_t["Service {0} Not Found.", request.Id]);
 
     await _serviceRepo.DeleteAsync(service, cancellationToken);
-
+    await _uow.CommitAsync(cancellationToken);
     return request.Id;
   }
 }
