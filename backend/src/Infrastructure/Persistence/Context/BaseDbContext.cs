@@ -66,6 +66,9 @@ public abstract class BaseDbContext
       optionsBuilder.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
     }
 
+    TenantMismatchMode = TenantMismatchMode.Overwrite;
+    TenantNotSetMode = TenantNotSetMode.Overwrite;
+
     string connectionString = string.Empty;
     if (_currentTenant != null && _currentSubscriptionType != null)
     {

@@ -1,9 +1,9 @@
 using FSH.WebApi.Application.Common.Exceptions;
-using FSH.WebApi.Application.Common.Persistence;
-using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Infrastructure.Common.Exceptions;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Exceptions;
+using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -16,11 +16,13 @@ public class RequireOpenCashRegisterHeaderAttribute : Attribute
 
 public class RequireOpenCashRegisterFilter : IAsyncActionFilter
 {
-  private readonly IReadRepository<CashRegister> _cashRegisterRepo;
+  private readonly ICashRegisterResolver _cashRegisterResolver;
+  private readonly IHttpContextAccessor _httpContextAccessor;
 
-  public RequireOpenCashRegisterFilter(IReadRepository<CashRegister> cashRegisterRepo)
+  public RequireOpenCashRegisterFilter(ICashRegisterResolver cashRegisterResolver, IHttpContextAccessor httpContextAccessor)
   {
-    _cashRegisterRepo = cashRegisterRepo;
+    _cashRegisterResolver = cashRegisterResolver;
+    _httpContextAccessor = httpContextAccessor;
   }
 
   public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -34,22 +36,7 @@ public class RequireOpenCashRegisterFilter : IAsyncActionFilter
     }
     else
     {
-      if (!context.HttpContext.Request.Headers.TryGetValue(MultitenancyConstants.CashRegisterHeaderName, out var headerValues)
-          || headerValues.Count == 0)
-      {
-        throw new MissingHeaderException("Cash register header is not provided for operation");
-      }
-
-      if (!Guid.TryParse(headerValues[0], out var cashRegisterId))
-      {
-        throw new MissingHeaderException("Cash register header is not provided for operation");
-      }
-
-      var cashRegister = await _cashRegisterRepo.GetByIdAsync(cashRegisterId);
-      if (cashRegister == null)
-      {
-        throw new NotFoundException("Cash register provided in header is not valid");
-      }
+      var cashRegister = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
 
       if (!cashRegister.Opened)
       {

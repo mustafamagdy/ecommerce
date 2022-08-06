@@ -54,24 +54,19 @@ public abstract class TenantSubscriptionConfig<T, TSubscription> : IEntityTypeCo
 
 public class TenantProdSubscriptionConfig : TenantSubscriptionConfig<TenantProdSubscription, StandardSubscription>
 {
-  public virtual void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
+  public override void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
   {
+    base.Configure(builder);
     builder.HasMany(a => a.Payments).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }
 
 public class TenantDemoSubscriptionConfig : TenantSubscriptionConfig<TenantDemoSubscription, DemoSubscription>
 {
-  public virtual void Configure(EntityTypeBuilder<TenantDemoSubscription> builder)
-  {
-  }
 }
 
 public class TenantTrainSubscriptionConfig : TenantSubscriptionConfig<TenantTrainSubscription, TrainSubscription>
 {
-  public virtual void Configure(EntityTypeBuilder<TenantTrainSubscription> builder)
-  {
-  }
 }
 
 public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHistory>

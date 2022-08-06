@@ -1,7 +1,6 @@
 using System.Net;
-using FSH.WebApi.Shared.Exceptions;
 
-namespace FSH.WebApi.Infrastructure.Common.Exceptions;
+namespace FSH.WebApi.Shared.Exceptions;
 
 public class MissingHeaderException : CustomException
 {

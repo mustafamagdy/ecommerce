@@ -5,7 +5,7 @@ namespace FSH.WebApi.Domain.Operation;
 
 public class CashRegister : BaseEntity, IAggregateRoot
 {
-  public CashRegister()
+  private CashRegister()
   {
   }
 
@@ -16,12 +16,18 @@ public class CashRegister : BaseEntity, IAggregateRoot
     Color = color;
   }
 
+  private List<ActivePaymentOperation> _activeOperations = new();
+  private readonly List<ArchivedPaymentOperation> _archivedOperations = new();
+
   public Guid BranchId { get; set; }
   public virtual Branch Branch { get; set; }
   public string Name { get; set; }
   public string Color { get; set; }
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
+
+  public virtual IReadOnlyList<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
+  public virtual IReadOnlyList<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
 
   public void Open()
   {
@@ -46,20 +52,14 @@ public class CashRegister : BaseEntity, IAggregateRoot
     _activeOperations = _activeOperations.Except(committedOperations).ToList();
   }
 
-  private List<ActivePaymentOperation> _activeOperations = new();
-  private List<ArchivedPaymentOperation> _archivedOperations = new();
-
-  public IReadOnlyList<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
-  public IReadOnlyList<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
-
-  public void AddOperation(PaymentOperation operation)
+  public void AddOperation(ActivePaymentOperation operation)
   {
     if (!Opened)
     {
       throw new InvalidOperationException("Cash register is not opened");
     }
 
-    _activeOperations.Add((ActivePaymentOperation)operation);
+    _activeOperations.Add(operation);
 
     UpdateBalance(operation);
   }
@@ -107,15 +107,30 @@ public abstract class PaymentOperation : BaseEntity, IAggregateRoot
   public PaymentOperationType Type { get; set; }
 
   public Guid CashRegisterId { get; set; }
-  public virtual CashRegister CashRegister { get; set; }
+  public CashRegister CashRegister { get; set; }
   public Guid PaymentMethodId { get; set; }
-  public virtual PaymentMethod PaymentMethod { get; set; }
+  public PaymentMethod PaymentMethod { get; set; }
 
   public Guid? PendingTransferId { get; set; }
 }
 
 public class ActivePaymentOperation : PaymentOperation
 {
+  private ActivePaymentOperation()
+  {
+  }
+
+  public ActivePaymentOperation(CashRegister cashRegister, Guid paymentMethodId, decimal amount,
+    DateTime date, PaymentOperationType type)
+  {
+    Amount = amount;
+    Type = type;
+    DateTime = date;
+    PaymentMethodId = paymentMethodId;
+    CashRegister = cashRegister;
+    CashRegisterId = cashRegister.Id;
+  }
+
   public static (ActivePaymentOperation source, ActivePaymentOperation dest) CreateTransfer(Guid sourceCashRegisterId,
     Guid destinationCashRegisterId, decimal amount, DateTime opDate)
   {
@@ -139,18 +154,6 @@ public class ActivePaymentOperation : PaymentOperation
     };
 
     return (src, dest);
-  }
-
-  public static implicit operator ArchivedPaymentOperation(ActivePaymentOperation op)
-  {
-    return new ArchivedPaymentOperation
-    {
-      Amount = op.Amount,
-      Id = op.Id,
-      CashRegisterId = op.CashRegisterId,
-      PaymentMethodId = op.PaymentMethodId,
-      Type = op.Type,
-    };
   }
 }
 

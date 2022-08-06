@@ -265,7 +265,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("ActivePaymentOperation", "Shared");
+                    b.ToTable("ActivePaymentOperations", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -307,7 +307,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("ArchivedPaymentOperation", "Shared");
+                    b.ToTable("ArchivedPaymentOperations", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -319,7 +319,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
 
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uuid");
@@ -551,9 +552,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.HasKey("Id");
 
                     b.ToTable("PaymentMethods", "Shared");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>

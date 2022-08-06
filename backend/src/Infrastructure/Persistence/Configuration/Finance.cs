@@ -8,20 +8,27 @@ namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
 public class CashRegisterConfig : IEntityTypeConfiguration<CashRegister>
 {
-  public void Configure(EntityTypeBuilder<CashRegister> builder)
+  public virtual void Configure(EntityTypeBuilder<CashRegister> builder)
   {
     builder.IsMultiTenant();
 
     builder.HasOne(a => a.Branch).WithMany(a => a.CashRegisters).HasForeignKey(a => a.BranchId);
-    builder.HasMany(a => a.ActiveOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
+
+    var activeOperations = builder.Navigation(nameof(CashRegister.ActiveOperations));
+    activeOperations.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
+    // builder.HasMany(a => a.ActiveOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
     builder.HasMany(a => a.ArchivedOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
+
+    builder
+      .Property(b => b.Balance)
+      .HasPrecision(7, 3);
   }
 }
 
 public abstract class BasePaymentOperationConfig<T> : IEntityTypeConfiguration<T>
   where T : PaymentOperation
 {
-  public void Configure(EntityTypeBuilder<T> builder)
+  public virtual void Configure(EntityTypeBuilder<T> builder)
   {
     builder.IsMultiTenant();
     builder
@@ -39,16 +46,18 @@ public abstract class BasePaymentOperationConfig<T> : IEntityTypeConfiguration<T
 
 public class ActivePaymentOperationConfig : BasePaymentOperationConfig<ActivePaymentOperation>
 {
-  public void Configure(EntityTypeBuilder<ActivePaymentOperation> builder)
+  public override void Configure(EntityTypeBuilder<ActivePaymentOperation> builder)
   {
+    base.Configure(builder);
     builder.HasOne(a => a.CashRegister).WithMany(a => a.ActiveOperations).HasForeignKey(a => a.CashRegisterId);
   }
 }
 
 public class ArchivedPaymentOperationConfig : BasePaymentOperationConfig<ArchivedPaymentOperation>
 {
-  public void Configure(EntityTypeBuilder<ArchivedPaymentOperation> builder)
+  public override void Configure(EntityTypeBuilder<ArchivedPaymentOperation> builder)
   {
+    base.Configure(builder);
     builder.HasOne(a => a.CashRegister).WithMany(a => a.ArchivedOperations).HasForeignKey(a => a.CashRegisterId);
   }
 }
