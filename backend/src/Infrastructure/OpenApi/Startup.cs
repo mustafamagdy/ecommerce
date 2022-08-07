@@ -22,6 +22,7 @@ internal static class Startup
     services.AddEndpointsApiExplorer();
     services.AddOpenApiDocument((document, serviceProvider) =>
     {
+
       document.PostProcess = doc =>
       {
         doc.Info.Title = settings.Title;

@@ -15,14 +15,13 @@ public sealed class BrandByNameSpec : Specification<Brand>, ISingleResultSpecifi
 
 public class CreateBrandRequestValidator : CustomValidator<CreateBrandRequest>
 {
-  public CreateBrandRequestValidator(
-    IReadRepository<Brand> repository,
-    IStringLocalizer<CreateBrandRequestValidator> T) =>
-    RuleFor(p => p.Name)
-      .NotEmpty()
-      .MaximumLength(75)
-      .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new BrandByNameSpec(name), ct) is null)
-      .WithMessage((_, name) => T["Brand {0} already Exists.", name]);
+  public CreateBrandRequestValidator(IReadRepository<Brand> repository, IStringLocalizer<CreateBrandRequestValidator> T)
+    =>
+      RuleFor(p => p.Name)
+        .NotEmpty()
+        .MaximumLength(75)
+        .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new BrandByNameSpec(name), ct) is null)
+        .WithMessage((_, name) => T["Brand {0} already Exists.", name]);
 }
 
 public class CreateBrandRequestHandler : IRequestHandler<CreateBrandRequest, Guid>
