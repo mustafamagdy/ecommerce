@@ -18,7 +18,7 @@ public class OrdersController : VersionedApiController
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
   [OpenApiOperation("Create a new order.", "")]
   [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task<OrderDto> CreateAsync(CreateCashOrderRequest request)
+  public Task<OrderDto> CreateCash(CreateCashOrderRequest request)
   {
     return Mediator.Send(request);
   }
@@ -27,7 +27,7 @@ public class OrdersController : VersionedApiController
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
   [OpenApiOperation("Create a new order.", "")]
   [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task<OrderDto> CreateAsync(CreateOrderWithNewCustomerRequest request)
+  public Task<OrderDto> CreateWithCustomer(CreateOrderWithNewCustomerRequest request)
   {
     return Mediator.Send(request);
   }
