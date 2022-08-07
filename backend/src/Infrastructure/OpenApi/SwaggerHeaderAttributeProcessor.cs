@@ -13,8 +13,7 @@ public class SwaggerHeaderAttributeProcessor : IOperationProcessor
 
     var parameters = context.OperationDescription.Operation.Parameters;
 
-    var existingParam = parameters.FirstOrDefault(p =>
-      p.Kind == OpenApiParameterKind.Header && p.Name == attribute.HeaderName);
+    var existingParam = parameters.FirstOrDefault(p => p.Kind == OpenApiParameterKind.Header && p.Name == attribute.HeaderName);
     if (existingParam is not null)
     {
       parameters.Remove(existingParam);

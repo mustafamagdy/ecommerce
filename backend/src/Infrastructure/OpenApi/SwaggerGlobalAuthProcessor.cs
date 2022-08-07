@@ -1,20 +1,12 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Namotion.Reflection;
 using NSwag;
 using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
 namespace FSH.WebApi.Infrastructure.OpenApi;
-
-internal static class ObjectExtensions
-{
-  public static T? TryGetPropertyValue<T>(this object? obj, string propertyName, T? defaultValue = default) =>
-    obj?.GetType().GetRuntimeProperty(propertyName) is PropertyInfo propertyInfo
-      ? (T?)propertyInfo.GetValue(obj)
-      : defaultValue;
-}
 
 /// <summary>
 /// The default NSwag AspNetCoreOperationProcessor doesn't take .RequireAuthorization() calls into account
@@ -37,7 +29,7 @@ public class SwaggerGlobalAuthProcessor : IOperationProcessor
 
   public bool Process(OperationProcessorContext context)
   {
-    IList<object>? list = ((AspNetCoreOperationProcessorContext)context).ApiDescription?.ActionDescriptor?.TryGetPropertyValue<IList<object>>("EndpointMetadata");
+    var list = ((AspNetCoreOperationProcessorContext)context).ApiDescription?.ActionDescriptor?.TryGetPropertyValue<IList<object>>("EndpointMetadata");
     if (list is not null)
     {
       if (list.OfType<AllowAnonymousAttribute>().Any())
