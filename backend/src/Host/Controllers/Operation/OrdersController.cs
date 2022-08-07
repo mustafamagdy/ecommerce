@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Operation.Orders;
 using FSH.WebApi.Infrastructure.Finance;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
@@ -15,8 +16,8 @@ public class OrdersController : VersionedApiController
 
   [HttpPost("cash")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
-  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
+  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
   public Task<OrderDto> CreateAsync(CreateCashOrderRequest request)
   {
     return Mediator.Send(request);
@@ -24,8 +25,8 @@ public class OrdersController : VersionedApiController
 
   [HttpPost("with-customer")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
-  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
+  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
   public Task<OrderDto> CreateAsync(CreateOrderWithNewCustomerRequest request)
   {
     return Mediator.Send(request);
@@ -33,8 +34,8 @@ public class OrdersController : VersionedApiController
 
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
-  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Create a new order.", "")]
+  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
   public Task<OrderDto> CreateAsync(CreateOrderRequest request)
   {
     return Mediator.Send(request);
@@ -59,8 +60,8 @@ public class OrdersController : VersionedApiController
 
   [HttpPut("cancel/{id:guid}")]
   [MustHavePermission(FSHAction.Cancel, FSHResource.Orders)]
-  [RequireOpenCashRegisterHeader]
   [OpenApiOperation("Cancel a order with its all payments.", "")]
+  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
   public Task CancelAsync(Guid id)
   {
     return Mediator.Send(new CancelOrderWithPaymentsRequest(id));
