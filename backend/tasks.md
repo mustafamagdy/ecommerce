@@ -50,6 +50,7 @@
     - print invoice, print history
 
 General
+- validation rules need to be common between backend and frontend
 - refactor domain models
 - update events for all models
 - tests
