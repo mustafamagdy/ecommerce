@@ -1,5 +1,4 @@
 using System.Net;
-using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Shared.Exceptions;
 using Microsoft.AspNetCore.Http;
@@ -33,15 +32,24 @@ internal class ExceptionMiddleware : IMiddleware
     }
     catch (Exception exception)
     {
-      string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
+      string email = _currentUser.GetUserEmail() ?? "Anonymous";
       var userId = _currentUser.GetUserId();
       string tenant = _currentUser.GetTenant() ?? string.Empty;
-      if (userId != Guid.Empty) LogContext.PushProperty("UserId", userId);
+      if (userId != Guid.Empty)
+      {
+        LogContext.PushProperty("UserId", userId);
+      }
+
       LogContext.PushProperty("UserEmail", email);
-      if (!string.IsNullOrEmpty(tenant)) LogContext.PushProperty("Tenant", tenant);
+      if (!string.IsNullOrEmpty(tenant))
+      {
+        LogContext.PushProperty("Tenant", tenant);
+      }
+
       string errorId = Guid.NewGuid().ToString();
       LogContext.PushProperty("ErrorId", errorId);
       LogContext.PushProperty("StackTrace", exception.StackTrace);
+
       var errorResult = new ErrorResult
       {
         Source = exception.TargetSite?.DeclaringType?.FullName,
