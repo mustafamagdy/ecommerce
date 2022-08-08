@@ -1,7 +1,6 @@
 using System.Reflection;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Infrastructure.OpenApi;
 using FSH.WebApi.Shared.Exceptions;
 using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
@@ -24,7 +23,7 @@ public class RequireOpenCashRegisterFilter : IAsyncActionFilter
   public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
   {
     var descriptor = context.ActionDescriptor as ControllerActionDescriptor;
-    var attribute = descriptor.MethodInfo.GetCustomAttribute(typeof(SwaggerHeaderAttribute)) as SwaggerHeaderAttribute;
+    var attribute = descriptor.MethodInfo.GetCustomAttribute(typeof(RequireOpenedCashRegisterAttribute)) as RequireOpenedCashRegisterAttribute;
     if (attribute != null && string.Equals(attribute.HeaderName, MultitenancyConstants.CashRegisterHeaderName, StringComparison.CurrentCultureIgnoreCase))
     {
       var cashRegisterId = await _cashRegisterResolver.Resolve(context.HttpContext);
