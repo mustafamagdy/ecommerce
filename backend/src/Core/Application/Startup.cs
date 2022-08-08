@@ -1,10 +1,5 @@
 using System.Reflection;
-using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Application.Operation.CashRegisters;
-using FSH.WebApi.Application.Operation.Orders;
-using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Domain.Operation;
-using Mapster;
+using FSH.WebApi.Application.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Application;
@@ -13,49 +8,11 @@ public static class Startup
 {
   public static IServiceCollection AddApplication(this IServiceCollection services)
   {
-    var assembly = Assembly.GetExecutingAssembly();
     DtoCustomMapping.Configure();
+
+    var assembly = Assembly.GetExecutingAssembly();
     return services
       .AddValidatorsFromAssembly(assembly)
       .AddMediatR(assembly);
-  }
-}
-
-public class DtoCustomMapping
-{
-  public static void Configure()
-  {
-    TypeAdapterConfig<Order, OrderDto>
-      .NewConfig()
-      .Map(dest => dest.OrderDate, src => src.OrderDate.ToString("dd/MM/yyyy"))
-      .Map(dest => dest.OrderTime, src => src.OrderDate.ToString("HH:mm:ss"))
-      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
-      ;
-
-    TypeAdapterConfig<Order, OrderExportDto>
-      .NewConfig()
-      .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
-      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber);
-
-    TypeAdapterConfig<TenantProdSubscription, ProdTenantSubscriptionDto>
-      .NewConfig()
-      .Map(dest => dest.SubscriptionId, src => src.Id)
-      .Map(dest => dest.History, src => src.History)
-      ;
-
-    TypeAdapterConfig<TenantProdSubscription, ProdTenantSubscriptionWithPaymentDto>
-      .NewConfig()
-      .Map(dest => dest.SubscriptionId, src => src.Id)
-      .Map(dest => dest.History, src => src.History);
-
-    TypeAdapterConfig<ActivePaymentOperation, CashRegisterOperationDto>
-      .NewConfig()
-      .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
-      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
-
-    TypeAdapterConfig<ArchivedPaymentOperation, CashRegisterOperationDto>
-      .NewConfig()
-      .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
-      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
   }
 }

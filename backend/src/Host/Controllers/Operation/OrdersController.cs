@@ -9,62 +9,68 @@ public class OrdersController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Orders)]
   [OpenApiOperation("Search orders using available filters.", "")]
-  public Task<PaginationResponse<OrderDto>> SearchAsync(SearchOrdersRequest request)
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
+  public Task<PaginationResponse<OrderDto>> SearchAsync(SearchOrdersRequest request, CancellationToken cancellationToken)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(request, cancellationToken);
   }
 
   [HttpPost("cash")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
   [OpenApiOperation("Create a new order.", "")]
-  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task<OrderDto> CreateAsync(CreateCashOrderRequest request)
+  [RequireOpenedCashRegister]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Create1))]
+  public Task<OrderDto> CreateCash(CreateCashOrderRequest request, CancellationToken cancellationToken)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(request, cancellationToken);
   }
 
   [HttpPost("with-customer")]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
   [OpenApiOperation("Create a new order.", "")]
-  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task<OrderDto> CreateAsync(CreateOrderWithNewCustomerRequest request)
+  [RequireOpenedCashRegister]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Create))]
+  public Task<OrderDto> CreateWithCustomer(CreateOrderWithNewCustomerRequest request, CancellationToken cancellationToken)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(request, cancellationToken);
   }
 
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Orders)]
   [OpenApiOperation("Create a new order.", "")]
-  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task<OrderDto> CreateAsync(CreateOrderRequest request)
+  [RequireOpenedCashRegister]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Create))]
+  public Task<OrderDto> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(request, cancellationToken);
   }
 
   [HttpGet("{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
   [OpenApiOperation("Get order details.", "")]
-  public Task<OrderDto> GetAsync(Guid id)
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.GetAsync))]
+  public Task<OrderDto> GetAsync(Guid id, CancellationToken cancellationToken)
   {
-    return Mediator.Send(new GetOrderRequest(id));
+    return Mediator.Send(new GetOrderRequest(id), cancellationToken);
   }
 
   [HttpGet("pdf/{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
   [OpenApiOperation("Export Pdf invoice receipt for an order.", "")]
-  public async Task<FileResult> ExportPdfInvoiceAsync(Guid id)
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Generate))]
+  public async Task<FileResult> ExportPdfInvoiceAsync(Guid id, CancellationToken cancellationToken)
   {
-    (string orderNumber, var generatedPdf) = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id });
+    (string orderNumber, var generatedPdf) = await Mediator.Send(new ExportOrderInvoiceRequest { OrderId = id }, cancellationToken);
     return File(generatedPdf, "application/octet-stream", $"invoice_{orderNumber}.pdf");
   }
 
   [HttpPut("cancel/{id:guid}")]
   [MustHavePermission(FSHAction.Cancel, FSHResource.Orders)]
   [OpenApiOperation("Cancel a order with its all payments.", "")]
-  [SwaggerHeader(MultitenancyConstants.CashRegisterHeaderName, "Cash register Id", isRequired: true)]
-  public Task CancelAsync(Guid id)
+  [RequireOpenedCashRegister]
+  public Task CancelAsync(Guid id, CancellationToken cancellationToken)
   {
-    return Mediator.Send(new CancelOrderWithPaymentsRequest(id));
+    return Mediator.Send(new CancelOrderWithPaymentsRequest(id), cancellationToken);
   }
 
   // [HttpPut("{id:guid}")]
