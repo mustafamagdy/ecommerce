@@ -2,6 +2,7 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
@@ -17,8 +18,9 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 public class ApplicationDbContext : BaseDbContext
 {
   public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionInfo subscriptionInfo, DbContextOptions options, ICurrentUser currentUser,
-    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings, TenantDbContext tenantDb)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionInfo, tenantDb)
+    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
+    ITenantConnectionStringResolver tenantConnectionStringResolver)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionInfo, tenantConnectionStringResolver)
   {
   }
 
