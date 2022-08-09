@@ -71,7 +71,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     var orderItems = new List<OrderItem>();
     foreach (var item in items)
     {
-      var serviceItem = await _serviceCatalogRepo.GetBySpecAsync(new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
+      var serviceItem = await _serviceCatalogRepo.FirstOrDefaultAsync(new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
       if (serviceItem is null)
       {
         throw new ArgumentNullException(_t["Service catalog item {0} is not found", item.ItemId]);
