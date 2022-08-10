@@ -18,8 +18,8 @@ public class Order : AuditableEntity, IAggregateRoot
   public string QrCodeBase64 { get; private set; }
   public Customer Customer { get; private set; }
 
-  public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
-  public IReadOnlyList<OrderPayment> OrderPayments => _orderPayments.AsReadOnly();
+  public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
+  public IReadOnlyCollection<OrderPayment> OrderPayments => _orderPayments.AsReadOnly();
 
   public decimal TotalAmount => OrderItems?.Sum(a => a.Price * a.Qty) ?? 0;
   public decimal TotalVat => OrderItems?.Sum(a => a.VatAmount) ?? 0;
@@ -33,7 +33,7 @@ public class Order : AuditableEntity, IAggregateRoot
       QrCodeBase64 = invoiceQrCode;
   }
 
-  public void AddItem(OrderItem item)
+  private void AddItem(OrderItem item)
   {
     item.SetOrderId(Id);
     _orderItems.Add(item);
@@ -41,8 +41,7 @@ public class Order : AuditableEntity, IAggregateRoot
 
   public void AddItems(List<OrderItem> items)
   {
-    items.ForEach(a => a.SetOrderId(Id));
-    _orderItems.AddRange(items);
+    items.ForEach(AddItem);
   }
 
   public void AddPayment(OrderPayment payment) => _orderPayments.Add(payment);
