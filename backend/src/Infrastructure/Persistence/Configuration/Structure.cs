@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class BranchConfig : IEntityTypeConfiguration<Branch>
+public class BranchConfig : BaseAuditableTenantEntityConfiguration<Branch>
 {
-  public void Configure(EntityTypeBuilder<Branch> builder)
+  public override void Configure(EntityTypeBuilder<Branch> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder.HasMany(a => a.CashRegisters).WithOne(a => a.Branch).HasForeignKey(a => a.BranchId);
   }

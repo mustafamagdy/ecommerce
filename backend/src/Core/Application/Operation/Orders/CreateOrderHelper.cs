@@ -7,7 +7,9 @@ using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
 using FSH.WebApi.Shared.Persistence;
+using Mapster;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -112,10 +114,9 @@ public class CreateOrderHelper : ICreateOrderHelper
 
     var cashRegisterId = await _cashRegisterResolver.Resolve(_httpContextAccessor.HttpContext);
     var cashRegister = await _cashRegisterRepo.GetByIdAsync(cashRegisterId, cancellationToken);
-
     foreach (var payment in payments)
     {
-      cashRegister.AddOperation(_uow, new ActivePaymentOperation(cashRegister, payment.PaymentMethodId, payment.Amount, _systemTime.Now, PaymentOperationType.In));
+      cashRegister.AddOperation(new ActivePaymentOperation(cashRegister, payment.PaymentMethodId, payment.Amount, _systemTime.Now, PaymentOperationType.In));
       var cashPayment = new OrderPayment(order.Id, payment.PaymentMethodId, payment.Amount);
       order.AddPayment(cashPayment);
     }
