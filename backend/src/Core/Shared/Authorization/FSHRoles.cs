@@ -8,7 +8,7 @@ public static class FSHRoles
     public const string Basic = nameof(Basic);
     public const string Demo = nameof(Demo);
 
-    public static IReadOnlyList<string> DefaultRoles { get; } = new ReadOnlyCollection<string>(new[]
+    public static IReadOnlyCollection<string> DefaultRoles { get; } = new ReadOnlyCollection<string>(new[]
     {
         Admin,
         Basic,

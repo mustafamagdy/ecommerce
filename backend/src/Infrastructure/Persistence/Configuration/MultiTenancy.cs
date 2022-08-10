@@ -1,10 +1,5 @@
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Domain.Structure;
-using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
@@ -48,10 +43,7 @@ public abstract class TenantSubscriptionConfig<T, TSubscription> : BaseEntityCon
   public override void Configure(EntityTypeBuilder<T> builder)
   {
     base.Configure(builder);
-
-    builder.HasOne(a => a.Subscription).WithMany().HasForeignKey(a => a.SubscriptionId);
     builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantSubscriptionId);
-    builder.HasOne(a => a.Tenant).WithMany().HasForeignKey(a => a.TenantId);
   }
 }
 
@@ -93,7 +85,5 @@ public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<Subscr
     builder
       .Property(b => b.Amount)
       .HasPrecision(7, 3);
-
-    builder.HasOne(a => a.TenantProdSubscription).WithMany().HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }

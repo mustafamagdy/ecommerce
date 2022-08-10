@@ -37,7 +37,7 @@ public sealed class TenantProdSubscription : TenantSubscription<StandardSubscrip
   {
   }
 
-  public IReadOnlyList<SubscriptionPayment> Payments => _payments.AsReadOnly();
+  public IReadOnlyCollection<SubscriptionPayment> Payments => _payments.AsReadOnly();
 
   public decimal TotalPaid => Payments?.Sum(a => a.Amount) ?? 0;
   public decimal TotalDue => History.Sum(a => a.Price) - TotalPaid;
@@ -73,7 +73,7 @@ public abstract class TenantSubscription<T> : BaseEntity
   public FSHTenantInfo Tenant { get; set; }
   public string TenantId { get; set; }
 
-  public IReadOnlyList<SubscriptionHistory> History => _history.AsReadOnly();
+  public IReadOnlyCollection<SubscriptionHistory> History => _history.AsReadOnly();
 
   public virtual TenantSubscription<T> Renew(DateTime today)
   {

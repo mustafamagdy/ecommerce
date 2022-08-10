@@ -6,14 +6,15 @@ public class Service : AuditableEntity, IAggregateRoot, IHaveImage
   {
   }
 
-  public string Name { get; set; }
-  public string? Description { get; set; }
-  public string? ImageUrl { get; set; }
-
   public Service(string name, string? description, string? imageUrl)
   {
     Name = name;
     Description = description;
     ImageUrl = imageUrl;
   }
+
+  public string Name { get; private set; }
+  public string? Description { get; private set; }
+  public string? ImageUrl { get; private set; }
+  public void SetImageUrl(string imageUrl) => ImageUrl = imageUrl;
 }

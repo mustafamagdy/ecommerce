@@ -15,7 +15,7 @@ public abstract class BaseEntity<TId> : IEntity<TId>
   public TId Id { get; set; } = default!;
 
   [NotMapped]
-  public IReadOnlyList<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+  public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
   public void AddDomainEvent(DomainEvent @event) => _domainEvents.Add(@event);
   public void ClearDomainEvents() => _domainEvents.Clear();

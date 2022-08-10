@@ -30,5 +30,5 @@ public abstract class Payment : AuditableEntity, IAggregateRoot
 
   public decimal Amount { get; protected set; }
   public Guid PaymentMethodId { get; protected set; }
-  public PaymentMethod PaymentMethod { get; set; } = default!;
+  public PaymentMethod PaymentMethod { get; set; }
 }

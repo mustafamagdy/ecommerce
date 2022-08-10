@@ -28,8 +28,8 @@ public class CashRegister : AuditableEntity, IAggregateRoot
   public Guid BranchId { get; set; }
   public Branch Branch { get; private set; }
 
-  public IReadOnlyList<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
-  public IReadOnlyList<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
+  public IReadOnlyCollection<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
+  public IReadOnlyCollection<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
 
   public void Open()
   {
