@@ -1,6 +1,7 @@
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
@@ -20,4 +21,8 @@ public class TenantUnitOfWork : ITenantUnitOfWork
   {
     return _dbContext.SaveChangesAsync(cancellationToken);
   }
+
+  public string DebugLongView => _dbContext.ChangeTracker.DebugView.LongView;
+  public string DebugShortView => _dbContext.ChangeTracker.DebugView.ShortView;
+  public ChangeTracker ChangeTracker => _dbContext.ChangeTracker;
 }

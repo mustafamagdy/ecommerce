@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class BrandConfig : IEntityTypeConfiguration<Brand>
+public class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
 {
-  public void Configure(EntityTypeBuilder<Brand> builder)
+  public override void Configure(EntityTypeBuilder<Brand> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)
@@ -19,11 +19,11 @@ public class BrandConfig : IEntityTypeConfiguration<Brand>
   }
 }
 
-public class ProductConfig : IEntityTypeConfiguration<Product>
+public class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
 {
-  public void Configure(EntityTypeBuilder<Product> builder)
+  public override void Configure(EntityTypeBuilder<Product> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)
@@ -39,11 +39,11 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
   }
 }
 
-public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
+public class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<ServiceCatalog>
 {
-  public void Configure(EntityTypeBuilder<ServiceCatalog> builder)
+  public override void Configure(EntityTypeBuilder<ServiceCatalog> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Price)
@@ -57,11 +57,11 @@ public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
   }
 }
 
-public class ServiceConfig : IEntityTypeConfiguration<Service>
+public class ServiceConfig : BaseAuditableTenantEntityConfiguration<Service>
 {
-  public void Configure(EntityTypeBuilder<Service> builder)
+  public override void Configure(EntityTypeBuilder<Service> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)

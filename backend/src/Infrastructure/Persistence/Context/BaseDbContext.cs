@@ -2,6 +2,7 @@ using System.Data;
 using System.Diagnostics;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
 using FSH.WebApi.Infrastructure.Identity;
@@ -20,15 +21,15 @@ public abstract class BaseDbContext
 {
   private readonly ITenantInfo? _currentTenant;
   private readonly ISubscriptionInfo? _currentSubscriptionType;
-  private readonly TenantDbContext _tenantDb;
   private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
   private readonly DatabaseSettings _dbSettings;
+  private readonly ITenantConnectionStringResolver _tenantConnectionStringResolver;
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
+    ISubscriptionInfo currentSubscriptionType, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;
@@ -37,7 +38,7 @@ public abstract class BaseDbContext
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
     _currentSubscriptionType = currentSubscriptionType;
-    _tenantDb = tenantDb;
+    _tenantConnectionStringResolver = tenantConnectionStringResolver;
   }
 
   // Used by Dapper
@@ -74,14 +75,8 @@ public abstract class BaseDbContext
     {
       var subscriptionType = _currentSubscriptionType.SubscriptionType;
       var tenantId = _currentTenant.Id;
-      var tenant = _tenantDb.TenantInfo.Find(tenantId);
-      connectionString = subscriptionType.Name switch
-      {
-        nameof(SubscriptionType.Standard) => tenant.ConnectionString,
-        nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
-        nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
-        _ => throw new ArgumentOutOfRangeException(subscriptionType.Name)
-      };
+
+      connectionString = _tenantConnectionStringResolver.Resolve(tenantId, subscriptionType);
     }
 
     if (!string.IsNullOrWhiteSpace(connectionString))

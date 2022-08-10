@@ -1,15 +1,14 @@
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Domain.Operation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class CustomerConfig : IEntityTypeConfiguration<Customer>
+public class CustomerConfig : BaseTenantEntityConfiguration<Customer, DefaultIdType>
 {
-  public void Configure(EntityTypeBuilder<Customer> builder)
+  public override void Configure(EntityTypeBuilder<Customer> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)
@@ -23,11 +22,11 @@ public class CustomerConfig : IEntityTypeConfiguration<Customer>
   }
 }
 
-public class OrderConfig : IEntityTypeConfiguration<Order>
+public class OrderConfig : BaseAuditableTenantEntityConfiguration<Order>
 {
-  public void Configure(EntityTypeBuilder<Order> builder)
+  public override void Configure(EntityTypeBuilder<Order> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(a => a.OrderNumber)
@@ -35,21 +34,20 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
 
     builder.HasIndex(a => a.OrderNumber).IsUnique();
 
-    // builder.HasMany(a => a.OrderItems).WithOne(a => a.Order).HasForeignKey(a => a.OrderId);
-    // builder.HasMany(a => a.OrderPayments).WithOne(a => a.Order).HasForeignKey(a => a.OrderId);
-
     var orderItems = builder.Metadata.FindNavigation(nameof(Order.OrderItems));
     orderItems?.SetPropertyAccessMode(PropertyAccessMode.Field);
+
     var orderPayments = builder.Metadata.FindNavigation(nameof(Order.OrderPayments));
     orderPayments?.SetPropertyAccessMode(PropertyAccessMode.Field);
   }
 }
 
-public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
+public class OrderItemConfig : BaseTenantEntityConfiguration<OrderItem, DefaultIdType>
 {
-  public void Configure(EntityTypeBuilder<OrderItem> builder)
+  public override void Configure(EntityTypeBuilder<OrderItem> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
+
 
     builder
       .Property(b => b.ServiceName)
@@ -73,11 +71,11 @@ public class OrderItemConfig : IEntityTypeConfiguration<OrderItem>
   }
 }
 
-public class OrderPaymentConfig : IEntityTypeConfiguration<OrderPayment>
+public class OrderPaymentConfig : BaseAuditableTenantEntityConfiguration<OrderPayment>
 {
-  public void Configure(EntityTypeBuilder<OrderPayment> builder)
+  public override void Configure(EntityTypeBuilder<OrderPayment> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(a => a.Amount)
