@@ -5,7 +5,14 @@ using Microsoft.Extensions.Internal;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public class FSHTenantInfo : ITenantInfo
+public interface ITenantConnectionStrings
+{
+  string? ConnectionString { get; set; }
+  string? DemoConnectionString { get; set; }
+  string? TrainConnectionString { get; set; }
+}
+
+public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
 {
   public FSHTenantInfo()
   {
@@ -99,21 +106,9 @@ public class FSHTenantInfo : ITenantInfo
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
 
-  string? ITenantInfo.Id
-  {
-    get => Id;
-    set => Id = value ?? throw new InvalidOperationException("Id can't be null.");
-  }
+  string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
 
-  string? ITenantInfo.Identifier
-  {
-    get => Identifier;
-    set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null.");
-  }
+  string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
 
-  string? ITenantInfo.Name
-  {
-    get => Name;
-    set => Name = value ?? throw new InvalidOperationException("Name can't be null.");
-  }
+  string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
 }
