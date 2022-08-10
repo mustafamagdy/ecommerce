@@ -10,13 +10,16 @@ public class OrderItemRequest : IRequest<OrderItemDto>
 
 public class OrderItemRequestValidator : CustomValidator<OrderItemRequest>
 {
-  public OrderItemRequestValidator(IStringLocalizer<IBaseRequest> t)
+  public OrderItemRequestValidator(IStringLocalizer<IBaseRequest> t, IReadRepository<ServiceCatalog> serviceCatalogRepo)
   {
     RuleFor(p => p.Qty)
       .GreaterThan(0)
       .LessThan(100);
 
     RuleFor(p => p.ItemId)
-      .NotEmpty();
+      .NotEmpty()
+      .MustAsync(async (request, guid, cancellationToken)
+        => await serviceCatalogRepo.AnyAsync(new GetServiceCatalogDetailByIdSpec(guid), cancellationToken))
+      .WithMessage(t["Service catalog item not found"]);
   }
 }
