@@ -4,6 +4,16 @@ namespace FSH.WebApi.Domain.Operation;
 
 public class OrderItem : BaseEntity, IAggregateRoot
 {
+  public OrderItem(Guid serviceCatalogId, int qty, decimal price, string productName, string serviceName, decimal vatPercent)
+  {
+    ServiceCatalogId = serviceCatalogId;
+    Qty = qty;
+    Price = price;
+    VatPercent = vatPercent;
+    ProductName = productName;
+    ServiceName = serviceName;
+  }
+
   public string ProductName { get; private set; }
   public string ServiceName { get; private set; }
   public int Qty { get; private set; }
@@ -17,17 +27,6 @@ public class OrderItem : BaseEntity, IAggregateRoot
   public virtual Order Order { get; private set; }
   public Guid ServiceCatalogId { get; private set; }
   public virtual ServiceCatalog ServiceCatalog { get; private set; }
-
-  public OrderItem(string serviceName, string productName, Guid serviceCatalogId, int qty, decimal price, decimal vatPercent, Guid orderId)
-  {
-    ServiceName = serviceName;
-    ProductName = productName;
-    ServiceCatalogId = serviceCatalogId;
-    Qty = qty;
-    Price = price;
-    VatPercent = vatPercent;
-    OrderId = orderId;
-  }
 
   public OrderItem Update(string? serviceName, string? productName, Guid? serviceCatalogId, int? qty, decimal? price, decimal? vatPercent)
   {

@@ -12,12 +12,4 @@ public class Customer : BaseEntity, IAggregateRoot
     PhoneNumber = phoneNumber;
     CashDefault = cashDefault;
   }
-
-  public Customer Update(string? name, string? phoneNumber, bool? cashDefault)
-  {
-    if (name is not null && Name?.Equals(name) is not true) Name = name;
-    if (phoneNumber is not null && PhoneNumber?.Equals(phoneNumber) is not true) PhoneNumber = phoneNumber;
-    if (cashDefault is not null && CashDefault != cashDefault) CashDefault = cashDefault.Value;
-    return this;
-  }
 }
