@@ -83,7 +83,7 @@ public abstract class TenantSubscription<T> : BaseEntity
   }
 }
 
-public sealed class SubscriptionHistory : BaseEntity
+public sealed class SubscriptionHistory : AuditableEntity
 {
   private SubscriptionHistory()
   {

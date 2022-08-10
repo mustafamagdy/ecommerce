@@ -4,9 +4,9 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Domain.Structure;
 
-public class Branch : BaseEntity, IAggregateRoot
+public class Branch : AuditableEntity, IAggregateRoot
 {
-  public Branch()
+  private Branch()
   {
   }
 

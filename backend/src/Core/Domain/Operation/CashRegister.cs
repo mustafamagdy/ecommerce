@@ -4,7 +4,7 @@ using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Domain.Operation;
 
-public class CashRegister : BaseEntity, IAggregateRoot
+public class CashRegister : AuditableEntity, IAggregateRoot
 {
   private CashRegister()
   {
@@ -53,14 +53,13 @@ public class CashRegister : BaseEntity, IAggregateRoot
     _activeOperations = _activeOperations.Except(committedOperations).ToList();
   }
 
-  public async Task AddOperation(IApplicationUnitOfWork uow, ActivePaymentOperation operation)
+  public void AddOperation(ActivePaymentOperation operation)
   {
     if (!Opened)
     {
       throw new InvalidOperationException("Cash register is not opened");
     }
 
-    await uow.Set<ActivePaymentOperation>().AddAsync(operation);
     _activeOperations.Add(operation);
 
     UpdateBalance(operation);
@@ -102,7 +101,7 @@ public class CashRegister : BaseEntity, IAggregateRoot
   }
 }
 
-public abstract class PaymentOperation : BaseEntity, IAggregateRoot
+public abstract class PaymentOperation : AuditableEntity, IAggregateRoot
 {
   public DateTime DateTime { get; set; }
   public decimal Amount { get; set; }
