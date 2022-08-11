@@ -68,7 +68,7 @@ internal class ApplicationDbSeeder
     }
   }
 
-  private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyList<FSHPermission> permissions, ApplicationRole role)
+  private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyCollection<FSHPermission> permissions, ApplicationRole role)
   {
     var currentClaims = await _roleManager.GetClaimsAsync(role);
     foreach (var permission in permissions)

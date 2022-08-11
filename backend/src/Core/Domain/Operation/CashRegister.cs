@@ -20,15 +20,16 @@ public class CashRegister : AuditableEntity, IAggregateRoot
   private List<ActivePaymentOperation> _activeOperations = new();
   private readonly List<ArchivedPaymentOperation> _archivedOperations = new();
 
-  public Guid BranchId { get; set; }
-  public virtual Branch Branch { get; set; }
   public string Name { get; set; }
   public string Color { get; set; }
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
 
-  public virtual IReadOnlyList<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
-  public virtual IReadOnlyList<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
+  public Guid BranchId { get; set; }
+  public Branch Branch { get; private set; }
+
+  public IReadOnlyCollection<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
+  public IReadOnlyCollection<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
 
   public void Open()
   {
@@ -132,7 +133,7 @@ public class ActivePaymentOperation : PaymentOperation
     CashRegisterId = cashRegister.Id;
   }
 
-  public static (ActivePaymentOperation source, ActivePaymentOperation dest) CreateTransfer(Guid sourceCashRegisterId,
+  public static (ActivePaymentOperation Source, ActivePaymentOperation Destination) CreateTransfer(Guid sourceCashRegisterId,
     Guid destinationCashRegisterId, decimal amount, DateTime opDate)
   {
     var src = new ActivePaymentOperation
@@ -168,11 +169,6 @@ public sealed class PaymentOperationType : SmartEnum<PaymentOperationType, strin
   public static readonly PaymentOperationType PendingIn = new(nameof(PendingIn), "pending-in");
   public static readonly PaymentOperationType Out = new(nameof(Out), "out");
   public static readonly PaymentOperationType PendingOut = new(nameof(PendingOut), "pending-out");
-
-  public PaymentOperationType()
-    : base(null, null)
-  {
-  }
 
   private PaymentOperationType(string name, string value)
     : base(name, value)

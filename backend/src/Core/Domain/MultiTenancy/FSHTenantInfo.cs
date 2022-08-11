@@ -41,38 +41,44 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
   /// <summary>
   /// The actual TenantId, which is also used in the TenantId shadow property on the multitenant entities.
   /// </summary>
-  public string Id { get; set; } = default!;
+  public string Id { get; private set; }
 
   /// <summary>
   /// The identifier that is used in headers/routes/querystrings. This is set to the same as Id to avoid confusion.
   /// </summary>
-  public string Identifier { get; set; } = default!;
+  public string Identifier { get; private set; }
 
-  public string Name { get; set; } = default!;
+  public string Name { get; private set; }
 
-  public string AdminEmail { get; private set; } = default!;
-  public string? PhoneNumber { get; set; }
-  public string? VatNo { get; set; }
-  public string? Email { get; set; }
-  public string? Address { get; set; }
-  public string? AdminName { get; set; }
-  public string? AdminPhoneNumber { get; set; }
-  public string? TechSupportUserId { get; set; }
+  public string AdminEmail { get; private set; }
+  public string? PhoneNumber { get; private set; }
+  public string? VatNo { get; private set; }
+  public string? Email { get; private set; }
+  public string? Address { get; private set; }
+  public string? AdminName { get; private set; }
+  public string? AdminPhoneNumber { get; private set; }
+  public string? TechSupportUserId { get; private set; }
   public bool Active { get; private set; }
 
-  public TenantProdSubscription? ProdSubscription { get; set; }
-  public Guid? ProdSubscriptionId { get; set; }
+  public void SetProdSubscription(TenantProdSubscription subscription)
+  {
+    ProdSubscription = subscription;
+    ProdSubscriptionId = subscription.Id;
+  }
+
+  public TenantProdSubscription? ProdSubscription { get; private set; }
+  public Guid? ProdSubscriptionId { get; private set; }
   public string? ConnectionString { get; set; }
 
-  public TenantDemoSubscription? DemoSubscription { get; set; }
-  public Guid? DemoSubscriptionId { get; set; }
+  public TenantDemoSubscription? DemoSubscription { get; private set; }
+  public Guid? DemoSubscriptionId { get; private set; }
   public string? DemoConnectionString { get; set; }
 
-  public TenantTrainSubscription? TrainSubscription { get; set; }
-  public Guid? TrainSubscriptionId { get; set; }
+  public TenantTrainSubscription? TrainSubscription { get; private set; }
+  public Guid? TrainSubscriptionId { get; private set; }
   public string? TrainConnectionString { get; set; }
 
-  public virtual HashSet<Branch> Branches { get; set; } = default!;
+  public virtual HashSet<Branch> Branches { get; private set; }
 
   public decimal TotalDue => ProdSubscription?.TotalDue ?? 0;
   public decimal TotalPaid => ProdSubscription?.TotalPaid ?? 0;
@@ -102,7 +108,7 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
   /// <summary>
   /// Used by AzureAd Authorization to store the AzureAd Tenant Issuer to map against.
   /// </summary>
-  public string? Issuer { get; set; }
+  public string? Issuer { get; private set; }
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
 

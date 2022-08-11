@@ -1,15 +1,11 @@
 ﻿using System.Diagnostics;
-using System.Security.AccessControl;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
-using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Finance;
 using FSH.WebApi.Shared.Multitenancy;
 using FSH.WebApi.Shared.Persistence;
-using Mapster;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -70,18 +66,7 @@ public class CreateOrderHelper : ICreateOrderHelper
   private async Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer,
     List<OrderPaymentAmount> payments, bool cashOrder, CancellationToken cancellationToken)
   {
-    var orderItems = new List<OrderItem>();
-    foreach (var item in items)
-    {
-      var serviceItem = await _serviceCatalogRepo.FirstOrDefaultAsync(new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
-      if (serviceItem is null)
-      {
-        throw new ArgumentNullException(_t["Service catalog item {0} is not found", item.ItemId]);
-      }
-
-      orderItems.Add(new OrderItem(serviceItem.ServiceName, serviceItem.ProductName, item.ItemId, item.Qty,
-        serviceItem.Price, TEMPHelper.VatPercent(), Guid.Empty));
-    }
+    var orderItems = GetOrderItems(items, cancellationToken);
 
     if (cashOrder)
     {
@@ -100,7 +85,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
     var order = new Order(customer.Id, orderNumber, _systemTime.Now);
 
-    orderItems.ForEach(order.AddItem);
+    order.AddItems(orderItems);
 
     var barcodeInfo = new KsaInvoiceBarcodeInfoInfo(
       _vatSettingProvider.LegalEntityName,
@@ -125,5 +110,16 @@ public class CreateOrderHelper : ICreateOrderHelper
 
     await _uow.CommitAsync(cancellationToken);
     return order;
+  }
+
+  private List<OrderItem> GetOrderItems(IEnumerable<OrderItemRequest> items, CancellationToken cancellationToken)
+  {
+    return items.Select(async item =>
+      {
+        var serviceItem = await _serviceCatalogRepo.FirstOrDefaultAsync(new GetServiceCatalogDetailByIdSpec(item.ItemId), cancellationToken);
+        return new OrderItem(item.ItemId, item.Qty, serviceItem.Price, serviceItem.ProductName, serviceItem.ServiceName, TEMPHelper.VatPercent());
+      })
+      .Select(a => a.Result)
+      .ToList();
   }
 }

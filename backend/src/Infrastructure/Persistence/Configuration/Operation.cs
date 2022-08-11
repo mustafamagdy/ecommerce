@@ -66,8 +66,6 @@ public class OrderItemConfig : BaseTenantEntityConfiguration<OrderItem, DefaultI
     builder
       .Property(b => b.VatPercent)
       .HasPrecision(7, 3);
-
-    builder.HasOne(a => a.Order).WithMany(a => a.OrderItems).HasForeignKey(a => a.OrderId);
   }
 }
 
@@ -80,7 +78,5 @@ public class OrderPaymentConfig : BaseAuditableTenantEntityConfiguration<OrderPa
     builder
       .Property(a => a.Amount)
       .HasPrecision(7, 3);
-
-    builder.HasOne(a => a.Order).WithMany(a => a.OrderPayments).HasForeignKey(a => a.OrderId);
   }
 }

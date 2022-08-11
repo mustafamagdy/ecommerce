@@ -45,7 +45,7 @@ public class UpdateServiceRequestHandler : IRequestHandler<UpdateServiceRequest,
 
     if (request.ImageFile != null || request.DeleteCurrentImage)
     {
-      service.ImageUrl = await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken);
+      service.SetImageUrl(await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken));
       var currentImage = service.ImageUrl ?? string.Empty;
       if (request.DeleteCurrentImage && !string.IsNullOrEmpty(currentImage))
       {
