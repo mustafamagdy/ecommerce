@@ -1,3 +1,4 @@
+using FSH.WebApi.Domain.Printing;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
@@ -15,21 +16,12 @@ public abstract class BasePdfDocument : IDocument
       SetupPage(page);
 
       page.Header().Height(200)
-#if troubleshoot
-        .Background(Colors.Blue.Accent1)
-#endif
         .Element(RenderHeader);
 
       page.Content().MinHeight(100)
-#if troubleshoot
-        .Background(Colors.Red.Accent1)
-#endif
         .Element(Body);
 
       page.Footer().Height(150)
-#if troubleshoot
-        .Background(Colors.Yellow.Accent1)
-#endif
         .Element(Footer);
     });
   }

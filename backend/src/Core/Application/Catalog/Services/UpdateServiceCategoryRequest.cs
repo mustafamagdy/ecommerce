@@ -18,7 +18,7 @@ public class UpdateServiceRequestValidator : CustomValidator<UpdateServiceReques
       .NotEmpty()
       .MaximumLength(75)
       .MustAsync(async (service, name, ct) =>
-        await repository.GetBySpecAsync(new ServiceByNameSpec(name), ct)
+        await repository.FirstOrDefaultAsync(new ServiceByNameSpec(name), ct)
           is not Service existingService || existingService.Id == service.Id)
       .WithMessage((_, name) => T["Service {0} already Exists.", name]);
 }

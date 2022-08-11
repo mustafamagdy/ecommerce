@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Common.Exporters;
+using FSH.WebApi.Application.Printing;
 using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Application.Operation.Orders;
@@ -57,13 +58,14 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   {
     var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 
-    var order = await _repository.GetBySpecAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
+    var order = await _repository.FirstOrDefaultAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
     if (order == null)
     {
       throw new NotFoundException(_t["Order #{0} ({1}) not found", request.OrderNumber ?? string.Empty, request.OrderId ?? Guid.Empty]);
     }
 
-    var invoice = new InvoiceDocument(order, _vatQrCodeGenerator);
+    var invoiceTemplate = new ContinuesFixedSizeReceiptInvoice(order, _vatQrCodeGenerator);
+    var invoice = new InvoiceDocument(invoiceTemplate);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }

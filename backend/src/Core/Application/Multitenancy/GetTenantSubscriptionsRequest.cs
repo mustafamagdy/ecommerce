@@ -44,7 +44,7 @@ public class GetTenantSubscriptionsRequestHandler : IRequestHandler<GetTenantSub
   public async Task<List<TenantSubscriptionDto>> Handle(GetTenantSubscriptionsRequest request, CancellationToken cancellationToken)
   {
     List<TenantSubscriptionDto> subscriptions = default!;
-    var tenant = await _repository.GetBySpecAsync(new GetTenantWithActiveSubscriptionsSpec(request.TenantId, _systemTime, request.ActiveSubscription), cancellationToken);
+    var tenant = await _repository.FirstOrDefaultAsync(new GetTenantWithActiveSubscriptionsSpec(request.TenantId, _systemTime, request.ActiveSubscription), cancellationToken);
     if (tenant == null)
     {
       throw new NotFoundException(_t["Tenant {0} is not found", request.TenantId]);

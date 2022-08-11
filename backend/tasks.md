@@ -120,3 +120,22 @@ Cash register
 transfer operation works in two steps
     - create operation (which will hold the transferred amount until the recipient accepts it)
 
+/////// Printing ///////
+
+- we have 3 components:
+  - data
+    - come from the application logic (the dto)
+  - template
+    - come from db based on the current tenant configuration for the template
+    - template takes the data and construct in memory structure representation of the printable
+  - pdf generator
+    - uses template to draw the pdf
+
+
+orderDto
+template:
+    sections (seeded):
+        logo, orderNumber, vat_reg, 
+    header:
+        logo
+        order number
