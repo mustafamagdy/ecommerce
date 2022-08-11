@@ -12,8 +12,6 @@ public class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashReg
   {
     base.Configure(builder);
 
-    builder.HasOne(a => a.Branch).WithMany(a => a.CashRegisters).HasForeignKey(a => a.BranchId);
-
     builder.HasMany(a => a.ActiveOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
     var activeOperations = builder.Navigation(nameof(CashRegister.ActiveOperations));
     activeOperations.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
@@ -49,18 +47,8 @@ public abstract class BaseAuditablePaymentOperationConfig<T> : BaseAuditableTena
 
 public class ActiveAuditablePaymentOperationConfig : BaseAuditablePaymentOperationConfig<ActivePaymentOperation>
 {
-  public override void Configure(EntityTypeBuilder<ActivePaymentOperation> builder)
-  {
-    base.Configure(builder);
-    builder.HasOne(a => a.CashRegister).WithMany(a => a.ActiveOperations).HasForeignKey(a => a.CashRegisterId);
-  }
 }
 
 public class ArchivedAuditablePaymentOperationConfig : BaseAuditablePaymentOperationConfig<ArchivedPaymentOperation>
 {
-  public override void Configure(EntityTypeBuilder<ArchivedPaymentOperation> builder)
-  {
-    base.Configure(builder);
-    builder.HasOne(a => a.CashRegister).WithMany(a => a.ArchivedOperations).HasForeignKey(a => a.CashRegisterId);
-  }
 }

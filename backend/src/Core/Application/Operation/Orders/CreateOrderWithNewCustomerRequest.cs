@@ -16,9 +16,10 @@ public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<Orde
 public class
   CreateOrderWithNewCustomerRequestValidator : CreateOrderRequestBaseValidator<CreateOrderWithNewCustomerRequest>
 {
-  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Order> repository,
-    IReadRepository<Customer> customerRepo, IStringLocalizer<IBaseRequest> t)
-    : base(t)
+  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Customer> customerRepo,
+    IReadRepository<ServiceCatalog> serviceCatalogRepo,
+    IStringLocalizer<IBaseRequest> t)
+    : base(t, serviceCatalogRepo)
   {
     RuleFor(a => a.Customer).SetValidator(new CreateSimpleCustomerRequestValidator(customerRepo, t));
 

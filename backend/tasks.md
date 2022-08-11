@@ -2,48 +2,48 @@
 
 ========================== API ==========================
 - Orders:
-  [✅] Search (order number, customer name, phone number, customer id)
+  [x] Search (order number, customer name, phone number, customer id)
   - Cancel payment, all payments (separate cancel cash permission)
-  [✅] Create with full customer
-  [✅] Create cash
-  [✅] Create with preexisting custer
+  [x] Create with full customer
+  [x] Create cash
+  [x] Create with preexisting custer
 - Customers:
-  [✅] Search (name, phone)
-  [✅] Auto complete customer
+  [x] Search (name, phone)
+  [x] Auto complete customer
 - Service catalog:
-  [✅] Get service catalogs
-  [✅] Services
-  [✅] Items
+  [x] Get service catalogs
+  [x] Services
+  [x] Items
   - Price list
   - activate/deactivate service item in a price list
 - Cash register
-  [✅] Search (search transactions)
-  [✅] Add/Update/Delete (Name, isMain, Color, Branch)
-  [✅] Get basic
-  [✅] Get with balance
-  [✅] Close (zero balance and transfer to main)
-  [✅] open/close history
-  [✅] Transfer (with hold until recipient accept)
+  [x] Search (search transactions)
+  [x] Add/Update/Delete (Name, isMain, Color, Branch)
+  [x] Get basic
+  [x] Get with balance
+  [x] Close (zero balance and transfer to main)
+  [x] open/close history
+  [x] Transfer (with hold until recipient accept)
 - Users:
-  [✅] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
-  [✅] Role
+  [x] predefined roles (activate/deactivate cannot be deleted) [I chose to delete instead of activate/deactivate]
+  [x] Role
   - Users (admin cannot be deleted, activate/deactivate user)
-  [✅] User roles
+  [x] User roles
   - Logout all users once role permissions updated
 - Branches:
-  [✅] Search
-  [✅] Add/Update
+  [x] Search
+  [x] Add/Update
   - Activate/Deactivate (deactivate all cash register in a branch)
 - Tenants:
-  [✅] Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
+  [x] Search (name, phone number, subscription from to, status active/not-active/all, balance from to)
   - Create, renew subscription 
-    [✅] (name, vat no, logo, phone number, email, address, zipcode, admin name, admin email, admin phone number)
-    [✅] Current subscription (name, date of subscription)
-    [✅] Subscription history
+    [x] (name, vat no, logo, phone number, email, address, zipcode, admin name, admin email, admin phone number)
+    [x] Current subscription (name, date of subscription)
+    [x] Subscription history
     - Technical support
   - Demo account
   - Reset admin account
-  [✅] activate/deactivate
+  [x] activate/deactivate
   - Invoices (payments, balances)
     - number, date, subscription from to, package, amount, paid, remaining
     - send reminder for payment
@@ -51,7 +51,7 @@
 
 General
 - validation rules need to be common between backend and frontend
-- refactor domain models
+[x] refactor domain models
 - update events for all models
 - tests
 
@@ -107,9 +107,9 @@ each branch has cash register(s)
 order helper 
     => register the payment in cash register 
         => cash register service 
-            => get the current cash register from header 
+            => get the current cash register from header (resolver)
                 => (todo: validate branch and user) 
-                    => validate cash register is open
+                    => validate cash register is open (attribute)
                         => register the payment operation
 
 

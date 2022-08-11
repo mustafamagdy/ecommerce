@@ -152,18 +152,18 @@ public static class FSHPermissions
     new("Delete Customer", FSHAction.Delete, FSHResource.Customers),
   };
 
-  public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
+  public static IReadOnlyCollection<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
 
-  public static IReadOnlyList<FSHPermission> Root { get; } =
+  public static IReadOnlyCollection<FSHPermission> Root { get; } =
     new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsRoot).ToArray());
 
-  public static IReadOnlyList<FSHPermission> Admin { get; } =
+  public static IReadOnlyCollection<FSHPermission> Admin { get; } =
     new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.IsRoot).ToArray());
 
-  public static IReadOnlyList<FSHPermission> Basic { get; } =
+  public static IReadOnlyCollection<FSHPermission> Basic { get; } =
     new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsBasic).ToArray());
 
-  public static IReadOnlyList<FSHPermission> Demo { get; } =
+  public static IReadOnlyCollection<FSHPermission> Demo { get; } =
     new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsDemo).ToArray());
 }
 

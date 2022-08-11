@@ -143,7 +143,7 @@ internal class TenantService : ITenantService
     tenantProdSubscription.Renew(today);
     await _tenantDbContext.TenantProdSubscriptions.AddAsync(tenantProdSubscription);
 
-    tenant.ProdSubscription = tenantProdSubscription;
+    tenant.SetProdSubscription(tenantProdSubscription);
     return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
   }
 

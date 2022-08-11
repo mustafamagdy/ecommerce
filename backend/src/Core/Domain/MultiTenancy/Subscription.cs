@@ -42,4 +42,3 @@ public class TrainSubscription : Subscription
     Price = 0.0m;
   }
 }
-

@@ -28,50 +28,56 @@ namespace FSH.WebApi.Infrastructure.Persistence.Repository
     /// <inheritdoc/>
     public virtual async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
     {
-      _uow.Set<T>().Add(entity);
+      await _uow.Set<T>().AddAsync(entity, cancellationToken);
       return entity;
     }
 
     /// <inheritdoc/>
     public virtual async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
-      _uow.Set<T>().AddRange(entities);
+      var entitiesArray = entities as T[] ?? entities.ToArray();
+      await _uow.Set<T>().AddRangeAsync(entitiesArray);
 
-      return entities;
+      return entitiesArray;
     }
 
     /// <inheritdoc/>
-    public virtual async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    public virtual Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
       _uow.Set<T>().Update(entity);
+      return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public virtual async Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    public virtual Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
       _uow.Set<T>().UpdateRange(entities);
+      return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public virtual async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
     {
       _uow.Set<T>().Remove(entity);
+      return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public virtual async Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    public virtual Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
       _uow.Set<T>().RemoveRange(entities);
+      return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public virtual async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public virtual Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-      return await _uow.CommitAsync(cancellationToken);
+      return _uow.CommitAsync(cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async Task<T?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default) where TId : notnull
+    public virtual async Task<T?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default)
+      where TId : notnull
     {
       return await _uow.Set<T>().FindAsync(new object[] { id }, cancellationToken: cancellationToken);
     }
@@ -91,33 +97,33 @@ namespace FSH.WebApi.Infrastructure.Persistence.Repository
     }
 
     /// <inheritdoc/>
-    public virtual async Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+    public virtual Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
     {
-      return await ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
+      return ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)
+    public virtual Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)
     {
-      return await ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
+      return ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)
+    public virtual Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)
     {
-      return await ApplySpecification(specification).SingleOrDefaultAsync(cancellationToken);
+      return ApplySpecification(specification).SingleOrDefaultAsync(cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async Task<TResult?> SingleOrDefaultAsync<TResult>(ISingleResultSpecification<T, TResult> specification, CancellationToken cancellationToken = default)
+    public virtual Task<TResult?> SingleOrDefaultAsync<TResult>(ISingleResultSpecification<T, TResult> specification, CancellationToken cancellationToken = default)
     {
-      return await ApplySpecification(specification).SingleOrDefaultAsync(cancellationToken);
+      return ApplySpecification(specification).SingleOrDefaultAsync(cancellationToken);
     }
 
     /// <inheritdoc/>
-    public virtual async Task<List<T>> ListAsync(CancellationToken cancellationToken = default)
+    public virtual Task<List<T>> ListAsync(CancellationToken cancellationToken = default)
     {
-      return await _uow.Set<T>().ToListAsync(cancellationToken);
+      return _uow.Set<T>().ToListAsync(cancellationToken);
     }
 
     /// <inheritdoc/>

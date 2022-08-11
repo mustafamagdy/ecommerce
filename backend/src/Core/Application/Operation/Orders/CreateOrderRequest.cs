@@ -15,8 +15,8 @@ public class CreateOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 
 public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<CreateOrderRequest>
 {
-  public CreateOrderRequestValidator(IStringLocalizer<IBaseRequest> t)
-    : base(t)
+  public CreateOrderRequestValidator(IReadRepository<ServiceCatalog> serviceCatalogRepo, IStringLocalizer<IBaseRequest> t)
+    : base(t, serviceCatalogRepo)
   {
     RuleFor(p => p.CustomerId)
       .NotEmpty();
