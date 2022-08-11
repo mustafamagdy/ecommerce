@@ -24,7 +24,7 @@ public class CreateSimpleCustomerRequestValidator : CustomValidator<CreateSimple
       .MaximumLength(1024);
 
     RuleFor(a => a.PhoneNumber)
-      .MustAsync(async (phoneNumber, ct) => await customerRepo.GetBySpecAsync(new GetCustomerByPhoneNumberSpec(phoneNumber), ct) is null)
+      .MustAsync(async (phoneNumber, ct) => await customerRepo.FirstOrDefaultAsync(new GetCustomerByPhoneNumberSpec(phoneNumber), ct) is null)
       .WithMessage((_, phoneNumber) => t["Customer with the same phone number already Exists."]);
   }
 }

@@ -36,7 +36,7 @@ public class MyTenantSubscriptionSearchRequestHandler : IRequestHandler<MyTenant
   public async Task<TenantSubscriptionDto> Handle(MyTenantSubscriptionSearchRequest request, CancellationToken cancellationToken)
   {
     var tenantId = _currentTenant.Id;
-    var tenant = await _repo.GetBySpecAsync(new GetTenantWithActiveSubscriptionsSpec(tenantId, _systemTime), cancellationToken);
+    var tenant = await _repo.FirstOrDefaultAsync(new GetTenantWithActiveSubscriptionsSpec(tenantId, _systemTime), cancellationToken);
     if (tenant == null)
     {
       throw new NotFoundException(_t["Tenant {0} has no subscriptions", tenantId]);

@@ -22,7 +22,7 @@ public class CreateCashRegisterRequestValidator : CustomValidator<CreateCashRegi
     RuleFor(p => p.Name)
       .NotEmpty()
       .MaximumLength(75)
-      .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new CashRegisterByNameSpec(name), ct) is null)
+      .MustAsync(async (name, ct) => await repository.FirstOrDefaultAsync(new CashRegisterByNameSpec(name), ct) is null)
       .WithMessage((_, name) => T["Cash Register {0} already Exists.", name]);
   }
 }

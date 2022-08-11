@@ -2,6 +2,8 @@
 
 using System.Reflection;
 using FSH.WebApi.Application.Common.Pdf;
+using FSH.WebApi.Application.Printing;
+using FSH.WebApi.Domain.Printing;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;

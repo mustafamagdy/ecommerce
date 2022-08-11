@@ -76,10 +76,10 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
     _decorated.GetByIdAsync(id, cancellationToken);
 
   public Task<T?> GetBySpecAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
-    => _decorated.GetBySpecAsync(specification, cancellationToken);
+    => _decorated.FirstOrDefaultAsync(specification, cancellationToken);
 
   public Task<TResult?> GetBySpecAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default) =>
-    _decorated.GetBySpecAsync(specification, cancellationToken);
+    _decorated.FirstOrDefaultAsync(specification, cancellationToken);
 
   public Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
     => _decorated.FirstOrDefaultAsync(specification, cancellationToken);
