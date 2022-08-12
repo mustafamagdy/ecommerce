@@ -44,7 +44,9 @@ public sealed class TenantProdSubscription : TenantSubscription<StandardSubscrip
 
   public void Pay(decimal amount, Guid paymentMethodId)
   {
-    _payments.Add(new SubscriptionPayment(this, amount, paymentMethodId));
+    var payment = new SubscriptionPayment(amount, paymentMethodId);
+    payment.TenantProdSubscriptionId = Id;
+    _payments.Add(payment);
   }
 }
 
@@ -75,7 +77,7 @@ public abstract class TenantSubscription<T> : BaseEntity
 
   public IReadOnlyCollection<SubscriptionHistory> History => _history.AsReadOnly();
 
-  public virtual TenantSubscription<T> Renew(DateTime today)
+  public TenantSubscription<T> Renew(DateTime today)
   {
     _history.Add(new SubscriptionHistory(Id, today, Subscription.Days, Subscription.Price));
     ExpiryDate = today.AddDays(Subscription.Days);

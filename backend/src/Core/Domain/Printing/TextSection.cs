@@ -1,29 +1,12 @@
-using QuestPDF.Fluent;
-
 namespace FSH.WebApi.Domain.Printing;
 
-public sealed class TextSection : IDocumentSection
+public abstract class TextSection : DocumentSection
 {
-  public TextSection(int order, SectionAlignment alignment, SectionPosition position, string content)
+  protected TextSection(int order, SectionAlignment alignment, SectionPosition position)
+    : base(order, alignment, position, false)
   {
-    Order = order;
-    Alignment = alignment;
-    Position = position;
-    Content = content;
   }
 
-  public SectionType Type => SectionType.Title;
-  public SectionAlignment Alignment { get; }
-  public SectionPosition Position { get; }
-  public int Order { get; }
-  public string Content { get; }
-
-  public void RenderInColumn(ColumnDescriptor col)
-  {
-    col
-      .Item()
-      .AlignCenter().AlignMiddle()
-      .Text(Content)
-      .FontSize(10);
-  }
+  public int FontSize { get; set; } = 10;
+  public override SectionType Type => SectionType.Title;
 }

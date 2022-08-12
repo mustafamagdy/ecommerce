@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Ardalis.Specification;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
@@ -12,6 +13,7 @@ using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +25,9 @@ namespace FSH.WebApi.Infrastructure.Multitenancy;
 internal class TenantService : ITenantService
 {
   private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
-  private readonly TenantDbContext _tenantDbContext;
+  private readonly ITenantUnitOfWork _uow;
+  private readonly ITenantRepository<FSHTenantInfo> _repo;
+  private readonly ITenantRepository<TenantProdSubscription> _tenantProdSubscriptionRepo;
   private readonly IConnectionStringSecurer _csSecurer;
   private readonly IDatabaseInitializer _dbInitializer;
   private readonly IJobService _jobService;
@@ -46,10 +50,13 @@ internal class TenantService : ITenantService
     IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
     IReadRepository<Branch> branchRepo,
-    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env, ISystemTime systemTime, IReadRepository<PaymentMethod> paymentMethodRepo)
+    ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env,
+    ISystemTime systemTime,
+    IReadRepository<PaymentMethod> paymentMethodRepo,
+    ITenantUnitOfWork uow,
+    ITenantRepository<FSHTenantInfo> repo)
   {
     _tenantStore = tenantStore;
-    _tenantDbContext = tenantDbContext;
     _csSecurer = csSecurer;
     _dbInitializer = dbInitializer;
     _jobService = jobService;
@@ -61,6 +68,8 @@ internal class TenantService : ITenantService
     _env = env;
     _systemTime = systemTime;
     _paymentMethodRepo = paymentMethodRepo;
+    _uow = uow;
+    _repo = repo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -93,7 +102,7 @@ internal class TenantService : ITenantService
     await _tenantStore.TryAddAsync(tenant);
     var prodSubscription = await TryCreateProdSubscription(tenant);
 
-    bool result = (await _tenantDbContext.SaveChangesAsync(cancellationToken)) > 0;
+    bool result = await _uow.CommitAsync(cancellationToken) > 0;
     if (!result)
     {
       throw new DbUpdateException($"Failed to create tenant & subscription for {tenant.Name}");
@@ -141,7 +150,8 @@ internal class TenantService : ITenantService
     var today = _systemTime.Now;
     var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant);
     tenantProdSubscription.Renew(today);
-    await _tenantDbContext.TenantProdSubscriptions.AddAsync(tenantProdSubscription);
+
+    await _uow.Set<TenantProdSubscription>().AddAsync(tenantProdSubscription);
 
     tenant.SetProdSubscription(tenantProdSubscription);
     return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
@@ -150,17 +160,18 @@ internal class TenantService : ITenantService
   public async Task<Unit> PayForSubscription(Guid subscriptionId, decimal amount, Guid? paymentMethodId)
   {
     paymentMethodId ??= await GetCashPaymentMethod();
-    var subscription = await _tenantDbContext.TenantProdSubscriptions.FindAsync(subscriptionId);
+    var subscription = await _tenantProdSubscriptionRepo.GetByIdAsync(subscriptionId);
     subscription.Pay(amount, paymentMethodId.Value);
 
-    await _tenantDbContext.SaveChangesAsync();
+    await _uow.CommitAsync();
     return Unit.Value;
   }
 
   private async Task<Guid> GetCashPaymentMethod()
   {
     var spec = new GetDefaultCashPaymentMethodSpec();
-    var pm = await _paymentMethodRepo.FirstOrDefaultAsync(spec) ?? throw new ArgumentOutOfRangeException($"No default cash payment method register");
+    var pm = await _paymentMethodRepo.FirstOrDefaultAsync(spec)
+             ?? throw new ArgumentOutOfRangeException($"No default cash payment method register");
     return pm.Id;
   }
 
@@ -169,11 +180,11 @@ internal class TenantService : ITenantService
   {
     return subscriptionType.Name switch
     {
-      nameof(SubscriptionType.Standard) => await _tenantDbContext.StandardSubscriptions.FirstOrDefaultAsync() as T
+      nameof(SubscriptionType.Standard) => await _uow.Set<StandardSubscription>().FirstOrDefaultAsync() as T
                                            ?? throw new NotFoundException("No standard subscription found"),
-      nameof(SubscriptionType.Demo) => await _tenantDbContext.DemoSubscriptions.FirstOrDefaultAsync() as T
+      nameof(SubscriptionType.Demo) => await _uow.Set<DemoSubscription>().FirstOrDefaultAsync() as T
                                        ?? throw new NotFoundException("No demo subscription found"),
-      nameof(SubscriptionType.Train) => await _tenantDbContext.TrainSubscriptions.FirstOrDefaultAsync() as T
+      nameof(SubscriptionType.Train) => await _uow.Set<TrainSubscription>().FirstOrDefaultAsync() as T
                                         ?? throw new NotFoundException("No train subscription found"),
       _ => throw new ArgumentOutOfRangeException()
     };
@@ -181,7 +192,7 @@ internal class TenantService : ITenantService
 
   private async Task<Subscription> GetDefaultMonthlySubscription()
   {
-    return (await _tenantDbContext.StandardSubscriptions.SingleOrDefaultAsync()
+    return (await _uow.Set<StandardSubscription>().SingleOrDefaultAsync()
             ?? throw new NotImplementedException("There is no standard subscription configured"))!;
   }
 
@@ -227,7 +238,7 @@ internal class TenantService : ITenantService
       _ => null
     };
 
-    await _tenantDbContext.SaveChangesAsync();
+    await _uow.CommitAsync();
 
     return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.SubscriptionType.Name, newExpiryDate];
   }
@@ -262,28 +273,47 @@ internal class TenantService : ITenantService
 
   public async Task<FSHTenantInfo> GetTenantById(string id)
   {
-    var tenant = await _tenantDbContext.TenantInfo
-                   .Include(a => a.ProdSubscription)
-                   .ThenInclude(a => a.History)
-                   .Include(a => a.ProdSubscription)
-                   .ThenInclude(a => a.Payments)
-                   .Include(a => a.DemoSubscription)
-                   .Include(a => a.TrainSubscription)
-                   .Include(a => a.Branches)
-                   .FirstOrDefaultAsync(a => a.Id == id)
+    var spec = new SingleResultSpecification<FSHTenantInfo>()
+      .Query
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.History)
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.Payments)
+      .Include(a => a.DemoSubscription)
+      .Include(a => a.TrainSubscription)
+      .Include(a => a.Branches)
+      .Where(a => a.Id == id);
+
+    var tenant = await _repo.FirstOrDefaultAsync(spec.Specification)
                  ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
+    //
+    //
+    // var tenant = await _tenantDbContext.TenantInfo
+    //                .Include(a => a.ProdSubscription)
+    //                .ThenInclude(a => a.History)
+    //                .Include(a => a.ProdSubscription)
+    //                .ThenInclude(a => a.Payments)
+    //                .Include(a => a.DemoSubscription)
+    //                .Include(a => a.TrainSubscription)
+    //                .Include(a => a.Branches)
+    //                .FirstOrDefaultAsync(a => a.Id == id)
+    //              ?? throw new NotFoundException(_t["{0} {1} Not Found.", nameof(FSHTenantInfo), id]);
     return tenant;
   }
 
   public Task<bool> HasAValidProdSubscription(string tenantId)
   {
     var today = _systemTime.Now;
-    return _tenantDbContext.TenantInfo
+
+    var spec = new SingleResultSpecification<FSHTenantInfo>()
+      .Query
       .Include(a => a.ProdSubscription)
       .ThenInclude(a => a.History)
-      .AnyAsync(a => a.Id == tenantId
-                     && a.Active
-                     && a.ProdSubscription != null
-                     && a.ProdSubscription.ExpiryDate >= today);
+      .Where(a => a.Id == tenantId
+                  && a.Active
+                  && a.ProdSubscription != null
+                  && a.ProdSubscription.ExpiryDate >= today);
+
+    return _repo.AnyAsync(spec.Specification);
   }
 }
