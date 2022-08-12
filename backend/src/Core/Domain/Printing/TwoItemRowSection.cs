@@ -11,9 +11,7 @@ public sealed class TwoItemRowSection : DocumentSection
   }
 
   public TwoItemRowSection(int order, SectionPosition position, SectionAlignment alignment)
-    : base(order, alignment, position, false)
+    : base(SectionType.TwoPartTitle, order, alignment, position, false)
   {
   }
-
-  public override SectionType Type => SectionType.Title;
 }

@@ -46,9 +46,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -111,6 +111,28 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PaymentMethods", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PrintableDocument",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrintableDocument", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -193,11 +215,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false),
                     Opened = table.Column<bool>(type: "boolean", nullable: false),
                     Balance = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
+                    BranchId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -275,6 +297,42 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         column: x => x.CustomerId,
                         principalSchema: "Shared",
                         principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentSection",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    Alignment = table.Column<int>(type: "integer", nullable: false),
+                    Position = table.Column<int>(type: "integer", nullable: false),
+                    ShowDebug = table.Column<bool>(type: "boolean", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DocumentId1 = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false),
+                    FontSize = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentSection", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DocumentSection_PrintableDocument_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "Shared",
+                        principalTable: "PrintableDocument",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DocumentSection_PrintableDocument_DocumentId1",
+                        column: x => x.DocumentId1,
+                        principalSchema: "Shared",
+                        principalTable: "PrintableDocument",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -627,6 +685,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DocumentSection_DocumentId",
+                schema: "Shared",
+                table: "DocumentSection",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentSection_DocumentId1",
+                schema: "Shared",
+                table: "DocumentSection",
+                column: "DocumentId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 schema: "Shared",
                 table: "OrderItems",
@@ -748,6 +818,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Auditing");
 
             migrationBuilder.DropTable(
+                name: "DocumentSection",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
                 name: "OrderItems",
                 schema: "Shared");
 
@@ -777,6 +851,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "CashRegisters",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "PrintableDocument",
                 schema: "Shared");
 
             migrationBuilder.DropTable(

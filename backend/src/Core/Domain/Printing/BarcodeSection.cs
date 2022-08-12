@@ -7,9 +7,7 @@ namespace FSH.WebApi.Domain.Printing;
 public sealed class BarcodeSection : DocumentSection
 {
   public BarcodeSection(int order, SectionAlignment alignment, SectionPosition position)
-    : base(order, alignment, position, false)
+    : base(SectionType.Title, order, alignment, position, false)
   {
   }
-
-  public override SectionType Type => SectionType.Title;
 }
