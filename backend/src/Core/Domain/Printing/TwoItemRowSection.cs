@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using QuestPDF.Fluent;
-
 namespace FSH.WebApi.Domain.Printing;
 
 public sealed class TwoItemRowSection : DocumentSection

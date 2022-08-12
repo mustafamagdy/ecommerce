@@ -5,17 +5,16 @@
         <AssemblyName>FSH.WebApi.Domain</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
-        <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0" />
-        <PackageReference Include="NewId" Version="4.0.0-develop.44+sha.e1e1364" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0"/>
+        <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0"/>
+        <PackageReference Include="NewId" Version="4.0.0-develop.44+sha.e1e1364"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Update="Roslynator.Analyzers" Version="4.1.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="QuestPDF" Version="2022.6.3" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Shared\Shared.csproj" />
+        <ProjectReference Include="..\Shared\Shared.csproj"/>
     </ItemGroup>
 </Project>

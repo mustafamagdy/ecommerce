@@ -613,6 +613,10 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("BindingProperty")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("char(36)");
 
