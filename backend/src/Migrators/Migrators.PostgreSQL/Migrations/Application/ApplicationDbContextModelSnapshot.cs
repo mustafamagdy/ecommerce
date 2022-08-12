@@ -616,6 +616,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("BindingProperty")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uuid");
 

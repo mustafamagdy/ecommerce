@@ -7,21 +7,24 @@
         "Order": 0,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true
+        "ShowDebug": true,
+        "BindingProperty": "$Logo"
       },
       {
         "Type": "Title",
         "Order": 1,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true
+        "ShowDebug": true,
+        "BindingProperty": "فاتورة ضريبية مبسطة"
       },
       {
         "Type": "Barcode",
         "Order": 2,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true
+        "ShowDebug": true,
+        "BindingProperty": "$OrderNumber"
       }
     ]
   }

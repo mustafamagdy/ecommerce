@@ -310,6 +310,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Alignment = table.Column<string>(type: "text", nullable: false),
                     Position = table.Column<string>(type: "text", nullable: false),
                     ShowDebug = table.Column<bool>(type: "boolean", nullable: false),
+                    BindingProperty = table.Column<string>(type: "text", nullable: false),
                     DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
