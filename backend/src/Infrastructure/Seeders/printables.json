@@ -1,15 +1,8 @@
 [
   {
     "Type": "Receipt",
+    "Active": true,
     "Sections": [
-      {
-        "Type": "Logo",
-        "Order": 0,
-        "Alignment": "Center",
-        "Position": "Header",
-        "ShowDebug": true,
-        "BindingProperty": "$Logo"
-      },
       {
         "Type": "Title",
         "Order": 1,
@@ -19,12 +12,28 @@
         "BindingProperty": "فاتورة ضريبية مبسطة"
       },
       {
-        "Type": "Barcode",
+        "Type": "Title",
         "Order": 2,
         "Alignment": "Center",
         "Position": "Header",
         "ShowDebug": true,
         "BindingProperty": "$OrderNumber"
+      },
+      {
+        "Type": "Barcode",
+        "Order": 3,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": true,
+        "BindingProperty": "$OrderNumber"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 3,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": true,
+        "BindingProperty": "رقم الطلب,$OrderNumber"
       }
     ]
   }

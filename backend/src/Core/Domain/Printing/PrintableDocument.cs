@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace FSH.WebApi.Domain.Printing;
 
 [JsonConverter(typeof(PrintableDocumentJsonConverter))]
-public abstract class PrintableDocument : AuditableEntity
+public abstract class PrintableDocument : AuditableEntity, IAggregateRoot
 {
   [JsonProperty(nameof(Sections))]
   private readonly List<DocumentSection> _sections = new();

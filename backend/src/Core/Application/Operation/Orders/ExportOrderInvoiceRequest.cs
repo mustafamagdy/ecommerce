@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Common.Exporters;
 using FSH.WebApi.Application.Printing;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Printing;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -41,16 +42,18 @@ public class ExportOrderInvoiceWithBrandsSpec : Specification<Order, OrderExport
 public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoiceRequest, (string OrderNumber, Stream PdfInvoice)>
 {
   private readonly IReadRepository<Order> _repository;
+  private readonly IReadRepository<SimpleReceiptInvoice> _templateInvoice;
   private readonly IPdfWriter _pdfWriter;
   private readonly IVatQrCodeGenerator _vatQrCodeGenerator;
   private readonly IStringLocalizer _t;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator, IStringLocalizer<ExportOrderInvoiceRequestHandler> localizer)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator, IStringLocalizer<ExportOrderInvoiceRequestHandler> localizer, IReadRepository<SimpleReceiptInvoice> templateInvoice)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
     _vatQrCodeGenerator = vatQrCodeGenerator;
     _t = localizer;
+    _templateInvoice = templateInvoice;
   }
 
   public async Task<(string OrderNumber, Stream PdfInvoice)> Handle(ExportOrderInvoiceRequest request, CancellationToken
@@ -64,7 +67,16 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
       throw new NotFoundException(_t["Order #{0} ({1}) not found", request.OrderNumber ?? string.Empty, request.OrderId ?? Guid.Empty]);
     }
 
-    // var invoiceTemplate = new ContinuesFixedSizeReceiptInvoice(order, _vatQrCodeGenerator);
+    var invoiceTemplate = await _templateInvoice.FirstOrDefaultAsync(
+      new SingleResultSpecification<SimpleReceiptInvoice>()
+        .Query
+        .Include(a => a.Sections.OrderBy(x=>x.Order))
+        .Where(a => a.Active)
+        .Specification, cancellationToken);
+
+    var boundTemplate = new BoundTemplate(invoiceTemplate);
+    boundTemplate.BindTemplate(order);
+
     // var invoice = new InvoiceDocument(invoiceTemplate);
     // return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
 
