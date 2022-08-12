@@ -58,14 +58,16 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   {
     var spec = new ExportOrderInvoiceWithBrandsSpec(request);
 
-    var order = await _repository.FirstOrDefaultAsync((ISpecification<Order, OrderExportDto>)spec, cancellationToken);
+    var order = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (order == null)
     {
       throw new NotFoundException(_t["Order #{0} ({1}) not found", request.OrderNumber ?? string.Empty, request.OrderId ?? Guid.Empty]);
     }
 
-    var invoiceTemplate = new ContinuesFixedSizeReceiptInvoice(order, _vatQrCodeGenerator);
-    var invoice = new InvoiceDocument(invoiceTemplate);
-    return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
+    // var invoiceTemplate = new ContinuesFixedSizeReceiptInvoice(order, _vatQrCodeGenerator);
+    // var invoice = new InvoiceDocument(invoiceTemplate);
+    // return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
+
+    throw new NotImplementedException("Wip for printing");
   }
 }

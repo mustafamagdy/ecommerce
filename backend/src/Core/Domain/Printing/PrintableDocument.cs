@@ -1,14 +1,27 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Ardalis.SmartEnum;
 using QuestPDF.Fluent;
 
 namespace FSH.WebApi.Domain.Printing;
 
-public abstract class PrintableDocument
+public abstract class PrintableDocument : AuditableEntity
 {
+  private readonly List<DocumentSection> _sections = new();
+
+  public bool Active { get; set; }
+  public IReadOnlyCollection<DocumentSection> Sections => _sections.AsReadOnly();
+
+  protected void AddSection(DocumentSection section) => _sections.Add(section);
 }
 
-public abstract class PrintableReceipt : PrintableDocument
+public class PrintableType : SmartEnum<PrintableType>
 {
+  public static PrintableType Receipt = new(nameof(Receipt), 1);
+
+  public PrintableType(string name, int value)
+    : base(name, value)
+  {
+  }
 }
 
 public class SectionAlignment : SmartEnum<SectionAlignment>
@@ -46,12 +59,21 @@ public class SectionType : SmartEnum<SectionType>
   }
 }
 
-public interface IDocumentSection
+public abstract class DocumentSection
 {
-  SectionType Type { get; }
-  int Order { get; }
-  SectionAlignment Alignment { get; }
-  SectionPosition Position { get; }
+  protected DocumentSection(int order, SectionAlignment alignment, SectionPosition position, bool showDebug)
+  {
+    Order = order;
+    Alignment = alignment;
+    Position = position;
+    ShowDebug = showDebug;
+  }
 
-  void RenderInColumn(ColumnDescriptor col);
+  public int Order { get; set; }
+  public SectionAlignment Alignment { get; set; }
+  public SectionPosition Position { get; set; }
+  public bool ShowDebug { get; set; }
+
+  [NotMapped]
+  public abstract SectionType Type { get; }
 }

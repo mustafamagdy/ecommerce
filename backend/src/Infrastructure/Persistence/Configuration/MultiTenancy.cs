@@ -1,5 +1,6 @@
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
@@ -52,7 +53,10 @@ public class TenantProdSubscriptionConfig : TenantSubscriptionConfig<TenantProdS
   public override void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
   {
     base.Configure(builder);
-    builder.HasMany(a => a.Payments).WithOne().HasForeignKey(a => a.TenantProdSubscriptionId);
+    builder
+      .HasMany(a => a.Payments)
+      .WithOne(a => a.TenantProdSubscription)
+      .HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }
 
@@ -76,11 +80,31 @@ public class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<Subscr
   }
 }
 
-public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
+// public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
+// {
+//   public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
+//   {
+//     // base.Configure(builder);
+//
+//     builder.HasKey(a => a.Id);
+//     builder.Property(a => a.Id).ValueGeneratedNever();
+//
+//     builder.HasOne(a => a.PaymentMethod).WithMany().HasForeignKey(a => a.PaymentMethodId);
+//
+//     builder
+//       .Property(b => b.Amount)
+//       .HasPrecision(7, 3);
+//   }
+// }
+
+public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPayment>
 {
-  public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
+  public void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
   {
-    base.Configure(builder);
+    builder.HasKey(a => a.Id);
+    builder.Property(a => a.Id).ValueGeneratedNever();
+
+    builder.HasOne(a => a.PaymentMethod).WithMany().HasForeignKey(a => a.PaymentMethodId);
 
     builder
       .Property(b => b.Amount)
