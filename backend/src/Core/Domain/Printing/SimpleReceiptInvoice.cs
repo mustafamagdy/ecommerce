@@ -2,5 +2,16 @@ namespace FSH.WebApi.Domain.Printing;
 
 public class SimpleReceiptInvoice : PrintableDocument
 {
-  public PrintableType Type => PrintableType.Receipt;
+  public SimpleReceiptInvoice()
+    : base(PrintableType.Receipt)
+  {
+  }
+}
+
+public class WideReceiptInvoice : PrintableDocument
+{
+  public WideReceiptInvoice()
+    : base(PrintableType.Wide)
+  {
+  }
 }

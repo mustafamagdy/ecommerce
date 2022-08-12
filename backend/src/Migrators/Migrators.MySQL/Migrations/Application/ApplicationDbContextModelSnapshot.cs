@@ -604,6 +604,101 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Alignment")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("DocumentId1")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ShowDebug")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("DocumentId1");
+
+                    b.ToTable("DocumentSection", "Shared");
+
+                    b.HasDiscriminator<string>("type").HasValue("DocumentSection");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PrintableDocument", "Shared");
+
+                    b.HasDiscriminator<string>("type").HasValue("PrintableDocument");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
                 {
                     b.Property<Guid>("Id")
@@ -972,6 +1067,44 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.BarcodeSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.HasDiscriminator().HasValue("Barcode");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.LogoSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.HasDiscriminator().HasValue("Logo");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Receipt");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TitleSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.Property<int>("FontSize")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue("Title");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Wide");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Product", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Catalog.Brand", "Brand")
@@ -1100,6 +1233,23 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("PaymentMethod");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", null)
+                        .WithMany("Sections")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("FSH.WebApi.Infrastructure.Identity.ApplicationRole", null)
@@ -1163,6 +1313,11 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("OrderItems");
 
                     b.Navigation("OrderPayments");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
+                {
+                    b.Navigation("Sections");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>

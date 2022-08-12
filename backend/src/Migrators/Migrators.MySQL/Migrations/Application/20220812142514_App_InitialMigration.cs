@@ -57,11 +57,11 @@ namespace Migrators.MySQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -136,6 +136,31 @@ namespace Migrators.MySQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PaymentMethods", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PrintableDocument",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Active = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    type = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrintableDocument", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -247,13 +272,13 @@ namespace Migrators.MySQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    BranchId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Color = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Opened = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(7,3)", precision: 7, scale: 3, nullable: false),
+                    BranchId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -341,6 +366,45 @@ namespace Migrators.MySQL.Migrations.Application
                         column: x => x.CustomerId,
                         principalSchema: "Shared",
                         principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "DocumentSection",
+                schema: "Shared",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    Alignment = table.Column<int>(type: "int", nullable: false),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    ShowDebug = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DocumentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DocumentId1 = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    type = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FontSize = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentSection", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DocumentSection_PrintableDocument_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "Shared",
+                        principalTable: "PrintableDocument",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DocumentSection_PrintableDocument_DocumentId1",
+                        column: x => x.DocumentId1,
+                        principalSchema: "Shared",
+                        principalTable: "PrintableDocument",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -737,6 +801,18 @@ namespace Migrators.MySQL.Migrations.Application
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_DocumentSection_DocumentId",
+                schema: "Shared",
+                table: "DocumentSection",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentSection_DocumentId1",
+                schema: "Shared",
+                table: "DocumentSection",
+                column: "DocumentId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 schema: "Shared",
                 table: "OrderItems",
@@ -858,6 +934,10 @@ namespace Migrators.MySQL.Migrations.Application
                 schema: "Auditing");
 
             migrationBuilder.DropTable(
+                name: "DocumentSection",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
                 name: "OrderItems",
                 schema: "Shared");
 
@@ -887,6 +967,10 @@ namespace Migrators.MySQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "CashRegisters",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "PrintableDocument",
                 schema: "Shared");
 
             migrationBuilder.DropTable(

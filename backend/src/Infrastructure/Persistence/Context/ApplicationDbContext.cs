@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
@@ -37,6 +38,8 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
   public DbSet<ActivePaymentOperation> ActivePaymentOperations => Set<ActivePaymentOperation>();
   public DbSet<ArchivedPaymentOperation> ArchivedPaymentOperations => Set<ArchivedPaymentOperation>();
+  public DbSet<SimpleReceiptInvoice> SimpleReceiptInvoiceTemplates => Set<SimpleReceiptInvoice>();
+  public DbSet<WideReceiptInvoice> WideReceiptInvoiceTemplates => Set<WideReceiptInvoice>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

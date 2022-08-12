@@ -607,6 +607,101 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Alignment")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DocumentId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("ShowDebug")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("DocumentId1");
+
+                    b.ToTable("DocumentSection", "Shared");
+
+                    b.HasDiscriminator<string>("type").HasValue("DocumentSection");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PrintableDocument", "Shared");
+
+                    b.HasDiscriminator<string>("type").HasValue("PrintableDocument");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
                 {
                     b.Property<Guid>("Id")
@@ -979,6 +1074,44 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.BarcodeSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.HasDiscriminator().HasValue("Barcode");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.LogoSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.HasDiscriminator().HasValue("Logo");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Receipt");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TitleSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.Property<int>("FontSize")
+                        .HasColumnType("integer");
+
+                    b.HasDiscriminator().HasValue("Title");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Wide");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Product", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Catalog.Brand", "Brand")
@@ -1107,6 +1240,23 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("PaymentMethod");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", null)
+                        .WithMany("Sections")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("FSH.WebApi.Infrastructure.Identity.ApplicationRole", null)
@@ -1170,6 +1320,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("OrderItems");
 
                     b.Navigation("OrderPayments");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
+                {
+                    b.Navigation("Sections");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
