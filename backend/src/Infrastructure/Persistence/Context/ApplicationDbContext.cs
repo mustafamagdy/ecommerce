@@ -1,6 +1,5 @@
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
-using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.Catalog;

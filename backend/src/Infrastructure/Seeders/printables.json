@@ -1,0 +1,28 @@
+[
+  {
+    "Type": "Receipt",
+    "Sections": [
+      {
+        "Type": "Logo",
+        "Order": 0,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": true
+      },
+      {
+        "Type": "Title",
+        "Order": 1,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": true
+      },
+      {
+        "Type": "Barcode",
+        "Order": 2,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": true
+      }
+    ]
+  }
+]

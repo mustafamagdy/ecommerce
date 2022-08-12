@@ -146,10 +146,9 @@ namespace Migrators.MySQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Active = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    type = table.Column<string>(type: "longtext", nullable: false)
+                    Type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -378,15 +377,15 @@ namespace Migrators.MySQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    Alignment = table.Column<int>(type: "int", nullable: false),
-                    Position = table.Column<int>(type: "int", nullable: false),
+                    Alignment = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Position = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ShowDebug = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     DocumentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    DocumentId1 = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Type = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    type = table.Column<string>(type: "longtext", nullable: false)
+                    Type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     FontSize = table.Column<int>(type: "int", nullable: true)
                 },
@@ -396,13 +395,6 @@ namespace Migrators.MySQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_DocumentSection_PrintableDocument_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "Shared",
-                        principalTable: "PrintableDocument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DocumentSection_PrintableDocument_DocumentId1",
-                        column: x => x.DocumentId1,
                         principalSchema: "Shared",
                         principalTable: "PrintableDocument",
                         principalColumn: "Id",
@@ -805,12 +797,6 @@ namespace Migrators.MySQL.Migrations.Application
                 schema: "Shared",
                 table: "DocumentSection",
                 column: "DocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DocumentSection_DocumentId1",
-                schema: "Shared",
-                table: "DocumentSection",
-                column: "DocumentId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
