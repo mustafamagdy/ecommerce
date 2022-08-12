@@ -259,6 +259,67 @@ public class OperationsTests : TestFixture
   }
 
   [Fact]
+  public async Task can_create_order_and_export_its_pdf_invoice()
+  {
+    var adminHeaders = await CreateTenantAndLogin();
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    var item = new OrderItemRequest()
+    {
+      ItemId = randomItem.Id,
+      Qty = 1
+    };
+    _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        item
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var order = await _.Content.ReadFromJsonAsync<OrderDto>();
+    order.Should().NotBeNull();
+    var orderId = order.Id;
+
+    _ = await GetAsync($"/api/v1/orders/pdf/{orderId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Fact]
   public async Task cash_register_active_operations_should_be_empty_when_open_cash_register()
   {
   }
