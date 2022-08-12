@@ -612,20 +612,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Alignment")
-                        .HasColumnType("integer");
+                    b.Property<string>("Alignment")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("DocumentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DocumentId1")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("ShowDebug")
                         .HasColumnType("boolean");
@@ -635,10 +634,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("type")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -646,11 +642,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("DocumentId");
 
-                    b.HasIndex("DocumentId1");
-
                     b.ToTable("DocumentSection", "Shared");
 
-                    b.HasDiscriminator<string>("type").HasValue("DocumentSection");
+                    b.HasDiscriminator<string>("Type").HasValue("DocumentSection");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -686,10 +680,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("type")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -697,7 +688,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.ToTable("PrintableDocument", "Shared");
 
-                    b.HasDiscriminator<string>("type").HasValue("PrintableDocument");
+                    b.HasDiscriminator<string>("Type").HasValue("PrintableDocument");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1105,6 +1096,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasDiscriminator().HasValue("Title");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TwoItemRowSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.HasDiscriminator().HasValue("TwoPartTitle");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
@@ -1242,15 +1240,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", null)
+                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", "Document")
                         .WithMany("Sections")
                         .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

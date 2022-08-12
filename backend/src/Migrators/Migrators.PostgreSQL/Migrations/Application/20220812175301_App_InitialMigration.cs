@@ -120,9 +120,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Active = table.Column<bool>(type: "boolean", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -308,14 +307,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
-                    Alignment = table.Column<int>(type: "integer", nullable: false),
-                    Position = table.Column<int>(type: "integer", nullable: false),
+                    Alignment = table.Column<string>(type: "text", nullable: false),
+                    Position = table.Column<string>(type: "text", nullable: false),
                     ShowDebug = table.Column<bool>(type: "boolean", nullable: false),
                     DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DocumentId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
                     FontSize = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
@@ -324,13 +321,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_DocumentSection_PrintableDocument_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "Shared",
-                        principalTable: "PrintableDocument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DocumentSection_PrintableDocument_DocumentId1",
-                        column: x => x.DocumentId1,
                         principalSchema: "Shared",
                         principalTable: "PrintableDocument",
                         principalColumn: "Id",
@@ -689,12 +679,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Shared",
                 table: "DocumentSection",
                 column: "DocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DocumentSection_DocumentId1",
-                schema: "Shared",
-                table: "DocumentSection",
-                column: "DocumentId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",

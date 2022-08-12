@@ -1,80 +1,83 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using FSH.WebApi.Domain.Serialization;
+using Newtonsoft.Json;
 using QuestPDF.Fluent;
 
 namespace FSH.WebApi.Domain.Printing;
 
+[JsonConverter(typeof(PrintableDocumentJsonConverter))]
 public abstract class PrintableDocument : AuditableEntity
 {
+  [JsonProperty(nameof(Sections))]
   private readonly List<DocumentSection> _sections = new();
-  private readonly PrintableType _type;
-
-  protected PrintableDocument(PrintableType type)
-  {
-    _type = type;
-  }
 
   public bool Active { get; set; }
-  public PrintableType Type => _type;
+
+  [JsonIgnore]
   public IReadOnlyCollection<DocumentSection> Sections => _sections.AsReadOnly();
 
   protected void AddSection(DocumentSection section) => _sections.Add(section);
 }
 
-public class PrintableType : SmartEnum<PrintableType>
+[JsonConverter(typeof(SmartEnumNameConverter<PrintableType, string>))]
+public class PrintableType : SmartEnum<PrintableType, string>
 {
-  public static PrintableType Receipt = new(nameof(Receipt), 1);
-  public static PrintableType Wide = new(nameof(Wide), 2);
+  public static PrintableType Receipt = new(nameof(Receipt), nameof(Receipt));
+  public static PrintableType Wide = new(nameof(Wide), nameof(Wide));
 
-  public PrintableType(string name, int value)
+  public PrintableType(string name, string value)
     : base(name, value)
   {
   }
 }
 
-public class SectionAlignment : SmartEnum<SectionAlignment>
+[JsonConverter(typeof(SmartEnumNameConverter<SectionAlignment, string>))]
+public class SectionAlignment : SmartEnum<SectionAlignment, string>
 {
-  public static SectionAlignment Center = new(nameof(Center), 1);
+  public static SectionAlignment Center = new(nameof(Center), nameof(Center));
 
-  public SectionAlignment(string name, int value)
+  public SectionAlignment(string name, string value)
     : base(name, value)
   {
   }
 }
 
-public class SectionPosition : SmartEnum<SectionPosition>
+[JsonConverter(typeof(SmartEnumNameConverter<SectionPosition, string>))]
+public class SectionPosition : SmartEnum<SectionPosition, string>
 {
-  public static SectionPosition Header = new(nameof(Header), 1);
-  public static SectionPosition Body = new(nameof(Body), 2);
-  public static SectionPosition Footer = new(nameof(Footer), 3);
+  public static SectionPosition Header = new(nameof(Header), nameof(Header));
+  public static SectionPosition Body = new(nameof(Body), nameof(Body));
+  public static SectionPosition Footer = new(nameof(Footer), nameof(Footer));
 
-  public SectionPosition(string name, int value)
+  public SectionPosition(string name, string value)
     : base(name, value)
   {
   }
 }
 
-public class SectionType : SmartEnum<SectionType>
+[JsonConverter(typeof(SmartEnumNameConverter<SectionType, string>))]
+public class SectionType : SmartEnum<SectionType, string>
 {
-  public static SectionType Logo = new(nameof(Logo), 1);
-  public static SectionType Title = new(nameof(Title), 2);
-  public static SectionType Barcode = new(nameof(Barcode), 3);
-  public static SectionType TwoPartTitle = new(nameof(TwoPartTitle), 4);
-  public static SectionType QrCode = new(nameof(QrCode), 5);
+  public static SectionType Logo = new(nameof(Logo), nameof(Logo));
+  public static SectionType Title = new(nameof(Title), nameof(Title));
+  public static SectionType Barcode = new(nameof(Barcode), nameof(Barcode));
 
-  public SectionType(string name, int value)
+  public static SectionType TwoPartTitle = new(nameof(TwoPartTitle), nameof(TwoPartTitle));
+  // public static SectionType QrCode = new(nameof(QrCode), nameof(QrCode));
+
+  public SectionType(string name, string value)
     : base(name, value)
   {
   }
 }
 
+[JsonConverter(typeof(DocumentSectionJsonConverter))]
 public abstract class DocumentSection : BaseEntity
 {
-  private readonly SectionType _type;
-
-  protected DocumentSection(SectionType type, int order, SectionAlignment alignment, SectionPosition position, bool showDebug)
+  protected DocumentSection(int order, SectionAlignment alignment, SectionPosition position, bool showDebug)
   {
-    _type = type;
     Order = order;
     Alignment = alignment;
     Position = position;
@@ -88,6 +91,4 @@ public abstract class DocumentSection : BaseEntity
 
   public Guid DocumentId { get; set; }
   public PrintableDocument Document { get; set; }
-
-  public SectionType Type => _type;
 }

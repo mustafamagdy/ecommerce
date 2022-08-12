@@ -11,20 +11,20 @@ public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDo
   {
     base.Configure(builder);
 
-    builder.Property(a => a.Type)
-      .HasConversion(
-        p => p.Value,
-        p => PrintableType.FromValue(p));
-
-    builder.Property(a => a.Type)
-      .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
+    // builder.Property(a => a.Type)
+    //   .HasConversion(
+    //     p => p.Name,
+    //     p => PrintableType.FromValue(p));
+    //
+    // builder.Property(a => a.Type)
+    //   .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 
     builder
-      .HasDiscriminator<string>("type")
+      .HasDiscriminator<string>("Type")
       .HasValue<SimpleReceiptInvoice>(PrintableType.Receipt.Name)
       .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name);
 
-    builder.HasMany(a => a.Sections).WithOne().HasForeignKey(a => a.DocumentId);
+    builder.HasMany(a => a.Sections).WithOne(a => a.Document).HasForeignKey(a => a.DocumentId);
     var sections = builder.Navigation(nameof(PrintableDocument.Sections));
     sections.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
   }
@@ -36,18 +36,19 @@ public class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSecti
   {
     base.Configure(builder);
 
-    builder.Property(a => a.Type)
-      .HasConversion(
-        p => p.Value,
-        p => SectionType.FromValue(p));
-
-    builder.Property(a => a.Type)
-      .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
+    // builder.Property(a => a.Type)
+    //   .HasConversion(
+    //     p => p.Name,
+    //     p => SectionType.FromValue(p));
+    //
+    // builder.Property(a => a.Type)
+    //   .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 
     builder
-      .HasDiscriminator<string>("type")
+      .HasDiscriminator<string>("Type")
       .HasValue<LogoSection>(SectionType.Logo.Name)
       .HasValue<BarcodeSection>(SectionType.Barcode.Name)
-      .HasValue<TitleSection>(SectionType.Title.Name);
+      .HasValue<TitleSection>(SectionType.Title.Name)
+      .HasValue<TwoItemRowSection>(SectionType.TwoPartTitle.Name);
   }
 }
