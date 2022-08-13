@@ -1096,6 +1096,25 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasDiscriminator().HasValue("Receipt");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TableSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.Property<string>("ColumnDefs")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HeaderStyle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HeaderTitle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasDiscriminator().HasValue("Table");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.TitleSection", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");

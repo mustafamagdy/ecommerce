@@ -316,6 +316,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
+                    HeaderTitle = table.Column<string>(type: "text", nullable: true),
+                    ColumnDefs = table.Column<string>(type: "text", nullable: true),
+                    HeaderStyle = table.Column<string>(type: "text", nullable: true),
                     FontSize = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>

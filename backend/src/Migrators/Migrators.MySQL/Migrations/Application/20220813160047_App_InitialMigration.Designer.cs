@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220812205545_App_InitialMigration")]
+    [Migration("20220813160047_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1089,6 +1089,25 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
 
                     b.HasDiscriminator().HasValue("Receipt");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TableSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+
+                    b.Property<string>("ColumnDefs")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("HeaderStyle")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("HeaderTitle")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasDiscriminator().HasValue("Table");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.TitleSection", b =>
