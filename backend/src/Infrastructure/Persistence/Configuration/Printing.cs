@@ -36,6 +36,16 @@ public class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSecti
   {
     base.Configure(builder);
 
+    builder.Property(a => a.Alignment)
+      .HasConversion(
+        p => p.Name,
+        p => SectionAlignment.FromValue(p));
+
+    builder.Property(a => a.Position)
+      .HasConversion(
+        p => p.Name,
+        p => SectionPosition.FromValue(p));
+
     // builder.Property(a => a.Type)
     //   .HasConversion(
     //     p => p.Name,
