@@ -206,57 +206,72 @@ public class BoundedTableSection : BoundedSection
 
   private void ComposeTable(IContainer container)
   {
-    var headerStyle = EvaluateHeaderStyles();
-
     container.Table(table =>
     {
-      table.ColumnsDefinition(columns =>
-      {
-        foreach (var colDef in _columnDefs)
-        {
-          if (colDef.ToLower().Trim() == "r")
-          {
-            columns.RelativeColumn();
-          }
-          else
-          {
-            var colWidth = Convert.ToInt32(colDef[1..]);
-            columns.ConstantColumn(colWidth);
-          }
-        }
-      });
+      DefineTableColumns(table);
 
-      table.Header(header =>
-      {
-        foreach (var colHeader in _columnHeaders)
-        {
-          // todo support alignment in header configuration
-          header.Cell().AlignLeft().Text(colHeader).Style(headerStyle);
-        }
-      });
+      BuildTableHeaders(table);
 
-      if (_list == null)
+      BuildTableContent(table);
+    });
+  }
+
+  private void BuildTableContent(TableDescriptor table)
+  {
+    if (_list == null)
+    {
+      throw new InvalidOperationException("Table source is not an IEnumerable");
+    }
+
+    var enumerator = _list.GetEnumerator();
+    while (enumerator.MoveNext())
+    {
+      var item = enumerator.Current;
+      var values = _propAccessort.Select(p => p(item)).ToArray();
+      foreach (var value in values)
       {
-        throw new InvalidOperationException("Table source is not an IEnumerable");
+        table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(value);
       }
+    }
 
-      var enumerator = _list.GetEnumerator();
-      while (enumerator.MoveNext())
+    static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
+  }
+
+  private void DefineTableColumns(TableDescriptor table)
+  {
+    table.ColumnsDefinition(columns =>
+    {
+      foreach (var colDef in _columnDefs)
       {
-        var item = enumerator.Current;
-        var values = _propAccessort.Select(p => p(item)).ToArray();
-        foreach (var value in values)
+        if (colDef.ToLower().Trim() == "r")
         {
-          table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(value);
+          columns.RelativeColumn();
+        }
+        else
+        {
+          var colWidth = Convert.ToInt32(colDef[1..]);
+          columns.ConstantColumn(colWidth);
         }
       }
+    });
+  }
 
-      static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
+  private void BuildTableHeaders(TableDescriptor table)
+  {
+    var headerStyle = EvaluateHeaderStyles();
+    table.Header(header =>
+    {
+      foreach (var colHeader in _columnHeaders)
+      {
+        // todo support alignment in header configuration
+        header.Cell().AlignLeft().Text(colHeader).Style(headerStyle);
+      }
     });
   }
 
   private static TextStyle EvaluateHeaderStyles()
   {
+    // apply header styles from _headerStyles
     return TextStyle.Default.FontSize(8).SemiBold();
   }
 }
