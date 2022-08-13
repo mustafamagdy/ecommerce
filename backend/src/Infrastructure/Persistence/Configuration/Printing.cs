@@ -49,6 +49,7 @@ public class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSecti
       .HasValue<LogoSection>(SectionType.Logo.Name)
       .HasValue<BarcodeSection>(SectionType.Barcode.Name)
       .HasValue<TitleSection>(SectionType.Title.Name)
-      .HasValue<TwoItemRowSection>(SectionType.TwoPartTitle.Name);
+      .HasValue<TwoItemRowSection>(SectionType.TwoPartTitle.Name)
+      .HasValue<TableSection>(SectionType.Table.Name);
   }
 }

@@ -20,6 +20,7 @@ public class DocumentSectionJsonConverter : JsonConverter
       nameof(SectionType.Barcode) => typeof(BarcodeSection),
       nameof(SectionType.Title) => typeof(TitleSection),
       nameof(SectionType.TwoPartTitle) => typeof(TwoItemRowSection),
+      nameof(SectionType.Table) => typeof(TableSection),
       _ => throw new ArgumentOutOfRangeException(typeToken)
     };
     if (existingValue == null || existingValue.GetType() != actualType)

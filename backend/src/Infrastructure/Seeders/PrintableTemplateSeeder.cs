@@ -6,7 +6,6 @@ using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 

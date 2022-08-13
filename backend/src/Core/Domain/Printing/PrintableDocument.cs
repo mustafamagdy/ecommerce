@@ -63,8 +63,8 @@ public class SectionType : SmartEnum<SectionType, string>
   public static SectionType Logo = new(nameof(Logo), nameof(Logo));
   public static SectionType Title = new(nameof(Title), nameof(Title));
   public static SectionType Barcode = new(nameof(Barcode), nameof(Barcode));
-
   public static SectionType TwoPartTitle = new(nameof(TwoPartTitle), nameof(TwoPartTitle));
+  public static SectionType Table = new(nameof(Table), nameof(Table));
   // public static SectionType QrCode = new(nameof(QrCode), nameof(QrCode));
 
   public SectionType(string name, string value)

@@ -44,18 +44,18 @@
         "Position": "Header",
         "ShowDebug": true,
         "BindingProperty": "رقم الطلب,$OrderNumber"
+      },
+      {
+        "Type": "Table",
+        "Order": 4,
+        "Alignment": "Center",
+        "Position": "Body",
+        "ShowDebug": true,
+        "BindingProperty": "$OrderItems[].Price,$OrderItems[].Qty,$OrderItems[].ItemName",
+        "HeaderTitle": "Qty,Price,Item Name",
+        "ColumnDefs": "c25,c25,r",
+        "HeaderStyle": "font=8,semi-bold"
       }
-//    ,      {
-//        "Type": "Table",
-//        "Order": 4,
-//        "Alignment": "Center",
-//        "Position": "Body",
-//        "ShowDebug": true,
-//        "BindingProperty": "$Items[].Price,$Items[].Qty,$Items[].ItemName",
-//        "HeaderTitle": "Qty,Price,Item Name",
-//        "ColumnDefs": "c25,c25,r",
-//        "HeaderStyle": "font=8,semi-bold"
-//      }
     ]
   }
 ]
