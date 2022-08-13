@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Text.RegularExpressions;
-using FSH.WebApi.Application.Common.Pdf;
 using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Elements.Table;
@@ -12,6 +11,7 @@ namespace FSH.WebApi.Application.Printing;
 
 public abstract class BoundedSection
 {
+  public abstract bool ShowDebug { get; }
   public abstract SectionPosition Position { get; }
   public abstract SectionAlignment Alignment { get; }
   protected abstract void EvaluateExpressionValues();
@@ -30,6 +30,7 @@ public class BoundedTitleSection : BoundedSection
     _dataSource = dataSource;
   }
 
+  public override bool ShowDebug => _decorated.ShowDebug;
   public override SectionPosition Position => _decorated.Position;
   public override SectionAlignment Alignment => _decorated.Alignment;
 
@@ -64,6 +65,7 @@ public class BoundedTwoItemRowSection : BoundedSection
     _dataSource = dataSource;
   }
 
+  public override bool ShowDebug => _decorated.ShowDebug;
   public override SectionPosition Position => _decorated.Position;
   public override SectionAlignment Alignment => _decorated.Alignment;
 
@@ -99,6 +101,7 @@ public class BoundedBarcodeSection : BoundedSection
     _dataSource = dataSource;
   }
 
+  public override bool ShowDebug => _decorated.ShowDebug;
   public override SectionPosition Position => _decorated.Position;
   public override SectionAlignment Alignment => _decorated.Alignment;
 
@@ -136,6 +139,7 @@ public class BoundedLogoSection : BoundedSection
     _dataSource = dataSource;
   }
 
+  public override bool ShowDebug => _decorated.ShowDebug;
   public override SectionPosition Position => _decorated.Position;
   public override SectionAlignment Alignment => _decorated.Alignment;
 
@@ -174,6 +178,7 @@ public class BoundedTableSection : BoundedSection
     _dataSource = dataSource;
   }
 
+  public override bool ShowDebug => _decorated.ShowDebug;
   public override SectionPosition Position => _decorated.Position;
   public override SectionAlignment Alignment => _decorated.Alignment;
 
@@ -218,6 +223,7 @@ public class BoundedTableSection : BoundedSection
   {
     container
       .ShowDebug(_decorated)
+      .AlignTop()
       .Table(table =>
       {
         DefineTableColumns(table);
@@ -293,7 +299,10 @@ public class BoundedTableSection : BoundedSection
 public static class PdfExtensions
 {
   public static IContainer ShowDebug(this IContainer container, DocumentSection section)
-    => section.ShowDebug ? container.DebugArea(section.GetType().Name, RandomColor) : container;
+    => ShowDebug(container, section.ShowDebug, section.GetType().Name);
+
+  public static IContainer ShowDebug(this IContainer container, bool showDebug, string title)
+    => showDebug ? container.DebugArea(title, RandomColor) : container;
 
   public static IContainer Align(this ITableCellContainer cell, string align)
   {
@@ -317,23 +326,12 @@ public static class PdfExtensions
     };
   }
 
-  private static string[] colors = {
-    "#ff8a80",
-    "#ff80ab",
-    "#ea80fc",
-    "#b388ff",
-    "#8c9eff",
-    "#82b1ff",
-    "#80d8ff",
-    "#84ffff",
-    "#a7ffeb",
-    "#b9f6ca",
-    "#ccff90",
-    "#f4ff81",
-    "#ffff8d",
-    "#ffe57f",
-    "#ffd180",
-    "#ff9e80",
+  private static string[] colors =
+  {
+    "#ff8a80", "#ff80ab", "#ea80fc", "#b388ff",
+    "#8c9eff", "#82b1ff", "#80d8ff", "#84ffff",
+    "#a7ffeb", "#b9f6ca", "#ccff90", "#f4ff81",
+    "#ffff8d", "#ffe57f", "#ffd180", "#ff9e80",
   };
 
   private static string RandomColor => colors.OrderBy(a => Guid.NewGuid()).First();

@@ -15,13 +15,13 @@ public abstract class BasePdfDocument : IDocument
     {
       SetupPage(page);
 
-      page.Header().Height(200)
+      page.Header()
         .Element(RenderHeader);
 
-      page.Content().MinHeight(100)
+      page.Content()
         .Element(Body);
 
-      page.Footer().Height(150)
+      page.Footer()
         .Element(Footer);
     });
   }
