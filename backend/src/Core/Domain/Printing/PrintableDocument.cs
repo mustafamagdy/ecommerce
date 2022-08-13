@@ -12,6 +12,8 @@ public abstract class PrintableDocument : AuditableEntity, IAggregateRoot
   private readonly List<DocumentSection> _sections = new();
 
   public bool Active { get; set; }
+  public int? Width { get; set; }
+  public bool ContinuousSize { get; set; }
 
   [JsonIgnore]
   public IReadOnlyCollection<DocumentSection> Sections => _sections.AsReadOnly();
