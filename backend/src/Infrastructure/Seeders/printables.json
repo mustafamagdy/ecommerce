@@ -10,7 +10,7 @@
         "Order": 1,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true,
+        "ShowDebug": false,
         "BindingProperty": "فاتورة ضريبية مبسطة"
       },
       {
@@ -26,7 +26,7 @@
         "Order": 2,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true,
+        "ShowDebug": false,
         "BindingProperty": "$Company.Address.City.Name"
       },
       {
@@ -34,7 +34,7 @@
         "Order": 3,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true,
+        "ShowDebug": false,
         "BindingProperty": "$OrderNumber"
       },
       {
@@ -42,7 +42,7 @@
         "Order": 3,
         "Alignment": "Center",
         "Position": "Header",
-        "ShowDebug": true,
+        "ShowDebug": false,
         "BindingProperty": "رقم الطلب,$OrderNumber"
       },
       {
@@ -50,7 +50,7 @@
         "Order": 4,
         "Alignment": "Center",
         "Position": "Body",
-        "ShowDebug": true,
+        "ShowDebug": false,
         "BindingProperty": "$OrderItems[](Price,Qty,ItemName)",
         "HeaderTitle": "Qty%al,Price%al,Item Name%ar",
         "ColumnDefs": "c25,c25,r",

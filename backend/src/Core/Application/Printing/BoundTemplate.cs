@@ -14,6 +14,8 @@ public class BoundTemplate
 
   public int? Width => _decorated.Width;
   public bool ContinuousSize => _decorated.ContinuousSize;
+  public bool ShowDebug => _sections.Any(a => a.ShowDebug);
+
   public IReadOnlyCollection<BoundedSection> Sections => _sections.AsReadOnly();
 
   public void BindTemplate<T>(T dto)

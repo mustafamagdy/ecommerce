@@ -27,14 +27,17 @@ public class InvoiceDocument : BasePdfDocument
 
   protected override void RenderHeader(IContainer container)
   {
-    container.Column(col =>
-    {
-      var components = GetComponentsFor(SectionPosition.Header);
-      foreach (var component in components)
+    container
+      .ShowDebug(_boundedTemplate.ShowDebug, "header")
+      .MaxHeight(200)
+      .Column(col =>
       {
-        component.Render(col);
-      }
-    });
+        var components = GetComponentsFor(SectionPosition.Header);
+        foreach (var component in components)
+        {
+          component.Render(col);
+        }
+      });
   }
 
   private IReadOnlyCollection<BoundedSection> GetComponentsFor(SectionPosition position)
@@ -42,26 +45,31 @@ public class InvoiceDocument : BasePdfDocument
 
   protected override void Body(IContainer container)
   {
-    container.PaddingVertical(5).Column(col =>
-    {
-      col.Spacing(5);
-      var components = GetComponentsFor(SectionPosition.Body);
-      foreach (var component in components)
+    container
+      .ShowDebug(_boundedTemplate.ShowDebug, "body")
+      .PaddingVertical(5)
+      .Column(col =>
       {
-        component.Render(col);
-      }
-    });
+        col.Spacing(5);
+        var components = GetComponentsFor(SectionPosition.Body);
+        foreach (var component in components)
+        {
+          component.Render(col);
+        }
+      });
   }
 
   protected override void Footer(IContainer container)
   {
-    container.Column(col =>
-    {
-      var components = GetComponentsFor(SectionPosition.Footer);
-      foreach (var component in components)
+    container
+      .ShowDebug(_boundedTemplate.ShowDebug, "footer")
+      .Column(col =>
       {
-        component.Render(col);
-      }
-    });
+        var components = GetComponentsFor(SectionPosition.Footer);
+        foreach (var component in components)
+        {
+          component.Render(col);
+        }
+      });
   }
 }
