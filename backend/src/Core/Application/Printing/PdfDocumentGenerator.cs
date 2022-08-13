@@ -32,7 +32,7 @@ public class InvoiceDocument : BasePdfDocument
       var components = GetComponentsFor(SectionPosition.Header);
       foreach (var component in components)
       {
-        component.RenderInColumn(col);
+        component.Render(col);
       }
     });
   }
@@ -42,12 +42,13 @@ public class InvoiceDocument : BasePdfDocument
 
   protected override void Body(IContainer container)
   {
-    container.Column(col =>
+    container.PaddingVertical(5).Column(col =>
     {
+      col.Spacing(5);
       var components = GetComponentsFor(SectionPosition.Body);
       foreach (var component in components)
       {
-        component.RenderInColumn(col);
+        component.Render(col);
       }
     });
   }
@@ -59,7 +60,7 @@ public class InvoiceDocument : BasePdfDocument
       var components = GetComponentsFor(SectionPosition.Footer);
       foreach (var component in components)
       {
-        component.RenderInColumn(col);
+        component.Render(col);
       }
     });
   }
