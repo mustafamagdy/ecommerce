@@ -51,7 +51,7 @@
         "Alignment": "Center",
         "Position": "Body",
         "ShowDebug": true,
-        "BindingProperty": "$OrderItems[].Price,$OrderItems[].Qty,$OrderItems[].ItemName",
+        "BindingProperty": "$OrderItems[](Price,Qty,ItemName)",
         "HeaderTitle": "Qty,Price,Item Name",
         "ColumnDefs": "c25,c25,r",
         "HeaderStyle": "font=8,semi-bold"
