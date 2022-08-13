@@ -11,12 +11,4 @@ public static class PdfDocumentEx
     element.AlignCenter().AlignTop().Text(lineStr).FontSize(5);
     return element;
   }
-
-  public static IContainer ShowDebugArea(this IContainer element)
-  {
-#if troubleshoot
-    element.DebugArea();
-#endif
-    return element;
-  }
 }
