@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FSH.WebApi.Application.Operation.Orders;
 
 public class OrderDto : IDto
@@ -29,30 +31,37 @@ public class OrderItemDto : IDto
 
 public class OrderExportDto : IDto
 {
-  public OrderExportDto(string orderNumber, DateTime orderDate, string phoneNumber, string customerName, decimal totalAmount, decimal totalVat, decimal netAmount, decimal totalPaid, bool paid, string base64QrCode, List<OrderItemDto> orderItems)
+  public OrderExportDto()
   {
-    OrderNumber = orderNumber;
-    OrderDate = orderDate;
-    PhoneNumber = phoneNumber;
-    CustomerName = customerName;
-    TotalAmount = totalAmount;
-    TotalVat = totalVat;
-    NetAmount = netAmount;
-    TotalPaid = totalPaid;
-    Paid = paid;
-    Base64QrCode = base64QrCode;
-    OrderItems = orderItems;
   }
 
-  public string OrderNumber { get; }
-  public DateTime OrderDate { get; }
-  public string PhoneNumber { get; }
-  public string CustomerName { get; }
-  public decimal TotalAmount { get; }
-  public decimal TotalVat { get; }
-  public decimal NetAmount { get; }
-  public decimal TotalPaid { get; }
-  public bool Paid { get; }
-  public string Base64QrCode { get; }
-  public List<OrderItemDto> OrderItems { get; }
+  public string OrderNumber { get; set; }
+  public DateTime OrderDate { get; set; }
+  public string PhoneNumber { get; set; }
+  public string CustomerName { get; set; }
+  public decimal TotalAmount { get; set; }
+  public decimal TotalVat { get; set; }
+  public decimal NetAmount { get; set; }
+  public decimal TotalPaid { get; set; }
+  public bool Paid { get; set; }
+  public string Base64QrCode { get; set; }
+  public List<OrderItemDto> OrderItems { get; set; }
+
+  public CompanyDto Company { get; set; }
+}
+
+public class CompanyDto
+{
+  public string CompanyName { get; set; }
+  public AddressDto Address { get; set; }
+}
+
+public class AddressDto
+{
+  public City City { get; set; }
+}
+
+public class City
+{
+  public string Name { get; set; }
 }
