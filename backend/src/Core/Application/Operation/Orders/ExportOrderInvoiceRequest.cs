@@ -70,16 +70,14 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     var invoiceTemplate = await _templateInvoice.FirstOrDefaultAsync(
       new SingleResultSpecification<SimpleReceiptInvoice>()
         .Query
-        .Include(a => a.Sections.OrderBy(x=>x.Order))
+        .Include(a => a.Sections.OrderBy(x => x.Order))
         .Where(a => a.Active)
         .Specification, cancellationToken);
 
     var boundTemplate = new BoundTemplate(invoiceTemplate);
     boundTemplate.BindTemplate(order);
 
-    // var invoice = new InvoiceDocument(invoiceTemplate);
-    // return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
-
-    throw new NotImplementedException("Wip for printing");
+    var invoice = new InvoiceDocument(boundTemplate);
+    return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }
