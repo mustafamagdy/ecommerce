@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Text.RegularExpressions;
 using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Fluent;
@@ -150,6 +152,11 @@ public class BoundedTableSection : BoundedSection
 {
   private readonly TableSection _decorated;
   private readonly object _dataSource;
+  private string[] _columnHeaders;
+  private string[] _columnDefs;
+  private string[] _headerStyles;
+  private IEnumerable? _list;
+  private List<Func<object, object?>> _propAccessort;
 
   public BoundedTableSection(TableSection decorated, object dataSource)
   {
@@ -162,6 +169,30 @@ public class BoundedTableSection : BoundedSection
 
   protected override void EvaluateExpressionValues()
   {
+    _columnHeaders = _decorated.HeaderTitle.Split(',');
+    _columnDefs = _decorated.ColumnDefs.Split(',');
+    _headerStyles = _decorated.HeaderStyle.Split(',');
+
+    var sourceProp = GetArrayPropName();
+    _list = sourceProp.GetPropertyValue(_dataSource) as IEnumerable;
+
+    _propAccessort = GetBindingProperties().ToList();
+  }
+
+  private IEnumerable<Func<object, object?>> GetBindingProperties()
+  {
+    var regex = new Regex(@"\((?<props>.+)\)");
+    var propNames = regex.Match(_decorated.BindingProperty).Groups["props"].Value;
+    var props = propNames.Split(",");
+    foreach (var prop in props)
+    {
+      yield return (object src) => prop.GetPropertyValue(src);
+    }
+  }
+
+  private string GetArrayPropName()
+  {
+    return _decorated.BindingProperty.Split("[]")[0][1..];
   }
 
   public override void Render(ColumnDescriptor col)
@@ -175,36 +206,57 @@ public class BoundedTableSection : BoundedSection
 
   private void ComposeTable(IContainer container)
   {
-    var headerStyle = TextStyle.Default.FontSize(8).SemiBold();
+    var headerStyle = EvaluateHeaderStyles();
 
     container.Table(table =>
     {
       table.ColumnsDefinition(columns =>
       {
-        columns.ConstantColumn(25);
-        columns.ConstantColumn(40);
-        columns.RelativeColumn();
+        foreach (var colDef in _columnDefs)
+        {
+          if (colDef.ToLower().Trim() == "r")
+          {
+            columns.RelativeColumn();
+          }
+          else
+          {
+            var colWidth = Convert.ToInt32(colDef[1..]);
+            columns.ConstantColumn(colWidth);
+          }
+        }
       });
 
       table.Header(header =>
       {
-        header.Cell().AlignLeft().Text("Price").Style(headerStyle);
-        header.Cell().AlignLeft().Text("Qty").Style(headerStyle);
-        header.Cell().AlignRight().Text("Item").Style(headerStyle);
+        foreach (var colHeader in _columnHeaders)
+        {
+          // todo support alignment in header configuration
+          header.Cell().AlignLeft().Text(colHeader).Style(headerStyle);
+        }
       });
 
-      // foreach (var item in Data)
-      // {
-      //   int qty = item.Qty;
-      //   string itemName = item.ItemName;
-      //   table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text($"{item.Price:F0}");
-      //   table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(qty);
-      //   table.Cell().Element(CellStyle).AlignRight().AlignTop().Text(itemName);
-      //
-      //   static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
-      //
-      //   // .BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
-      // }
+      if (_list == null)
+      {
+        throw new InvalidOperationException("Table source is not an IEnumerable");
+      }
+
+      var enumerator = _list.GetEnumerator();
+      while (enumerator.MoveNext())
+      {
+        var item = enumerator.Current;
+        var values = _propAccessort.Select(p => p(item)).ToArray();
+        foreach (var value in values)
+        {
+          table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(value);
+        }
+      }
+
+      static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
     });
+  }
+
+  private static TextStyle EvaluateHeaderStyles()
+  {
+    return TextStyle.Default.FontSize(8).SemiBold();
   }
 }
