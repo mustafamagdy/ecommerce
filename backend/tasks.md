@@ -126,24 +126,25 @@ transfer operation works in two steps
 /////// Printing ///////
 
 - we have 3 components:
-    - data
-        - come from the application logic (the dto)
-    - template
-        - come from db based on the current tenant configuration for the template
-        - template takes the data and construct in memory structure representation of the printable
-        - we can have multiple templates for a given printable, but only on is active (more than one or none throws an
-          exception)
-            - each template has predefined sections, you cannot add, or delete sections
-            - you can enable/disable section
-            - each section has: type (readonly), position, alignment, order, show-debug, bindingValue, valueFormat
-            - based on some types section can have: font-size, font-name, width, height
-            - bindingValue:
-              - propName, propName.propName, propName[].propName
-    - pdf generator
-        - uses template to draw the pdf
-    - here how it should work -> 
-      - export func need to get the active template from that template types (the active invoice template for ex)
-      - export func also has the model (the dto), it passes the dto to the template to bind its values and get back a bound template
-      - then the output bound template should contains each section with its properties, and its content has been populated
-      - export func should pass this bound template to the pdf generator to draw the pdf
-    - 
+[x] data 
+  [x] come from the application logic (the dto)
+[x] template
+    [x] come from db based on the current tenant configuration for the template
+    [x] template takes the data and construct in memory structure representation of the printable
+    [x] we can have multiple templates for a given printable, but only on is active (more than one or none throws an
+      exception)
+        [x] each template has predefined sections, you cannot add, or delete sections
+        [x] you can enable/disable section
+        [x] each section has: type (readonly), position, alignment, order, show-debug, bindingValue, valueFormat
+        [x] based on some types section can have: font-size, font-name, width, height
+        [x] bindingValue:
+          [x] propName, propName.propName, propName[].propName
+  [x] pdf generator
+      [x] uses template to draw the pdf
+[x] here how it should work -> 
+  [x] export func need to get the active template from that template types (the active invoice template for ex)
+  [x] export func also has the model (the dto), it passes the dto to the template to bind its values and get back a bound template
+  [x] then the output bound template should contains each section with its properties, and its content has been populated
+  [x] export func should pass this bound template to the pdf generator to draw the pdf
+- formats
+  - format number, date, 

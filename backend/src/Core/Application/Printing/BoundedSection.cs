@@ -81,6 +81,7 @@ public class BoundedTwoItemRowSection : BoundedSection
     EvaluateExpressionValues();
     col.Item()
       .ShowDebug(_decorated)
+      .Align(_decorated.Alignment)
       .Text(text =>
       {
         text.Span(_item1);
@@ -214,9 +215,6 @@ public class BoundedTableSection : BoundedSection
   {
     EvaluateExpressionValues();
     col.Item().Element(ComposeTable);
-
-    var totalPrice = 0; //Data.TotalAmount;
-    col.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:N2}").SemiBold();
   }
 
   private void ComposeTable(IContainer container)

@@ -55,6 +55,14 @@
         "HeaderTitle": "Qty%al,Price%al,Item Name%ar",
         "ColumnDefs": "c25,c25,r",
         "HeaderStyle": "font=8,semi-bold"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 5,
+        "Alignment": "Right",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "Grand Total: ,$TotalAmount"
       }
     ]
   }

@@ -36,7 +36,9 @@ public class PrintableType : SmartEnum<PrintableType, string>
 [JsonConverter(typeof(SmartEnumNameConverter<SectionAlignment, string>))]
 public class SectionAlignment : SmartEnum<SectionAlignment, string>
 {
-  public static SectionAlignment Center = new(nameof(Center), nameof(Center));
+  public static SectionAlignment Center = new(nameof(Center), "ac");
+  public static SectionAlignment Right = new(nameof(Right), "ar");
+  public static SectionAlignment Left = new(nameof(Left), "al");
 
   public SectionAlignment(string name, string value)
     : base(name, value)
@@ -64,6 +66,7 @@ public class SectionType : SmartEnum<SectionType, string>
   public static SectionType Title = new(nameof(Title), nameof(Title));
   public static SectionType Barcode = new(nameof(Barcode), nameof(Barcode));
   public static SectionType TwoPartTitle = new(nameof(TwoPartTitle), nameof(TwoPartTitle));
+
   public static SectionType Table = new(nameof(Table), nameof(Table));
   // public static SectionType QrCode = new(nameof(QrCode), nameof(QrCode));
 
