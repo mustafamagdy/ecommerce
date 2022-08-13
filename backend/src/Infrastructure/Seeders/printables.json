@@ -52,7 +52,7 @@
         "Position": "Body",
         "ShowDebug": true,
         "BindingProperty": "$OrderItems[](Price,Qty,ItemName)",
-        "HeaderTitle": "Qty,Price,Item Name",
+        "HeaderTitle": "Qty%al,Price%al,Item Name%ar",
         "ColumnDefs": "c25,c25,r",
         "HeaderStyle": "font=8,semi-bold"
       }

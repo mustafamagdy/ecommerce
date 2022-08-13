@@ -2,6 +2,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Shared.Extensions;
+using QuestPDF.Elements.Table;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -157,6 +158,7 @@ public class BoundedTableSection : BoundedSection
   private string[] _headerStyles;
   private IEnumerable? _list;
   private List<Func<object, object?>> _propAccessort;
+  private Dictionary<int, string> _columnAlignment = new();
 
   public BoundedTableSection(TableSection decorated, object dataSource)
   {
@@ -186,7 +188,7 @@ public class BoundedTableSection : BoundedSection
     var props = propNames.Split(",");
     foreach (var prop in props)
     {
-      yield return (object src) => prop.GetPropertyValue(src);
+      yield return src => prop.GetPropertyValue(src);
     }
   }
 
@@ -218,19 +220,17 @@ public class BoundedTableSection : BoundedSection
 
   private void BuildTableContent(TableDescriptor table)
   {
-    if (_list == null)
-    {
-      throw new InvalidOperationException("Table source is not an IEnumerable");
-    }
+    _ = _list ?? throw new InvalidOperationException("Table source is not an IEnumerable");
 
     var enumerator = _list.GetEnumerator();
     while (enumerator.MoveNext())
     {
       var item = enumerator.Current;
       var values = _propAccessort.Select(p => p(item)).ToArray();
-      foreach (var value in values)
+      for (int idx = 0; idx < values.Length; idx++)
       {
-        table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(value);
+        object? value = values[idx];
+        table.Cell().Element(CellStyle).Align(_columnAlignment[idx]).AlignTop().Text(value);
       }
     }
 
@@ -261,10 +261,14 @@ public class BoundedTableSection : BoundedSection
     var headerStyle = EvaluateHeaderStyles();
     table.Header(header =>
     {
-      foreach (var colHeader in _columnHeaders)
+      for (int cidx = 0; cidx < _columnHeaders.Length; cidx++)
       {
-        // todo support alignment in header configuration
-        header.Cell().AlignLeft().Text(colHeader).Style(headerStyle);
+        string? colHeader = _columnHeaders[cidx];
+        var headerProps = colHeader.Split('%');
+        var title = headerProps[0];
+        var align = headerProps[1];
+        _columnAlignment.Add(cidx, align);
+        header.Cell().Align(align).Text(title).Style(headerStyle);
       }
     });
   }
@@ -273,5 +277,30 @@ public class BoundedTableSection : BoundedSection
   {
     // apply header styles from _headerStyles
     return TextStyle.Default.FontSize(8).SemiBold();
+  }
+}
+
+public static class PdfExtensions
+{
+  public static IContainer Align(this ITableCellContainer cell, string align)
+  {
+    return align switch
+    {
+      "al" => cell.AlignLeft(),
+      "ar" => cell.AlignRight(),
+      "ac" => cell.AlignCenter(),
+      _ => throw new ArgumentOutOfRangeException(nameof(align))
+    };
+  }
+
+  public static IContainer Align(this IContainer cell, string align)
+  {
+    return align switch
+    {
+      "al" => cell.AlignLeft(),
+      "ar" => cell.AlignRight(),
+      "ac" => cell.AlignCenter(),
+      _ => throw new ArgumentOutOfRangeException(nameof(align))
+    };
   }
 }
