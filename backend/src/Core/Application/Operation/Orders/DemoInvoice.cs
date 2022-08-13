@@ -39,13 +39,13 @@ namespace FSH.WebApi.Application.Operation.Orders
       container.Column(col =>
       {
         col.Item().Height(30)
-          .AlignMiddle().AlignCenter().ShowDebugArea()
+          .AlignMiddle().AlignCenter().DebugArea()
           .Width(100).Image(logo, ImageScaling.Resize);
 
         col
           .Item()
           .Height(38)
-          .ShowDebugArea()
+          .DebugArea()
           .Background(Colors.White)
           .AlignCenter()
           .AlignMiddle()
@@ -56,14 +56,14 @@ namespace FSH.WebApi.Application.Operation.Orders
 
         col
           .Item()
-          .ShowDebugArea()
+          .DebugArea()
           .AlignCenter().AlignMiddle()
           .Text(Model.OrderNumber)
           .FontSize(10);
 
         col.Item().SeparatorLine('=', 70);
-        col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("فاتورة ضريبية مبسطة").FontSize(10);
-        col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("Simplified Tax Invoice").FontSize(10);
+        col.Item().AlignMiddle().AlignCenter().DebugArea().Text("فاتورة ضريبية مبسطة").FontSize(10);
+        col.Item().AlignMiddle().AlignCenter().DebugArea().Text("Simplified Tax Invoice").FontSize(10);
       });
     }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Text.RegularExpressions;
+using FSH.WebApi.Application.Common.Pdf;
 using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Elements.Table;
@@ -43,7 +44,7 @@ public class BoundedTitleSection : BoundedSection
     EvaluateExpressionValues();
     col
       .Item()
-      // .ShowDebugArea()
+      .ShowDebug(_decorated)
       .AlignCenter().AlignMiddle()
       .Text(_content)
       .FontSize(_decorated.FontSize);
@@ -76,11 +77,13 @@ public class BoundedTwoItemRowSection : BoundedSection
   public override void Render(ColumnDescriptor col)
   {
     EvaluateExpressionValues();
-    col.Item().Text(text =>
-    {
-      text.Span(_item1);
-      text.Span(_item2);
-    });
+    col.Item()
+      .ShowDebug(_decorated)
+      .Text(text =>
+      {
+        text.Span(_item1);
+        text.Span(_item2);
+      });
   }
 }
 
@@ -110,8 +113,8 @@ public class BoundedBarcodeSection : BoundedSection
     EvaluateExpressionValues();
     col
       .Item()
+      .ShowDebug(_decorated)
       .Height(38)
-      // .ShowDebugArea()
       .Background(Colors.White)
       .AlignCenter()
       .AlignMiddle()
@@ -143,9 +146,14 @@ public class BoundedLogoSection : BoundedSection
   public override void Render(ColumnDescriptor col)
   {
     EvaluateExpressionValues();
-    // col.Item().Height(30)
-    //   .AlignMiddle().AlignCenter()
-    //   .Width(100).Image(ImageData, ImageScaling.Resize);
+    col.Item()
+      .ShowDebug(_decorated)
+      .Height(30)
+      .AlignMiddle()
+      .AlignCenter()
+      .Width(100)
+      // .Image(ImageData, ImageScaling.Resize);
+      .Image(QuestPDF.Helpers.Placeholders.Image(100, 100), ImageScaling.Resize);
   }
 }
 
@@ -208,14 +216,16 @@ public class BoundedTableSection : BoundedSection
 
   private void ComposeTable(IContainer container)
   {
-    container.Table(table =>
-    {
-      DefineTableColumns(table);
+    container
+      .ShowDebug(_decorated)
+      .Table(table =>
+      {
+        DefineTableColumns(table);
 
-      BuildTableHeaders(table);
+        BuildTableHeaders(table);
 
-      BuildTableContent(table);
-    });
+        BuildTableContent(table);
+      });
   }
 
   private void BuildTableContent(TableDescriptor table)
@@ -282,6 +292,9 @@ public class BoundedTableSection : BoundedSection
 
 public static class PdfExtensions
 {
+  public static IContainer ShowDebug(this IContainer container, DocumentSection section)
+    => section.ShowDebug ? container.DebugArea(section.GetType().Name, RandomColor) : container;
+
   public static IContainer Align(this ITableCellContainer cell, string align)
   {
     return align switch
@@ -303,4 +316,25 @@ public static class PdfExtensions
       _ => throw new ArgumentOutOfRangeException(nameof(align))
     };
   }
+
+  private static string[] colors = {
+    "#ff8a80",
+    "#ff80ab",
+    "#ea80fc",
+    "#b388ff",
+    "#8c9eff",
+    "#82b1ff",
+    "#80d8ff",
+    "#84ffff",
+    "#a7ffeb",
+    "#b9f6ca",
+    "#ccff90",
+    "#f4ff81",
+    "#ffff8d",
+    "#ffe57f",
+    "#ffd180",
+    "#ff9e80",
+  };
+
+  private static string RandomColor => colors.OrderBy(a => Guid.NewGuid()).First();
 }
