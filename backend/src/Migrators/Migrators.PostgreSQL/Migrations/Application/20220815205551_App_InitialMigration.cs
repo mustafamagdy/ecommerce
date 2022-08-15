@@ -11,10 +11,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "Shared");
+                name: "Auditing");
 
             migrationBuilder.EnsureSchema(
-                name: "Auditing");
+                name: "Shared");
 
             migrationBuilder.EnsureSchema(
                 name: "Identity");
@@ -459,76 +459,38 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ActivePaymentOperations",
+                name: "PaymentOperations",
                 schema: "Shared",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
+                    OperationType = table.Column<string>(type: "text", nullable: false),
+                    CashRegisterId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaymentMethodId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PendingTransferId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false),
-                    CashRegisterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PaymentMethodId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PendingTransferId = table.Column<Guid>(type: "uuid", nullable: true)
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ActivePaymentOperations", x => x.Id);
+                    table.PrimaryKey("PK_PaymentOperations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ActivePaymentOperations_CashRegisters_CashRegisterId",
+                        name: "FK_PaymentOperations_CashRegisters_CashRegisterId",
                         column: x => x.CashRegisterId,
                         principalSchema: "Shared",
                         principalTable: "CashRegisters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ActivePaymentOperations_PaymentMethods_PaymentMethodId",
-                        column: x => x.PaymentMethodId,
-                        principalSchema: "Shared",
-                        principalTable: "PaymentMethods",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ArchivedPaymentOperations",
-                schema: "Shared",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false),
-                    CashRegisterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PaymentMethodId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PendingTransferId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArchivedPaymentOperations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ArchivedPaymentOperations_CashRegisters_CashRegisterId",
-                        column: x => x.CashRegisterId,
-                        principalSchema: "Shared",
-                        principalTable: "CashRegisters",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ArchivedPaymentOperations_PaymentMethods_PaymentMethodId",
+                        name: "FK_PaymentOperations_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
                         principalSchema: "Shared",
                         principalTable: "PaymentMethods",
@@ -644,30 +606,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActivePaymentOperations_CashRegisterId",
-                schema: "Shared",
-                table: "ActivePaymentOperations",
-                column: "CashRegisterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ActivePaymentOperations_PaymentMethodId",
-                schema: "Shared",
-                table: "ActivePaymentOperations",
-                column: "PaymentMethodId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArchivedPaymentOperations_CashRegisterId",
-                schema: "Shared",
-                table: "ArchivedPaymentOperations",
-                column: "CashRegisterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArchivedPaymentOperations_PaymentMethodId",
-                schema: "Shared",
-                table: "ArchivedPaymentOperations",
-                column: "PaymentMethodId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CashRegisters_BranchId",
                 schema: "Shared",
                 table: "CashRegisters",
@@ -722,6 +660,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 table: "Orders",
                 column: "OrderNumber",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentOperations_CashRegisterId",
+                schema: "Shared",
+                table: "PaymentOperations",
+                column: "CashRegisterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentOperations_PaymentMethodId",
+                schema: "Shared",
+                table: "PaymentOperations",
+                column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
@@ -796,14 +746,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ActivePaymentOperations",
-                schema: "Shared");
-
-            migrationBuilder.DropTable(
-                name: "ArchivedPaymentOperations",
-                schema: "Shared");
-
-            migrationBuilder.DropTable(
                 name: "AuditTrails",
                 schema: "Auditing");
 
@@ -817,6 +759,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "OrderPayments",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "PaymentOperations",
                 schema: "Shared");
 
             migrationBuilder.DropTable(
@@ -840,10 +786,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "CashRegisters",
-                schema: "Shared");
-
-            migrationBuilder.DropTable(
                 name: "PrintableDocument",
                 schema: "Shared");
 
@@ -853,6 +795,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Orders",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "CashRegisters",
                 schema: "Shared");
 
             migrationBuilder.DropTable(
@@ -868,10 +814,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "Branches",
-                schema: "Shared");
-
-            migrationBuilder.DropTable(
                 name: "Products",
                 schema: "Shared");
 
@@ -881,6 +823,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Customers",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "Branches",
                 schema: "Shared");
 
             migrationBuilder.DropTable(

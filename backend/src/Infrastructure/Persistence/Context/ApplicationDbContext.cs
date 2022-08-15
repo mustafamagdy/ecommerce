@@ -22,6 +22,10 @@ public class ApplicationDbContext : BaseDbContext
     ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionInfo, tenantConnectionStringResolver)
   {
+    if (this.Database.IsNpgsql())
+    {
+      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
   }
 
   public DbSet<Branch> Branches => Set<Branch>();
@@ -35,8 +39,8 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
   public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
-  public DbSet<ActivePaymentOperation> ActivePaymentOperations => Set<ActivePaymentOperation>();
-  public DbSet<ArchivedPaymentOperation> ArchivedPaymentOperations => Set<ArchivedPaymentOperation>();
+
+  public DbSet<PaymentOperation> PaymentOperations => Set<PaymentOperation>();
   public DbSet<SimpleReceiptInvoice> SimpleReceiptInvoiceTemplates => Set<SimpleReceiptInvoice>();
   public DbSet<WideReceiptInvoice> WideReceiptInvoiceTemplates => Set<WideReceiptInvoice>();
 

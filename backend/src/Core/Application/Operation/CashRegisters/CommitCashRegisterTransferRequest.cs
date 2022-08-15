@@ -27,13 +27,13 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
   public async Task<string> Handle(CommitCashRegisterTransferRequest request, CancellationToken cancellationToken)
   {
     var tr = await _repository.GetByIdAsync(request.TransferId, cancellationToken);
-    if (tr.Type != PaymentOperationType.PendingIn || tr.PendingTransferId == null)
+    if (tr.OperationType != PaymentOperationType.PendingIn || tr.PendingTransferId == null)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }
 
     var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId, cancellationToken);
-    if (pendingOut == null || pendingOut.Type != PaymentOperationType.PendingOut)
+    if (pendingOut == null || pendingOut.OperationType != PaymentOperationType.PendingOut)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }

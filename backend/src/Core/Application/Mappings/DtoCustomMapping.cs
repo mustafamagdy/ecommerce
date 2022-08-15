@@ -39,11 +39,11 @@ public class DtoCustomMapping
     TypeAdapterConfig<ActivePaymentOperation, CashRegisterOperationDto>
       .NewConfig()
       .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
-      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
+      .Map(dest => dest.PaymentOperationType, src => src.OperationType.Name);
 
     TypeAdapterConfig<ArchivedPaymentOperation, CashRegisterOperationDto>
       .NewConfig()
       .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
-      .Map(dest => dest.PaymentOperationType, src => src.Type.Name);
+      .Map(dest => dest.PaymentOperationType, src => src.OperationType.Name);
   }
 }

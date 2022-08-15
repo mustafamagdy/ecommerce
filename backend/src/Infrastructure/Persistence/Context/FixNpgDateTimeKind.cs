@@ -39,7 +39,7 @@ public class FixNpgDateTimeKind : SaveChangesInterceptor
     fi.SetValue(obj, val);
   }
 
-  private async Task FixDateTimeKind(ChangeTracker changeTracker)
+  private Task FixDateTimeKind(ChangeTracker changeTracker)
   {
     var dateProperties = changeTracker.Context.Model.GetEntityTypes()
       .SelectMany(t => t.GetProperties())
@@ -79,5 +79,7 @@ public class FixNpgDateTimeKind : SaveChangesInterceptor
         }
       }
     }
+
+    return Task.CompletedTask;
   }
 }
