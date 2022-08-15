@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Domain.Printing.Sections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

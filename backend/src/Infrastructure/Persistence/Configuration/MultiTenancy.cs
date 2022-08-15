@@ -5,10 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public abstract class SubscriptionConfig<T> : BaseEntityConfiguration<T, DefaultIdType>
-  where T : Subscription
+public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultIdType>
 {
-  public override void Configure(EntityTypeBuilder<T> builder)
+  public override void Configure(EntityTypeBuilder<Subscription> builder)
   {
     base.Configure(builder);
 
@@ -17,55 +16,11 @@ public abstract class SubscriptionConfig<T> : BaseEntityConfiguration<T, Default
       .HasPrecision(7, 3);
 
     builder
-      .Property(b => b.SubscriptionType)
-      .HasConversion(
-        p => p.Value,
-        p => SubscriptionType.FromValue(p)
-      );
+      .HasDiscriminator<string>("Type")
+      .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
+      .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
+      .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
   }
-}
-
-public class StandardSubscriptionConfig : SubscriptionConfig<StandardSubscription>
-{
-}
-
-public class DemoSubscriptionConfig : SubscriptionConfig<DemoSubscription>
-{
-}
-
-public class TrainSubscriptionConfig : SubscriptionConfig<TrainSubscription>
-{
-}
-
-public abstract class TenantSubscriptionConfig<T, TSubscription> : BaseEntityConfiguration<T, DefaultIdType>
-  where T : TenantSubscription<TSubscription>
-  where TSubscription : Subscription, new()
-{
-  public override void Configure(EntityTypeBuilder<T> builder)
-  {
-    base.Configure(builder);
-    builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantSubscriptionId);
-  }
-}
-
-public class TenantProdSubscriptionConfig : TenantSubscriptionConfig<TenantProdSubscription, StandardSubscription>
-{
-  public override void Configure(EntityTypeBuilder<TenantProdSubscription> builder)
-  {
-    base.Configure(builder);
-    builder
-      .HasMany(a => a.Payments)
-      .WithOne(a => a.TenantProdSubscription)
-      .HasForeignKey(a => a.TenantProdSubscriptionId);
-  }
-}
-
-public class TenantDemoSubscriptionConfig : TenantSubscriptionConfig<TenantDemoSubscription, DemoSubscription>
-{
-}
-
-public class TenantTrainSubscriptionConfig : TenantSubscriptionConfig<TenantTrainSubscription, TrainSubscription>
-{
 }
 
 public class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<SubscriptionHistory>
@@ -80,34 +35,35 @@ public class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<Subscr
   }
 }
 
-// public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
-// {
-//   public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
-//   {
-//     // base.Configure(builder);
-//
-//     builder.HasKey(a => a.Id);
-//     builder.Property(a => a.Id).ValueGeneratedNever();
-//
-//     builder.HasOne(a => a.PaymentMethod).WithMany().HasForeignKey(a => a.PaymentMethodId);
-//
-//     builder
-//       .Property(b => b.Amount)
-//       .HasPrecision(7, 3);
-//   }
-// }
-
-public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPayment>
+public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
 {
-  public void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
+  public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
   {
-    builder.HasKey(a => a.Id);
-    builder.Property(a => a.Id).ValueGeneratedNever();
-
-    builder.HasOne(a => a.PaymentMethod).WithMany().HasForeignKey(a => a.PaymentMethodId);
+    base.Configure(builder);
 
     builder
       .Property(b => b.Amount)
       .HasPrecision(7, 3);
+
+    builder
+      .HasOne(a => a.TenantProdSubscription)
+      .WithMany()
+      .HasForeignKey(a => a.TenantProdSubscriptionId);
+  }
+}
+
+public class TenantSubscriptionConfig<TSubscription> : BaseEntityConfiguration<TenantSubscription<TSubscription>, DefaultIdType>
+  where TSubscription : Subscription, new()
+{
+  public override void Configure(EntityTypeBuilder<TenantSubscription<TSubscription>> builder)
+  {
+    base.Configure(builder);
+    builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantSubscriptionId);
+
+    builder
+      .HasDiscriminator<string>("Type")
+      .HasValue<TenantProdSubscription>(SubscriptionType.Standard.Name)
+      .HasValue<TenantDemoSubscription>(SubscriptionType.Demo.Name)
+      .HasValue<TenantTrainSubscription>(SubscriptionType.Train.Name);
   }
 }
