@@ -23,7 +23,7 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.9.8" />
         <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
         <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.1" />
+        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.108" />
         <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
         <PackageReference Include="MailKit" Version="3.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.6" />
