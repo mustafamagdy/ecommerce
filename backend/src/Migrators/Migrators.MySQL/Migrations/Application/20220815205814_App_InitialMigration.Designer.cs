@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220813160047_App_InitialMigration")]
+    [Migration("20220815205814_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -219,124 +219,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasIndex("ServiceId");
 
                     b.ToTable("ServiceCatalogs", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(7, 3)
-                        .HasColumnType("decimal(7,3)");
-
-                    b.Property<Guid>("CashRegisterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("PaymentMethodId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("PendingTransferId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CashRegisterId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.ToTable("ActivePaymentOperations", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(7, 3)
-                        .HasColumnType("decimal(7,3)");
-
-                    b.Property<Guid>("CashRegisterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("PaymentMethodId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("PendingTransferId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CashRegisterId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.ToTable("ArchivedPaymentOperations", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -606,31 +488,48 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentOperation", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Alignment")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
-                    b.Property<string>("BindingProperty")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("DocumentId")
+                    b.Property<Guid>("CashRegisterId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("Position")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OperationType")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("ShowDebug")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("PendingTransferId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -643,11 +542,11 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("DocumentSection", "Shared");
+                    b.ToTable("PaymentOperations", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("DocumentSection");
+                    b.HasDiscriminator<string>("Type").HasValue("PaymentOperation");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -698,6 +597,52 @@ namespace Migrators.MySQL.Migrations.Application
                     b.ToTable("PrintableDocument", "Shared");
 
                     b.HasDiscriminator<string>("Type").HasValue("PrintableDocument");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.DocumentSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Alignment")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BindingProperty")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("ShowDebug")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentSection", "Shared");
+
+                    b.HasDiscriminator<string>("Type").HasValue("DocumentSection");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1070,30 +1015,41 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.BarcodeSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
                 {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+                    b.HasBaseType("FSH.WebApi.Domain.Operation.PaymentOperation");
+
+                    b.HasIndex("CashRegisterId");
+
+                    b.HasDiscriminator().HasValue("active");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Operation.PaymentOperation");
+
+                    b.HasIndex("CashRegisterId");
+
+                    b.HasDiscriminator().HasValue("archived");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.BarcodeSection", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
 
                     b.HasDiscriminator().HasValue("Barcode");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.LogoSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.LogoSection", b =>
                 {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
 
                     b.HasDiscriminator().HasValue("Logo");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.TableSection", b =>
                 {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
-
-                    b.HasDiscriminator().HasValue("Receipt");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TableSection", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
 
                     b.Property<string>("ColumnDefs")
                         .IsRequired()
@@ -1110,9 +1066,9 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasDiscriminator().HasValue("Table");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TitleSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.TitleSection", b =>
                 {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
 
                     b.Property<int>("FontSize")
                         .HasColumnType("int");
@@ -1120,11 +1076,18 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasDiscriminator().HasValue("Title");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.TwoItemRowSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.TwoItemRowSection", b =>
                 {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.DocumentSection");
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
 
                     b.HasDiscriminator().HasValue("TwoPartTitle");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Receipt");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
@@ -1162,44 +1125,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("Product");
 
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ActiveOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-
-                    b.Navigation("PaymentMethod");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ArchivedOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-
-                    b.Navigation("PaymentMethod");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>
@@ -1262,7 +1187,18 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("PaymentMethod");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.DocumentSection", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.DocumentSection", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Printing.PrintableDocument", "Document")
                         .WithMany("Sections")
@@ -1322,6 +1258,28 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
+                        .WithMany("ActiveOperations")
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegister");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
+                        .WithMany("ArchivedOperations")
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegister");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>

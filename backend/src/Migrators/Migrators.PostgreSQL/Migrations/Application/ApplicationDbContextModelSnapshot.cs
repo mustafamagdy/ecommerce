@@ -224,124 +224,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(7, 3)
-                        .HasColumnType("numeric(7,3)");
-
-                    b.Property<Guid>("CashRegisterId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("PaymentMethodId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PendingTransferId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CashRegisterId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.ToTable("ActivePaymentOperations", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(7, 3)
-                        .HasColumnType("numeric(7,3)");
-
-                    b.Property<Guid>("CashRegisterId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("PaymentMethodId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PendingTransferId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CashRegisterId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.ToTable("ArchivedPaymentOperations", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>
                 {
                     b.Property<Guid>("Id")
@@ -603,6 +485,69 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasKey("Id");
 
                     b.ToTable("PaymentMethods", "Shared");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentOperation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
+
+                    b.Property<Guid>("CashRegisterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OperationType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PendingTransferId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.ToTable("PaymentOperations", "Shared");
+
+                    b.HasDiscriminator<string>("Type").HasValue("PaymentOperation");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1075,6 +1020,24 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Operation.PaymentOperation");
+
+                    b.HasIndex("CashRegisterId");
+
+                    b.HasDiscriminator().HasValue("active");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Operation.PaymentOperation");
+
+                    b.HasIndex("CashRegisterId");
+
+                    b.HasDiscriminator().HasValue("archived");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.BarcodeSection", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
@@ -1169,44 +1132,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ActiveOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-
-                    b.Navigation("PaymentMethod");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ArchivedOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-
-                    b.Navigation("PaymentMethod");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Structure.Branch", "Branch")
@@ -1263,6 +1188,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
 
                     b.Navigation("Order");
+
+                    b.Navigation("PaymentMethod");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("PaymentMethod");
                 });
@@ -1327,6 +1263,28 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
+                        .WithMany("ActiveOperations")
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegister");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
+                        .WithMany("ArchivedOperations")
+                        .HasForeignKey("CashRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CashRegister");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>

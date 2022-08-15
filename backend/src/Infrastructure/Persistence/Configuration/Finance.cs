@@ -26,10 +26,9 @@ public class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashReg
   }
 }
 
-public abstract class BaseAuditablePaymentOperationConfig<T> : BaseAuditableTenantEntityConfiguration<T>
-  where T : PaymentOperation
+public class PaymentOperationConfig : BaseAuditableTenantEntityConfiguration<PaymentOperation>
 {
-  public override void Configure(EntityTypeBuilder<T> builder)
+  public override void Configure(EntityTypeBuilder<PaymentOperation> builder)
   {
     base.Configure(builder);
 
@@ -38,17 +37,8 @@ public abstract class BaseAuditablePaymentOperationConfig<T> : BaseAuditableTena
       .HasPrecision(7, 3);
 
     builder
-      .Property(b => b.Type)
-      .HasConversion(
-        p => p.Value,
-        p => PaymentOperationType.FromValue(p));
+      .HasDiscriminator<string>("Type")
+      .HasValue<ActivePaymentOperation>("active")
+      .HasValue<ArchivedPaymentOperation>("archived");
   }
-}
-
-public class ActiveAuditablePaymentOperationConfig : BaseAuditablePaymentOperationConfig<ActivePaymentOperation>
-{
-}
-
-public class ArchivedAuditablePaymentOperationConfig : BaseAuditablePaymentOperationConfig<ArchivedPaymentOperation>
-{
 }

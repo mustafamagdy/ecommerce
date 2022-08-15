@@ -45,8 +45,8 @@ public class CashRegister : AuditableEntity, IAggregateRoot
   private void MoveAllOperationsToArchive()
   {
     var committedOperations = _activeOperations
-      .Where(a => a.Type != PaymentOperationType.PendingIn
-                  || a.Type != PaymentOperationType.PendingOut)
+      .Where(a => a.OperationType != PaymentOperationType.PendingIn
+                  || a.OperationType != PaymentOperationType.PendingOut)
       .ToList();
 
     _archivedOperations.AddRange(committedOperations.Cast<ArchivedPaymentOperation>());
@@ -68,28 +68,28 @@ public class CashRegister : AuditableEntity, IAggregateRoot
 
   public void AcceptPendingIn(PaymentOperation operation)
   {
-    if (operation.Type != PaymentOperationType.PendingIn)
+    if (operation.OperationType != PaymentOperationType.PendingIn)
     {
-      throw new InvalidOperationException($"Operation {operation.Type} is not valid for accept pending in operation");
+      throw new InvalidOperationException($"Operation {operation.OperationType} is not valid for accept pending in operation");
     }
 
-    operation.Type = PaymentOperationType.In;
+    operation.OperationType = PaymentOperationType.In;
     UpdateBalance(operation);
   }
 
   public void CommitPendingOut(PaymentOperation operation)
   {
-    if (operation.Type != PaymentOperationType.PendingOut)
+    if (operation.OperationType != PaymentOperationType.PendingOut)
     {
-      throw new InvalidOperationException($"Operation {operation.Type} is not valid for committing pending out operation");
+      throw new InvalidOperationException($"Operation {operation.OperationType} is not valid for committing pending out operation");
     }
 
-    operation.Type = PaymentOperationType.Out;
+    operation.OperationType = PaymentOperationType.Out;
   }
 
   private void UpdateBalance(PaymentOperation operation)
   {
-    switch (operation.Type.Name)
+    switch (operation.OperationType.Name)
     {
       case nameof(PaymentOperationType.In):
         Balance += operation.Amount;
@@ -106,7 +106,7 @@ public abstract class PaymentOperation : AuditableEntity, IAggregateRoot
 {
   public DateTime DateTime { get; set; }
   public decimal Amount { get; set; }
-  public PaymentOperationType Type { get; set; }
+  public PaymentOperationType OperationType { get; set; }
 
   public Guid CashRegisterId { get; set; }
   public CashRegister CashRegister { get; set; }
@@ -123,10 +123,10 @@ public class ActivePaymentOperation : PaymentOperation
   }
 
   public ActivePaymentOperation(CashRegister cashRegister, Guid paymentMethodId, decimal amount,
-    DateTime date, PaymentOperationType type)
+    DateTime date, PaymentOperationType operationType)
   {
     Amount = amount;
-    Type = type;
+    OperationType = operationType;
     DateTime = date;
     PaymentMethodId = paymentMethodId;
     CashRegister = cashRegister;
@@ -140,7 +140,7 @@ public class ActivePaymentOperation : PaymentOperation
     {
       Id = Guid.NewGuid(),
       Amount = amount,
-      Type = PaymentOperationType.PendingOut,
+      OperationType = PaymentOperationType.PendingOut,
       DateTime = opDate,
       CashRegisterId = sourceCashRegisterId
     };
@@ -149,7 +149,7 @@ public class ActivePaymentOperation : PaymentOperation
     {
       Id = Guid.NewGuid(),
       Amount = amount,
-      Type = PaymentOperationType.PendingIn,
+      OperationType = PaymentOperationType.PendingIn,
       DateTime = opDate,
       CashRegisterId = destinationCashRegisterId,
       PendingTransferId = src.Id

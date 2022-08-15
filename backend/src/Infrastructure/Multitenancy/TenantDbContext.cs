@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Finbuckle.MultiTenant.Stores;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
@@ -22,11 +23,18 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
     : base(options)
   {
     _dbSettings = dbSettings.Value;
+
+    if (this.Database.IsNpgsql())
+    {
+      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
   }
 
   public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
   public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+
   private DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+
   // public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
   // public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
   // public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();
@@ -59,6 +67,11 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
       .Entity<FSHTenantInfo>()
       .HasOne(a => a.TrainSubscription).WithMany().HasForeignKey(a => a.TrainSubscriptionId);
 
+    IgnoredEntities(modelBuilder);
+  }
+
+  private static void IgnoredEntities(ModelBuilder modelBuilder)
+  {
     modelBuilder.Ignore<ActivePaymentOperation>();
     modelBuilder.Ignore<ArchivedPaymentOperation>();
     modelBuilder.Ignore<CashRegister>();
