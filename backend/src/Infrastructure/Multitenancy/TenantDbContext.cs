@@ -26,6 +26,7 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
   public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
   public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+  private DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
   // public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
   // public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
   // public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();

@@ -52,10 +52,10 @@ public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<Subscr
   }
 }
 
-public class TenantSubscriptionConfig<TSubscription> : BaseEntityConfiguration<TenantSubscription<TSubscription>, DefaultIdType>
+public class TenantSubscriptionConfig<TSubscription> : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
   where TSubscription : Subscription, new()
 {
-  public override void Configure(EntityTypeBuilder<TenantSubscription<TSubscription>> builder)
+  public override void Configure(EntityTypeBuilder<TenantSubscription> builder)
   {
     base.Configure(builder);
     builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantSubscriptionId);
