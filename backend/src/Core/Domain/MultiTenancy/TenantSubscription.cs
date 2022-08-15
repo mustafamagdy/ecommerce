@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public sealed class TenantDemoSubscription : TenantSubscription<DemoSubscription>
+public sealed class TenantDemoSubscription : TenantSubscription
 {
   private TenantDemoSubscription()
   {
@@ -12,7 +12,7 @@ public sealed class TenantDemoSubscription : TenantSubscription<DemoSubscription
   }
 }
 
-public sealed class TenantTrainSubscription : TenantSubscription<TrainSubscription>
+public sealed class TenantTrainSubscription : TenantSubscription
 {
   private TenantTrainSubscription()
   {
@@ -24,7 +24,7 @@ public sealed class TenantTrainSubscription : TenantSubscription<TrainSubscripti
   }
 }
 
-public sealed class TenantProdSubscription : TenantSubscription<StandardSubscription>
+public sealed class TenantProdSubscription : TenantSubscription
 {
   private readonly List<SubscriptionPayment> _payments = new();
 
@@ -50,8 +50,7 @@ public sealed class TenantProdSubscription : TenantSubscription<StandardSubscrip
   }
 }
 
-public abstract class TenantSubscription<T> : BaseEntity
-  where T : Subscription, new()
+public abstract class TenantSubscription : BaseEntity
 {
   private readonly List<SubscriptionHistory> _history = new();
 
@@ -59,7 +58,7 @@ public abstract class TenantSubscription<T> : BaseEntity
   {
   }
 
-  protected TenantSubscription(T subscription, FSHTenantInfo tenant)
+  protected TenantSubscription(Subscription subscription, FSHTenantInfo tenant)
   {
     Subscription = subscription;
     Tenant = tenant;
@@ -69,7 +68,7 @@ public abstract class TenantSubscription<T> : BaseEntity
 
   public DateTime ExpiryDate { get; private set; }
 
-  public T Subscription { get; set; }
+  public Subscription Subscription { get; set; }
   public Guid SubscriptionId { get; set; }
 
   public FSHTenantInfo Tenant { get; set; }
@@ -77,7 +76,7 @@ public abstract class TenantSubscription<T> : BaseEntity
 
   public IReadOnlyCollection<SubscriptionHistory> History => _history.AsReadOnly();
 
-  public TenantSubscription<T> Renew(DateTime today)
+  public TenantSubscription Renew(DateTime today)
   {
     _history.Add(new SubscriptionHistory(Id, today, Subscription.Days, Subscription.Price));
     ExpiryDate = today.AddDays(Subscription.Days);
