@@ -72,9 +72,9 @@ public class SubscriptionSeeder : ICustomSeeder
 
     string jsonData = await File.ReadAllTextAsync(path + "/Seeders/subscriptions.json", cancellationToken);
     var items = JsonConvert.DeserializeObject<List<Subscription>>(jsonData, new SubscriptionConverterWithSubscriptionType());
-    var prod = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Standard) as StandardSubscription;
-    var demo = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Demo) as DemoSubscription;
-    var train = items.SingleOrDefault(a => a.SubscriptionType == SubscriptionType.Train) as TrainSubscription;
+    var prod = items.OfType<StandardSubscription>().Single();
+    var demo = items.OfType<DemoSubscription>().Single();
+    var train = items.OfType<TrainSubscription>().Single();
 
     if (!hasStandardSubs && prod != null)
     {

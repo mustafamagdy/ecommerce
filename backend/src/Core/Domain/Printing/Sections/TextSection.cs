@@ -1,4 +1,4 @@
-namespace FSH.WebApi.Domain.Printing;
+namespace FSH.WebApi.Domain.Printing.Sections;
 
 public abstract class TextSection : DocumentSection
 {

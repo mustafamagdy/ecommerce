@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.RegularExpressions;
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Domain.Printing.Sections;
 using FSH.WebApi.Shared.Extensions;
 using QuestPDF.Elements.Table;
 using QuestPDF.Fluent;

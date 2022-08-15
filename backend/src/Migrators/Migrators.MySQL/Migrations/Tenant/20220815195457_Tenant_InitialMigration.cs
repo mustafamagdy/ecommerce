@@ -16,22 +16,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DemoSubscriptions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    SubscriptionType = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Days = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DemoSubscriptions", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "RootPaymentMethods",
                 columns: table => new
                 {
@@ -47,34 +31,18 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "StandardSubscriptions",
+                name: "Subscriptions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    SubscriptionType = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Days = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Discriminator = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StandardSubscriptions", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "TrainSubscriptions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    SubscriptionType = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Days = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrainSubscriptions", x => x.Id);
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -103,7 +71,7 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SubscriptionHistories",
+                name: "SubscriptionHistory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -123,12 +91,12 @@ namespace Migrators.MySQL.Migrations.Tenant
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubscriptionHistories", x => x.Id);
+                    table.PrimaryKey("PK_SubscriptionHistory", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "SubscriptionPayments",
+                name: "SubscriptionPayment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -144,9 +112,9 @@ namespace Migrators.MySQL.Migrations.Tenant
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubscriptionPayments", x => x.Id);
+                    table.PrimaryKey("PK_SubscriptionPayment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubscriptionPayments_RootPaymentMethods_PaymentMethodId",
+                        name: "FK_SubscriptionPayment_RootPaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
                         principalTable: "RootPaymentMethods",
                         principalColumn: "Id",
@@ -155,7 +123,7 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "TenantDemoSubscriptions",
+                name: "TenantDemoSubscription",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -166,18 +134,18 @@ namespace Migrators.MySQL.Migrations.Tenant
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TenantDemoSubscriptions", x => x.Id);
+                    table.PrimaryKey("PK_TenantDemoSubscription", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TenantDemoSubscriptions_DemoSubscriptions_SubscriptionId",
+                        name: "FK_TenantDemoSubscription_Subscriptions_SubscriptionId",
                         column: x => x.SubscriptionId,
-                        principalTable: "DemoSubscriptions",
+                        principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "TenantProdSubscriptions",
+                name: "TenantProdSubscription",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -188,11 +156,11 @@ namespace Migrators.MySQL.Migrations.Tenant
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TenantProdSubscriptions", x => x.Id);
+                    table.PrimaryKey("PK_TenantProdSubscription", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TenantProdSubscriptions_StandardSubscriptions_SubscriptionId",
+                        name: "FK_TenantProdSubscription_Subscriptions_SubscriptionId",
                         column: x => x.SubscriptionId,
-                        principalTable: "StandardSubscriptions",
+                        principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -242,20 +210,20 @@ namespace Migrators.MySQL.Migrations.Tenant
                 {
                     table.PrimaryKey("PK_Tenants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tenants_TenantDemoSubscriptions_DemoSubscriptionId",
+                        name: "FK_Tenants_TenantDemoSubscription_DemoSubscriptionId",
                         column: x => x.DemoSubscriptionId,
-                        principalTable: "TenantDemoSubscriptions",
+                        principalTable: "TenantDemoSubscription",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Tenants_TenantProdSubscriptions_ProdSubscriptionId",
+                        name: "FK_Tenants_TenantProdSubscription_ProdSubscriptionId",
                         column: x => x.ProdSubscriptionId,
-                        principalTable: "TenantProdSubscriptions",
+                        principalTable: "TenantProdSubscription",
                         principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "TenantTrainSubscriptions",
+                name: "TenantTrainSubscription",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
@@ -266,18 +234,18 @@ namespace Migrators.MySQL.Migrations.Tenant
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TenantTrainSubscriptions", x => x.Id);
+                    table.PrimaryKey("PK_TenantTrainSubscription", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TenantTrainSubscriptions_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalSchema: "MultiTenancy",
-                        principalTable: "Tenants",
+                        name: "FK_TenantTrainSubscription_Subscriptions_SubscriptionId",
+                        column: x => x.SubscriptionId,
+                        principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TenantTrainSubscriptions_TrainSubscriptions_SubscriptionId",
-                        column: x => x.SubscriptionId,
-                        principalTable: "TrainSubscriptions",
+                        name: "FK_TenantTrainSubscription_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "MultiTenancy",
+                        principalTable: "Tenants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -289,48 +257,48 @@ namespace Migrators.MySQL.Migrations.Tenant
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionHistories_TenantDemoSubscriptionId",
-                table: "SubscriptionHistories",
+                name: "IX_SubscriptionHistory_TenantDemoSubscriptionId",
+                table: "SubscriptionHistory",
                 column: "TenantDemoSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionHistories_TenantProdSubscriptionId",
-                table: "SubscriptionHistories",
+                name: "IX_SubscriptionHistory_TenantProdSubscriptionId",
+                table: "SubscriptionHistory",
                 column: "TenantProdSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionHistories_TenantTrainSubscriptionId",
-                table: "SubscriptionHistories",
+                name: "IX_SubscriptionHistory_TenantTrainSubscriptionId",
+                table: "SubscriptionHistory",
                 column: "TenantTrainSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionPayments_PaymentMethodId",
-                table: "SubscriptionPayments",
+                name: "IX_SubscriptionPayment_PaymentMethodId",
+                table: "SubscriptionPayment",
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionPayments_TenantProdSubscriptionId",
-                table: "SubscriptionPayments",
+                name: "IX_SubscriptionPayment_TenantProdSubscriptionId",
+                table: "SubscriptionPayment",
                 column: "TenantProdSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantDemoSubscriptions_SubscriptionId",
-                table: "TenantDemoSubscriptions",
+                name: "IX_TenantDemoSubscription_SubscriptionId",
+                table: "TenantDemoSubscription",
                 column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantDemoSubscriptions_TenantId",
-                table: "TenantDemoSubscriptions",
+                name: "IX_TenantDemoSubscription_TenantId",
+                table: "TenantDemoSubscription",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantProdSubscriptions_SubscriptionId",
-                table: "TenantProdSubscriptions",
+                name: "IX_TenantProdSubscription_SubscriptionId",
+                table: "TenantProdSubscription",
                 column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantProdSubscriptions_TenantId",
-                table: "TenantProdSubscriptions",
+                name: "IX_TenantProdSubscription_TenantId",
+                table: "TenantProdSubscription",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
@@ -359,13 +327,13 @@ namespace Migrators.MySQL.Migrations.Tenant
                 column: "TrainSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantTrainSubscriptions_SubscriptionId",
-                table: "TenantTrainSubscriptions",
+                name: "IX_TenantTrainSubscription_SubscriptionId",
+                table: "TenantTrainSubscription",
                 column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantTrainSubscriptions_TenantId",
-                table: "TenantTrainSubscriptions",
+                name: "IX_TenantTrainSubscription_TenantId",
+                table: "TenantTrainSubscription",
                 column: "TenantId");
 
             migrationBuilder.AddForeignKey(
@@ -378,37 +346,37 @@ namespace Migrators.MySQL.Migrations.Tenant
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionHistories_TenantDemoSubscriptions_TenantDemoSubs~",
-                table: "SubscriptionHistories",
+                name: "FK_SubscriptionHistory_TenantDemoSubscription_TenantDemoSubscri~",
+                table: "SubscriptionHistory",
                 column: "TenantDemoSubscriptionId",
-                principalTable: "TenantDemoSubscriptions",
+                principalTable: "TenantDemoSubscription",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionHistories_TenantProdSubscriptions_TenantProdSubs~",
-                table: "SubscriptionHistories",
+                name: "FK_SubscriptionHistory_TenantProdSubscription_TenantProdSubscri~",
+                table: "SubscriptionHistory",
                 column: "TenantProdSubscriptionId",
-                principalTable: "TenantProdSubscriptions",
+                principalTable: "TenantProdSubscription",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionHistories_TenantTrainSubscriptions_TenantTrainSu~",
-                table: "SubscriptionHistories",
+                name: "FK_SubscriptionHistory_TenantTrainSubscription_TenantTrainSubsc~",
+                table: "SubscriptionHistory",
                 column: "TenantTrainSubscriptionId",
-                principalTable: "TenantTrainSubscriptions",
+                principalTable: "TenantTrainSubscription",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionPayments_TenantProdSubscriptions_TenantProdSubsc~",
-                table: "SubscriptionPayments",
+                name: "FK_SubscriptionPayment_TenantProdSubscription_TenantProdSubscri~",
+                table: "SubscriptionPayment",
                 column: "TenantProdSubscriptionId",
-                principalTable: "TenantProdSubscriptions",
+                principalTable: "TenantProdSubscription",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_TenantDemoSubscriptions_Tenants_TenantId",
-                table: "TenantDemoSubscriptions",
+                name: "FK_TenantDemoSubscription_Tenants_TenantId",
+                table: "TenantDemoSubscription",
                 column: "TenantId",
                 principalSchema: "MultiTenancy",
                 principalTable: "Tenants",
@@ -416,8 +384,8 @@ namespace Migrators.MySQL.Migrations.Tenant
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_TenantProdSubscriptions_Tenants_TenantId",
-                table: "TenantProdSubscriptions",
+                name: "FK_TenantProdSubscription_Tenants_TenantId",
+                table: "TenantProdSubscription",
                 column: "TenantId",
                 principalSchema: "MultiTenancy",
                 principalTable: "Tenants",
@@ -425,36 +393,36 @@ namespace Migrators.MySQL.Migrations.Tenant
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tenants_TenantTrainSubscriptions_TrainSubscriptionId",
+                name: "FK_Tenants_TenantTrainSubscription_TrainSubscriptionId",
                 schema: "MultiTenancy",
                 table: "Tenants",
                 column: "TrainSubscriptionId",
-                principalTable: "TenantTrainSubscriptions",
+                principalTable: "TenantTrainSubscription",
                 principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_TenantDemoSubscriptions_Tenants_TenantId",
-                table: "TenantDemoSubscriptions");
+                name: "FK_TenantDemoSubscription_Tenants_TenantId",
+                table: "TenantDemoSubscription");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_TenantProdSubscriptions_Tenants_TenantId",
-                table: "TenantProdSubscriptions");
+                name: "FK_TenantProdSubscription_Tenants_TenantId",
+                table: "TenantProdSubscription");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_TenantTrainSubscriptions_Tenants_TenantId",
-                table: "TenantTrainSubscriptions");
+                name: "FK_TenantTrainSubscription_Tenants_TenantId",
+                table: "TenantTrainSubscription");
 
             migrationBuilder.DropTable(
                 name: "Branch");
 
             migrationBuilder.DropTable(
-                name: "SubscriptionHistories");
+                name: "SubscriptionHistory");
 
             migrationBuilder.DropTable(
-                name: "SubscriptionPayments");
+                name: "SubscriptionPayment");
 
             migrationBuilder.DropTable(
                 name: "RootPaymentMethods");
@@ -464,22 +432,16 @@ namespace Migrators.MySQL.Migrations.Tenant
                 schema: "MultiTenancy");
 
             migrationBuilder.DropTable(
-                name: "TenantDemoSubscriptions");
+                name: "TenantDemoSubscription");
 
             migrationBuilder.DropTable(
-                name: "TenantProdSubscriptions");
+                name: "TenantProdSubscription");
 
             migrationBuilder.DropTable(
-                name: "TenantTrainSubscriptions");
+                name: "TenantTrainSubscription");
 
             migrationBuilder.DropTable(
-                name: "DemoSubscriptions");
-
-            migrationBuilder.DropTable(
-                name: "StandardSubscriptions");
-
-            migrationBuilder.DropTable(
-                name: "TrainSubscriptions");
+                name: "Subscriptions");
         }
     }
 }

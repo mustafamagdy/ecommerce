@@ -230,17 +230,17 @@ internal class TenantService : ITenantService
 
   public async Task<string> RenewSubscription(FSHTenantInfo tenant, Subscription subscription)
   {
-    var newExpiryDate = subscription.SubscriptionType.Name switch
+    var newExpiryDate = subscription switch
     {
-      nameof(SubscriptionType.Standard) => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      nameof(SubscriptionType.Demo) => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      nameof(SubscriptionType.Train) => tenant.TrainSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      StandardSubscription standardSubscription => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      DemoSubscription demoSubscription => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
+      TrainSubscription drainSubscription => tenant.TrainSubscription?.Renew(_systemTime.Now).ExpiryDate,
       _ => null
     };
 
     await _uow.CommitAsync();
 
-    return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.SubscriptionType.Name, newExpiryDate];
+    return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.GetType().Name, newExpiryDate];
   }
 
   public async Task<bool> DatabaseExistAsync(string databaseName)

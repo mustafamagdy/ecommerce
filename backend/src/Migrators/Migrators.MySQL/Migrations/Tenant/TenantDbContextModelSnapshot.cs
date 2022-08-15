@@ -19,27 +19,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                 .HasAnnotation("ProductVersion", "6.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.DemoSubscription", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Days")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("SubscriptionType")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DemoSubscriptions");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
                 {
                     b.Property<string>("Id")
@@ -117,7 +96,7 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.ToTable("Tenants", "MultiTenancy");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.StandardSubscription", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,16 +105,18 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Property<int>("Days")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("SubscriptionType")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("StandardSubscriptions");
+                    b.ToTable("Subscriptions");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Subscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
@@ -191,7 +172,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantTrainSubscriptionId");
 
-                    b.ToTable("SubscriptionHistories");
+                    b.ToTable("SubscriptionHistory");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
@@ -233,7 +214,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantProdSubscriptionId");
 
-                    b.ToTable("SubscriptionPayments");
+                    b.ToTable("SubscriptionPayment");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
@@ -258,7 +239,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("TenantDemoSubscriptions");
+                    b.ToTable("TenantDemoSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
@@ -283,7 +264,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("TenantProdSubscriptions");
+                    b.ToTable("TenantProdSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
@@ -308,28 +289,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("TenantTrainSubscriptions");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TrainSubscription", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Days")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("SubscriptionType")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TrainSubscriptions");
+                    b.ToTable("TenantTrainSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentMethod", b =>
@@ -390,6 +350,27 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.HasIndex("TenantId");
 
                     b.ToTable("Branch");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.DemoSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
+
+                    b.HasDiscriminator().HasValue("DemoSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.StandardSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
+
+                    b.HasDiscriminator().HasValue("StandardSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TrainSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
+
+                    b.HasDiscriminator().HasValue("TrainSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>

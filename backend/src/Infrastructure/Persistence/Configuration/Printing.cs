@@ -1,5 +1,5 @@
 using FSH.WebApi.Domain.Printing;
-using Mapster;
+using FSH.WebApi.Domain.Printing.Sections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Domain.Printing.Sections;
 
 namespace FSH.WebApi.Application.Printing;
 
