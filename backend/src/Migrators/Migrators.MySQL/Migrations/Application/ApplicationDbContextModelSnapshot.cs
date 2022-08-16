@@ -534,7 +534,7 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("payment_type")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -544,7 +544,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.ToTable("PaymentOperations", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("PaymentOperation");
+                    b.HasDiscriminator<string>("payment_type").HasValue("PaymentOperation");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -583,18 +583,18 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<int?>("Width")
                         .HasColumnType("int");
+
+                    b.Property<string>("template_type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("PrintableDocument", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("PrintableDocument");
+                    b.HasDiscriminator<string>("template_type").HasValue("PrintableDocument");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -630,7 +630,7 @@ namespace Migrators.MySQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("section_type")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -640,7 +640,7 @@ namespace Migrators.MySQL.Migrations.Application
 
                     b.ToTable("DocumentSection", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("DocumentSection");
+                    b.HasDiscriminator<string>("section_type").HasValue("DocumentSection");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });

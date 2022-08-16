@@ -281,7 +281,6 @@ internal class TenantService : ITenantService
       .ThenInclude(a => a.Payments)
       .Include(a => a.DemoSubscription)
       .Include(a => a.TrainSubscription)
-      .Include(a => a.Branches)
       .Where(a => a.Id == id);
 
     var tenant = await _repo.FirstOrDefaultAsync(spec.Specification)

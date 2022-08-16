@@ -1,6 +1,5 @@
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
@@ -16,10 +15,25 @@ public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultI
       .HasPrecision(7, 3);
 
     builder
-      .HasDiscriminator<string>("Type")
+      .HasDiscriminator<string>("subscription_type")
       .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
       .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
       .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
+  }
+}
+
+public class TenantSubscriptionConfig : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
+{
+  public override void Configure(EntityTypeBuilder<TenantSubscription> builder)
+  {
+    base.Configure(builder);
+    builder.HasMany(a => a.History).WithOne(a => a.TenantSubscription).HasForeignKey(a => a.TenantSubscriptionId);
+
+    builder
+      .HasDiscriminator<string>("tenant_subscription_type")
+      .HasValue<TenantProdSubscription>(SubscriptionType.Standard.Name)
+      .HasValue<TenantDemoSubscription>(SubscriptionType.Demo.Name)
+      .HasValue<TenantTrainSubscription>(SubscriptionType.Train.Name);
   }
 }
 
@@ -49,21 +63,5 @@ public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<Subscr
       .HasOne(a => a.TenantProdSubscription)
       .WithMany()
       .HasForeignKey(a => a.TenantProdSubscriptionId);
-  }
-}
-
-public class TenantSubscriptionConfig<TSubscription> : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
-  where TSubscription : Subscription, new()
-{
-  public override void Configure(EntityTypeBuilder<TenantSubscription> builder)
-  {
-    base.Configure(builder);
-    builder.HasMany(a => a.History).WithOne().HasForeignKey(a => a.TenantSubscriptionId);
-
-    builder
-      .HasDiscriminator<string>("Type")
-      .HasValue<TenantProdSubscription>(SubscriptionType.Standard.Name)
-      .HasValue<TenantDemoSubscription>(SubscriptionType.Demo.Name)
-      .HasValue<TenantTrainSubscription>(SubscriptionType.Train.Name);
   }
 }

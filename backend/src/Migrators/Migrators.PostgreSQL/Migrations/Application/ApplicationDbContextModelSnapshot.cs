@@ -537,7 +537,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("payment_type")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -547,7 +547,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.ToTable("PaymentOperations", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("PaymentOperation");
+                    b.HasDiscriminator<string>("payment_type").HasValue("PaymentOperation");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -586,18 +586,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int?>("Width")
                         .HasColumnType("integer");
+
+                    b.Property<string>("template_type")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("PrintableDocument", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("PrintableDocument");
+                    b.HasDiscriminator<string>("template_type").HasValue("PrintableDocument");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -633,7 +633,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("section_type")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -643,7 +643,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.ToTable("DocumentSection", "Shared");
 
-                    b.HasDiscriminator<string>("Type").HasValue("DocumentSection");
+                    b.HasDiscriminator<string>("section_type").HasValue("DocumentSection");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });

@@ -26,37 +26,17 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subscriptions",
+                name: "Subscription",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Days = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    Discriminator = table.Column<string>(type: "text", nullable: false)
+                    Price = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
+                    subscription_type = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Branch",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Branch", x => x.Id);
+                    table.PrimaryKey("PK_Subscription", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,7 +44,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TenantSubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -86,13 +66,14 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantProdSubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantProdSubscriptionId1 = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
                     PaymentMethodId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -137,37 +118,32 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 });
 
             migrationBuilder.CreateTable(
-                name: "TenantSubscriptions",
+                name: "TenantSubscription",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     SubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", nullable: false),
-                    Discriminator = table.Column<string>(type: "text", nullable: false)
+                    tenant_subscription_type = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TenantSubscriptions", x => x.Id);
+                    table.PrimaryKey("PK_TenantSubscription", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TenantSubscriptions_Subscriptions_SubscriptionId",
+                        name: "FK_TenantSubscription_Subscription_SubscriptionId",
                         column: x => x.SubscriptionId,
-                        principalTable: "Subscriptions",
+                        principalTable: "Subscription",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TenantSubscriptions_Tenants_TenantId",
+                        name: "FK_TenantSubscription_Tenants_TenantId",
                         column: x => x.TenantId,
                         principalSchema: "MultiTenancy",
                         principalTable: "Tenants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Branch_TenantId",
-                table: "Branch",
-                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubscriptionHistories_TenantSubscriptionId",
@@ -183,6 +159,11 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 name: "IX_SubscriptionPayments_TenantProdSubscriptionId",
                 table: "SubscriptionPayments",
                 column: "TenantProdSubscriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionPayments_TenantProdSubscriptionId1",
+                table: "SubscriptionPayments",
+                column: "TenantProdSubscriptionId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tenants_DemoSubscriptionId",
@@ -210,73 +191,79 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 column: "TrainSubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantSubscriptions_SubscriptionId",
-                table: "TenantSubscriptions",
+                name: "IX_TenantSubscription_SubscriptionId",
+                table: "TenantSubscription",
                 column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantSubscriptions_TenantId",
-                table: "TenantSubscriptions",
+                name: "IX_TenantSubscription_TenantId",
+                table: "TenantSubscription",
                 column: "TenantId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Branch_Tenants_TenantId",
-                table: "Branch",
-                column: "TenantId",
-                principalSchema: "MultiTenancy",
-                principalTable: "Tenants",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionHistories_TenantSubscriptions_TenantSubscriptio~",
+                name: "FK_SubscriptionHistories_TenantSubscription_TenantSubscription~",
                 table: "SubscriptionHistories",
                 column: "TenantSubscriptionId",
-                principalTable: "TenantSubscriptions",
+                principalTable: "TenantSubscription",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_SubscriptionPayments_TenantSubscriptions_TenantProdSubscrip~",
+                name: "FK_SubscriptionPayments_TenantSubscription_TenantProdSubscrip~1",
+                table: "SubscriptionPayments",
+                column: "TenantProdSubscriptionId1",
+                principalTable: "TenantSubscription",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_SubscriptionPayments_TenantSubscription_TenantProdSubscript~",
                 table: "SubscriptionPayments",
                 column: "TenantProdSubscriptionId",
-                principalTable: "TenantSubscriptions",
+                principalTable: "TenantSubscription",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tenants_TenantSubscriptions_DemoSubscriptionId",
+                name: "FK_Tenants_TenantSubscription_DemoSubscriptionId",
                 schema: "MultiTenancy",
                 table: "Tenants",
                 column: "DemoSubscriptionId",
-                principalTable: "TenantSubscriptions",
+                principalTable: "TenantSubscription",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tenants_TenantSubscriptions_ProdSubscriptionId",
+                name: "FK_Tenants_TenantSubscription_ProdSubscriptionId",
                 schema: "MultiTenancy",
                 table: "Tenants",
                 column: "ProdSubscriptionId",
-                principalTable: "TenantSubscriptions",
+                principalTable: "TenantSubscription",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tenants_TenantSubscriptions_TrainSubscriptionId",
+                name: "FK_Tenants_TenantSubscription_TrainSubscriptionId",
                 schema: "MultiTenancy",
                 table: "Tenants",
                 column: "TrainSubscriptionId",
-                principalTable: "TenantSubscriptions",
+                principalTable: "TenantSubscription",
                 principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_TenantSubscriptions_Tenants_TenantId",
-                table: "TenantSubscriptions");
+                name: "FK_Tenants_TenantSubscription_DemoSubscriptionId",
+                schema: "MultiTenancy",
+                table: "Tenants");
 
-            migrationBuilder.DropTable(
-                name: "Branch");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Tenants_TenantSubscription_ProdSubscriptionId",
+                schema: "MultiTenancy",
+                table: "Tenants");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Tenants_TenantSubscription_TrainSubscriptionId",
+                schema: "MultiTenancy",
+                table: "Tenants");
 
             migrationBuilder.DropTable(
                 name: "SubscriptionHistories");
@@ -288,14 +275,14 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 name: "RootPaymentMethods");
 
             migrationBuilder.DropTable(
+                name: "TenantSubscription");
+
+            migrationBuilder.DropTable(
+                name: "Subscription");
+
+            migrationBuilder.DropTable(
                 name: "Tenants",
                 schema: "MultiTenancy");
-
-            migrationBuilder.DropTable(
-                name: "TenantSubscriptions");
-
-            migrationBuilder.DropTable(
-                name: "Subscriptions");
         }
     }
 }

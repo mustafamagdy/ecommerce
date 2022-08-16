@@ -150,7 +150,7 @@ namespace Migrators.MySQL.Migrations.Application
                     ContinuousSize = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Type = table.Column<string>(type: "longtext", nullable: false)
+                    template_type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -389,7 +389,7 @@ namespace Migrators.MySQL.Migrations.Application
                     DocumentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Type = table.Column<string>(type: "longtext", nullable: false)
+                    section_type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     HeaderTitle = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -580,7 +580,7 @@ namespace Migrators.MySQL.Migrations.Application
                     PendingTransferId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     TenantId = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Type = table.Column<string>(type: "longtext", nullable: false)
+                    payment_type = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),

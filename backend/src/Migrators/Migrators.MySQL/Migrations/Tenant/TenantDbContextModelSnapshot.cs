@@ -99,30 +99,29 @@ namespace Migrators.MySQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<int>("Days")
                         .HasColumnType("int");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<decimal>("Price")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
+
+                    b.Property<string>("subscription_type")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscription");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Subscription");
+                    b.HasDiscriminator<string>("subscription_type").HasValue("Subscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("CreatedBy")
@@ -147,7 +146,8 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
@@ -165,11 +165,11 @@ namespace Migrators.MySQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("decimal(7,3)");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("char(36)");
@@ -195,11 +195,16 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.Property<Guid>("TenantProdSubscriptionId")
                         .HasColumnType("char(36)");
 
+                    b.Property<Guid?>("TenantProdSubscriptionId1")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PaymentMethodId");
 
                     b.HasIndex("TenantProdSubscriptionId");
+
+                    b.HasIndex("TenantProdSubscriptionId1");
 
                     b.ToTable("SubscriptionPayments");
                 });
@@ -207,12 +212,7 @@ namespace Migrators.MySQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime(6)");
@@ -224,13 +224,17 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired()
                         .HasColumnType("varchar(64)");
 
+                    b.Property<string>("tenant_subscription_type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SubscriptionId");
 
-                    b.ToTable("TenantSubscriptions");
+                    b.ToTable("TenantSubscription");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("TenantSubscription");
+                    b.HasDiscriminator<string>("tenant_subscription_type").HasValue("TenantSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentMethod", b =>
@@ -251,60 +255,18 @@ namespace Migrators.MySQL.Migrations.Tenant
                     b.ToTable("RootPaymentMethods");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasColumnType("varchar(64)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Branch");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.DemoSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
 
-                    b.HasDiscriminator().HasValue("DemoSubscription");
+                    b.HasDiscriminator().HasValue("Demo");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.StandardSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
 
-                    b.HasDiscriminator().HasValue("StandardSubscription");
+                    b.HasDiscriminator().HasValue("Standard");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
@@ -313,7 +275,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.HasDiscriminator().HasValue("TenantDemoSubscription");
+                    b.HasDiscriminator().HasValue("Demo");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
@@ -322,7 +284,7 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.HasDiscriminator().HasValue("TenantProdSubscription");
+                    b.HasDiscriminator().HasValue("Standard");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
@@ -331,14 +293,14 @@ namespace Migrators.MySQL.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.HasDiscriminator().HasValue("TenantTrainSubscription");
+                    b.HasDiscriminator().HasValue("Train");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TrainSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
 
-                    b.HasDiscriminator().HasValue("TrainSubscription");
+                    b.HasDiscriminator().HasValue("Train");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
@@ -364,11 +326,13 @@ namespace Migrators.MySQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", null)
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", "TenantSubscription")
                         .WithMany("History")
                         .HasForeignKey("TenantSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("TenantSubscription");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
@@ -380,10 +344,15 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired();
 
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
-                        .WithMany("Payments")
+                        .WithMany()
                         .HasForeignKey("TenantProdSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("TenantProdSubscriptionId1")
+                        .HasConstraintName("FK_SubscriptionPayments_TenantSubscription_TenantProdSubscript~1");
 
                     b.Navigation("PaymentMethod");
 
@@ -399,17 +368,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("Subscription");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "Tenant")
-                        .WithMany("Branches")
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
@@ -443,11 +401,6 @@ namespace Migrators.MySQL.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
-                {
-                    b.Navigation("Branches");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
