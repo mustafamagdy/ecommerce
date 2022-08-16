@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Finbuckle.MultiTenant.Stores;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
-using FSH.WebApi.Shared.Multitenancy;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -33,20 +31,29 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
   public DbSet<SubscriptionHistory> SubscriptionHistories => Set<SubscriptionHistory>();
   public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
 
-  private DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+  // private DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
 
-  // public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
-  // public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
-  // public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();
-  private DbSet<Subscription> Subscriptions => Set<Subscription>();
+  public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
+  public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
+
+  public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();
+
+  // private DbSet<Subscription> Subscriptions => Set<Subscription>();
   public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
   public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
   public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
+
   public DbSet<PaymentMethod> RootPaymentMethods => Set<PaymentMethod>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
+
+    // modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+    modelBuilder.ApplyConfiguration(new SubscriptionConfig());
+    modelBuilder.ApplyConfiguration(new TenantSubscriptionConfig());
+    modelBuilder.ApplyConfiguration(new SubscriptionHistoryConfig());
+    modelBuilder.ApplyConfiguration(new SubscriptionPaymentConfig());
 
     modelBuilder.ConfigureSmartEnum();
 
@@ -72,6 +79,7 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
   private static void IgnoredEntities(ModelBuilder modelBuilder)
   {
+    modelBuilder.Ignore<Branch>();
     modelBuilder.Ignore<ActivePaymentOperation>();
     modelBuilder.Ignore<ArchivedPaymentOperation>();
     modelBuilder.Ignore<CashRegister>();

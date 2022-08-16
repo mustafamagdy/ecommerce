@@ -103,4 +103,5 @@ public sealed class SubscriptionHistory : AuditableEntity
   public DateTime ExpiryDate { get; private set; }
 
   public Guid TenantSubscriptionId { get; set; }
+  public TenantSubscription TenantSubscription { get; set; }
 }

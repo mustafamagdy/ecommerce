@@ -2,15 +2,15 @@
 
 ========================== API ==========================
 
-- Orders:
-  [x] Search (order number, customer name, phone number, customer id)
-    - Cancel payment, all payments (separate cancel cash permission)
-      [x] Create with full customer
-      [x] Create cash
-      [x] Create with preexisting custer
-- Customers:
-  [x] Search (name, phone)
-  [x] Auto complete customer
+[]- Orders:
+    [x] Search (order number, customer name, phone number, customer id)
+        - Cancel payment, all payments (separate cancel cash permission)
+            [x] Create with full customer
+            [x] Create cash
+            [x] Create with preexisting custer
+[] Customers:
+    [x] Search (name, phone)
+    [x] Auto complete customer
 - Service catalog:
   [x] Get service catalogs
   [x] Services

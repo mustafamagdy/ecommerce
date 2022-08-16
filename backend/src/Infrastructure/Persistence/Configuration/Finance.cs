@@ -37,7 +37,7 @@ public class PaymentOperationConfig : BaseAuditableTenantEntityConfiguration<Pay
       .HasPrecision(7, 3);
 
     builder
-      .HasDiscriminator<string>("Type")
+      .HasDiscriminator<string>("payment_type")
       .HasValue<ActivePaymentOperation>("active")
       .HasValue<ArchivedPaymentOperation>("archived");
   }

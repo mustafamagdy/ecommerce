@@ -20,7 +20,7 @@ public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDo
     //   .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 
     builder
-      .HasDiscriminator<string>("Type")
+      .HasDiscriminator<string>("template_type")
       .HasValue<SimpleReceiptInvoice>(PrintableType.Receipt.Name)
       .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name);
 
@@ -55,7 +55,7 @@ public class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSecti
     //   .Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 
     builder
-      .HasDiscriminator<string>("Type")
+      .HasDiscriminator<string>("section_type")
       .HasValue<LogoSection>(SectionType.Logo.Name)
       .HasValue<BarcodeSection>(SectionType.Barcode.Name)
       .HasValue<TitleSection>(SectionType.Title.Name)
