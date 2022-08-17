@@ -2,10 +2,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Ardalis.Specification;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
@@ -26,7 +28,8 @@ internal class TokenService : ITokenService
   private readonly SecuritySettings _securitySettings;
   private readonly JwtSettings _jwtSettings;
   private readonly FSHTenantInfo? _currentTenant;
-  private readonly ITenantService _tenantService;
+  private readonly ISystemTime _systemTime;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;
 
   public TokenService(
     UserManager<ApplicationUser> userManager,
@@ -35,14 +38,15 @@ internal class TokenService : ITokenService
     IStringLocalizer<TokenService> localizer,
     FSHTenantInfo? currentTenant,
     IOptions<SecuritySettings> securitySettings,
-    ITenantService tenantService)
+    ISystemTime systemTime, IReadNonAggregateRepository<FSHTenantInfo> repo)
   {
     _userManager = userManager;
     _t = localizer;
     _identitySettings = identitySettings.Value;
     _jwtSettings = jwtSettings.Value;
     _currentTenant = currentTenant;
-    _tenantService = tenantService;
+    _systemTime = systemTime;
+    _repo = repo;
     _securitySettings = securitySettings.Value;
   }
 
@@ -84,7 +88,18 @@ internal class TokenService : ITokenService
 
   private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return _tenantService.HasAValidProdSubscription(tenantId);
+    var today = _systemTime.Now;
+
+    var spec = new SingleResultSpecification<FSHTenantInfo>()
+      .Query
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.History)
+      .Where(a => a.Id == tenantId
+                  && a.Active
+                  && a.ProdSubscription != null
+                  && a.ProdSubscription.ExpiryDate >= today);
+
+    return _repo.AnyAsync(spec.Specification);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
