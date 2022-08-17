@@ -1,4 +1,4 @@
-﻿namespace FSH.WebApi.Infrastructure.Multitenancy;
+﻿namespace FSH.WebApi.Application.Multitenancy.EventHandlers;
 
 public class TenantCreatedEmailModel
 {

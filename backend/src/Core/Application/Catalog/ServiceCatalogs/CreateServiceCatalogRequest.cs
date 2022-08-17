@@ -26,11 +26,12 @@ public class CreateServiceCatalogRequestHandler : IRequestHandler<CreateServiceC
   {
     var product = new ServiceCatalog(request.ServiceId, request.ProductId, request.Price, request.Priority);
 
-    // Add Domain Events to be raised after the commit
     product.AddDomainEvent(EntityCreatedEvent.WithEntity(product));
 
     await _repository.AddAsync(product, cancellationToken);
+
     await _uow.CommitAsync(cancellationToken);
+
     return product.Id;
   }
 }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Auditing;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Auditing;
