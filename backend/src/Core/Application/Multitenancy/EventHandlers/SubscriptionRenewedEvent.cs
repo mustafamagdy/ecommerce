@@ -7,14 +7,12 @@ namespace FSH.WebApi.Application.Multitenancy.EventHandlers;
 public class SubscriptionRenewedEvent : DomainEvent
 {
   public FSHTenantInfo Tenant { get; }
-  public TenantProdSubscription Subscription { get; }
-  public decimal Amount { get; }
+  public TenantSubscription Subscription { get; }
 
-  public SubscriptionRenewedEvent(FSHTenantInfo tenant, TenantProdSubscription subscription, decimal amount)
+  public SubscriptionRenewedEvent(FSHTenantInfo tenant, TenantSubscription subscription)
   {
     Tenant = tenant;
     Subscription = subscription;
-    Amount = amount;
   }
 }
 
@@ -40,7 +38,6 @@ public class SubscriptionRenewedEventHandler : EventNotificationHandler<Subscrip
   {
     var eMailModel = new SubscriptionRenewedModel
     {
-      Amount = @event.Amount,
       TenantName = @event.Tenant.Name,
       SubscriptionExpiryDate = @event.Subscription.ExpiryDate
     };

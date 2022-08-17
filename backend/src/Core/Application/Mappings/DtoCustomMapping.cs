@@ -45,5 +45,13 @@ public class DtoCustomMapping
       .NewConfig()
       .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
       .Map(dest => dest.PaymentOperationType, src => src.OperationType.Name);
+
+    TypeAdapterConfig<FSHTenantInfo, BasicTenantInfoDto>
+      .NewConfig()
+      .Map(dest => dest.TotalDue, src =>
+        src.ProdSubscription.History.DefaultIfEmpty().Sum(a => (decimal?)a.Price) ?? 0
+        - src.ProdSubscription.Payments.DefaultIfEmpty().Sum(a => (decimal?)a.Amount) ?? 0)
+      .Map(dest => dest.TotalPaid, src =>
+        src.ProdSubscription.Payments.DefaultIfEmpty().Sum(a => (decimal?)a.Amount) ?? 0);
   }
 }

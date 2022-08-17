@@ -23,8 +23,6 @@ public class GetTenantBasicInfoSpec : Specification<FSHTenantInfo, BasicTenantIn
   public GetTenantBasicInfoSpec(string tenantId) =>
     Query
       .Include(a => a.ProdSubscription)
-      .ThenInclude(a => a.History)
-      .Include(a => a.ProdSubscription)
       .ThenInclude(a => a.Payments)
       .Include(a => a.DemoSubscription)
       .Include(a => a.TrainSubscription)

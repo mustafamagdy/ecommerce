@@ -186,59 +186,6 @@ internal class TenantService : ITenantService
     };
   }
 
-  private async Task<Subscription> GetDefaultMonthlySubscription()
-  {
-    return (await _uow.Set<StandardSubscription>().SingleOrDefaultAsync()
-            ?? throw new NotImplementedException("There is no standard subscription configured"))!;
-  }
-
-  public async Task<string> ActivateAsync(string tenantId)
-  {
-    var tenant = await GetTenantById(tenantId);
-
-    if (tenant.Active)
-    {
-      throw new ConflictException(_t["Tenant is already Activated."]);
-    }
-
-    tenant.Activate();
-
-    await _tenantStore.TryUpdateAsync(tenant);
-
-    return _t["Tenant {0} is now Activated.", tenantId];
-  }
-
-  public async Task<string> DeactivateAsync(string tenantId)
-  {
-    var tenant = await GetTenantById(tenantId);
-
-    if (!tenant.Active)
-    {
-      throw new ConflictException(_t["Tenant is already Deactivated."]);
-    }
-
-    tenant.DeActivate();
-
-    await _tenantStore.TryUpdateAsync(tenant);
-
-    return _t[$"Tenant {0} is now Deactivated.", tenantId];
-  }
-
-  public async Task<string> RenewSubscription(FSHTenantInfo tenant, Subscription subscription)
-  {
-    var newExpiryDate = subscription switch
-    {
-      StandardSubscription standardSubscription => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      DemoSubscription demoSubscription => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      TrainSubscription drainSubscription => tenant.TrainSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      _ => null
-    };
-
-    await _uow.CommitAsync();
-
-    return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.GetType().Name, newExpiryDate];
-  }
-
   public async Task<bool> DatabaseExistAsync(string databaseName)
   {
     return (await _tenantStore.GetAllAsync()).Any(t =>

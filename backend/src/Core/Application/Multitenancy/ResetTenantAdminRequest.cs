@@ -38,12 +38,12 @@ public class ResetTenantAdminRequestHandler : IRequestHandler<ResetTenantAdminRe
 
   public async Task<string> Handle(ResetTenantAdminRequest request, CancellationToken cancellationToken)
   {
-    var tenant = await _tenantService.GetByIdAsync(request.TenantId);
-    _ = tenant ?? throw new NotFoundException(_t["Tenant {0} not found "]);
-    if (tenant.Id == MultitenancyConstants.RootTenant.Id)
-    {
-      throw new InvalidOperationException(_t["Cannot reset admin account for root tenant"]);
-    }
+    // var tenant = await _tenantService.GetByIdAsync(request.TenantId);
+    // _ = tenant ?? throw new NotFoundException(_t["Tenant {0} not found "]);
+    // if (tenant.Id == MultitenancyConstants.RootTenant.Id)
+    // {
+    //   throw new InvalidOperationException(_t["Cannot reset admin account for root tenant"]);
+    // }
     //
     // var adminUserId = await _tenantService.GetAdminUserIdAsync(request.TenantId);
     // var newPassword = await _userService.ResetUserPasswordAsync(new UserResetPasswordRequest(adminUserId, request.Password));
