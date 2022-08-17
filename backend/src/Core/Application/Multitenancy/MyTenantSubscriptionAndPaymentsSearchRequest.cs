@@ -20,10 +20,10 @@ public class MyTenantSubscriptionAndPaymentsSearchRequestHandler : IRequestHandl
 {
   private readonly FSHTenantInfo _currentTenant;
   private readonly IStringLocalizer _t;
-  private readonly IReadTenantRepository<FSHTenantInfo> _repo;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;
   private readonly ISystemTime _systemTime;
 
-  public MyTenantSubscriptionAndPaymentsSearchRequestHandler(FSHTenantInfo currentTenant, IStringLocalizer<MyTenantSubscriptionAndPaymentsSearchRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repo, ISystemTime systemTime)
+  public MyTenantSubscriptionAndPaymentsSearchRequestHandler(FSHTenantInfo currentTenant, IStringLocalizer<MyTenantSubscriptionAndPaymentsSearchRequestHandler> localizer, IReadNonAggregateRepository<FSHTenantInfo> repo, ISystemTime systemTime)
   {
     _currentTenant = currentTenant;
     _t = localizer;

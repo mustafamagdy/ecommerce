@@ -114,8 +114,8 @@ internal static class Startup
   {
     // Add Repositories
     services.AddScoped(typeof(IRepository<>), typeof(ApplicationDbRepository<>));
-    services.AddScoped(typeof(ITenantRepository<>), typeof(TenantDbRepository<>));
-    services.AddScoped(typeof(IReadTenantRepository<>), typeof(TenantDbRepository<>));
+    services.AddScoped(typeof(INonAggregateRepository<>), typeof(NonAggregateDbRepository<>));
+    services.AddScoped(typeof(IReadNonAggregateRepository<>), typeof(NonAggregateDbRepository<>));
 
     var aggregateRootTypes = typeof(IAggregateRoot)
       .Assembly

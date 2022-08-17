@@ -31,15 +31,13 @@ public interface IRepositoryWithEvents<T> : IRepositoryBase<T>
 {
 }
 
-public interface ITenantRepository<TEntity> : IRepositoryBase<TEntity>
+public interface INonAggregateRepository<TEntity> : IRepositoryBase<TEntity>
   where TEntity : class
-
-
 {
   Task<List<TEntity>> AddRangeAsync(List<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
 }
 
-public interface IReadTenantRepository<TEntity> : IReadRepositoryBase<TEntity>
+public interface IReadNonAggregateRepository<TEntity> : IReadRepositoryBase<TEntity>
   where TEntity : class
 {
 }

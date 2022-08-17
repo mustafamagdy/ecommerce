@@ -20,11 +20,11 @@ public class MyTenantSubscriptionSearchRequestHandler : IRequestHandler<MyTenant
 {
   private readonly FSHTenantInfo _currentTenant;
   private readonly IStringLocalizer _t;
-  private readonly IReadTenantRepository<FSHTenantInfo> _repo;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;
   private readonly ISystemTime _systemTime;
-  private readonly IReadTenantRepository<SubscriptionHistory> _subscriptionHistoryRepo;
+  private readonly IReadNonAggregateRepository<SubscriptionHistory> _subscriptionHistoryRepo;
 
-  public MyTenantSubscriptionSearchRequestHandler(FSHTenantInfo currentTenant, IStringLocalizer<MyTenantSubscriptionSearchRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repo, ISystemTime systemTime, IReadTenantRepository<SubscriptionHistory> subscriptionHistoryRepo)
+  public MyTenantSubscriptionSearchRequestHandler(FSHTenantInfo currentTenant, IStringLocalizer<MyTenantSubscriptionSearchRequestHandler> localizer, IReadNonAggregateRepository<FSHTenantInfo> repo, ISystemTime systemTime, IReadNonAggregateRepository<SubscriptionHistory> subscriptionHistoryRepo)
   {
     _currentTenant = currentTenant;
     _t = localizer;

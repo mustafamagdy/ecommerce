@@ -1,8 +1,7 @@
-namespace FSH.WebApi.Application.Auditing;
+namespace FSH.WebApi.Domain.Auditing;
 
-public class AuditDto
+public class Trail : BaseEntity
 {
-  public Guid Id { get; set; }
   public Guid UserId { get; set; }
   public string? Type { get; set; }
   public string? TableName { get; set; }

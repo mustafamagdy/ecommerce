@@ -30,11 +30,11 @@ public class GetTenantWithActiveSubscriptionsSpec : Specification<FSHTenantInfo>
 
 public class GetTenantSubscriptionsRequestHandler : IRequestHandler<GetTenantSubscriptionsRequest, List<TenantSubscriptionDto>>
 {
-  private readonly IReadTenantRepository<FSHTenantInfo> _repository;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _repository;
   private readonly IStringLocalizer _t;
   private readonly ISystemTime _systemTime;
 
-  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadTenantRepository<FSHTenantInfo> repository, ISystemTime systemTime)
+  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadNonAggregateRepository<FSHTenantInfo> repository, ISystemTime systemTime)
   {
     _t = localizer;
     _repository = repository;
