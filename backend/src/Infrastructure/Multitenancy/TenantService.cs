@@ -42,7 +42,6 @@ internal class TenantService : ITenantService
 
   public TenantService(
     IMultiTenantStore<FSHTenantInfo> tenantStore,
-    TenantDbContext tenantDbContext,
     IConnectionStringSecurer csSecurer,
     IDatabaseInitializer dbInitializer,
     IJobService jobService,
@@ -54,7 +53,8 @@ internal class TenantService : ITenantService
     ISystemTime systemTime,
     IReadRepository<PaymentMethod> paymentMethodRepo,
     ITenantUnitOfWork uow,
-    ITenantRepository<FSHTenantInfo> repo)
+    ITenantRepository<FSHTenantInfo> repo,
+    ITenantRepository<TenantProdSubscription> tenantProdSubscriptionRepo)
   {
     _tenantStore = tenantStore;
     _csSecurer = csSecurer;
@@ -70,6 +70,7 @@ internal class TenantService : ITenantService
     _paymentMethodRepo = paymentMethodRepo;
     _uow = uow;
     _repo = repo;
+    _tenantProdSubscriptionRepo = tenantProdSubscriptionRepo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
