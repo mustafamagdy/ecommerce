@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Application.Multitenancy;

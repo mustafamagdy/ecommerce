@@ -7,6 +7,13 @@ public class GetProductRequest : IRequest<ProductDetailsDto>
     public GetProductRequest(Guid id) => Id = id;
 }
 
+public class ProductByIdWithBrandSpec : Specification<Product, ProductDetailsDto>, ISingleResultSpecification
+{
+  public ProductByIdWithBrandSpec(Guid id) =>
+    Query
+      .Where(p => p.Id == id)
+      .Include(p => p.Brand);
+}
 public class GetProductRequestHandler : IRequestHandler<GetProductRequest, ProductDetailsDto>
 {
     private readonly IRepository<Product> _repository;

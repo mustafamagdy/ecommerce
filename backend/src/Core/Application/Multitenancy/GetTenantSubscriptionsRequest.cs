@@ -34,7 +34,8 @@ public class GetTenantSubscriptionsRequestHandler : IRequestHandler<GetTenantSub
   private readonly IStringLocalizer _t;
   private readonly ISystemTime _systemTime;
 
-  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer, IReadNonAggregateRepository<FSHTenantInfo> repository, ISystemTime systemTime)
+  public GetTenantSubscriptionsRequestHandler(IStringLocalizer<GetTenantSubscriptionsRequestHandler> localizer,
+    IReadNonAggregateRepository<FSHTenantInfo> repository, ISystemTime systemTime)
   {
     _t = localizer;
     _repository = repository;

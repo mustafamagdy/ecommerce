@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
@@ -12,8 +13,10 @@ public interface ITenantConnectionStrings
   string? TrainConnectionString { get; set; }
 }
 
-public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
+public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity
 {
+  private readonly List<DomainEvent> _domainEvents = new();
+
   public FSHTenantInfo()
   {
   }
@@ -115,4 +118,11 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
   string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
 
   string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
+
+
+  [NotMapped]
+  public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+  public void AddDomainEvent(DomainEvent @event) => _domainEvents.Add(@event);
+  public void ClearDomainEvents() => _domainEvents.Clear();
 }

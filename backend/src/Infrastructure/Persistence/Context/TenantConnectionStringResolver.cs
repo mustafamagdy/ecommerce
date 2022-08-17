@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
 

@@ -1,3 +1,4 @@
+using FSH.WebApi.Domain.Common.Events;
 using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Catalog.Services;
@@ -37,8 +38,12 @@ public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest,
     var imageUrl = await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken);
     var service = new Service(request.Name, request.Description, imageUrl);
 
+    service.AddDomainEvent(EntityCreatedEvent.WithEntity(service));
+
     await _repository.AddAsync(service, cancellationToken);
+
     await _uow.CommitAsync(cancellationToken);
+
     return service.Id;
   }
 }

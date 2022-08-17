@@ -1,3 +1,5 @@
+using FSH.WebApi.Application.Multitenancy.Services;
+
 namespace FSH.WebApi.Application.Multitenancy;
 
 public class CreateTenantRequestValidator : CustomValidator<CreateTenantRequest>
