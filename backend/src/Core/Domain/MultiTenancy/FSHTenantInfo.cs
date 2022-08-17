@@ -78,8 +78,6 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings
   public Guid? TrainSubscriptionId { get; private set; }
   public string? TrainConnectionString { get; set; }
 
-  public virtual HashSet<Branch> Branches { get; private set; }
-
   public decimal TotalDue => ProdSubscription?.TotalDue ?? 0;
   public decimal TotalPaid => ProdSubscription?.TotalPaid ?? 0;
 
