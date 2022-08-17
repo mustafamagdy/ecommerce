@@ -26,8 +26,8 @@ internal class TenantService : ITenantService
 {
   private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
   private readonly ITenantUnitOfWork _uow;
-  private readonly ITenantRepository<FSHTenantInfo> _repo;
-  private readonly ITenantRepository<TenantProdSubscription> _tenantProdSubscriptionRepo;
+  private readonly INonAggregateRepository<FSHTenantInfo> _repo;
+  private readonly INonAggregateRepository<TenantProdSubscription> _nonAggregateProdSubscriptionRepo;
   private readonly IConnectionStringSecurer _csSecurer;
   private readonly IDatabaseInitializer _dbInitializer;
   private readonly IJobService _jobService;
@@ -53,8 +53,8 @@ internal class TenantService : ITenantService
     ISystemTime systemTime,
     IReadRepository<PaymentMethod> paymentMethodRepo,
     ITenantUnitOfWork uow,
-    ITenantRepository<FSHTenantInfo> repo,
-    ITenantRepository<TenantProdSubscription> tenantProdSubscriptionRepo)
+    INonAggregateRepository<FSHTenantInfo> repo,
+    INonAggregateRepository<TenantProdSubscription> nonAggregateProdSubscriptionRepo)
   {
     _tenantStore = tenantStore;
     _csSecurer = csSecurer;
@@ -70,7 +70,7 @@ internal class TenantService : ITenantService
     _paymentMethodRepo = paymentMethodRepo;
     _uow = uow;
     _repo = repo;
-    _tenantProdSubscriptionRepo = tenantProdSubscriptionRepo;
+    _nonAggregateProdSubscriptionRepo = nonAggregateProdSubscriptionRepo;
   }
 
   public async Task<List<TenantDto>> GetAllAsync()
@@ -161,7 +161,7 @@ internal class TenantService : ITenantService
   public async Task<Unit> PayForSubscription(Guid subscriptionId, decimal amount, Guid? paymentMethodId)
   {
     paymentMethodId ??= await GetCashPaymentMethod();
-    var subscription = await _tenantProdSubscriptionRepo.GetByIdAsync(subscriptionId);
+    var subscription = await _nonAggregateProdSubscriptionRepo.GetByIdAsync(subscriptionId);
     subscription.Pay(amount, paymentMethodId.Value);
 
     await _uow.CommitAsync();

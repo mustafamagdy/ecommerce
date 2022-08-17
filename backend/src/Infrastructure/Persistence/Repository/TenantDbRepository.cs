@@ -8,13 +8,13 @@ using Mapster;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-public class TenantDbRepository<TEntity> : RepositoryBase<TEntity>,
-  IReadTenantRepository<TEntity>, ITenantRepository<TEntity>
+public class NonAggregateDbRepository<TEntity> : RepositoryBase<TEntity>,
+  IReadNonAggregateRepository<TEntity>, INonAggregateRepository<TEntity>
   where TEntity : class
 {
   private readonly TenantUnitOfWork _uow;
 
-  public TenantDbRepository(TenantUnitOfWork uow)
+  public NonAggregateDbRepository(TenantUnitOfWork uow)
     : base(uow)
   {
     _uow = uow;
