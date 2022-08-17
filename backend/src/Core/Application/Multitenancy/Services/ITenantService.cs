@@ -8,5 +8,4 @@ public interface ITenantService
   Task<bool> ExistsWithIdAsync(string id);
   Task<bool> ExistsWithNameAsync(string name);
   Task<bool> DatabaseExistAsync(string databaseName);
-  Task<bool> HasAValidProdSubscription(string tenantId);
 }
