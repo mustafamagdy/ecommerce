@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -7,11 +8,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy
 {
-  public interface ITenantConnectionStringBuilder
-  {
-    string BuildConnectionString(string databaseName);
-  }
-
   public class TenantConnectionStringBuilder : ITenantConnectionStringBuilder
   {
     private readonly IConfiguration _config;

@@ -1,7 +1,7 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -12,14 +12,15 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
   public class HasValidSubscriptionTypeFilter : IAsyncActionFilter
   {
     private readonly ITenantResolver _tenantResolver;
-    private readonly ITenantService _tenantService;
     private readonly ISystemTime _systemTime;
+    private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
 
-    public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver, ITenantService tenantService, ISystemTime systemTime)
+    public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver,
+      ISystemTime systemTime, IReadNonAggregateRepository<FSHTenantInfo> tenantRepo)
     {
       _tenantResolver = tenantResolver;
-      _tenantService = tenantService;
       _systemTime = systemTime;
+      _tenantRepo = tenantRepo;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -42,10 +43,12 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
         if (hasControllerLevel || hasMethodLevel)
         {
           var tenantContext = await _tenantResolver.ResolveAsync(context.HttpContext) as MultiTenantContext<FSHTenantInfo> ?? throw new FeatureNotAllowedException();
-          var tenant = await _tenantService.GetByIdAsync(tenantContext.TenantInfo?.Id) ?? throw new FeatureNotAllowedException();
+          string tenantId = tenantContext.TenantInfo?.Id!;
+          var tenant = await _tenantRepo.FirstOrDefaultAsync(new GetTenantBasicInfoSpec(tenantId))
+                       ?? throw new FeatureNotAllowedException();
           if (tenant.Id != MultitenancyConstants.Root.Id)
           {
-            if (tenant.ProdSubscriptionId == null && tenant.DemoSubscriptionId == null && tenant.TrainSubscriptionId == null)
+            if (tenant.ProdSubscription == null && tenant.DemoSubscription == null && tenant.TrainSubscription == null)
             {
               throw new FeatureNotAllowedException();
             }
