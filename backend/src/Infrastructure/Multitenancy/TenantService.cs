@@ -3,9 +3,9 @@ using Ardalis.Specification;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.EventHandlers;
 using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
@@ -30,9 +30,6 @@ internal class TenantService : ITenantService
   private readonly INonAggregateRepository<TenantProdSubscription> _nonAggregateProdSubscriptionRepo;
   private readonly IConnectionStringSecurer _csSecurer;
   private readonly IDatabaseInitializer _dbInitializer;
-  private readonly IJobService _jobService;
-  private readonly IMailService _mailService;
-  private readonly IEmailTemplateService _templateService;
   private readonly IStringLocalizer _t;
   private readonly IReadRepository<Branch> _branchRepo;
   private readonly ITenantConnectionStringBuilder _cnBuilder;
@@ -44,9 +41,6 @@ internal class TenantService : ITenantService
     IMultiTenantStore<FSHTenantInfo> tenantStore,
     IConnectionStringSecurer csSecurer,
     IDatabaseInitializer dbInitializer,
-    IJobService jobService,
-    IMailService mailService,
-    IEmailTemplateService templateService,
     IStringLocalizer<TenantService> localizer,
     IReadRepository<Branch> branchRepo,
     ITenantConnectionStringBuilder cnBuilder, IHostEnvironment env,
@@ -59,9 +53,6 @@ internal class TenantService : ITenantService
     _tenantStore = tenantStore;
     _csSecurer = csSecurer;
     _dbInitializer = dbInitializer;
-    _jobService = jobService;
-    _mailService = mailService;
-    _templateService = templateService;
     _t = localizer;
     _branchRepo = branchRepo;
     _cnBuilder = cnBuilder;
@@ -71,13 +62,6 @@ internal class TenantService : ITenantService
     _uow = uow;
     _repo = repo;
     _nonAggregateProdSubscriptionRepo = nonAggregateProdSubscriptionRepo;
-  }
-
-  public async Task<List<TenantDto>> GetAllAsync()
-  {
-    var tenants = (await _tenantStore.GetAllAsync()).Adapt<List<TenantDto>>();
-    // tenants.ForEach(t => t.DatabaseName = _csSecurer.MakeSecure(t.DatabaseName));
-    return tenants;
   }
 
   public async Task<bool> ExistsWithIdAsync(string id) =>
@@ -101,7 +85,10 @@ internal class TenantService : ITenantService
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
+
     var prodSubscription = await TryCreateProdSubscription(tenant);
+
+    tenant.AddDomainEvent(new TenantCreatedEvent(tenant, prodSubscription));
 
     bool result = await _uow.CommitAsync(cancellationToken) > 0;
     if (!result)
@@ -112,8 +99,6 @@ internal class TenantService : ITenantService
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
-
-      SendWelcomeEmail(tenant, request, prodSubscription);
     }
     catch
     {
@@ -124,27 +109,7 @@ internal class TenantService : ITenantService
     return tenant.Id;
   }
 
-  private void SendWelcomeEmail(FSHTenantInfo tenant, CreateTenantRequest request, TenantSubscriptionDto subscription)
-  {
-    string prodUrl = $"https://prod.abcd.com/{tenant.Key}";
-
-    var eMailModel = new TenantCreatedEmailModel()
-    {
-      AdminEmail = request.AdminEmail,
-      TenantName = request.Name,
-      SubscriptionExpiryDate = subscription.ExpiryDate,
-      SiteUrl = prodUrl
-    };
-
-    var mailRequest = new MailRequest(
-      new List<string> { request.AdminEmail },
-      _t["Subscription Created"],
-      _templateService.GenerateEmailTemplate("email-subscription", eMailModel));
-
-    _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
-  }
-
-  private async Task<ProdTenantSubscriptionDto> TryCreateProdSubscription(FSHTenantInfo tenant)
+  private async Task<TenantProdSubscription> TryCreateProdSubscription(FSHTenantInfo tenant)
   {
     var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
 
@@ -155,25 +120,7 @@ internal class TenantService : ITenantService
     await _uow.Set<TenantProdSubscription>().AddAsync(tenantProdSubscription);
 
     tenant.SetProdSubscription(tenantProdSubscription);
-    return tenant.ProdSubscription.Adapt<ProdTenantSubscriptionDto>();
-  }
-
-  public async Task<Unit> PayForSubscription(Guid subscriptionId, decimal amount, Guid? paymentMethodId)
-  {
-    paymentMethodId ??= await GetCashPaymentMethod();
-    var subscription = await _nonAggregateProdSubscriptionRepo.GetByIdAsync(subscriptionId);
-    subscription.Pay(amount, paymentMethodId.Value);
-
-    await _uow.CommitAsync();
-    return Unit.Value;
-  }
-
-  private async Task<Guid> GetCashPaymentMethod()
-  {
-    var spec = new GetDefaultCashPaymentMethodSpec();
-    var pm = await _paymentMethodRepo.FirstOrDefaultAsync(spec)
-             ?? throw new ArgumentOutOfRangeException($"No default cash payment method register");
-    return pm.Id;
+    return tenant.ProdSubscription;
   }
 
   public async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
@@ -189,59 +136,6 @@ internal class TenantService : ITenantService
                                         ?? throw new NotFoundException("No train subscription found"),
       _ => throw new ArgumentOutOfRangeException()
     };
-  }
-
-  private async Task<Subscription> GetDefaultMonthlySubscription()
-  {
-    return (await _uow.Set<StandardSubscription>().SingleOrDefaultAsync()
-            ?? throw new NotImplementedException("There is no standard subscription configured"))!;
-  }
-
-  public async Task<string> ActivateAsync(string tenantId)
-  {
-    var tenant = await GetTenantById(tenantId);
-
-    if (tenant.Active)
-    {
-      throw new ConflictException(_t["Tenant is already Activated."]);
-    }
-
-    tenant.Activate();
-
-    await _tenantStore.TryUpdateAsync(tenant);
-
-    return _t["Tenant {0} is now Activated.", tenantId];
-  }
-
-  public async Task<string> DeactivateAsync(string tenantId)
-  {
-    var tenant = await GetTenantById(tenantId);
-
-    if (!tenant.Active)
-    {
-      throw new ConflictException(_t["Tenant is already Deactivated."]);
-    }
-
-    tenant.DeActivate();
-
-    await _tenantStore.TryUpdateAsync(tenant);
-
-    return _t[$"Tenant {0} is now Deactivated.", tenantId];
-  }
-
-  public async Task<string> RenewSubscription(FSHTenantInfo tenant, Subscription subscription)
-  {
-    var newExpiryDate = subscription switch
-    {
-      StandardSubscription standardSubscription => tenant.ProdSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      DemoSubscription demoSubscription => tenant.DemoSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      TrainSubscription drainSubscription => tenant.TrainSubscription?.Renew(_systemTime.Now).ExpiryDate,
-      _ => null
-    };
-
-    await _uow.CommitAsync();
-
-    return _t["Subscription {0} renewed. Now Valid till {1}.", subscription.GetType().Name, newExpiryDate];
   }
 
   public async Task<bool> DatabaseExistAsync(string databaseName)

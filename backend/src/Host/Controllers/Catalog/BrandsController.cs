@@ -48,21 +48,4 @@ public class BrandsController : VersionedApiController
   {
     return Mediator.Send(new DeleteBrandRequest(id));
   }
-
-  [HttpPost("generate-random")]
-  [MustHavePermission(FSHAction.Generate, FSHResource.Brands)]
-  [OpenApiOperation("Generate a number of random brands.", "")]
-  public Task<string> GenerateRandomAsync(GenerateRandomBrandRequest request)
-  {
-    return Mediator.Send(request);
-  }
-
-  [HttpDelete("delete-random")]
-  [MustHavePermission(FSHAction.Clean, FSHResource.Brands)]
-  [OpenApiOperation("Delete the brands generated with the generate-random call.", "")]
-  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
-  public Task<string> DeleteRandomAsync()
-  {
-    return Mediator.Send(new DeleteRandomBrandRequest());
-  }
 }

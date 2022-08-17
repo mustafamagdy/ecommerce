@@ -2,6 +2,11 @@
 
 namespace FSH.WebApi.Application.Catalog.Products;
 
+
+/// <summary>
+/// This is an example of how to use Dapper to execute SQL script directly
+/// Be aware of which dialect you are using with your db vendor
+/// </summary>
 public class GetProductViaDapperRequest : IRequest<ProductDto>
 {
     public Guid Id { get; set; }
