@@ -1,3 +1,4 @@
+using FSH.WebApi.Domain.Common.Events;
 using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Catalog.Brands;
@@ -39,8 +40,12 @@ public class CreateBrandRequestHandler : IRequestHandler<CreateBrandRequest, Gui
   {
     var brand = new Brand(request.Name, request.Description);
 
+    brand.AddDomainEvent(EntityCreatedEvent.WithEntity(brand));
+
     await _repository.AddAsync(brand, cancellationToken);
+
     await _uow.CommitAsync(cancellationToken);
+
     return brand.Id;
   }
 }

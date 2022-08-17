@@ -22,15 +22,15 @@ public class MyTenantSubscriptionSearchRequestHandler : IRequestHandler<MyTenant
   private readonly IStringLocalizer _t;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;
   private readonly ISystemTime _systemTime;
-  private readonly IReadNonAggregateRepository<SubscriptionHistory> _subscriptionHistoryRepo;
 
-  public MyTenantSubscriptionSearchRequestHandler(FSHTenantInfo currentTenant, IStringLocalizer<MyTenantSubscriptionSearchRequestHandler> localizer, IReadNonAggregateRepository<FSHTenantInfo> repo, ISystemTime systemTime, IReadNonAggregateRepository<SubscriptionHistory> subscriptionHistoryRepo)
+  public MyTenantSubscriptionSearchRequestHandler(FSHTenantInfo currentTenant,
+    IStringLocalizer<MyTenantSubscriptionSearchRequestHandler> localizer,
+    IReadNonAggregateRepository<FSHTenantInfo> repo, ISystemTime systemTime)
   {
     _currentTenant = currentTenant;
     _t = localizer;
     _repo = repo;
     _systemTime = systemTime;
-    _subscriptionHistoryRepo = subscriptionHistoryRepo;
   }
 
   public async Task<TenantSubscriptionDto> Handle(MyTenantSubscriptionSearchRequest request, CancellationToken cancellationToken)

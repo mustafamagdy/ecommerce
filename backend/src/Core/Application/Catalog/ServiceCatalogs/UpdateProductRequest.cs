@@ -35,7 +35,6 @@ public class UpdateServiceCatalogRequestHandler : IRequestHandler<UpdateServiceC
 
     var updatedServiceCatalog = serviceCatalog.Update(request.Price, request.Priority);
 
-    // Add Domain Events to be raised after the commit
     serviceCatalog.AddDomainEvent(EntityUpdatedEvent.WithEntity(serviceCatalog));
 
     await _repository.UpdateAsync(updatedServiceCatalog, cancellationToken);
