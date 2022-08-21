@@ -125,6 +125,10 @@ internal static class Startup
           options.OAuth2Client.Scopes.Add(config["SecuritySettings:Swagger:ApiScope"]);
         }
       });
+      app.UseReDoc(conf =>
+      {
+        conf.Path = "/docs";
+      });
     }
 
     return app;
