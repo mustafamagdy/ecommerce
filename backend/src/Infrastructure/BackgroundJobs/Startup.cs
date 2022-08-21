@@ -26,9 +26,18 @@ internal static class Startup
 
     var storageSettings = config.GetSection("HangfireSettings:Storage").Get<HangfireStorageSettings>();
 
-    if (string.IsNullOrEmpty(storageSettings.StorageProvider))
+    var storageProvider = string.IsNullOrEmpty(storageSettings.StorageProvider)
+      ? config["DatabaseSettings:DBProvider"]
+      : storageSettings.StorageProvider;
+
+    if (string.IsNullOrEmpty(storageProvider))
       throw new Exception("Hangfire Storage Provider is not configured.");
-    if (string.IsNullOrEmpty(storageSettings.ConnectionString))
+
+    var connectionString = string.IsNullOrEmpty(storageSettings.ConnectionString)
+      ? config["DatabaseSettings:ConnectionString"]
+      : storageSettings.ConnectionString;
+
+    if (string.IsNullOrEmpty(connectionString))
       throw new Exception("Hangfire Storage Provider ConnectionString is not configured.");
     _logger.Information($"Hangfire: Current Storage Provider : {storageSettings.StorageProvider}");
 
@@ -36,7 +45,7 @@ internal static class Startup
 
     services.AddHangfire((provider, hangfireConfig) =>
       hangfireConfig
-        .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
+        .UseDatabase(storageProvider, connectionString, config)
         .UseFilter(new FSHJobFilter(provider))
         .UseFilter(new LogJobFilter())
         .UseConsole());

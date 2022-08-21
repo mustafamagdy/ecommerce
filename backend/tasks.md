@@ -53,9 +53,26 @@
 General
 
 - validation rules need to be common between backend and frontend
-  [x] refactor domain models
+[x] refactor domain models
 - update events for all models
 - tests
+
+========================== Reports ===========================
+- Export option for:
+  - Products
+  - Services
+  - Service Catalog
+ 
+- Operations reports:
+  - Orders (by user, service catalog item, payment method, days of week, cash register, branch)
+  - VAT report (vat per order with total)
+- 
+    
+========================== Mobile App =========================
+
+This is a mobile app for the customers to order their cloths to be collected, cleaned, and serviced
+
+- ...
 
 ========================== FRAMEWORK ==========================
 
@@ -63,28 +80,28 @@ General
 servers with LB
 [x] refactor invoice to generate the qrcode, barcode, and logo
 
-- OrdeBr api
+- Order api
   [x] can send multiple payments in the same endpoint
     - BUG: if order with customer call failed, a customer will be added anyway, do validation first
     - cancel payment/all payments for order
-- Cash-box operations
+- Cash-register operations
     - Transfer (with recipient approval)
     - Open/Close?
 - Demo account (with reset)
 - Permissions
   [x] call an endpoint with higher permission for 1 time operation
     - login as admin for another tenant (open new private window and pass jwt token)
-    - permission can be scoped on specific data (like one cash box => all invoices to that cash box, or multiple
+    - permission can be scoped on specific data (like one cash register => all invoices to that cash register, or multiple
       subscriptions => can only manage those)
 - Predefined roles
 - Notification
     - SMS
     - Whatsapp
-- smart enum (specially for subscription types)
+[x] smart enum (specially for subscription types)
 - Pdfs
     - Payment receipt
     - demo watermark
-    - serialize reports to xml
+    - serialize reports to xml (NO NEED, we can store the configuration only - done)
 - Subscriptions
     - ending notification
         - Tenant
@@ -117,11 +134,11 @@ order helper
 => register the payment operation
 
 Cash register
-- key, name, main?
+[X] key, name, main?
 - any payment to or from go through a cash register
-- available balance to to pay from is current balance - total held transfer from
+[X] available balance to to pay from is current balance - total held transfer from
 transfer operation works in two steps
-- create operation (which will hold the transferred amount until the recipient accepts it)
+[X] create operation (which will hold the transferred amount until the recipient accepts it)
 
 /////// Printing ///////
 

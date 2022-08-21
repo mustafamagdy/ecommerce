@@ -12,11 +12,11 @@ public class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashReg
   {
     base.Configure(builder);
 
-    builder.HasMany(a => a.ActiveOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
+    // builder.HasMany(a => a.ActiveOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
     var activeOperations = builder.Navigation(nameof(CashRegister.ActiveOperations));
     activeOperations.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-    builder.HasMany(a => a.ArchivedOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
+    // builder.HasMany(a => a.ArchivedOperations).WithOne(a => a.CashRegister).HasForeignKey(a => a.CashRegisterId);
     var archivedOperations = builder.Navigation(nameof(CashRegister.ArchivedOperations));
     archivedOperations.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
 

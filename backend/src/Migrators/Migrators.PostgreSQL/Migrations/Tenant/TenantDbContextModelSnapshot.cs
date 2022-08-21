@@ -87,14 +87,17 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DemoSubscriptionId");
+                    b.HasIndex("DemoSubscriptionId")
+                        .IsUnique();
 
                     b.HasIndex("Identifier")
                         .IsUnique();
 
-                    b.HasIndex("ProdSubscriptionId");
+                    b.HasIndex("ProdSubscriptionId")
+                        .IsUnique();
 
-                    b.HasIndex("TrainSubscriptionId");
+                    b.HasIndex("TrainSubscriptionId")
+                        .IsUnique();
 
                     b.ToTable("Tenants", "MultiTenancy");
                 });
@@ -198,16 +201,11 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.Property<Guid>("TenantProdSubscriptionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("TenantProdSubscriptionId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PaymentMethodId");
 
                     b.HasIndex("TenantProdSubscriptionId");
-
-                    b.HasIndex("TenantProdSubscriptionId1");
 
                     b.ToTable("SubscriptionPayments");
                 });
@@ -225,7 +223,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
 
                     b.Property<string>("TenantId")
                         .IsRequired()
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("text");
 
                     b.Property<string>("tenant_subscription_type")
                         .IsRequired()
@@ -276,8 +274,6 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
 
-                    b.HasIndex("TenantId");
-
                     b.HasDiscriminator().HasValue("Demo");
                 });
 
@@ -285,16 +281,12 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
 
-                    b.HasIndex("TenantId");
-
                     b.HasDiscriminator().HasValue("Standard");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
-
-                    b.HasIndex("TenantId");
 
                     b.HasDiscriminator().HasValue("Train");
                 });
@@ -309,16 +301,16 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", "DemoSubscription")
-                        .WithMany()
-                        .HasForeignKey("DemoSubscriptionId");
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "DemoSubscriptionId");
 
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "ProdSubscription")
-                        .WithMany()
-                        .HasForeignKey("ProdSubscriptionId");
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "ProdSubscriptionId");
 
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", "TrainSubscription")
-                        .WithMany()
-                        .HasForeignKey("TrainSubscriptionId");
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "TrainSubscriptionId");
 
                     b.Navigation("DemoSubscription");
 
@@ -347,15 +339,10 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                         .IsRequired();
 
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("TenantProdSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", null)
-                        .WithMany("Payments")
-                        .HasForeignKey("TenantProdSubscriptionId1")
-                        .HasConstraintName("FK_SubscriptionPayments_TenantSubscription_TenantProdSubscrip~1");
 
                     b.Navigation("PaymentMethod");
 
@@ -373,47 +360,29 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
                 {
                     b.Navigation("History");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
+                {
+                    b.Navigation("Tenant")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
                 {
                     b.Navigation("Payments");
+
+                    b.Navigation("Tenant")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
+                {
+                    b.Navigation("Tenant")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

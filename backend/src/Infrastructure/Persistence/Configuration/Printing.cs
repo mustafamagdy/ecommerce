@@ -24,7 +24,7 @@ public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDo
       .HasValue<SimpleReceiptInvoice>(PrintableType.Receipt.Name)
       .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name);
 
-    builder.HasMany(a => a.Sections).WithOne(a => a.Document).HasForeignKey(a => a.DocumentId);
+    // builder.HasMany(a => a.Sections).WithOne(a => a.Document).HasForeignKey(a => a.DocumentId);
     var sections = builder.Navigation(nameof(PrintableDocument.Sections));
     sections.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
   }
