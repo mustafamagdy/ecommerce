@@ -11,7 +11,7 @@ public class BranchConfig : BaseAuditableTenantEntityConfiguration<Branch>
   {
     base.Configure(builder);
 
-    builder.HasMany(a => a.CashRegisters).WithOne(a => a.Branch).HasForeignKey(a => a.BranchId);
+    // builder.HasMany(a => a.CashRegisters).WithOne(a => a.Branch).HasForeignKey(a => a.BranchId);
     var cashRegisterNavigation = builder.Navigation(nameof(Branch.CashRegisters));
     cashRegisterNavigation.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
   }

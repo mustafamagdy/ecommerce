@@ -36,7 +36,7 @@ public class GetBasicTenantInfoRequestHandler : IRequestHandler<GetBasicTenantIn
   private readonly IStringLocalizer _t;
 
   public GetBasicTenantInfoRequestHandler(IReadNonAggregateRepository<FSHTenantInfo> repo, IReadRepository<Branch> branchRepo,
-    IStringLocalizer localizer)
+    IStringLocalizer<GetBasicTenantInfoRequestHandler> localizer)
   {
     _repo = repo;
     _branchRepo = branchRepo;

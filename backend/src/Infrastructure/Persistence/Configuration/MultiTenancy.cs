@@ -61,7 +61,7 @@ public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<Subscr
 
     builder
       .HasOne(a => a.TenantProdSubscription)
-      .WithMany()
+      .WithMany(a => a.Payments)
       .HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }

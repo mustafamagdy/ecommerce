@@ -64,15 +64,15 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
     modelBuilder
       .Entity<FSHTenantInfo>()
-      .HasOne(a => a.ProdSubscription).WithMany().HasForeignKey(a => a.ProdSubscriptionId);
+      .HasOne(a => a.ProdSubscription).WithOne(a => a.Tenant).HasForeignKey<FSHTenantInfo>(a => a.ProdSubscriptionId);
 
     modelBuilder
       .Entity<FSHTenantInfo>()
-      .HasOne(a => a.DemoSubscription).WithMany().HasForeignKey(a => a.DemoSubscriptionId);
+      .HasOne(a => a.DemoSubscription).WithOne(a => a.Tenant).HasForeignKey<FSHTenantInfo>(a => a.DemoSubscriptionId);
 
     modelBuilder
       .Entity<FSHTenantInfo>()
-      .HasOne(a => a.TrainSubscription).WithMany().HasForeignKey(a => a.TrainSubscriptionId);
+      .HasOne(a => a.TrainSubscription).WithOne(a => a.Tenant).HasForeignKey<FSHTenantInfo>(a => a.TrainSubscriptionId);
 
     IgnoredEntities(modelBuilder);
   }

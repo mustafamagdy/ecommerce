@@ -54,8 +54,10 @@ public class HostFixture : IAsyncLifetime
       ["DatabaseSettings:DBProvider"] = dbProvider,
       ["DatabaseSettings:ConnectionString"] = connectionString,
       ["DatabaseSettings:ConnectionStringTemplate"] = tenantDbConnectionStringTemplate,
-      ["HangfireSettings:Storage:ConnectionString"] = connectionString,
-      ["HangfireSettings:Storage:StorageProvider"] = dbProvider,
+      // ["HangfireSettings:Storage:ConnectionString"] = connectionString,
+      // ["HangfireSettings:Storage:StorageProvider"] = dbProvider,
+      ["HangfireSettings:Storage:ConnectionString"] = "",
+      ["HangfireSettings:Storage:StorageProvider"] = "",
       ["MailSettings:Port"] = mailPort.ToString()
     });
 
