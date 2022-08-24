@@ -11,7 +11,7 @@ public interface ITokenService : ITransientService
 
 public interface ISystemSupportService : IScopedService
 {
-  Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId);
+  Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, CancellationToken cancellationToken);
 }
 
 public interface IOverrideTokenService : ITransientService
