@@ -7,7 +7,7 @@ using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Identity.Tokens;
-using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
@@ -120,7 +120,7 @@ internal class TokenService : ITokenService
     return await GenerateTokensAndUpdateUser(user, ipAddress);
   }
 
-  private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress)
+  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress)
   {
     string token = GenerateJwt(user, ipAddress);
 
