@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
+using FSH.WebApi.Application.Identity.Tokens;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
@@ -289,5 +291,40 @@ public class TenantManagementTests : TestFixture
     subscriptionInfo.ExpiryDate.Should().BeAfter(today);
     subscriptionInfo.History.Should().NotBeEmpty();
     subscriptionInfo.Payments.Should().NotBeEmpty();
+  }
+
+  [Fact]
+  public async Task can_login_as_tenant_admin_and_do_admin_stuff_on_that_tenant()
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = $"admin@{tenantId}.com",
+      Name = $"Tenant {tenantId}",
+      DatabaseName = $"{tenantId}-db",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var responseTenantId = await _.Content.ReadAsStringAsync();
+    responseTenantId.Should().Be(tenantId);
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/tenants/remote-admin-login", new RemoteAdminLoginRequest
+    {
+      TenantId = responseTenantId
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tokenResponse = await _.Content.ReadFromJsonAsync<TokenResponse>();
+    tokenResponse.Should().NotBeNull();
+
+    // do admin stuff
+    var headers = new Dictionary<string, string> { { "tenant", tenantId } };
+    headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
+    _ = await GetAsync("api/users", headers);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
+    users.Should().NotBeNullOrEmpty();
   }
 }

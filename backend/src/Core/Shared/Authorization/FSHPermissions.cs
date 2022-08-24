@@ -24,6 +24,8 @@ public static class FSHAction
   public const string ViewAdvanced = nameof(ViewAdvanced);
 
   public const string Clean = nameof(Clean);
+  public const string RemoteLogin = nameof(RemoteLogin);
+
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
 }
 
@@ -105,6 +107,7 @@ public static class FSHPermissions
     new("View Basic Tenants Info", FSHAction.ViewBasic, FSHResource.Tenants),
     new("View My Tenant Info", FSHAction.ViewMy, FSHResource.Subscriptions),
     new("View My Tenant History & Payments", FSHAction.ViewAdvanced, FSHResource.Subscriptions),
+    new("Root admin can remote login to tenant db to provide support", FSHAction.RemoteLogin, FSHResource.Tenants),
 
     // Branches
     new("Search Branches", FSHAction.Search, FSHResource.Branches),

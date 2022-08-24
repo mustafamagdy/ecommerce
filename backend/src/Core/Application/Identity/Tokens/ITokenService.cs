@@ -1,9 +1,17 @@
+using FSH.WebApi.Domain.Identity;
+
 namespace FSH.WebApi.Application.Identity.Tokens;
 
 public interface ITokenService : ITransientService
 {
   Task<TokenResponse> GetTokenAsync(TokenRequest request, string ipAddress, CancellationToken cancellationToken);
   Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
+  Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress);
+}
+
+public interface ISystemSupportService : IScopedService
+{
+  Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId);
 }
 
 public interface IOverrideTokenService : ITransientService

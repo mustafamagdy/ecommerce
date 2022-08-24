@@ -1,4 +1,5 @@
 ﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
