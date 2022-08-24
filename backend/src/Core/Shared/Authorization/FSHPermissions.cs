@@ -108,6 +108,7 @@ public static class FSHPermissions
     new("View My Tenant Info", FSHAction.ViewMy, FSHResource.Subscriptions),
     new("View My Tenant History & Payments", FSHAction.ViewAdvanced, FSHResource.Subscriptions),
     new("Root admin can remote login to tenant db to provide support", FSHAction.RemoteLogin, FSHResource.Tenants),
+    new("Root admin can reset other tenant's user password to provide support", FSHAction.ResetPassword, FSHResource.Tenants),
 
     // Branches
     new("Search Branches", FSHAction.Search, FSHResource.Branches),

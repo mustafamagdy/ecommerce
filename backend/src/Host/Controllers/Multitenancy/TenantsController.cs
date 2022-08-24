@@ -1,4 +1,3 @@
-using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
 using MediatR;
 
@@ -78,13 +77,5 @@ public class TenantsController : VersionNeutralApiController
   public Task<BasicTenantInfoDto> GetBasicAsync(string id)
   {
     return Mediator.Send(new GetBasicTenantInfoRequest(id));
-  }
-
-  [HttpPost("remote-admin-login")]
-  [MustHavePermission(FSHAction.RemoteLogin, FSHResource.Tenants)]
-  [OpenApiOperation("Root admin can remote login to tenant db to provide support", "")]
-  public Task<TokenResponse> RemoteLogin(RemoteAdminLoginRequest request)
-  {
-    return Mediator.Send(request);
   }
 }
