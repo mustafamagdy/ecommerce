@@ -297,11 +297,13 @@ public class TenantManagementTests : TestFixture
   public async Task can_login_as_tenant_admin_and_do_admin_stuff_on_that_tenant()
   {
     var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+    var username = $"{tenantId}.admin";
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
       Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
+      AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
       DatabaseName = $"{tenantId}-db",
     };
@@ -311,9 +313,10 @@ public class TenantManagementTests : TestFixture
     var responseTenantId = await _.Content.ReadAsStringAsync();
     responseTenantId.Should().Be(tenantId);
 
-    _ = await RootAdmin_PostAsJsonAsync("/api/tenants/remote-admin-login", new RemoteAdminLoginRequest
+    _ = await RootAdmin_PostAsJsonAsync("/api/support/remote-admin-login", new RemoteAdminLoginRequest
     {
-      TenantId = responseTenantId
+      TenantId = responseTenantId,
+      UserName = username
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResponse = await _.Content.ReadFromJsonAsync<TokenResponse>();
@@ -326,5 +329,36 @@ public class TenantManagementTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
     users.Should().NotBeNullOrEmpty();
+  }
+
+  [Fact]
+  public async Task root_tenant_admin_can_reset_any_other_tenant_user_password()
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+    var username = $"{tenantId}.admin";
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+      DatabaseName = $"{tenantId}-db",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var responseTenantId = await _.Content.ReadAsStringAsync();
+    responseTenantId.Should().Be(tenantId);
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/support/reset-other-user-password",
+      new ResetRemoteUserPasswordRequest(responseTenantId, username));
+
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var newPassword = await _.Content.ReadAsStringAsync();
+    newPassword.Should().NotBeNull();
+
+    _ = await TryLoginAs(adminEmail, newPassword, tenantId, CancellationToken.None);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }
