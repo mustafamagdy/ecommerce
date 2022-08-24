@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Auditing;
 using FSH.WebApi.Domain.Common.Contracts;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Auditing;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;

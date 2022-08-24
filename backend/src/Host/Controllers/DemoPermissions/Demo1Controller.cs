@@ -2,6 +2,7 @@
 using FSH.WebApi.Application.Dashboard;
 using FSH.WebApi.Application.Identity.Roles;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;

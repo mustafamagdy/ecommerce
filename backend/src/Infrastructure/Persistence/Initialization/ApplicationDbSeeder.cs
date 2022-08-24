@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.MultiTenancy;
+﻿using FSH.WebApi.Domain.Identity;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;

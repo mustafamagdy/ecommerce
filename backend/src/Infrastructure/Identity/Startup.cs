@@ -1,3 +1,4 @@
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
