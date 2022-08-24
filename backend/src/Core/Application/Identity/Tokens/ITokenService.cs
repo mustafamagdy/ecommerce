@@ -9,11 +9,6 @@ public interface ITokenService : ITransientService
   Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress);
 }
 
-public interface ISystemSupportService : IScopedService
-{
-  Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, CancellationToken cancellationToken);
-}
-
 public interface IOverrideTokenService : ITransientService
 {
   Task<OverrideTokenResponse> GetOverrideTokenAsync(OverrideTokenRequest request, string ipAddress, CancellationToken cancellationToken);
