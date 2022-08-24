@@ -90,7 +90,7 @@ servers with LB
 - Demo account (with reset)
 - Permissions
   [x] call an endpoint with higher permission for 1 time operation
-    - login as admin for another tenant (open new private window and pass jwt token)
+    [x] login as admin for another tenant (open new private window and pass jwt token)
     - permission can be scoped on specific data (like one cash register => all invoices to that cash register, or multiple
       subscriptions => can only manage those)
 - Predefined roles
