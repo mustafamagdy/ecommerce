@@ -168,11 +168,11 @@ transfer operation works in two steps
 
 /////// Remaining Tasks ///////
 
-- save new order prints the receipt with it
 - pay for order
-- cancel payment 
 - cancel order
 - update order (add, remove item(s))
+- save new order prints the receipt with it
+- cancel payment 
 - credit note
 - print credit note on save
 - service catalog categories

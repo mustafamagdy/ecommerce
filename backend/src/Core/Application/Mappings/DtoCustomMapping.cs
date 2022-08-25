@@ -46,6 +46,11 @@ public class DtoCustomMapping
       .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
       .Map(dest => dest.PaymentOperationType, src => src.OperationType.Name);
 
+    TypeAdapterConfig<OrderPayment, OrderPaymentDto>
+      .NewConfig()
+      .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
+      .Map(dest => dest.PaymentId, src => src.Id);
+
     TypeAdapterConfig<FSHTenantInfo, BasicTenantInfoDto>
       .NewConfig()
       .Map(dest => dest.TotalDue, src =>

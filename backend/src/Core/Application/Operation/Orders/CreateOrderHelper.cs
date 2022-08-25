@@ -77,7 +77,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     decimal orderItemsTotal = orderItems.Sum(a => a.ItemTotal);
     decimal totalPaid = payments.Sum(a => a.Amount);
 
-    if (totalPaid < orderItemsTotal)
+    if (totalPaid < orderItemsTotal && cashOrder)
     {
       throw new InvalidOperationException(_t["Total paid amount {0} doesn't match order net amount {1}", totalPaid, orderItemsTotal]);
     }

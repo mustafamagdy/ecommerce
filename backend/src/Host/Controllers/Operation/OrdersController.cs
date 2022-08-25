@@ -73,6 +73,16 @@ public class OrdersController : VersionedApiController
     return Mediator.Send(new CancelOrderWithPaymentsRequest(id), cancellationToken);
   }
 
+  [HttpPost("pay")]
+  [MustHavePermission(FSHAction.Pay, FSHResource.Orders)]
+  [OpenApiOperation("Export Pdf invoice receipt for an order.", "")]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Generate))]
+  public Task<OrderPaymentDto> PayForOrder(PayForOrderRequest request, CancellationToken cancellationToken)
+  {
+    return Mediator.Send(request, cancellationToken);
+  }
+
+
   // [HttpPut("{id:guid}")]
   // [MustHavePermission(FSHAction.Update, FSHResource.Orders)]
   // [OpenApiOperation("Update a order.", "")]
