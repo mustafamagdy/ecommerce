@@ -165,3 +165,37 @@ transfer operation works in two steps
   [x] export func should pass this bound template to the pdf generator to draw the pdf
 - formats
   - format number, date, 
+
+/////// Remaining Tasks ///////
+
+- save new order prints the receipt with it
+- pay for order
+- cancel payment 
+- cancel order
+- update order (add, remove item(s))
+- credit note
+- print credit note on save
+- service catalog categories
+- add group with service catalog items
+- add product, service, to form a service catalog item
+- cash register type (cash register, bank account)
+- cash register manager (what is the permissions)
+- cash register branch 
+- cash register operations (description, debut, credit)
+- customer list with remaining balance
+- search customer with balance range
+- list customer orders + print + totals
+- arabic role + permissions
+- add role + permissions 
+- permission group (for screens)
+- add/remote user to/from role
+- branch crud
+- activate/deactivate branch (deactivate all operations => filter)
+- subscription on branch level? how many branches
+- subscription types (what type of subscriptions? subscription allowed features)
+- subscription invoices + payments
+- update tenant info (full page details)
+- subscription support manager 
+- subscription credit note
+- subscription print
+- subscription send invoice by email, notifications 
