@@ -25,6 +25,7 @@ public static class FSHAction
 
   public const string Clean = nameof(Clean);
   public const string RemoteLogin = nameof(RemoteLogin);
+  public const string Pay = nameof(Pay);
 
   // public const string UpgradeSubscription = nameof(UpgradeSubscription);
 }
@@ -147,6 +148,7 @@ public static class FSHPermissions
     new("Update Order", FSHAction.Update, FSHResource.Orders),
     new("Delete Order", FSHAction.Delete, FSHResource.Orders),
     new("Cancel Order", FSHAction.Cancel, FSHResource.Orders),
+    new("Pay for order", FSHAction.Pay, FSHResource.Orders),
 
     // Customers
     new("Search Customers", FSHAction.Search, FSHResource.Customers),
