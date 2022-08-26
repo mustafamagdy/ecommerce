@@ -20,6 +20,13 @@ public class DapperEntityRepository : IDapperEntityRepository
     (await _dbContext.Connection.QueryAsync<T>(sql, param, transaction))
     .AsList();
 
+  public async Task<T?> QueryFirstOrDefaultNoneEntAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default) where T : class
+  {
+    var entity = await _dbContext.Connection.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
+
+    return entity ?? throw new NotFoundException(string.Empty);
+  }
+
   public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity
   {

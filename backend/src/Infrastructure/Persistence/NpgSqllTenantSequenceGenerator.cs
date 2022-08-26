@@ -10,6 +10,11 @@ using Npgsql;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
+public class TableExist
+{
+  public int tableCount { get; set; }
+}
+
 public class NpgsqlTenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
@@ -30,9 +35,12 @@ public class NpgsqlTenantSequenceGenerator : ITenantSequenceGenerator
 
   private async Task CheckCounterTableExist(string tableName)
   {
-    var sql = @"SELECT count(*) AS tableCount FROM information_schema.TABLES
-                 WHERE (TABLE_SCHEMA = @dbName) AND  (TABLE_NAME = @tableName);";
-    dynamic result = await _counterRepo.QueryFirstOrDefaultAsync(sql, new { dbName = _counterRepo.DatabaseName, tableName });
+    // var sql = @"SELECT count(*) AS tableCount FROM information_schema.TABLES
+    //              WHERE (TABLE_SCHEMA = @dbName) AND  (TABLE_NAME = @tableName);";
+
+    var sql = @"SELECT cast(count(*) as int) AS tableCount FROM information_schema.TABLES
+                 WHERE (table_catalog = @dbName) AND  (TABLE_NAME = @tableName);";
+    var result = await _counterRepo.QueryFirstOrDefaultNoneEntAsync<TableExist>(sql, new { dbName = _counterRepo.DatabaseName, tableName });
     _counterTableExist = result.tableCount > 0;
 
     if (!_counterTableExist.Value)

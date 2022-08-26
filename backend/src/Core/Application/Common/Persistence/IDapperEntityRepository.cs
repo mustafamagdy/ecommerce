@@ -7,6 +7,9 @@ public interface IDapperEntityRepository : ITransientService
   Task<IReadOnlyCollection<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;
 
+  Task<T?> QueryFirstOrDefaultNoneEntAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
+    where T : class;
+
   Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;
 
