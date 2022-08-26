@@ -531,6 +531,88 @@ public class OperationsTests : TestFixture
     firstCustomer.DueAmount.Should().Be(order.NetAmount - orderPayment.Amount);
   }
 
+  [Fact]
+  public async Task new_order_to_customer_should_listed_in_customer_orders()
+  {
+    var adminHeaders = await CreateTenantAndLogin();
+    var newCustomer = new CreateSimpleCustomerRequest
+    {
+      Name = "customer name",
+      PhoneNumber = "1234567"
+    };
+    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
+
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    _ = await PostAsJsonAsync("/api/v1/orders", new CreateOrderRequest()
+    {
+      CustomerId = customer.Id,
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = randomItem.Id,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var order = await _.Content.ReadFromJsonAsync<OrderDto>();
+
+    _ = await PostAsJsonAsync("/api/v1/customers/with-orders", new SearchCustomerWithOrdersRequest
+    {
+      Name = customer.Name
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var customerWithBalance = await _.Content.ReadFromJsonAsync<PaginationResponse<CustomerWithOrdersDto>>();
+    customerWithBalance.Should().NotBeNull();
+    customerWithBalance.Data.Should().NotBeNullOrEmpty();
+    var firstCustomer = customerWithBalance.Data.First();
+    firstCustomer.Should().NotBeNull();
+
+    firstCustomer.DueAmount.Should().Be(order.NetAmount);
+    var ordersCount = firstCustomer.Orders.Count;
+    ordersCount.Should().Be(1);
+  }
+
   /*
    * - cash_register
    * ? can_create_only_one_cash_register_per_branch
