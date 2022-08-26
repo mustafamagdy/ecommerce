@@ -1,4 +1,17 @@
+using Ardalis.SmartEnum;
+
 namespace FSH.WebApi.Domain.Operation;
+
+public class OrderStatus : SmartEnum<OrderStatus, string>
+{
+  public static readonly OrderStatus Normal = new(nameof(Normal), "normal");
+  public static readonly OrderStatus Canceled = new(nameof(Canceled), "canceled");
+
+  public OrderStatus(string name, string value)
+    : base(name, value)
+  {
+  }
+}
 
 public class Order : AuditableEntity, IAggregateRoot
 {
@@ -18,6 +31,7 @@ public class Order : AuditableEntity, IAggregateRoot
 
   public string OrderNumber { get; private set; }
   public DateTime OrderDate { get; private set; }
+  public OrderStatus Status { get; set; } = OrderStatus.Normal;
   public string QrCodeBase64 { get; private set; }
   public Guid CustomerId { get; private set; }
   public Customer Customer { get; private set; }
@@ -52,5 +66,11 @@ public class Order : AuditableEntity, IAggregateRoot
   {
     Customer.PayDue(payment.Amount);
     _orderPayments.Add(payment);
+  }
+
+  public void Cancel(DateTime cancellationTime)
+  {
+    Status = OrderStatus.Canceled;
+    Customer.PayDue(-1 * (TotalPaid - NetAmount));
   }
 }

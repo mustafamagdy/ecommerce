@@ -169,7 +169,7 @@ transfer operation works in two steps
 /////// Remaining Tasks ///////
 
 [x] pay for order
-- cancel order
+[x] cancel order
 - update order (add, remove item(s))
 - save new order prints the receipt with it
 - cancel payment 
@@ -183,8 +183,8 @@ transfer operation works in two steps
 - cash register branch 
 - cash register operations (description, debut, credit)
 [x] customer list with remaining balance
-- search customer with balance range
-- list customer orders + print + totals
+[x] search customer with balance range
+[x] list customer orders + print + totals
 - arabic role + permissions
 - add role + permissions 
 - permission group (for screens)
