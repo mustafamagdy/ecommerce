@@ -65,7 +65,10 @@ public class PayForOrderRequestHandler : IRequestHandler<PayForOrderRequest, Ord
 
   public async Task<OrderPaymentDto> Handle(PayForOrderRequest request, CancellationToken cancellationToken)
   {
-    var order = await _repo.GetByIdAsync(request.OrderId, cancellationToken);
+    var order = await _repo.FirstOrDefaultAsync(new SingleResultSpecification<Order>()
+      .Query.Include(a => a.Customer)
+      .Where(a => a.Id == request.OrderId)
+      .Specification, cancellationToken);
     if (order is null)
     {
       throw new NotFoundException(_t["Order {0} not found", request.OrderId]);
@@ -85,6 +88,7 @@ public class PayForOrderRequestHandler : IRequestHandler<PayForOrderRequest, Ord
 
     register.AddOperation(new ActivePaymentOperation(register, pm.Id, request.Amount, _systemTime.Now, PaymentOperationType.In));
     var payment = new OrderPayment(order.Id, pm.Id, request.Amount);
+
     order.AddPayment(payment);
 
     await _uow.CommitAsync(cancellationToken);

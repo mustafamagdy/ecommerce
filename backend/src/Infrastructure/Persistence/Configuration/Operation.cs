@@ -19,6 +19,9 @@ public class CustomerConfig : BaseTenantEntityConfiguration<Customer, DefaultIdT
       .HasMaxLength(64);
 
     builder.HasIndex(a => a.PhoneNumber).IsUnique();
+
+    var orders = builder.Metadata.FindNavigation(nameof(Customer.Orders));
+    orders?.SetPropertyAccessMode(PropertyAccessMode.Field);
   }
 }
 

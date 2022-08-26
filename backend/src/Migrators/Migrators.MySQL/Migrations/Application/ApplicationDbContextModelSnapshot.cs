@@ -497,6 +497,9 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Property<bool>("CashDefault")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<decimal>("DueAmount")
+                        .HasColumnType("decimal(65,30)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(1024)
@@ -511,6 +514,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
+
+                    b.Property<decimal>("TotalOrders")
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -1151,7 +1157,7 @@ namespace Migrators.MySQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1288,6 +1294,11 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("ActiveOperations");
 
                     b.Navigation("ArchivedOperations");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>

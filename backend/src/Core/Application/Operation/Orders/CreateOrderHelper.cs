@@ -83,7 +83,7 @@ public class CreateOrderHelper : ICreateOrderHelper
     }
 
     string orderNumber = await _sequenceGenerator.NextFormatted(nameof(Order));
-    var order = new Order(customer.Id, orderNumber, _systemTime.Now);
+    var order = new Order(customer, orderNumber, _systemTime.Now);
 
     order.AddItems(orderItems);
 
@@ -106,7 +106,7 @@ public class CreateOrderHelper : ICreateOrderHelper
       order.AddPayment(cashPayment);
     }
 
-    await _repository.AddAsync(order, cancellationToken);
+    customer.AddOrder(order);
 
     await _uow.CommitAsync(cancellationToken);
     return order;

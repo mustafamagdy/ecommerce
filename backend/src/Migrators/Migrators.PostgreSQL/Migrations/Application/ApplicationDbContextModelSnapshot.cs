@@ -502,6 +502,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<bool>("CashDefault")
                         .HasColumnType("boolean");
 
+                    b.Property<decimal>("DueAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(1024)
@@ -516,6 +519,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<decimal>("TotalOrders")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -1158,7 +1164,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1295,6 +1301,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("ActiveOperations");
 
                     b.Navigation("ArchivedOperations");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>

@@ -92,6 +92,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Name = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     PhoneNumber = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CashDefault = table.Column<bool>(type: "boolean", nullable: false),
+                    TotalOrders = table.Column<decimal>(type: "numeric", nullable: false),
+                    DueAmount = table.Column<decimal>(type: "numeric", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -280,9 +282,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderNumber = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     QrCodeBase64 = table.Column<string>(type: "text", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
