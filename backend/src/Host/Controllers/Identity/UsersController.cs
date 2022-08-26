@@ -17,6 +17,14 @@ public class UsersController : VersionNeutralApiController
     return _userService.GetListAsync(cancellationToken);
   }
 
+  [HttpGet("basic")]
+  [MustHavePermission(FSHAction.View, FSHResource.Users)]
+  [OpenApiOperation("Get basic list of all users.", "")]
+  public Task<List<BasicUserDataDto>> GetBasicListAsync(CancellationToken cancellationToken)
+  {
+    return _userService.GetListBasicDataAsync(cancellationToken);
+  }
+
   [HttpGet("{id}")]
   [MustHavePermission(FSHAction.View, FSHResource.Users)]
   [OpenApiOperation("Get a user's details.", "")]

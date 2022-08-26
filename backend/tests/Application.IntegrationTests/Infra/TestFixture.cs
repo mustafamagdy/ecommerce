@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
@@ -110,6 +111,13 @@ public abstract class TestFixture
     var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
     return tenantAdminLoginHeaders;
+  }
+
+  protected async Task<List<BasicUserDataDto>> GetUserList(Dictionary<string, string> headers)
+  {
+    var _ = await GetAsync("/api/users/basic", headers);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    return await _.Content.ReadFromJsonAsync<List<BasicUserDataDto>>();
   }
 
   public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant, CancellationToken cancellationToken)

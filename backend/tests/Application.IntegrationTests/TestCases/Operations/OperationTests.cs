@@ -40,10 +40,12 @@ public class OperationsTests : TestFixture
     branches.Should().Contain(a => a.Name == newBranch.Name);
     var branch = branches.First(a => a.Name == newBranch.Name);
 
+    var users = await GetUserList(adminHeaders);
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -71,11 +73,14 @@ public class OperationsTests : TestFixture
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
 
+    var users = await GetUserList(adminHeaders);
+
     var randomItem = catalog.Data[1];
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -138,11 +143,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -171,11 +178,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -209,12 +218,14 @@ public class OperationsTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
+    var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -281,11 +292,14 @@ public class OperationsTests : TestFixture
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
 
+    var users = await GetUserList(adminHeaders);
+
     var randomItem = catalog.Data[1];
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -368,11 +382,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -449,11 +465,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -554,11 +572,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -628,11 +648,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -723,11 +745,13 @@ public class OperationsTests : TestFixture
 
     var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
     var branch = branches.First(a => a.Name == newBranch.Name);
+    var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
       BranchId = branch.Id,
+      ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
