@@ -3,8 +3,11 @@ using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -69,6 +72,41 @@ public class CatalogTests : TestFixture
   [Fact]
   public async Task cannot_delete_brand_when_brand_is_used_and_has_permission()
   {
+  }
+
+  [Fact]
+  public async Task can_create_service_catalog_with_new_product_and_service()
+  {
+    var adminHeaders = await CreateTenantAndLogin();
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var catalogItems = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalogItems.Should().NotBeNull();
+    catalogItems.Data.Should().NotBeNullOrEmpty();
+    var itemCount = catalogItems.TotalCount;
+    itemCount.Should().BeGreaterThan(0);
+
+    var newCatalogItem = new CreateServiceCatalogFromProductAndServiceRequest
+    {
+      Price = 100,
+      Priority = ServicePriority.Normal,
+      ProductName = "new product",
+      ServiceName = "new service"
+    };
+    _ = await PostAsJsonAsync("/api/v1/catalog/with-product-and-service", newCatalogItem, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    catalogItems = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalogItems.Should().NotBeNull();
+    catalogItems.Data.Should().NotBeNullOrEmpty();
+    var newItemCount = catalogItems.TotalCount;
+    newItemCount.Should().Be(itemCount + 1);
+    catalogItems.Data.Should().Contain(a => a.ProductName == newCatalogItem.ProductName);
+    catalogItems.Data.Should().Contain(a => a.ServiceName == newCatalogItem.ServiceName);
   }
 
   /*

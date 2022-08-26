@@ -1,12 +1,21 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Domain.Catalog;
 
-public enum ServicePriority
+[JsonConverter(typeof(SmartEnumNameConverter<ServicePriority, string>))]
+public class ServicePriority : SmartEnum<ServicePriority, string>
 {
-  [EnumMember(Value = "normal")] Normal,
-  [EnumMember(Value = "urgent")] Urgent
+  public static readonly ServicePriority Normal = new(nameof(Normal), "normal");
+  public static readonly ServicePriority Urgent = new(nameof(Urgent), "urgent");
+
+  public ServicePriority(string name, string value)
+    : base(name, value)
+  {
+  }
 }
 
 public class ServiceCatalog : AuditableEntity, IAggregateRoot
