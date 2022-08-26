@@ -182,7 +182,7 @@ transfer operation works in two steps
 - cash register manager (what is the permissions)
 - cash register branch 
 - cash register operations (description, debut, credit)
-- customer list with remaining balance
+[x] customer list with remaining balance
 - search customer with balance range
 - list customer orders + print + totals
 - arabic role + permissions

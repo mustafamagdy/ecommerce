@@ -2,15 +2,13 @@ using System.Net;
 using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
-using FSH.WebApi.Application.Catalog.Brands;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Common.Specification;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Application.Operation.Orders;
-using FSH.WebApi.Infrastructure.Middleware;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -613,6 +611,92 @@ public class OperationsTests : TestFixture
     ordersCount.Should().Be(1);
   }
 
+  [Fact]
+  public async Task search_customer_with_balance_range_should_list_those_customers()
+  {
+    var adminHeaders = await CreateTenantAndLogin();
+
+    var newBranch = new CreateBranchRequest
+    {
+      Name = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
+    var branch = branches.First(a => a.Name == newBranch.Name);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branch.Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    var customer1 = await create_customer_and_order(adminHeaders, randomItem.Id);
+    var customer2 = await create_customer_and_order(adminHeaders, randomItem.Id);
+
+    _ = await PostAsJsonAsync("/api/v1/customers/with-balance", new SearchCustomerWithBalanceRequest
+    {
+      Balance = Range<decimal>.With(0, 100)
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var customerWithBalance = await _.Content.ReadFromJsonAsync<PaginationResponse<CustomerWithBalanceDto>>();
+    customerWithBalance.Should().NotBeNull();
+    customerWithBalance.Data.Should().NotBeNullOrEmpty();
+    var customers = customerWithBalance.Data;
+
+    customers.Should().Contain(a => a.Name == customer1.Name);
+    customers.Should().Contain(a => a.Name == customer2.Name);
+  }
+
+  private async Task<BasicCustomerDto> create_customer_and_order(Dictionary<string, string> adminHeaders, Guid orderItemId)
+  {
+    var newCustomer = new CreateSimpleCustomerRequest
+    {
+      Name = Guid.NewGuid().ToString(),
+      PhoneNumber = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
+
+    _ = await PostAsJsonAsync("/api/v1/orders", new CreateOrderRequest()
+    {
+      CustomerId = customer.Id,
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = orderItemId,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    return customer;
+  }
   /*
    * - cash_register
    * ? can_create_only_one_cash_register_per_branch
