@@ -23,6 +23,14 @@ public class CatalogController : VersionedApiController
     return Mediator.Send(request);
   }
 
+  [HttpPost("with-product-and-service")]
+  [MustHavePermission(FSHAction.Create, FSHResource.ServiceCatalog)]
+  [OpenApiOperation("Create a new service catalog item with new product and new service.", "")]
+  public Task<Guid> CreateWithProductAndService(CreateServiceCatalogFromProductAndServiceRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
   [HttpPut("{id:guid}")]
   [MustHavePermission(FSHAction.Update, FSHResource.ServiceCatalog)]
   [OpenApiOperation("Update a service catalog.", "")]

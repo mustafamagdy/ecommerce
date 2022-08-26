@@ -1,5 +1,6 @@
 using Ardalis.SmartEnum;
 using Ardalis.SmartEnum.JsonNet;
+using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Printing.Sections;
 using FSH.WebApi.Domain.Serialization;
 using Newtonsoft.Json;

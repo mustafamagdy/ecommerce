@@ -168,7 +168,7 @@ transfer operation works in two steps
 
 /////// Remaining Tasks ///////
 
-- pay for order
+[x] pay for order
 - cancel order
 - update order (add, remove item(s))
 - save new order prints the receipt with it
@@ -194,6 +194,7 @@ transfer operation works in two steps
 - subscription on branch level? how many branches
 - subscription types (what type of subscriptions? subscription allowed features)
 - subscription invoices + payments
+- subscription payment goes through main cash register also 
 - update tenant info (full page details)
 - subscription support manager 
 - subscription credit note

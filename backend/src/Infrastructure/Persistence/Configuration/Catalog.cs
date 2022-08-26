@@ -45,6 +45,11 @@ public class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<Servi
   {
     base.Configure(builder);
 
+    builder.Property(a => a.Priority)
+      .HasConversion(
+        p => p.Name,
+        p => ServicePriority.FromValue(p));
+
     builder
       .Property(b => b.Price)
       .IsRequired()
