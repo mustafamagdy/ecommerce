@@ -35,6 +35,11 @@ public class OrderConfig : BaseAuditableTenantEntityConfiguration<Order>
       .Property(a => a.OrderNumber)
       .HasMaxLength(64);
 
+    builder.Property(a => a.Status)
+      .HasConversion(
+        p => p.Name,
+        p => OrderStatus.FromValue(p));
+
     builder.HasIndex(a => a.OrderNumber).IsUnique();
 
     var orderItems = builder.Metadata.FindNavigation(nameof(Order.OrderItems));
