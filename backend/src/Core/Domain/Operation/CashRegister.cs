@@ -10,8 +10,9 @@ public class CashRegister : AuditableEntity, IAggregateRoot
   {
   }
 
-  public CashRegister(Guid branchId, string name, string color)
+  public CashRegister(Guid managerId, Guid branchId, string name, string color)
   {
+    ManagerId = managerId;
     BranchId = branchId;
     Name = name;
     Color = color;
@@ -25,6 +26,7 @@ public class CashRegister : AuditableEntity, IAggregateRoot
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
 
+  public Guid ManagerId { get; set; }
   public Guid BranchId { get; set; }
   public Branch Branch { get; private set; }
 

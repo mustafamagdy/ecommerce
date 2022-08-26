@@ -223,6 +223,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Color = table.Column<string>(type: "text", nullable: false),
                     Opened = table.Column<bool>(type: "boolean", nullable: false),
                     Balance = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
+                    ManagerId = table.Column<Guid>(type: "uuid", nullable: false),
                     BranchId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),

@@ -6,6 +6,7 @@ namespace FSH.WebApi.Application.Operation.CashRegisters;
 public class CreateCashRegisterRequest : IRequest<Guid>
 {
   public Guid BranchId { get; set; }
+  public Guid ManagerId { get; set; }
   public string Name { get; set; }
   public string Color { get; set; }
 }
@@ -19,6 +20,9 @@ public class CreateCashRegisterRequestValidator : CustomValidator<CreateCashRegi
 {
   public CreateCashRegisterRequestValidator(IReadRepository<CashRegister> repository, IStringLocalizer<CreateCashRegisterRequestValidator> T)
   {
+    RuleFor(a => a.BranchId).NotNull();
+    RuleFor(a => a.ManagerId).NotNull();
+
     RuleFor(p => p.Name)
       .NotEmpty()
       .MaximumLength(75)
@@ -40,7 +44,7 @@ public class CreateCashRegisterRequestHandler : IRequestHandler<CreateCashRegist
 
   public async Task<Guid> Handle(CreateCashRegisterRequest request, CancellationToken cancellationToken)
   {
-    var cr = new CashRegister(request.BranchId, request.Name, request.Color);
+    var cr = new CashRegister(request.ManagerId, request.BranchId, request.Name, request.Color);
     await _repository.AddAsync(cr, cancellationToken);
     await _uow.CommitAsync(cancellationToken);
 
