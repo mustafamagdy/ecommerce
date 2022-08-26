@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220826103218_App_InitialMigration")]
+    [Migration("20220826105353_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -504,6 +504,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<bool>("CashDefault")
                         .HasColumnType("boolean");
 
+                    b.Property<decimal>("DueAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(1024)
@@ -518,6 +521,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<decimal>("TotalOrders")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -1160,7 +1166,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1297,6 +1303,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("ActiveOperations");
 
                     b.Navigation("ArchivedOperations");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>

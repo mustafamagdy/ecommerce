@@ -177,7 +177,7 @@ transfer operation works in two steps
 - print credit note on save
 - service catalog categories
 - add group with service catalog items
-- add product, service, to form a service catalog item
+[x] add product, service, to form a service catalog item
 - cash register type (cash register, bank account)
 - cash register manager (what is the permissions)
 - cash register branch 

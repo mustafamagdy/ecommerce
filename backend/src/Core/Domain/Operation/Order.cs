@@ -5,17 +5,21 @@ public class Order : AuditableEntity, IAggregateRoot
   private readonly List<OrderItem> _orderItems = new();
   private readonly List<OrderPayment> _orderPayments = new();
 
-  public Order(Guid customerId, string orderNumber, DateTime orderDate)
+  private Order()
   {
-    CustomerId = customerId;
+  }
+
+  public Order(Customer customer, string orderNumber, DateTime orderDate)
+  {
     OrderNumber = orderNumber;
     OrderDate = orderDate;
+    Customer = customer;
   }
 
   public string OrderNumber { get; private set; }
-  public Guid CustomerId { get; private set; }
   public DateTime OrderDate { get; private set; }
   public string QrCodeBase64 { get; private set; }
+  public Guid CustomerId { get; private set; }
   public Customer Customer { get; private set; }
 
   public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
@@ -44,5 +48,9 @@ public class Order : AuditableEntity, IAggregateRoot
     items.ForEach(AddItem);
   }
 
-  public void AddPayment(OrderPayment payment) => _orderPayments.Add(payment);
+  public void AddPayment(OrderPayment payment)
+  {
+    Customer.PayDue(payment.Amount);
+    _orderPayments.Add(payment);
+  }
 }
