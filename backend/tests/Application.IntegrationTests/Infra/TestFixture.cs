@@ -4,6 +4,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -137,14 +138,11 @@ public abstract class TestFixture
   {
     var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
 
-    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, branchId), tenantHeader, cancellationToken);
+    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, SubscriptionType.Standard, branchId), tenantHeader, cancellationToken);
   }
 
   public async Task<Dictionary<string, string>> LoginAs(string username, string password,
-    Dictionary<string, string>? headers,
-    string? tenant,
-    Guid? branchId = null,
-    CancellationToken cancellationToken = default)
+    Dictionary<string, string>? headers, string? tenant, Guid? branchId = null, CancellationToken cancellationToken = default)
   {
     var response = await TryLoginAs(username, password, tenant, branchId, cancellationToken);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -152,7 +150,7 @@ public abstract class TestFixture
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
     _output.WriteLine("Token is " + tokenResult.Token);
 
-    headers = headers == null ? new Dictionary<string, string>() : headers;
+    headers ??= new Dictionary<string, string>();
 
     headers.Add("Authorization", $"Bearer {tokenResult.Token}");
     return headers;

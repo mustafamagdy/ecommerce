@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Infrastructure.Middleware;
+using FSH.WebApi.Shared.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,7 +43,7 @@ public class SubscriptionTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword),
+      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword, SubscriptionType.Standard),
       new Dictionary<string, string> { { "tenant", tenantId } });
 
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -73,7 +74,7 @@ public class SubscriptionTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
+      new TokenRequest(tenant.AdminEmail, "123Pa$$word!", SubscriptionType.Standard),
       new Dictionary<string, string> { { "tenant", tenantId } });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResult = await _.Content.ReadFromJsonAsync<TokenResponse>();

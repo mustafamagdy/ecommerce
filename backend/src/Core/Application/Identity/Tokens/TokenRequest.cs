@@ -1,6 +1,8 @@
+using FSH.WebApi.Shared.Multitenancy;
+
 namespace FSH.WebApi.Application.Identity.Tokens;
 
-public record TokenRequest(string Email, string Password, Guid? BranchId = null);
+public record TokenRequest(string Email, string Password, SubscriptionType SubscriptionType, Guid? BranchId = null);
 
 public class TokenRequestValidator : CustomValidator<TokenRequest>
 {
