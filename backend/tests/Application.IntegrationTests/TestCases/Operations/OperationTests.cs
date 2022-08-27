@@ -24,27 +24,13 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_create_cash_register_for_branch()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    branches.Should().NotBeNullOrEmpty();
-    branches.Should().Contain(a => a.Name == newBranch.Name);
-    var branch = branches.First(a => a.Name == newBranch.Name);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
     var users = await GetUserList(adminHeaders);
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -54,21 +40,9 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task cannot_do_any_operations_on_closed_cash_register()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
-
-    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
@@ -79,7 +53,7 @@ public class OperationsTests : TestFixture
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -130,25 +104,13 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_open_cash_register()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -165,25 +127,13 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_close_cash_register()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -200,21 +150,9 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task any_payment_should_have_record_in_cash_register()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
-
-    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
@@ -224,7 +162,7 @@ public class OperationsTests : TestFixture
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -273,21 +211,9 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_create_order_and_export_its_pdf_invoice()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
-
-    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
@@ -298,7 +224,7 @@ public class OperationsTests : TestFixture
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -369,25 +295,14 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_create_order_and_pay_for_it_later()
   {
-    var adminHeaders = await CreateTenantAndLogin();
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -443,7 +358,7 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task customer_balance_affected_by_order_and_payment()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var newCustomer = new CreateSimpleCustomerRequest
     {
       Name = "customer name",
@@ -452,25 +367,12 @@ public class OperationsTests : TestFixture
     var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
-
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
     var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -550,7 +452,7 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task new_order_to_customer_should_listed_in_customer_orders()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var newCustomer = new CreateSimpleCustomerRequest
     {
       Name = "customer name",
@@ -559,25 +461,12 @@ public class OperationsTests : TestFixture
     var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
-
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
     var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -634,26 +523,14 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task search_customer_with_balance_range_should_list_those_customers()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);
@@ -723,7 +600,7 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task can_create_order_and_cancel_it_should_affect_customer_balance()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var newCustomer = new CreateSimpleCustomerRequest
     {
       Name = "customer name",
@@ -732,25 +609,12 @@ public class OperationsTests : TestFixture
     var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
-
-    var newBranch = new CreateBranchRequest
-    {
-      Name = Guid.NewGuid().ToString()
-    };
-    _ = await PostAsJsonAsync("/api/v1/branch", newBranch, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/branch/search", new SearchBranchRequest(), adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var branches = await _.Content.ReadFromJsonAsync<List<BranchDto>>();
-    var branch = branches.First(a => a.Name == newBranch.Name);
     var users = await GetUserList(adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
     {
       Name = Guid.NewGuid().ToString(),
-      BranchId = branch.Id,
+      BranchId = branchId,
       ManagerId = users.First().Id,
       Color = "red"
     }, adminHeaders);

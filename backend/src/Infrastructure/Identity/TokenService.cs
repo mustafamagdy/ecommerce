@@ -83,7 +83,7 @@ internal class TokenService : ITokenService
       }
     }
 
-    return await GenerateTokensAndUpdateUser(user, ipAddress);
+    return await GenerateTokensAndUpdateUser(user, ipAddress, request.BranchId);
   }
 
   private Task<bool> HasAValidSubscription(string tenantId)
@@ -120,22 +120,26 @@ internal class TokenService : ITokenService
     return await GenerateTokensAndUpdateUser(user, ipAddress);
   }
 
-  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress)
+  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, Guid? branchId = null)
   {
-    string token = GenerateJwt(user, ipAddress);
+    string token = GenerateJwt(user, ipAddress, branchId);
 
     user.RefreshToken = GenerateRefreshToken();
     user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
+    if (branchId != null)
+    {
+      user.LastUsedBranchId = branchId;
+    }
 
     await _userManager.UpdateAsync(user);
 
     return new TokenResponse(token, user.RefreshToken, user.RefreshTokenExpiryTime);
   }
 
-  private string GenerateJwt(ApplicationUser user, string ipAddress) =>
-    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
+  private string GenerateJwt(ApplicationUser user, string ipAddress, Guid? branchId) =>
+    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress, branchId));
 
-  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress, Guid? branchId)
   {
     var claims = new List<Claim>
     {
@@ -146,6 +150,7 @@ internal class TokenService : ITokenService
       new(ClaimTypes.Surname, user.LastName ?? string.Empty),
       new(FSHClaims.IpAddress, ipAddress),
       new(FSHClaims.Tenant, _currentTenant!.Id),
+      new(FSHClaims.Branch, (string.IsNullOrEmpty(user.LastUsedBranchId.ToString()) ? branchId?.ToString() : user.LastUsedBranchId.ToString()) ?? string.Empty),
       new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
     };

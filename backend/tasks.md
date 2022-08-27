@@ -179,7 +179,7 @@ transfer operation works in two steps
 - add group with service catalog items
 [x] add product, service, to form a service catalog item
 - cash register type (cash register, bank account)
-- cash register manager (what is the permissions)
+[x] cash register manager (what is the permissions)
 - cash register branch 
 - cash register operations (description, debut, credit)
 [x] customer list with remaining balance
@@ -200,3 +200,8 @@ transfer operation works in two steps
 - subscription credit note
 - subscription print
 - subscription send invoice by email, notifications 
+
+////////////////////////////////////////////////////////////////
+
+- test refactor with better more organized way
+     

@@ -108,7 +108,7 @@ public class AdministrativeTests : TestFixture
     var roleResult = await _.Content.ReadAsStringAsync();
 
     // login with the user and execute action => should fail
-    var loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
+    var loginHeader = await LoginAs(user.Email, password, null, "root");
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
     var productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     productResult.Should().NotBeNull();
@@ -127,7 +127,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     // login again with the user
-    loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
+    loginHeader = await LoginAs(user.Email, password, null, "root");
     // execute the same action => should succeed
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
     productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
@@ -163,7 +163,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    var loginHeader = await LoginAs(user.Email, password, null, "root", CancellationToken.None);
+    var loginHeader = await LoginAs(user.Email, password, null, "root");
     loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/toggle-status", new ToggleUserStatusRequest
@@ -173,7 +173,7 @@ public class AdministrativeTests : TestFixture
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, password, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, password, "root");
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
 
@@ -201,7 +201,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    var loginHeader = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    var loginHeader = await LoginAs(user.Email, originalPassword, null, "root");
     loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     // reset
@@ -210,11 +210,11 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     // login with old password, should not work
-    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
     // login with new password, should work
-    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, newPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
@@ -233,7 +233,7 @@ public class AdministrativeTests : TestFixture
   [Fact]
   public async Task admin_can_change_his_own_password()
   {
-    var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root", CancellationToken.None);
+    var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var newPassword = RootAdminPassword + "1";
@@ -245,10 +245,10 @@ public class AdministrativeTests : TestFixture
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-    _ = await TryLoginAs(RootAdminEmail, newPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(RootAdminEmail, newPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     // Update new password for subsequent tests
@@ -273,10 +273,10 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var loginHeaders = await LoginAs(user.Email, originalPassword, null, "root", CancellationToken.None);
+    var loginHeaders = await LoginAs(user.Email, originalPassword, null, "root");
 
     var newPassword = originalPassword + "1";
     _ = await PutAsJsonAsync("/api/personal/change-password", new ChangePasswordRequest
@@ -287,10 +287,10 @@ public class AdministrativeTests : TestFixture
     }, loginHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, newPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
@@ -312,7 +312,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
-    _ = await TryLoginAs(user.Email, originalPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, originalPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var mailReceivedTask = new TaskCompletionSource<SmtpMessage>();
@@ -348,7 +348,7 @@ public class AdministrativeTests : TestFixture
     }, headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(user.Email, newPassword, "root", CancellationToken.None);
+    _ = await TryLoginAs(user.Email, newPassword, "root");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

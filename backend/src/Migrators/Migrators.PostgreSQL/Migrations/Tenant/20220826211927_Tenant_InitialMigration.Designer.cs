@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20220826163828_Tenant_InitialMigration")]
+    [Migration("20220826211927_Tenant_InitialMigration")]
     partial class Tenant_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

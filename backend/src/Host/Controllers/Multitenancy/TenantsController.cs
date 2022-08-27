@@ -24,7 +24,7 @@ public class TenantsController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Tenants)]
   [OpenApiOperation("Create a new tenant.", "")]
-  public Task<string> CreateAsync(CreateTenantRequest request)
+  public Task<BasicTenantInfoDto> CreateAsync(CreateTenantRequest request)
   {
     return Mediator.Send(request);
   }

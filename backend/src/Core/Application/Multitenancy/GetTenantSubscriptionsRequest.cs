@@ -25,6 +25,7 @@ public class GetTenantWithActiveSubscriptionsSpec : Specification<FSHTenantInfo>
       .ThenInclude(a => a.Payments)
       .Include(a => a.DemoSubscription)
       .Include(a => a.TrainSubscription)
+      .AsSplitQuery()
       .Where(a => a.Id == tenantId);
 }
 

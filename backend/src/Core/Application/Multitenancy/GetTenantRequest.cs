@@ -26,6 +26,7 @@ public class GetTenantInfoSpec : Specification<FSHTenantInfo, TenantDto>, ISingl
       .ThenInclude(a => a.Payments)
       .Include(a => a.DemoSubscription)
       .Include(a => a.TrainSubscription)
+      .AsSplitQuery()
       .Where(a => a.Id == tenantId);
 }
 

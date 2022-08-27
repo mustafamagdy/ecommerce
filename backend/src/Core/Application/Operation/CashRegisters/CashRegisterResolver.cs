@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using FSH.WebApi.Application.Operation.CurrentBranchs;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Exceptions;
 using FSH.WebApi.Shared.Finance;
@@ -10,10 +11,12 @@ namespace FSH.WebApi.Application.Operation.CashRegisters;
 public class CashRegisterResolver : ICashRegisterResolver
 {
   private readonly IReadRepository<CashRegister> _cashRegisterRepo;
+  private readonly ICurrentBranchResolver _branchResolver;
 
-  public CashRegisterResolver(IReadRepository<CashRegister> cashRegisterRepo)
+  public CashRegisterResolver(IReadRepository<CashRegister> cashRegisterRepo, ICurrentBranchResolver branchResolver)
   {
     _cashRegisterRepo = cashRegisterRepo;
+    _branchResolver = branchResolver;
   }
 
   public async Task<Guid> Resolve(object context)
@@ -40,6 +43,12 @@ public class CashRegisterResolver : ICashRegisterResolver
     if (cashRegister == null)
     {
       throw new NotFoundException("Cash register provided in header is not valid");
+    }
+
+    var currentBranchId = _branchResolver.Resolve(context);
+    if (cashRegister.BranchId != currentBranchId)
+    {
+      throw new ForbiddenException("You are not allowed to use this cash register from this branch");
     }
 
     return cashRegisterId;

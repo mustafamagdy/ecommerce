@@ -6,7 +6,7 @@ public interface ITokenService : ITransientService
 {
   Task<TokenResponse> GetTokenAsync(TokenRequest request, string ipAddress, CancellationToken cancellationToken);
   Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
-  Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress);
+  Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, Guid? branchId = null);
 }
 
 public interface IOverrideTokenService : ITransientService

@@ -113,10 +113,10 @@
         <None Update="Seeders\subscriptions.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Seeders\branch.json">
+        <None Update="Seeders\printables.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Seeders\printables.json">
+        <None Update="Seeders\branch.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
