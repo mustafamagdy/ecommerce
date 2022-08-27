@@ -33,20 +33,21 @@ public class SubscriptionTests : TestFixture
       DatabaseName = $"{tenantId}-db",
     };
 
-    var response = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
 
-    response = await PostAsJsonAsync("/api/tokens",
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
+
+    _ = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword),
       new Dictionary<string, string> { { "tenant", tenantId } });
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenant_admin_token = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    var tenant_admin_token = await _.Content.ReadFromJsonAsync<TokenResponse>();
     tenant_admin_token.Token.Should().NotBeEmpty();
   }
 
@@ -64,33 +65,34 @@ public class SubscriptionTests : TestFixture
       DatabaseName = $"{tenantId}-db",
     };
 
-    var response = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
-    response = await PostAsJsonAsync("/api/tokens",
+    _ = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
       new Dictionary<string, string> { { "tenant", tenantId } });
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tokenResult = await _.Content.ReadFromJsonAsync<TokenResponse>();
 
     HostFixture.SYSTEM_TIME.DaysOffset = 100;
 
-    response = await PostAsJsonAsync("/api/v1/products/search",
+    _ = await PostAsJsonAsync("/api/v1/products/search",
       new SearchProductsRequest(),
       new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
 
-    response.StatusCode.Should().NotBe(HttpStatusCode.OK);
-    response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-    var errorResult = await response.Content.ReadFromJsonAsync<ErrorResult>();
+    _.StatusCode.Should().NotBe(HttpStatusCode.OK);
+    _.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    var errorResult = await _.Content.ReadFromJsonAsync<ErrorResult>();
     errorResult.Exception.Should().Contain("Subscription expired");
 
-    response = await RootAdmin_GetAsync($"/api/tenants/{tenantId}");
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    _ = await RootAdmin_GetAsync($"/api/tenants/{tenantId}");
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantInfo = await response.Content.ReadFromJsonAsync<TenantDto>();
+    var tenantInfo = await _.Content.ReadFromJsonAsync<TenantDto>();
     tenantInfo.Should().NotBeNull();
     tenantInfo.ProdSubscriptionId.Should().NotBeEmpty();
 

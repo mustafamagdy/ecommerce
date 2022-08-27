@@ -2,6 +2,7 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy.EventHandlers;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
 using FSH.WebApi.Shared.Persistence;
 using Mapster;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class CreateTenantRequest : IRequest<string>
+public class CreateTenantRequest : IRequest<BasicTenantInfoDto>
 {
   public string Id { get; set; } = default!;
   public string Name { get; set; } = default!;
@@ -29,25 +30,32 @@ public class CreateTenantRequest : IRequest<string>
   public bool? CreateDemoSubscription { get; set; }
 }
 
-public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, string>
+public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, BasicTenantInfoDto>
 {
   private readonly ITenantUnitOfWork _uow;
+  private readonly IApplicationUnitOfWork _appUow;
   private readonly ITenantConnectionStringBuilder _cnBuilder;
   private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
   private readonly IDatabaseInitializer _dbInitializer;
   private readonly ISystemTime _systemTime;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
+  private readonly IRepository<Branch> _branchRepo;
 
   public CreateTenantRequestHandler(ITenantUnitOfWork uow, ITenantConnectionStringBuilder cnBuilder,
-    IMultiTenantStore<FSHTenantInfo> tenantStore, IDatabaseInitializer dbInitializer, ISystemTime systemTime)
+    IMultiTenantStore<FSHTenantInfo> tenantStore, IDatabaseInitializer dbInitializer, ISystemTime systemTime,
+    IReadNonAggregateRepository<FSHTenantInfo> tenantRepo, IRepository<Branch> branchRepo, IApplicationUnitOfWork appUow)
   {
     _uow = uow;
     _cnBuilder = cnBuilder;
     _tenantStore = tenantStore;
     _dbInitializer = dbInitializer;
     _systemTime = systemTime;
+    _tenantRepo = tenantRepo;
+    _branchRepo = branchRepo;
+    _appUow = appUow;
   }
 
-  public async Task<string> Handle(CreateTenantRequest request, CancellationToken cancellationToken)
+  public async Task<BasicTenantInfoDto> Handle(CreateTenantRequest request, CancellationToken cancellationToken)
   {
     string connectionString = string.IsNullOrWhiteSpace(request.DatabaseName) ? string.Empty : _cnBuilder.BuildConnectionString(request.DatabaseName);
 
@@ -56,6 +64,7 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, s
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
+
     var prodSubscription = await TryCreateProdSubscription(tenant);
 
     bool result = await _uow.CommitAsync(cancellationToken) > 0;
@@ -68,6 +77,8 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, s
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
+
+      await _appUow.CommitAsync(cancellationToken);
     }
     catch
     {
@@ -75,7 +86,8 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, s
       throw;
     }
 
-    return tenant.Id;
+    var tenantDto = await _tenantRepo.FirstOrDefaultAsync(new GetTenantBasicInfoSpec(tenant.Id), cancellationToken);
+    return tenantDto;
   }
 
   private async Task<TenantProdSubscription> TryCreateProdSubscription(FSHTenantInfo tenant)

@@ -1,4 +1,5 @@
 using System.Reflection;
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Structure;
@@ -14,12 +15,14 @@ public class BranchSeeder : ICustomSeeder
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;
   private readonly ILogger<BranchSeeder> _logger;
+  private readonly ITenantInfo _currentTenant;
 
-  public BranchSeeder(ISerializerService serializerService, ILogger<BranchSeeder> logger, ApplicationDbContext db)
+  public BranchSeeder(ISerializerService serializerService, ILogger<BranchSeeder> logger, ApplicationDbContext db, ITenantInfo currentTenant)
   {
     _serializerService = serializerService;
     _logger = logger;
     _db = db;
+    _currentTenant = currentTenant;
   }
 
   public string Order => "01.01";
@@ -37,6 +40,7 @@ public class BranchSeeder : ICustomSeeder
       foreach (var item in items)
       {
         item.Id = Guid.NewGuid();
+        item.TenantId = _currentTenant.Id;
         await _db.Branches.AddAsync(item, cancellationToken);
       }
 

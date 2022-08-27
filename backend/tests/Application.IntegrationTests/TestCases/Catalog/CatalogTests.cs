@@ -25,7 +25,7 @@ public class CatalogTests : TestFixture
   [Fact]
   public async Task can_create_brand_when_submit_valid_data_and_has_permission()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var _ = await PostAsJsonAsync("/api/v1/brands/search", new SearchBrandsRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -77,7 +77,7 @@ public class CatalogTests : TestFixture
   [Fact]
   public async Task can_create_service_catalog_with_new_product_and_service()
   {
-    var adminHeaders = await CreateTenantAndLogin();
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 

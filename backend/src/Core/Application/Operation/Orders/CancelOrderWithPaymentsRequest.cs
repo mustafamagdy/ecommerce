@@ -33,6 +33,7 @@ public class CancelOrderWithPaymentsRequestHandler : IRequestHandler<CancelOrder
                   .Include(a => a.OrderPayments)
                   .Include(a => a.OrderItems)
                   .Include(a => a.Customer)
+                  .AsSplitQuery()
                   .Where(a => a.Id == request.Id).Specification, cancellationToken)
                 ?? throw new NotFoundException($"Order {request.Id} not found");
 

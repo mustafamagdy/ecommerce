@@ -190,6 +190,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastUsedBranchId = table.Column<Guid>(type: "uuid", nullable: true),
                     ObjectId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     MustChangePassword = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),

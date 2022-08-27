@@ -48,6 +48,7 @@ internal static class Startup
         }
 
         dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+
         dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddApplicationUnitOfWork()

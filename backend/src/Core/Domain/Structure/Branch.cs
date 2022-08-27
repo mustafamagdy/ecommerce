@@ -22,7 +22,7 @@ public class Branch : AuditableEntity, IAggregateRoot
   public string Name { get; private set; }
   public string? Description { get; private set; }
 
-  public string TenantId { get; private set; }
+  public string TenantId { get;  set; }
   public FSHTenantInfo Tenant { get; private set; }
 
   public IReadOnlyCollection<CashRegister> CashRegisters => _cashRegisters.AsReadOnly();

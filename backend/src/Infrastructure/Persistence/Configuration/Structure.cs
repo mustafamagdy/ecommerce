@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class BranchConfig : BaseAuditableTenantEntityConfiguration<Branch>
+public class BranchConfig : BaseAuditableEntityConfiguration<Branch>
 {
   public override void Configure(EntityTypeBuilder<Branch> builder)
   {

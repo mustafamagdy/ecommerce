@@ -374,6 +374,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("LastUsedBranchId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 

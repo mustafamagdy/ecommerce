@@ -32,8 +32,9 @@ public class TenantManagementTests : TestFixture
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var responseTenantId = await _.Content.ReadAsStringAsync();
-    responseTenantId.Should().Be(tenantId);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
   }
 
   [Fact]
@@ -51,8 +52,9 @@ public class TenantManagementTests : TestFixture
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var responseTenantId = await _.Content.ReadAsStringAsync();
-    responseTenantId.Should().Be(tenantId);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
     _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -76,13 +78,13 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/deactivate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
 
@@ -104,19 +106,19 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/deactivate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/activate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
@@ -138,7 +140,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -167,7 +169,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -197,7 +199,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -239,7 +241,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -310,12 +312,13 @@ public class TenantManagementTests : TestFixture
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var responseTenantId = await _.Content.ReadAsStringAsync();
-    responseTenantId.Should().Be(tenantId);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
     _ = await RootAdmin_PostAsJsonAsync("/api/support/remote-admin-login", new RemoteAdminLoginRequest
     {
-      TenantId = responseTenantId,
+      TenantId = tenantResponse.Id,
       UserName = username
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -348,17 +351,18 @@ public class TenantManagementTests : TestFixture
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var responseTenantId = await _.Content.ReadAsStringAsync();
-    responseTenantId.Should().Be(tenantId);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
     _ = await RootAdmin_PostAsJsonAsync("/api/support/reset-other-user-password",
-      new ResetRemoteUserPasswordRequest(responseTenantId, username));
+      new ResetRemoteUserPasswordRequest(tenantResponse.Id, username));
 
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var newPassword = await _.Content.ReadAsStringAsync();
     newPassword.Should().NotBeNull();
 
-    _ = await TryLoginAs(adminEmail, newPassword, tenantId, CancellationToken.None);
+    _ = await TryLoginAs(adminEmail, newPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

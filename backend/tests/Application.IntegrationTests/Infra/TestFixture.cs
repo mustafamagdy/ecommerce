@@ -91,7 +91,7 @@ public abstract class TestFixture
     return await GetAsync(requestUri, headers, cancellationToken);
   }
 
-  protected async Task<Dictionary<string, string>> CreateTenantAndLogin()
+  protected async Task<(Dictionary<string, string> Headers, Guid BranchId)> CreateTenantAndLogin()
   {
     var tenantId = Guid.NewGuid().ToString();
     string adminEmail = $"admin@{tenantId}.com";
@@ -107,10 +107,21 @@ public abstract class TestFixture
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, CancellationToken.None);
+    var tenantResult = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
-    return tenantAdminLoginHeaders;
+
+    _ = await GetAsync("/api/v1/my/", tenantAdminLoginHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantInfo.Should().NotBeNull();
+    tenantInfo.Branches.Should().NotBeEmpty();
+    var defaultBranch = tenantInfo.Branches.First();
+
+    tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, defaultBranch.Id);
+    tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
+
+    return (tenantAdminLoginHeaders, defaultBranch.Id);
   }
 
   protected async Task<List<BasicUserDataDto>> GetUserList(Dictionary<string, string> headers)
@@ -120,15 +131,22 @@ public abstract class TestFixture
     return await _.Content.ReadFromJsonAsync<List<BasicUserDataDto>>();
   }
 
-  public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant, CancellationToken cancellationToken)
+  public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant,
+    Guid? branchId = null,
+    CancellationToken cancellationToken = default)
   {
     var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
-    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password), tenantHeader, cancellationToken);
+
+    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, branchId), tenantHeader, cancellationToken);
   }
 
-  public async Task<Dictionary<string, string>> LoginAs(string username, string password, Dictionary<string, string>? headers, string? tenant, CancellationToken cancellationToken)
+  public async Task<Dictionary<string, string>> LoginAs(string username, string password,
+    Dictionary<string, string>? headers,
+    string? tenant,
+    Guid? branchId = null,
+    CancellationToken cancellationToken = default)
   {
-    var response = await TryLoginAs(username, password, tenant, cancellationToken);
+    var response = await TryLoginAs(username, password, tenant, branchId, cancellationToken);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
@@ -142,6 +160,6 @@ public abstract class TestFixture
 
   private Task<Dictionary<string, string>> LoginAsRootAdmin(Dictionary<string, string> headers, CancellationToken cancellationToken)
   {
-    return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", cancellationToken);
+    return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", null, cancellationToken);
   }
 }
