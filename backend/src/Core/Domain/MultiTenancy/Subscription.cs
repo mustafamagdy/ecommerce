@@ -1,13 +1,22 @@
 using Ardalis.SmartEnum.JsonNet;
+using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Shared.Multitenancy;
 using Newtonsoft.Json;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
+// public class SubscriptionFeature : BaseEntity
+// {
+//   public SubscriptionFeatureType Feature { get; set; }
+//   public string Value { get; set; }
+// }
+
 public abstract class Subscription : BaseEntity
 {
   public int Days { get; set; }
   public decimal Price { get; set; }
+
+  // public List<SubscriptionFeature> Features { get; set; }
 }
 
 public class StandardSubscription : Subscription

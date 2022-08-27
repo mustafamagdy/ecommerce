@@ -1,6 +1,4 @@
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
