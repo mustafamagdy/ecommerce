@@ -25,7 +25,7 @@ public class SystemSupportService : ISystemSupportService
     _repo = repo;
   }
 
-  public async Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, CancellationToken cancellationToken)
+  public async Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, SubscriptionType subscription, CancellationToken cancellationToken)
   {
     if (tenantId == MultitenancyConstants.RootTenant.Id)
     {
@@ -46,10 +46,11 @@ public class SystemSupportService : ISystemSupportService
                 ?? throw new NotFoundException($"User {username} not found");
     var tokenService = sp.GetRequiredService<ITokenService>();
 
-    return await tokenService.GenerateTokensAndUpdateUser(admin, "ROOT_ADMIN_REMOTE_SUPPORT");
+    return await tokenService.GenerateTokensAndUpdateUser(admin, "ROOT_ADMIN_REMOTE_SUPPORT", subscription);
   }
 
-  public async Task<string> ResetRemoteUserPassword(string tenantId, string username, string? newPassword, CancellationToken cancellationToken)
+  public async Task<string> ResetRemoteUserPassword(string tenantId, string username, string? newPassword,
+    SubscriptionType subscription, CancellationToken cancellationToken)
   {
     if (tenantId == MultitenancyConstants.RootTenant.Id)
     {
