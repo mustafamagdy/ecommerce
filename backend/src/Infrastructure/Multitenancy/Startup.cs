@@ -45,7 +45,7 @@ internal static class Startup
       .Services
       .AddScoped<ITenantService, TenantService>()
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
-      .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
+      .AddSingleton<ISubscriptionResolver, SubscriptionResolver>();
   }
 
   private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)

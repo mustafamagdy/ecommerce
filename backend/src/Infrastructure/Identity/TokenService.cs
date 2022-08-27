@@ -83,7 +83,7 @@ internal class TokenService : ITokenService
       }
     }
 
-    return await GenerateTokensAndUpdateUser(user, ipAddress, request.BranchId);
+    return await GenerateTokensAndUpdateUser(user, ipAddress, request.SubscriptionType, request.BranchId);
   }
 
   private Task<bool> HasAValidSubscription(string tenantId)
@@ -117,12 +117,12 @@ internal class TokenService : ITokenService
       throw new UnauthorizedException(_t["Invalid Refresh Token."]);
     }
 
-    return await GenerateTokensAndUpdateUser(user, ipAddress);
+    return await GenerateTokensAndUpdateUser(user, ipAddress, request.Subscription);
   }
 
-  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, Guid? branchId = null)
+  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, SubscriptionType subscription, Guid? branchId = null)
   {
-    string token = GenerateJwt(user, ipAddress, branchId);
+    string token = GenerateJwt(user, ipAddress, subscription, branchId);
 
     user.RefreshToken = GenerateRefreshToken();
     user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
@@ -136,10 +136,10 @@ internal class TokenService : ITokenService
     return new TokenResponse(token, user.RefreshToken, user.RefreshTokenExpiryTime);
   }
 
-  private string GenerateJwt(ApplicationUser user, string ipAddress, Guid? branchId) =>
-    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress, branchId));
+  private string GenerateJwt(ApplicationUser user, string ipAddress, SubscriptionType subscription, Guid? branchId) =>
+    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress, subscription, branchId));
 
-  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress, Guid? branchId)
+  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress, SubscriptionType subscription, Guid? branchId)
   {
     var claims = new List<Claim>
     {
@@ -150,6 +150,7 @@ internal class TokenService : ITokenService
       new(ClaimTypes.Surname, user.LastName ?? string.Empty),
       new(FSHClaims.IpAddress, ipAddress),
       new(FSHClaims.Tenant, _currentTenant!.Id),
+      new(FSHClaims.Subscription, subscription),
       new(FSHClaims.Branch, (string.IsNullOrEmpty(user.LastUsedBranchId.ToString()) ? branchId?.ToString() : user.LastUsedBranchId.ToString()) ?? string.Empty),
       new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)

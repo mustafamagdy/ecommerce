@@ -5,6 +5,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -319,7 +320,8 @@ public class TenantManagementTests : TestFixture
     _ = await RootAdmin_PostAsJsonAsync("/api/support/remote-admin-login", new RemoteAdminLoginRequest
     {
       TenantId = tenantResponse.Id,
-      UserName = username
+      UserName = username,
+      Subscription = SubscriptionType.Standard
     });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResponse = await _.Content.ReadFromJsonAsync<TokenResponse>();
@@ -356,7 +358,7 @@ public class TenantManagementTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await RootAdmin_PostAsJsonAsync("/api/support/reset-other-user-password",
-      new ResetRemoteUserPasswordRequest(tenantResponse.Id, username));
+      new ResetRemoteUserPasswordRequest(tenantResponse.Id, username, SubscriptionType.Standard));
 
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var newPassword = await _.Content.ReadAsStringAsync();

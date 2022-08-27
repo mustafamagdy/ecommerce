@@ -12,4 +12,5 @@ public static class FSHClaims
     public const string MOT_Permission = "mot_permission";
     public const string MOT_Scope = "mot_scope";
     public const string MustChangePassword = "must-change-password";
+    public const string Subscription = "subscription";
 }
