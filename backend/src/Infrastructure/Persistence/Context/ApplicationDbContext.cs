@@ -61,15 +61,16 @@ public class ApplicationDbContext : BaseDbContext
   private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
   {
     modelBuilder.Ignore<FSHTenantInfo>();
-    modelBuilder.Ignore<Subscription>();
+    // modelBuilder.Ignore<Subscription>();
     modelBuilder.Ignore<TenantSubscription>();
     modelBuilder.Ignore<TenantProdSubscription>();
     modelBuilder.Ignore<TenantDemoSubscription>();
     modelBuilder.Ignore<TenantTrainSubscription>();
-    modelBuilder.Ignore<StandardSubscription>();
-    modelBuilder.Ignore<Subscription>();
-    modelBuilder.Ignore<DemoSubscription>();
-    modelBuilder.Ignore<TrainSubscription>();
+    // modelBuilder.Ignore<StandardSubscription>();
+    // modelBuilder.Ignore<DemoSubscription>();
+    // modelBuilder.Ignore<TrainSubscription>();
+    modelBuilder.Ignore<SubscriptionFeature>();
+    modelBuilder.Ignore<SubscriptionPackage>();
     modelBuilder.Ignore<SubscriptionPayment>();
     modelBuilder.Ignore<SubscriptionHistory>();
   }

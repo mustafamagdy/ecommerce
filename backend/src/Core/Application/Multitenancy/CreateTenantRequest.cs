@@ -13,12 +13,12 @@ namespace FSH.WebApi.Application.Multitenancy;
 
 public class CreateTenantRequest : IRequest<BasicTenantInfoDto>
 {
-  public string Id { get; set; } = default!;
-  public string Name { get; set; } = default!;
-  public string? DatabaseName { get; set; }
-  public string AdminEmail { get; set; } = default!;
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public string AdminEmail { get; set; }
+  public Guid? ProdPackageId { get; set; }
+  public Guid? DemoPackageId { get; set; }
   public string? Issuer { get; set; }
-
   public string? PhoneNumber { get; set; }
   public string? VatNo { get; set; }
   public string? Email { get; set; }
@@ -26,8 +26,6 @@ public class CreateTenantRequest : IRequest<BasicTenantInfoDto>
   public string? AdminName { get; set; }
   public string? AdminPhoneNumber { get; set; }
   public string? TechSupportUserId { get; set; }
-
-  public bool? CreateDemoSubscription { get; set; }
 }
 
 public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, BasicTenantInfoDto>
@@ -57,10 +55,18 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
 
   public async Task<BasicTenantInfoDto> Handle(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    string connectionString = string.IsNullOrWhiteSpace(request.DatabaseName) ? string.Empty : _cnBuilder.BuildConnectionString(request.DatabaseName);
+    string prodConnectionString = string.Empty;
+    string trainConnectionString = string.Empty;
+    if (request.ProdPackageId != null)
+    {
+      prodConnectionString = _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Standard);
+      trainConnectionString = _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Train);
+    }
 
-    var tenant = new FSHTenantInfo(request.Id, request.Name, connectionString, request.AdminEmail,
-      request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
+    string demoConnectionString = request.DemoPackageId != null ? _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Demo) : string.Empty;
+
+    var tenant = new FSHTenantInfo(request.Id, request.Name, prodConnectionString, demoConnectionString, trainConnectionString,
+      request.AdminEmail, request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
@@ -92,7 +98,8 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
 
   private async Task<TenantProdSubscription> TryCreateProdSubscription(FSHTenantInfo tenant)
   {
-    var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
+    // var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
+    var prodSubscription = await GetDefaultMonthlyPackage();
 
     var today = _systemTime.Now;
     var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant);
@@ -104,18 +111,22 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
     return tenant.ProdSubscription;
   }
 
-  public async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
-    where T : Subscription
-  {
-    return subscriptionType.Name switch
-    {
-      nameof(SubscriptionType.Standard) => await _uow.Set<StandardSubscription>().FirstOrDefaultAsync() as T
-                                           ?? throw new NotFoundException("No standard subscription found"),
-      nameof(SubscriptionType.Demo) => await _uow.Set<DemoSubscription>().FirstOrDefaultAsync() as T
-                                       ?? throw new NotFoundException("No demo subscription found"),
-      nameof(SubscriptionType.Train) => await _uow.Set<TrainSubscription>().FirstOrDefaultAsync() as T
-                                        ?? throw new NotFoundException("No train subscription found"),
-      _ => throw new ArgumentOutOfRangeException()
-    };
-  }
+  private Task<SubscriptionPackage?> GetDefaultMonthlyPackage() =>
+    _uow.Set<SubscriptionPackage>().FirstOrDefaultAsync(a => a.Default)
+    ?? throw new InvalidOperationException("No default subscription package configured");
+
+  // public async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
+  //   where T : Subscription
+  // {
+  //   return subscriptionType.Name switch
+  //   {
+  //     nameof(SubscriptionType.Standard) => await _uow.Set<StandardSubscription>().FirstOrDefaultAsync() as T
+  //                                          ?? throw new NotFoundException("No standard subscription found"),
+  //     nameof(SubscriptionType.Demo) => await _uow.Set<DemoSubscription>().FirstOrDefaultAsync() as T
+  //                                      ?? throw new NotFoundException("No demo subscription found"),
+  //     nameof(SubscriptionType.Train) => await _uow.Set<TrainSubscription>().FirstOrDefaultAsync() as T
+  //                                       ?? throw new NotFoundException("No train subscription found"),
+  //     _ => throw new ArgumentOutOfRangeException()
+  //   };
+  // }
 }

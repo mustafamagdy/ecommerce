@@ -21,14 +21,16 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity
   {
   }
 
-  public FSHTenantInfo(string id, string name, string? connectionString, string adminEmail, string? phoneNumber,
-    string? vatNo, string? email, string? address, string? adminName, string? adminPhoneNumber,
-    string? techSupportUserId, string? issuer = null)
+  public FSHTenantInfo(string id, string name, string? connectionString, string? demoConnectionString, string? trainConnectionString,
+    string adminEmail, string? phoneNumber, string? vatNo, string? email, string? address, string? adminName,
+    string? adminPhoneNumber, string? techSupportUserId, string? issuer = null)
   {
     Id = id;
     Identifier = id;
     Name = name;
     ConnectionString = connectionString ?? string.Empty;
+    DemoConnectionString = demoConnectionString ?? string.Empty;
+    TrainConnectionString = trainConnectionString ?? string.Empty;
     AdminEmail = adminEmail;
     PhoneNumber = phoneNumber;
     VatNo = vatNo;
@@ -118,7 +120,6 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity
   string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
 
   string? ITenantInfo.Name { get => Name; set => Name = value ?? throw new InvalidOperationException("Name can't be null."); }
-
 
   [NotMapped]
   public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();

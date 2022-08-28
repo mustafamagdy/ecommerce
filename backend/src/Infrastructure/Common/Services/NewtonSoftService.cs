@@ -27,7 +27,7 @@ public class NewtonSoftService : ISerializerService
       Converters = new List<JsonConverter>
       {
         new StringEnumConverter() { CamelCaseText = true },
-        new SubscriptionConverterWithSubscriptionType()
+        // new SubscriptionConverterWithSubscriptionType()
       }
     });
   }

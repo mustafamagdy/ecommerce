@@ -164,7 +164,7 @@ public class AdministrativeTests : TestFixture
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
     var loginHeader = await LoginAs(user.Email, password, null, "root");
-    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+    loginHeader.Should().NotBeNull().And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/toggle-status", new ToggleUserStatusRequest
     {
@@ -202,7 +202,7 @@ public class AdministrativeTests : TestFixture
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
     var loginHeader = await LoginAs(user.Email, originalPassword, null, "root");
-    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+    loginHeader.Should().NotBeNull().And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     // reset
     var newPassword = "NEW@p@ssword";

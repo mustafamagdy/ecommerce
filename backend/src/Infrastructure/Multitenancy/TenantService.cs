@@ -29,19 +29,4 @@ internal class TenantService : ITenantService
 
   public async Task<bool> ExistsWithNameAsync(string name) =>
     (await _tenantStore.GetAllAsync()).Any(t => t.Name == name);
-
-  public async Task<bool> DatabaseExistAsync(string databaseName)
-  {
-    return (await _tenantStore.GetAllAsync()).Any(t =>
-    {
-      if (string.IsNullOrEmpty(t.ConnectionString)) return false;
-      var cnBuilder = new DbConnectionStringBuilder
-      {
-        ConnectionString = t.ConnectionString
-      };
-
-      var newDbName = $"{_env.GetShortenName()}-{databaseName}";
-      return cnBuilder.TryGetValue("initial catalog", out var dbName) && newDbName.Equals(dbName);
-    });
-  }
 }

@@ -5,6 +5,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
@@ -25,10 +26,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = $"admin@{tenantId}.com",
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -45,10 +46,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = $"admin@{tenantId}.com",
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -70,10 +71,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -98,10 +99,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -132,10 +133,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -161,10 +162,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -191,10 +192,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -233,10 +234,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -305,10 +306,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -330,6 +331,8 @@ public class TenantManagementTests : TestFixture
     // do admin stuff
     var headers = new Dictionary<string, string> { { "tenant", tenantId } };
     headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
+    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
+
     _ = await GetAsync("api/users", headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
@@ -345,10 +348,10 @@ public class TenantManagementTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -367,4 +370,6 @@ public class TenantManagementTests : TestFixture
     _ = await TryLoginAs(adminEmail, newPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
+
+
 }

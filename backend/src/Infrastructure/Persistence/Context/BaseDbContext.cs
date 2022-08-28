@@ -76,7 +76,7 @@ public abstract class BaseDbContext
     string connectionString = string.Empty;
     if (_currentTenant != null && _currentSubscriptionType != null)
     {
-      var subscriptionType = _currentSubscriptionType.Resolve();
+      var subscriptionType = _currentSubscriptionType.Resolve(_currentTenant.Id);
       var tenantId = _currentTenant.Id;
 
       connectionString = _tenantConnectionStringResolver.Resolve(tenantId, subscriptionType);

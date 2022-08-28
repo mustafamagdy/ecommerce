@@ -1,10 +1,19 @@
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.MultiTenancy;
 using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
 public class TenantsController : VersionNeutralApiController
 {
+  [HttpGet("packages")]
+  [AllowAnonymous]
+  [OpenApiOperation("Get list of subscription packages.", "")]
+  public Task<List<SubscriptionPackageDto>> GetSubscriptionPackages()
+  {
+    return Mediator.Send(new GetSubscriptionPackagesRequest());
+  }
+
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
   [OpenApiOperation("Search all tenants.", "")]

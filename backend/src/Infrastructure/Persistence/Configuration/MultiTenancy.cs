@@ -3,10 +3,41 @@ using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
+//
+// public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultIdType>
+// {
+//   public override void Configure(EntityTypeBuilder<Subscription> builder)
+//   {
+//     base.Configure(builder);
+//
+//     builder
+//       .Property(b => b.Price)
+//       .HasPrecision(7, 3);
+//
+//     builder
+//       .HasDiscriminator<string>("subscription_type")
+//       .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
+//       .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
+//       .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
+//   }
+// }
 
-public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultIdType>
+public class SubscriptionFeatureConfig : BaseEntityConfiguration<SubscriptionFeature, DefaultIdType>
 {
-  public override void Configure(EntityTypeBuilder<Subscription> builder)
+  public override void Configure(EntityTypeBuilder<SubscriptionFeature> builder)
+  {
+    base.Configure(builder);
+
+    builder.Property(a => a.Feature)
+      .HasConversion(
+        p => p.Name,
+        p => SubscriptionFeatureType.FromValue(p));
+  }
+}
+
+public class SubscriptionPackageConfig : BaseEntityConfiguration<SubscriptionPackage, DefaultIdType>
+{
+  public override void Configure(EntityTypeBuilder<SubscriptionPackage> builder)
   {
     base.Configure(builder);
 
@@ -14,11 +45,13 @@ public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultI
       .Property(b => b.Price)
       .HasPrecision(7, 3);
 
-    builder
-      .HasDiscriminator<string>("subscription_type")
-      .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
-      .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
-      .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
+    builder.HasMany(a => a.Features).WithOne(a => a.Package).HasForeignKey(a => a.PackageId);
+
+    // builder
+    //   .HasDiscriminator<string>("subscription_type")
+    //   .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
+    //   .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
+    //   .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
   }
 }
 

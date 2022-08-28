@@ -13,7 +13,7 @@ namespace Application.IntegrationTests.Infra;
 
 [Collection(nameof(TestConstants.WebHostTests))]
 // public abstract class TestFixture : IClassFixture<HostFixture>
-public abstract class TestFixture
+public abstract class TestFixture : IAsyncLifetime
 {
   private readonly HostFixture _host;
   private readonly HttpClient _client;
@@ -103,7 +103,7 @@ public abstract class TestFixture
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
+      ProdPackageId = _packages.First().Id
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -137,8 +137,8 @@ public abstract class TestFixture
     CancellationToken cancellationToken = default)
   {
     var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
-
-    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, SubscriptionType.Standard, branchId), tenantHeader, cancellationToken);
+    tenantHeader.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
+    return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, branchId), tenantHeader, cancellationToken);
   }
 
   public async Task<Dictionary<string, string>> LoginAs(string username, string password,
@@ -153,11 +153,27 @@ public abstract class TestFixture
     headers ??= new Dictionary<string, string>();
 
     headers.Add("Authorization", $"Bearer {tokenResult.Token}");
+    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
+
     return headers;
   }
 
   private Task<Dictionary<string, string>> LoginAsRootAdmin(Dictionary<string, string> headers, CancellationToken cancellationToken)
   {
     return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", null, cancellationToken);
+  }
+
+  protected List<SubscriptionPackageDto>? _packages;
+
+  public async Task InitializeAsync()
+  {
+    var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();
+  }
+
+  public Task DisposeAsync()
+  {
+    return Task.CompletedTask;
   }
 }

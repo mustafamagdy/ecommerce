@@ -46,7 +46,7 @@ public class SystemSupportService : ISystemSupportService
                 ?? throw new NotFoundException($"User {username} not found");
     var tokenService = sp.GetRequiredService<ITokenService>();
 
-    return await tokenService.GenerateTokensAndUpdateUser(admin, "ROOT_ADMIN_REMOTE_SUPPORT", subscription);
+    return await tokenService.GenerateTokensAndUpdateUser(admin, "ROOT_ADMIN_REMOTE_SUPPORT");
   }
 
   public async Task<string> ResetRemoteUserPassword(string tenantId, string username, string? newPassword,
