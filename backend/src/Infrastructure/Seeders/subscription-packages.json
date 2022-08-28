@@ -1,0 +1,19 @@
+[
+  {
+    "Default": true,
+    "Id": "56325915-a650-46fb-ab10-6f7a03030823",
+    "Name": "Monthly - شهري",
+    "ValidForDays": 30,
+    "Price": 99.0,
+    "Features": [
+      {
+        "Feature": "NoOfUsers",
+        "Value": 2
+      },
+      {
+        "Feature": "OrdersPerMonth",
+        "Value": 5
+      }
+    ]
+  }
+]

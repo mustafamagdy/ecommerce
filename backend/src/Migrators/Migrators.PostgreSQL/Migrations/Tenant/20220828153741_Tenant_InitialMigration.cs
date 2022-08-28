@@ -26,17 +26,37 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subscription",
+                name: "SubscriptionPackage",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Days = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
-                    subscription_type = table.Column<string>(type: "text", nullable: false)
+                    Default = table.Column<bool>(type: "boolean", nullable: false),
+                    ValidForDays = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subscription", x => x.Id);
+                    table.PrimaryKey("PK_SubscriptionPackage", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubscriptionFeatures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Feature = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    PackageId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionFeatures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubscriptionFeatures_SubscriptionPackage_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "SubscriptionPackage",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -45,7 +65,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    SubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CurrentPackageId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "text", nullable: false),
                     tenant_subscription_type = table.Column<string>(type: "text", nullable: false)
                 },
@@ -53,9 +73,9 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 {
                     table.PrimaryKey("PK_TenantSubscription", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TenantSubscription_Subscription_SubscriptionId",
-                        column: x => x.SubscriptionId,
-                        principalTable: "Subscription",
+                        name: "FK_TenantSubscription_SubscriptionPackage_CurrentPackageId",
+                        column: x => x.CurrentPackageId,
+                        principalTable: "SubscriptionPackage",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -68,6 +88,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     Price = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PackageId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantSubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -79,6 +100,12 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubscriptionHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubscriptionHistories_SubscriptionPackage_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "SubscriptionPackage",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SubscriptionHistories_TenantSubscription_TenantSubscription~",
                         column: x => x.TenantSubscriptionId,
@@ -165,6 +192,16 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionFeatures_PackageId",
+                table: "SubscriptionFeatures",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionHistories_PackageId",
+                table: "SubscriptionHistories",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubscriptionHistories_TenantSubscriptionId",
                 table: "SubscriptionHistories",
                 column: "TenantSubscriptionId");
@@ -208,13 +245,16 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TenantSubscription_SubscriptionId",
+                name: "IX_TenantSubscription_CurrentPackageId",
                 table: "TenantSubscription",
-                column: "SubscriptionId");
+                column: "CurrentPackageId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "SubscriptionFeatures");
+
             migrationBuilder.DropTable(
                 name: "SubscriptionHistories");
 
@@ -232,7 +272,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                 name: "TenantSubscription");
 
             migrationBuilder.DropTable(
-                name: "Subscription");
+                name: "SubscriptionPackage");
         }
     }
 }

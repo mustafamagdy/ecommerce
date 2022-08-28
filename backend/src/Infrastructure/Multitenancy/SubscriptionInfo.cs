@@ -1,4 +1,5 @@
 ﻿using Finbuckle.MultiTenant;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Exceptions;
 using FSH.WebApi.Shared.Multitenancy;
@@ -6,25 +7,23 @@ using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public interface ISubscriptionResolver
+public interface ISubscriptionResolver : ITransientService
 {
-  public SubscriptionType Resolve();
+  public SubscriptionType Resolve(string tenantId);
 }
 
 public class SubscriptionResolver : ISubscriptionResolver
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
-  private readonly ITenantInfo _currentTenant;
 
-  public SubscriptionResolver(IHttpContextAccessor httpContextAccessor, ITenantInfo currentTenant)
+  public SubscriptionResolver(IHttpContextAccessor httpContextAccessor)
   {
     _httpContextAccessor = httpContextAccessor;
-    _currentTenant = currentTenant;
   }
 
-  public SubscriptionType Resolve()
+  public SubscriptionType Resolve(string tenantId)
   {
-    if (_currentTenant.Id == MultitenancyConstants.Root.Id)
+    if (tenantId == MultitenancyConstants.Root.Id)
     {
       return SubscriptionType.Standard;
     }
@@ -35,17 +34,12 @@ public class SubscriptionResolver : ISubscriptionResolver
       throw new ArgumentException("Tenant subscription cannot be resolved");
     }
 
-    var claimValue = context.User?.Claims.FirstOrDefault(c => c.Type == FSHClaims.Subscription);
-    if (claimValue == null)
+    var headerValue = context.Request.Headers.FirstOrDefault(a => a.Key == MultitenancyConstants.SubscriptionTypeHeaderName);
+    if (headerValue.Value.Count > 0 && SubscriptionType.TryFromValue(headerValue.Value[0], out var subscriptionType))
     {
-      throw new MissingHeaderException("Tenant subscription not found in user claims");
+      return subscriptionType;
     }
 
-    if (!SubscriptionType.TryFromValue(claimValue.Value, out var subscriptionType))
-    {
-      throw new MissingHeaderException("Tenant subscription not found in user claims");
-    }
-
-    return subscriptionType;
+    throw new MissingHeaderException("Tenant subscription type not found in request header");
   }
 }

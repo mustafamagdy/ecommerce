@@ -6,8 +6,8 @@ public sealed class TenantDemoSubscription : TenantSubscription
   {
   }
 
-  public TenantDemoSubscription(DemoSubscription subscription, FSHTenantInfo tenant)
-    : base(subscription, tenant)
+  public TenantDemoSubscription(SubscriptionPackage currentPackage, FSHTenantInfo tenant)
+    : base(currentPackage, tenant)
   {
   }
 }
@@ -18,8 +18,8 @@ public sealed class TenantTrainSubscription : TenantSubscription
   {
   }
 
-  public TenantTrainSubscription(TrainSubscription subscription, FSHTenantInfo tenant)
-    : base(subscription, tenant)
+  public TenantTrainSubscription(SubscriptionPackage currentPackage, FSHTenantInfo tenant)
+    : base(currentPackage, tenant)
   {
   }
 }
@@ -32,8 +32,8 @@ public sealed class TenantProdSubscription : TenantSubscription
   {
   }
 
-  public TenantProdSubscription(StandardSubscription subscription, FSHTenantInfo tenant)
-    : base(subscription, tenant)
+  public TenantProdSubscription(SubscriptionPackage currentPackage, FSHTenantInfo tenant)
+    : base(currentPackage, tenant)
   {
   }
 
@@ -58,28 +58,28 @@ public abstract class TenantSubscription : BaseEntity
   {
   }
 
-  protected TenantSubscription(Subscription subscription, FSHTenantInfo tenant)
+  protected TenantSubscription(SubscriptionPackage currentPackage, FSHTenantInfo tenant)
   {
-    Subscription = subscription;
+    CurrentPackage = currentPackage;
     Tenant = tenant;
-    SubscriptionId = subscription.Id;
+    CurrentPackageId = currentPackage.Id;
     TenantId = tenant.Id;
   }
 
   public DateTime ExpiryDate { get; private set; }
 
-  public Subscription Subscription { get; set; }
-  public Guid SubscriptionId { get; set; }
+  public Guid CurrentPackageId { get; set; }
+  public SubscriptionPackage CurrentPackage { get; set; }
 
-  public FSHTenantInfo Tenant { get; set; }
   public string TenantId { get; set; }
+  public FSHTenantInfo Tenant { get; set; }
 
   public IReadOnlyCollection<SubscriptionHistory> History => _history.AsReadOnly();
 
   public TenantSubscription Renew(DateTime today)
   {
-    _history.Add(new SubscriptionHistory(Id, today, Subscription.Days, Subscription.Price));
-    ExpiryDate = today.AddDays(Subscription.Days);
+    _history.Add(new SubscriptionHistory(Id, CurrentPackageId, today, CurrentPackage.ValidForDays, CurrentPackage.Price));
+    ExpiryDate = today.AddDays(CurrentPackage.ValidForDays);
     return this;
   }
 }
@@ -90,9 +90,10 @@ public sealed class SubscriptionHistory : AuditableEntity
   {
   }
 
-  public SubscriptionHistory(Guid tenantSubscriptionId, DateTime startDate, int days, decimal price)
+  public SubscriptionHistory(Guid tenantSubscriptionId, Guid packageId, DateTime startDate, int days, decimal price)
   {
     TenantSubscriptionId = tenantSubscriptionId;
+    PackageId = packageId;
     StartDate = startDate;
     Price = price;
     ExpiryDate = startDate.AddDays(days);
@@ -101,6 +102,9 @@ public sealed class SubscriptionHistory : AuditableEntity
   public decimal Price { get; private set; }
   public DateTime StartDate { get; private set; }
   public DateTime ExpiryDate { get; private set; }
+
+  public Guid PackageId { get; set; }
+  public SubscriptionPackage Package { get; set; }
 
   public Guid TenantSubscriptionId { get; set; }
   public TenantSubscription TenantSubscription { get; set; }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220826211952_App_InitialMigration")]
+    [Migration("20220828153813_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -913,14 +913,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Property<string>("TenantId")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Branches", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>

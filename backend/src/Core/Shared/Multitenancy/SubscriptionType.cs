@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace FSH.WebApi.Shared.Multitenancy;
 
+[JsonConverter(typeof(SmartEnumNameConverter<SubscriptionFeatureType, string>))]
 public class SubscriptionFeatureType : SmartEnum<SubscriptionFeatureType, string>
 {
   public static readonly SubscriptionFeatureType NoOfUsers = new(nameof(NoOfUsers), "no_of_users");

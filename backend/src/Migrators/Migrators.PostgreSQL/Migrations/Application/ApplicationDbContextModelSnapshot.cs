@@ -911,14 +911,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Property<string>("TenantId")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Branches", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>

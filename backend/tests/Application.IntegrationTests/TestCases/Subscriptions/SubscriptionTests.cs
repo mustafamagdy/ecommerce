@@ -28,10 +28,10 @@ public class SubscriptionTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
+      Name = $"Tenant {tenantId}"
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -43,8 +43,12 @@ public class SubscriptionTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword, SubscriptionType.Standard),
-      new Dictionary<string, string> { { "tenant", tenantId } });
+      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword),
+      new Dictionary<string, string>
+      {
+        { "tenant", tenantId },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
 
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -60,10 +64,10 @@ public class SubscriptionTests : TestFixture
     var tenant = new CreateTenantRequest
     {
       Id = tenantId,
+      ProdPackageId = _packages.First().Id,
       Email = $"email@{tenantId}.com",
       AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
+      Name = $"Tenant {tenantId}"
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
@@ -74,8 +78,12 @@ public class SubscriptionTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, "123Pa$$word!", SubscriptionType.Standard),
-      new Dictionary<string, string> { { "tenant", tenantId } });
+      new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
+      new Dictionary<string, string>
+      {
+        { "tenant", tenantId },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tokenResult = await _.Content.ReadFromJsonAsync<TokenResponse>();
 
@@ -83,7 +91,11 @@ public class SubscriptionTests : TestFixture
 
     _ = await PostAsJsonAsync("/api/v1/products/search",
       new SearchProductsRequest(),
-      new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
+      new Dictionary<string, string>
+      {
+        { "Authorization", $"Bearer {tokenResult.Token}" },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
 
     _.StatusCode.Should().NotBe(HttpStatusCode.OK);
     _.StatusCode.Should().Be(HttpStatusCode.InternalServerError);

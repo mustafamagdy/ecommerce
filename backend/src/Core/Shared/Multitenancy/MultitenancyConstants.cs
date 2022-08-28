@@ -7,6 +7,7 @@ public class MultitenancyConstants
   public static decimal MaxOneTimePaymentAmountForSubscription = 100000;
   public const string JobRunnerUserName = "JobRunner";
   public const string CashRegisterHeaderName = "cash-register";
+  public const string SubscriptionTypeHeaderName = "subscription-type";
   public const string DefaultBranchName = "main-branch";
 
   public static class Root

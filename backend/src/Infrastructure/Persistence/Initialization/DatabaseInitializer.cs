@@ -45,6 +45,7 @@ internal class DatabaseInitializer : IDatabaseInitializer
       TenantInfo = tenant
     };
 
+    // initialize per connection string ?? (prod, demo, train)
     // Then run the initialization in the new scope
     await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
       .InitializeAsync(cancellationToken);
@@ -73,6 +74,8 @@ internal class DatabaseInitializer : IDatabaseInitializer
       var rootTenant = new FSHTenantInfo(
         MultitenancyConstants.Root.Id,
         MultitenancyConstants.Root.Name,
+        string.Empty,
+        string.Empty,
         string.Empty,
         MultitenancyConstants.Root.EmailAddress,
         null, null, null, null, null, null, null);
