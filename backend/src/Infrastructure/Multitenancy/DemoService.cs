@@ -14,7 +14,7 @@ public class DemoService : IHostedService
 
   public Task StartAsync(CancellationToken cancellationToken)
   {
-    _jobService.Enqueue(() => Console.WriteLine("This is a demo job is running at startup, it can be anything"));
+    // _jobService.Enqueue(() => Console.WriteLine("This is a demo job is running at startup, it can be anything"));
     return Task.CompletedTask;
   }
 

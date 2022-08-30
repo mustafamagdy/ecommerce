@@ -43,7 +43,7 @@ public class SubscriptionTests : TestFixture
     tenantResponse.Id.Should().Be(tenantId);
 
     _ = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, TestConstants.DefaultTenantAdminPassword),
+      new TokenRequest(tenant.AdminEmail, MultitenancyConstants.DefaultPassword),
       new Dictionary<string, string>
       {
         { "tenant", tenantId },

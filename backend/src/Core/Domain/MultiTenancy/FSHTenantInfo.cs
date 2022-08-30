@@ -71,6 +71,18 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity
     ProdSubscriptionId = subscription.Id;
   }
 
+  public void SetDemoSubscription(TenantDemoSubscription subscription)
+  {
+    DemoSubscription = subscription;
+    DemoSubscriptionId = subscription.Id;
+  }
+
+  public void SetTrainSubscription(TenantTrainSubscription subscription)
+  {
+    TrainSubscription = subscription;
+    TrainSubscriptionId = subscription.Id;
+  }
+
   public TenantProdSubscription? ProdSubscription { get; private set; }
   public Guid? ProdSubscriptionId { get; private set; }
   public string? ConnectionString { get; set; }

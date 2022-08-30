@@ -35,20 +35,47 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
   public async Task InitializeApplicationDbForTenantAsync(FSHTenantInfo tenant, CancellationToken cancellationToken)
   {
-    // First create a new scope
-    using var scope = _serviceProvider.CreateScope();
-
-    // Then set current tenant so the right connectionstring is used
-    _serviceProvider.GetRequiredService<IMultiTenantContextAccessor>()
-      .MultiTenantContext = new MultiTenantContext<FSHTenantInfo>()
+    foreach (var subscriptionType in GetSubscriptions(tenant))
     {
-      TenantInfo = tenant
-    };
+      // First create a new scope
+      using var scope = _serviceProvider.CreateScope();
 
-    // initialize per connection string ?? (prod, demo, train)
-    // Then run the initialization in the new scope
-    await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
-      .InitializeAsync(cancellationToken);
+      // Then set current tenant so the right connectionstring is used
+      _serviceProvider.GetRequiredService<IMultiTenantContextAccessor>()
+        .MultiTenantContext = new MultiTenantContext<FSHTenantInfo>()
+      {
+        TenantInfo = tenant,
+      };
+
+      _serviceProvider.GetRequiredService<ISubscriptionAccessor>()
+        .SubscriptionType = subscriptionType;
+
+      // initialize per connection string ?? (prod, demo, train)
+      // Then run the initialization in the new scope
+      await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
+        .InitializeAsync(cancellationToken);
+    }
+  }
+
+  private static List<SubscriptionType> GetSubscriptions(FSHTenantInfo tenant)
+  {
+    var listSubscriptions = new List<SubscriptionType>();
+    if (tenant.ProdSubscriptionId != null || tenant.Id == MultitenancyConstants.RootTenant.Id)
+    {
+      listSubscriptions.Add(SubscriptionType.Standard);
+    }
+
+    if (tenant.DemoSubscriptionId != null)
+    {
+      listSubscriptions.Add(SubscriptionType.Demo);
+    }
+
+    if (tenant.TrainSubscriptionId != null)
+    {
+      listSubscriptions.Add(SubscriptionType.Train);
+    }
+
+    return listSubscriptions;
   }
 
   private async Task InitializeTenantDbAsync(CancellationToken cancellationToken)

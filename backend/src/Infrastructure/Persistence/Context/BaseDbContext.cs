@@ -2,14 +2,13 @@ using System.Data;
 using System.Diagnostics;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Auditing;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Auditing;
-using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Extensions;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +22,7 @@ public abstract class BaseDbContext
   : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
   private readonly ITenantInfo? _currentTenant;
-  private readonly ISubscriptionResolver? _currentSubscriptionType;
+  private readonly ISubscriptionAccessor _currentSubscriptionType;
   private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
@@ -32,7 +31,7 @@ public abstract class BaseDbContext
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    ISubscriptionResolver currentSubscriptionType, ITenantConnectionStringResolver tenantConnectionStringResolver)
+    ISubscriptionAccessor currentSubscriptionType, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;
@@ -73,22 +72,20 @@ public abstract class BaseDbContext
     TenantMismatchMode = TenantMismatchMode.Overwrite;
     TenantNotSetMode = TenantNotSetMode.Overwrite;
 
-    string connectionString = string.Empty;
-    if (_currentTenant != null && _currentSubscriptionType != null)
-    {
-      var subscriptionType = _currentSubscriptionType.Resolve(_currentTenant.Id);
-      var tenantId = _currentTenant.Id;
+    var subscriptionType = _currentSubscriptionType.SubscriptionType;
+    string connectionString = _currentTenant.Id != MultitenancyConstants.RootTenant.Id
+      ? _tenantConnectionStringResolver.Resolve(_currentTenant.Id, subscriptionType)
+      : _currentTenant.ConnectionString.IfNullOrEmpty(_dbSettings.ConnectionString);
 
-      connectionString = _tenantConnectionStringResolver.Resolve(tenantId, subscriptionType);
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      throw new InvalidOperationException($"Unable to create db context for tenant {_currentTenant.Id} for subscription {subscriptionType}");
     }
 
-    if (!string.IsNullOrWhiteSpace(connectionString))
-    {
-      optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo?.ConnectionString!);
-    }
+    optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
   }
 
-  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
   {
     var auditEntries = HandleAuditingBeforeSaveChanges(_currentUser.GetUserId());
 
