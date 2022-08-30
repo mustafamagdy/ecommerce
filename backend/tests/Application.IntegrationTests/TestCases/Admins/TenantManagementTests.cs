@@ -80,13 +80,13 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/deactivate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
 
@@ -108,19 +108,19 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/deactivate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/tenants/{tenantId}/activate", null);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    _ = await TryLoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, tenantId);
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
@@ -142,7 +142,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -171,7 +171,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -201,7 +201,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -243,7 +243,7 @@ public class TenantManagementTests : TestFixture
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my", tenantAdminLoginHeaders, CancellationToken.None);
@@ -298,78 +298,45 @@ public class TenantManagementTests : TestFixture
   }
 
   [Fact]
-  public async Task can_login_as_tenant_admin_and_do_admin_stuff_on_that_tenant()
+  public async Task different_subscription_has_different_data_for_same_tenant()
+  {
+    string tenantId = PrepareNewTenant(out string adminEmail, out var tenant);
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId, null, SubscriptionType.Standard);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId, null, SubscriptionType.Demo);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var tenantId2 = PrepareNewTenant(out string adminEmail2, out var tenant2, hasDemo: false);
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant2);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(adminEmail2, MultitenancyConstants.DefaultPassword, tenantId2, null, SubscriptionType.Standard);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await TryLoginAs(adminEmail2, MultitenancyConstants.DefaultPassword, tenantId2, null, SubscriptionType.Demo);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+  }
+
+  private string PrepareNewTenant(out string adminEmail, out CreateTenantRequest tenant, bool hasDemo = true)
   {
     var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
+    adminEmail = $"admin@{tenantId}.com";
     var username = $"{tenantId}.admin";
-    var tenant = new CreateTenantRequest
+    tenant = new CreateTenantRequest
     {
       Id = tenantId,
       ProdPackageId = _packages.First().Id,
+      DemoPackageId = hasDemo ? _packages.First().Id : null,
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
     };
-
-    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
-    tenantResponse.Should().NotBeNull();
-    tenantResponse.Id.Should().Be(tenantId);
-
-    _ = await RootAdmin_PostAsJsonAsync("/api/support/remote-admin-login", new RemoteAdminLoginRequest
-    {
-      TenantId = tenantResponse.Id,
-      UserName = username,
-      Subscription = SubscriptionType.Standard
-    });
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tokenResponse = await _.Content.ReadFromJsonAsync<TokenResponse>();
-    tokenResponse.Should().NotBeNull();
-
-    // do admin stuff
-    var headers = new Dictionary<string, string> { { "tenant", tenantId } };
-    headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
-    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
-
-    _ = await GetAsync("api/users", headers);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
-    users.Should().NotBeNullOrEmpty();
+    return tenantId;
   }
-
-  [Fact]
-  public async Task root_tenant_admin_can_reset_any_other_tenant_user_password()
-  {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-    var username = $"{tenantId}.admin";
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
-
-    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
-    tenantResponse.Should().NotBeNull();
-    tenantResponse.Id.Should().Be(tenantId);
-
-    _ = await RootAdmin_PostAsJsonAsync("/api/support/reset-other-user-password",
-      new ResetRemoteUserPasswordRequest(tenantResponse.Id, username, SubscriptionType.Standard));
-
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var newPassword = await _.Content.ReadAsStringAsync();
-    newPassword.Should().NotBeNull();
-
-    _ = await TryLoginAs(adminEmail, newPassword, tenantId);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-  }
-
-
 }

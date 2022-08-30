@@ -24,6 +24,7 @@ internal static class Startup
   internal static IServiceCollection AddMultitenancy(this IServiceCollection services, IConfiguration config)
   {
     return services
+      .AddSingleton<ISubscriptionAccessor, SubscriptionAccessor>()
       .AddDbContext<TenantDbContext>((sp, dbOptions) =>
       {
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
@@ -45,7 +46,7 @@ internal static class Startup
       .Services
       .AddScoped<ITenantService, TenantService>()
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
-      .AddSingleton<ISubscriptionResolver, SubscriptionResolver>();
+      .AddSingleton<ISubscriptionAccessor, SubscriptionAccessor>();
   }
 
   private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)

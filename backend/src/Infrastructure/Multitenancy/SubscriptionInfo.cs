@@ -1,37 +1,37 @@
 ﻿using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Exceptions;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public interface ISubscriptionResolver : ITransientService
+public interface ISubscriptionAccessor
 {
-  public SubscriptionType Resolve(string tenantId);
+  SubscriptionType SubscriptionType { get; set; }
 }
 
-public class SubscriptionResolver : ISubscriptionResolver
+public class SubscriptionAccessor : ISubscriptionAccessor
 {
-  private readonly IHttpContextAccessor _httpContextAccessor;
+  private SubscriptionType _subscriptionType;
 
-  public SubscriptionResolver(IHttpContextAccessor httpContextAccessor)
+  public SubscriptionAccessor(IHttpContextAccessor httpContextAccessor, ITenantInfo? currentTenant)
   {
-    _httpContextAccessor = httpContextAccessor;
+    _subscriptionType = GetSubscriptionType(httpContextAccessor, currentTenant);
   }
 
-  public SubscriptionType Resolve(string tenantId)
+  private SubscriptionType GetSubscriptionType(IHttpContextAccessor httpContextAccessor, ITenantInfo? currentTenant)
   {
-    if (tenantId == MultitenancyConstants.Root.Id)
+    if (currentTenant == null || currentTenant.Id == MultitenancyConstants.Root.Id)
     {
       return SubscriptionType.Standard;
     }
 
-    var context = _httpContextAccessor.HttpContext;
+    var context = httpContextAccessor.HttpContext;
     if (context == null)
     {
-      throw new ArgumentException("Tenant subscription cannot be resolved");
+      // throw new ArgumentException("Tenant subscription cannot be resolved");
+      return SubscriptionType.Standard;
     }
 
     var headerValue = context.Request.Headers.FirstOrDefault(a => a.Key == MultitenancyConstants.SubscriptionTypeHeaderName);
@@ -40,6 +40,9 @@ public class SubscriptionResolver : ISubscriptionResolver
       return subscriptionType;
     }
 
-    throw new MissingHeaderException("Tenant subscription type not found in request header");
+    // throw new MissingHeaderException("Tenant subscription type not found in request header");
+    return SubscriptionType.Standard;
   }
+
+  public SubscriptionType SubscriptionType { get => _subscriptionType; set => _subscriptionType = value; }
 }

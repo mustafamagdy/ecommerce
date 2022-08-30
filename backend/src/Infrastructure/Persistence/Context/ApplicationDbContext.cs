@@ -18,15 +18,11 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionResolver subscriptionResolver, DbContextOptions options, ICurrentUser currentUser,
+  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionAccessor subscriptionAccessor, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
     ITenantConnectionStringResolver tenantConnectionStringResolver)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionResolver, tenantConnectionStringResolver)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionAccessor, tenantConnectionStringResolver)
   {
-    if (this.Database.IsNpgsql())
-    {
-      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-    }
   }
 
   public DbSet<Branch> Branches => Set<Branch>();
@@ -47,6 +43,11 @@ public class ApplicationDbContext : BaseDbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    if (Database.IsNpgsql())
+    {
+      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
     base.OnModelCreating(modelBuilder);
 
     modelBuilder.Entity<PaymentMethod>().IsMultiTenant();
