@@ -6,12 +6,12 @@ namespace FSH.WebApi.Application.Multitenancy.EventHandlers;
 public class TenantCreatedEvent : DomainEvent
 {
   public FSHTenantInfo Tenant { get; }
-  public TenantSubscription Subscription { get; }
+  public List<TenantSubscription> Subscriptions { get; }
 
-  public TenantCreatedEvent(FSHTenantInfo tenant, TenantSubscription subscription)
+  public TenantCreatedEvent(FSHTenantInfo tenant, List<TenantSubscription> subscriptions)
   {
     Tenant = tenant;
-    Subscription = subscription;
+    Subscriptions = subscriptions;
   }
 }
 
@@ -41,7 +41,8 @@ public class TenantCreatedEventHandler : EventNotificationHandler<TenantCreatedE
     {
       AdminEmail = @event.Tenant.AdminEmail,
       TenantName = @event.Tenant.Name,
-      SubscriptionExpiryDate = @event.Subscription.ExpiryDate,
+      // todo notify for all subscriptions
+      SubscriptionExpiryDate = @event.Subscriptions.FirstOrDefault().ExpiryDate,
       SiteUrl = prodUrl
     };
 

@@ -18,15 +18,11 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionInfo subscriptionInfo, DbContextOptions options, ICurrentUser currentUser,
+  public ApplicationDbContext(ITenantInfo currentTenant,SubscriptionTypeResolver subscriptionTypeResolver, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
     ITenantConnectionStringResolver tenantConnectionStringResolver)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionInfo, tenantConnectionStringResolver)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionTypeResolver, tenantConnectionStringResolver)
   {
-    if (this.Database.IsNpgsql())
-    {
-      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-    }
   }
 
   public DbSet<Branch> Branches => Set<Branch>();
@@ -47,6 +43,11 @@ public class ApplicationDbContext : BaseDbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    if (Database.IsNpgsql())
+    {
+      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
     base.OnModelCreating(modelBuilder);
 
     modelBuilder.Entity<PaymentMethod>().IsMultiTenant();
@@ -61,15 +62,16 @@ public class ApplicationDbContext : BaseDbContext
   private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
   {
     modelBuilder.Ignore<FSHTenantInfo>();
-    modelBuilder.Ignore<Subscription>();
+    // modelBuilder.Ignore<Subscription>();
     modelBuilder.Ignore<TenantSubscription>();
     modelBuilder.Ignore<TenantProdSubscription>();
     modelBuilder.Ignore<TenantDemoSubscription>();
     modelBuilder.Ignore<TenantTrainSubscription>();
-    modelBuilder.Ignore<StandardSubscription>();
-    modelBuilder.Ignore<Subscription>();
-    modelBuilder.Ignore<DemoSubscription>();
-    modelBuilder.Ignore<TrainSubscription>();
+    // modelBuilder.Ignore<StandardSubscription>();
+    // modelBuilder.Ignore<DemoSubscription>();
+    // modelBuilder.Ignore<TrainSubscription>();
+    modelBuilder.Ignore<SubscriptionFeature>();
+    modelBuilder.Ignore<SubscriptionPackage>();
     modelBuilder.Ignore<SubscriptionPayment>();
     modelBuilder.Ignore<SubscriptionHistory>();
   }

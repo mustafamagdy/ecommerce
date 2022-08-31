@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Identity;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Application.Identity.Tokens;
 

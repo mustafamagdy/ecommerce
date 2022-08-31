@@ -102,27 +102,27 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.ToTable("Tenants", "MultiTenancy");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.Subscription", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionFeature", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Days")
-                        .HasColumnType("integer");
+                    b.Property<string>("Feature")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
-                        .HasPrecision(7, 3)
-                        .HasColumnType("numeric(7,3)");
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("subscription_type")
+                    b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subscription");
+                    b.HasIndex("PackageId");
 
-                    b.HasDiscriminator<string>("subscription_type").HasValue("Subscription");
+                    b.ToTable("SubscriptionFeatures");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
@@ -151,6 +151,9 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(7, 3)
                         .HasColumnType("numeric(7,3)");
@@ -163,9 +166,31 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PackageId");
+
                     b.HasIndex("TenantSubscriptionId");
 
                     b.ToTable("SubscriptionHistories");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Default")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
+
+                    b.Property<int>("ValidForDays")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPackage");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
@@ -215,11 +240,11 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CurrentPackageId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("SubscriptionId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -231,7 +256,7 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SubscriptionId");
+                    b.HasIndex("CurrentPackageId");
 
                     b.ToTable("TenantSubscription");
 
@@ -256,20 +281,6 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.ToTable("RootPaymentMethods");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.DemoSubscription", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
-
-                    b.HasDiscriminator().HasValue("Demo");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.StandardSubscription", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
-
-                    b.HasDiscriminator().HasValue("Standard");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
@@ -287,13 +298,6 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
-
-                    b.HasDiscriminator().HasValue("Train");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TrainSubscription", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.Subscription");
 
                     b.HasDiscriminator().HasValue("Train");
                 });
@@ -319,13 +323,32 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                     b.Navigation("TrainSubscription");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionFeature", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "Package")
+                        .WithMany("Features")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", "TenantSubscription")
                         .WithMany("History")
                         .HasForeignKey("TenantSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Package");
 
                     b.Navigation("TenantSubscription");
                 });
@@ -351,13 +374,18 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.Subscription", "Subscription")
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "CurrentPackage")
                         .WithMany()
-                        .HasForeignKey("SubscriptionId")
+                        .HasForeignKey("CurrentPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Subscription");
+                    b.Navigation("CurrentPackage");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", b =>
+                {
+                    b.Navigation("Features");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>

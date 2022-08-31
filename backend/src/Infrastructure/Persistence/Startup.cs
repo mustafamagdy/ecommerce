@@ -63,7 +63,6 @@ internal static class Startup
       .AddTransient<ITenantSequenceGenerator>(sp =>
       {
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        var config = sp.GetService<IConfiguration>();
         var currentTenant = sp.GetService<ITenantInfo>();
         var env = sp.GetService<IHostEnvironment>();
         var counterRepo = sp.GetService<IDapperEntityRepository>();

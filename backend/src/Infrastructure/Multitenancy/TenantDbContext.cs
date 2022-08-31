@@ -33,15 +33,17 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 
   // private DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
 
+  public DbSet<SubscriptionPackage> Packages => Set<SubscriptionPackage>();
+  public DbSet<SubscriptionFeature> SubscriptionFeatures => Set<SubscriptionFeature>();
   public DbSet<TenantProdSubscription> TenantProdSubscriptions => Set<TenantProdSubscription>();
   public DbSet<TenantDemoSubscription> TenantDemoSubscriptions => Set<TenantDemoSubscription>();
-
   public DbSet<TenantTrainSubscription> TenantTrainSubscriptions => Set<TenantTrainSubscription>();
 
   // private DbSet<Subscription> Subscriptions => Set<Subscription>();
-  public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
-  public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
-  public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
+  // public DbSet<StandardSubscription> StandardSubscriptions => Set<StandardSubscription>();
+  // public DbSet<DemoSubscription> DemoSubscriptions => Set<DemoSubscription>();
+  // public DbSet<TrainSubscription> TrainSubscriptions => Set<TrainSubscription>();
+  public DbSet<SubscriptionPackage> SubscriptionPackages => Set<SubscriptionPackage>();
 
   public DbSet<PaymentMethod> RootPaymentMethods => Set<PaymentMethod>();
 
@@ -50,7 +52,9 @@ public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
     base.OnModelCreating(modelBuilder);
 
     // modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-    modelBuilder.ApplyConfiguration(new SubscriptionConfig());
+    // modelBuilder.ApplyConfiguration(new SubscriptionConfig());
+    modelBuilder.ApplyConfiguration(new SubscriptionFeatureConfig());
+    modelBuilder.ApplyConfiguration(new SubscriptionPackageConfig());
     modelBuilder.ApplyConfiguration(new TenantSubscriptionConfig());
     modelBuilder.ApplyConfiguration(new SubscriptionHistoryConfig());
     modelBuilder.ApplyConfiguration(new SubscriptionPaymentConfig());

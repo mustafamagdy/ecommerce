@@ -4,6 +4,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,7 +13,7 @@ namespace Application.IntegrationTests.Infra;
 
 [Collection(nameof(TestConstants.WebHostTests))]
 // public abstract class TestFixture : IClassFixture<HostFixture>
-public abstract class TestFixture
+public abstract class TestFixture : IAsyncLifetime
 {
   private readonly HostFixture _host;
   private readonly HttpClient _client;
@@ -102,13 +103,13 @@ public abstract class TestFixture
       Email = $"email@{tenantId}.com",
       AdminEmail = adminEmail,
       Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
+      ProdPackageId = _packages.First().Id
     };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tenantResult = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
-    var tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId);
+    var tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     _ = await GetAsync("/api/v1/my/", tenantAdminLoginHeaders);
@@ -118,7 +119,7 @@ public abstract class TestFixture
     tenantInfo.Branches.Should().NotBeEmpty();
     var defaultBranch = tenantInfo.Branches.First();
 
-    tenantAdminLoginHeaders = await LoginAs(adminEmail, TestConstants.DefaultTenantAdminPassword, null, tenantId, defaultBranch.Id);
+    tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId, defaultBranch.Id);
     tenantAdminLoginHeaders.Should().NotBeNullOrEmpty();
 
     return (tenantAdminLoginHeaders, defaultBranch.Id);
@@ -131,35 +132,49 @@ public abstract class TestFixture
     return await _.Content.ReadFromJsonAsync<List<BasicUserDataDto>>();
   }
 
-  public Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant,
-    Guid? branchId = null,
-    CancellationToken cancellationToken = default)
+  protected Task<HttpResponseMessage> TryLoginAs(string username, string password, string? tenant,
+    Guid? branchId = null, SubscriptionType? subscriptionType = default, CancellationToken cancellationToken = default)
   {
     var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
-
+    tenantHeader.Add(MultitenancyConstants.SubscriptionTypeHeaderName, subscriptionType ?? SubscriptionType.Standard);
     return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, branchId), tenantHeader, cancellationToken);
   }
 
-  public async Task<Dictionary<string, string>> LoginAs(string username, string password,
-    Dictionary<string, string>? headers,
-    string? tenant,
-    Guid? branchId = null,
+  protected async Task<Dictionary<string, string>> LoginAs(string username, string password,
+    Dictionary<string, string>? headers, string? tenant, Guid? branchId = null,
+    SubscriptionType? subscriptionType = default,
     CancellationToken cancellationToken = default)
   {
-    var response = await TryLoginAs(username, password, tenant, branchId, cancellationToken);
+    var response = await TryLoginAs(username, password, tenant, branchId, subscriptionType, cancellationToken);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
     _output.WriteLine("Token is " + tokenResult.Token);
 
-    headers = headers == null ? new Dictionary<string, string>() : headers;
+    headers ??= new Dictionary<string, string>();
 
     headers.Add("Authorization", $"Bearer {tokenResult.Token}");
+    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
+
     return headers;
   }
 
   private Task<Dictionary<string, string>> LoginAsRootAdmin(Dictionary<string, string> headers, CancellationToken cancellationToken)
   {
-    return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", null, cancellationToken);
+    return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", null, SubscriptionType.Standard, cancellationToken);
+  }
+
+  protected List<SubscriptionPackageDto>? _packages;
+
+  public async Task InitializeAsync()
+  {
+    var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();
+  }
+
+  public Task DisposeAsync()
+  {
+    return Task.CompletedTask;
   }
 }
