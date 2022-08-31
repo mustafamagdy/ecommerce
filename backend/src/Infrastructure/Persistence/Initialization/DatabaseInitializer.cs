@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -40,17 +41,20 @@ internal class DatabaseInitializer : IDatabaseInitializer
       // First create a new scope
       using var scope = _serviceProvider.CreateScope();
 
-      // Then set current tenant so the right connectionstring is used
+      // Then set current tenant so the right connection string is used
       _serviceProvider.GetRequiredService<IMultiTenantContextAccessor>()
         .MultiTenantContext = new MultiTenantContext<FSHTenantInfo>()
       {
         TenantInfo = tenant,
       };
 
-      _serviceProvider.GetRequiredService<ISubscriptionAccessor>()
-        .SubscriptionType = subscriptionType;
+      // initialize per subscription type ?? (prod, demo, train)
+      _serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext ??= new DefaultHttpContext();
+      _serviceProvider.GetRequiredService<IHttpContextAccessor>()
+        .HttpContext!
+        .Request
+        .Headers[MultitenancyConstants.SubscriptionTypeHeaderName] = subscriptionType.Value;
 
-      // initialize per connection string ?? (prod, demo, train)
       // Then run the initialization in the new scope
       await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
         .InitializeAsync(cancellationToken);

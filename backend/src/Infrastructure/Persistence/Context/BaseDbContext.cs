@@ -22,7 +22,7 @@ public abstract class BaseDbContext
   : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
   private readonly ITenantInfo? _currentTenant;
-  private readonly ISubscriptionAccessor _currentSubscriptionType;
+  private readonly SubscriptionTypeResolver _subscriptionTypeResolver;
   private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
@@ -31,7 +31,7 @@ public abstract class BaseDbContext
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    ISubscriptionAccessor currentSubscriptionType, ITenantConnectionStringResolver tenantConnectionStringResolver)
+    SubscriptionTypeResolver subscriptionTypeResolver, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;
@@ -39,7 +39,7 @@ public abstract class BaseDbContext
     _serializer = serializer;
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
-    _currentSubscriptionType = currentSubscriptionType;
+    _subscriptionTypeResolver = subscriptionTypeResolver;
     _tenantConnectionStringResolver = tenantConnectionStringResolver;
   }
 
@@ -72,7 +72,7 @@ public abstract class BaseDbContext
     TenantMismatchMode = TenantMismatchMode.Overwrite;
     TenantNotSetMode = TenantNotSetMode.Overwrite;
 
-    var subscriptionType = _currentSubscriptionType.SubscriptionType;
+    var subscriptionType = _subscriptionTypeResolver.Resolve();
     string connectionString = _currentTenant.Id != MultitenancyConstants.RootTenant.Id
       ? _tenantConnectionStringResolver.Resolve(_currentTenant.Id, subscriptionType)
       : _currentTenant.ConnectionString.IfNullOrEmpty(_dbSettings.ConnectionString);
