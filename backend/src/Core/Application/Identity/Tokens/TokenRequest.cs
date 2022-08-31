@@ -1,3 +1,5 @@
+using FSH.WebApi.Shared.Multitenancy;
+
 namespace FSH.WebApi.Application.Identity.Tokens;
 
 public record TokenRequest(string Email, string Password, Guid? BranchId = null);

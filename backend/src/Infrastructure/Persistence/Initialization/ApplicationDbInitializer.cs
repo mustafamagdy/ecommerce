@@ -1,5 +1,4 @@
 using Finbuckle.MultiTenant;
-using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

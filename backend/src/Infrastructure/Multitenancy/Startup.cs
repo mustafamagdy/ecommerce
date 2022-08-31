@@ -38,14 +38,12 @@ internal static class Startup
       .AddTenantUnitOfWork()
       .AddMultiTenant<FSHTenantInfo>()
       .WithClaimStrategy(FSHClaims.Tenant)
-      .WithHostStrategy(MultitenancyConstants.TenantIdName)
       .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
-      .WithQueryStringStrategy(MultitenancyConstants.TenantIdName)
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
+      .AddScoped<SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
-      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
-      .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
+      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
   }
 
   private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)

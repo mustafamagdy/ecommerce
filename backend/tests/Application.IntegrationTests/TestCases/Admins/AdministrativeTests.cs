@@ -6,8 +6,11 @@ using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Roles;
+using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
+using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -164,7 +167,7 @@ public class AdministrativeTests : TestFixture
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
     var loginHeader = await LoginAs(user.Email, password, null, "root");
-    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+    loginHeader.Should().NotBeNull().And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     _ = await RootAdmin_PostAsJsonAsync($"/api/users/{user.Id}/toggle-status", new ToggleUserStatusRequest
     {
@@ -202,7 +205,7 @@ public class AdministrativeTests : TestFixture
     var user = await _.Content.ReadFromJsonAsync<CreateUserResponseDto>();
 
     var loginHeader = await LoginAs(user.Email, originalPassword, null, "root");
-    loginHeader.Should().NotBeNull().And.HaveCount(1).And.Contain(a => !string.IsNullOrEmpty(a.Value));
+    loginHeader.Should().NotBeNull().And.Contain(a => !string.IsNullOrEmpty(a.Value));
 
     // reset
     var newPassword = "NEW@p@ssword";
@@ -349,6 +352,80 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
 
     _ = await TryLoginAs(user.Email, newPassword, "root");
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Fact]
+  public async Task can_login_as_tenant_admin_and_do_admin_stuff_on_that_tenant()
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+    var username = $"{tenantId}.admin";
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      ProdPackageId = _packages.First().Id,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/support/remote-admin-login", new RemoteAdminLoginRequest
+    {
+      TenantId = tenantResponse.Id,
+      UserName = username,
+      Subscription = SubscriptionType.Standard
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tokenResponse = await _.Content.ReadFromJsonAsync<TokenResponse>();
+    tokenResponse.Should().NotBeNull();
+
+    // do admin stuff
+    var headers = new Dictionary<string, string> { { "tenant", tenantId } };
+    headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
+    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
+
+    _ = await GetAsync("api/users", headers);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
+    users.Should().NotBeNullOrEmpty();
+  }
+
+  [Fact]
+  public async Task root_tenant_admin_can_reset_any_other_tenant_user_password()
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    string adminEmail = $"admin@{tenantId}.com";
+    var username = $"{tenantId}.admin";
+    var tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      ProdPackageId = _packages.First().Id,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+    };
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
+
+    _ = await RootAdmin_PostAsJsonAsync("/api/support/reset-other-user-password",
+      new ResetRemoteUserPasswordRequest(tenantResponse.Id, username, SubscriptionType.Standard));
+
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var newPassword = await _.Content.ReadAsStringAsync();
+    newPassword.Should().NotBeNull();
+
+    _ = await TryLoginAs(adminEmail, newPassword, tenantId);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

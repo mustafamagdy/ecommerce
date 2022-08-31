@@ -13,12 +13,12 @@ namespace FSH.WebApi.Application.Multitenancy;
 
 public class CreateTenantRequest : IRequest<BasicTenantInfoDto>
 {
-  public string Id { get; set; } = default!;
-  public string Name { get; set; } = default!;
-  public string? DatabaseName { get; set; }
-  public string AdminEmail { get; set; } = default!;
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public string AdminEmail { get; set; }
+  public Guid? ProdPackageId { get; set; }
+  public Guid? DemoPackageId { get; set; }
   public string? Issuer { get; set; }
-
   public string? PhoneNumber { get; set; }
   public string? VatNo { get; set; }
   public string? Email { get; set; }
@@ -26,8 +26,6 @@ public class CreateTenantRequest : IRequest<BasicTenantInfoDto>
   public string? AdminName { get; set; }
   public string? AdminPhoneNumber { get; set; }
   public string? TechSupportUserId { get; set; }
-
-  public bool? CreateDemoSubscription { get; set; }
 }
 
 public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, BasicTenantInfoDto>
@@ -57,15 +55,23 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
 
   public async Task<BasicTenantInfoDto> Handle(CreateTenantRequest request, CancellationToken cancellationToken)
   {
-    string connectionString = string.IsNullOrWhiteSpace(request.DatabaseName) ? string.Empty : _cnBuilder.BuildConnectionString(request.DatabaseName);
+    string prodConnectionString = string.Empty;
+    string trainConnectionString = string.Empty;
+    if (request.ProdPackageId != null)
+    {
+      prodConnectionString = _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Standard);
+      trainConnectionString = _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Train);
+    }
 
-    var tenant = new FSHTenantInfo(request.Id, request.Name, connectionString, request.AdminEmail,
-      request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
+    string demoConnectionString = request.DemoPackageId != null ? _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Demo) : string.Empty;
+
+    var tenant = new FSHTenantInfo(request.Id, request.Name, prodConnectionString, demoConnectionString, trainConnectionString,
+      request.AdminEmail, request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
       request.TechSupportUserId, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
 
-    var prodSubscription = await TryCreateProdSubscription(tenant);
+    var subscriptions = await CreateTenantSubscriptions(tenant, request);
 
     bool result = await _uow.CommitAsync(cancellationToken) > 0;
     if (!result)
@@ -73,7 +79,8 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
       throw new DbUpdateException($"Failed to create tenant & subscription for {tenant.Name}");
     }
 
-    tenant.AddDomainEvent(new TenantCreatedEvent(tenant, prodSubscription));
+    tenant.AddDomainEvent(new TenantCreatedEvent(tenant, subscriptions));
+
     try
     {
       await _dbInitializer.InitializeApplicationDbForTenantAsync(tenant, cancellationToken);
@@ -90,32 +97,57 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
     return tenantDto;
   }
 
-  private async Task<TenantProdSubscription> TryCreateProdSubscription(FSHTenantInfo tenant)
+  private async Task<List<TenantSubscription>> CreateTenantSubscriptions(FSHTenantInfo tenant, CreateTenantRequest request)
   {
-    var prodSubscription = await GetSubscription<StandardSubscription>(SubscriptionType.Standard);
+    var list = new List<TenantSubscription>();
+    if (request.ProdPackageId != null)
+    {
+      list.Add(await TryCreateSubscription(tenant, SubscriptionType.Standard, request.ProdPackageId));
+      list.Add(await TryCreateSubscription(tenant, SubscriptionType.Train, request.ProdPackageId));
+    }
+
+    if (request.DemoPackageId != null)
+    {
+      list.Add(await TryCreateSubscription(tenant, SubscriptionType.Demo, request.DemoPackageId));
+    }
+
+    return list;
+  }
+
+  private async Task<TenantSubscription> TryCreateSubscription(FSHTenantInfo tenant, SubscriptionType subscriptionType, Guid? packageId)
+  {
+    var package = await GetPackageOrDefaultPackage(packageId);
 
     var today = _systemTime.Now;
-    var tenantProdSubscription = new TenantProdSubscription(prodSubscription, tenant);
-    tenantProdSubscription.Renew(today);
 
-    await _uow.Set<TenantProdSubscription>().AddAsync(tenantProdSubscription);
-
-    tenant.SetProdSubscription(tenantProdSubscription);
-    return tenant.ProdSubscription;
-  }
-
-  public async Task<T> GetSubscription<T>(SubscriptionType subscriptionType)
-    where T : Subscription
-  {
-    return subscriptionType.Name switch
+    switch (subscriptionType.Name)
     {
-      nameof(SubscriptionType.Standard) => await _uow.Set<StandardSubscription>().FirstOrDefaultAsync() as T
-                                           ?? throw new NotFoundException("No standard subscription found"),
-      nameof(SubscriptionType.Demo) => await _uow.Set<DemoSubscription>().FirstOrDefaultAsync() as T
-                                       ?? throw new NotFoundException("No demo subscription found"),
-      nameof(SubscriptionType.Train) => await _uow.Set<TrainSubscription>().FirstOrDefaultAsync() as T
-                                        ?? throw new NotFoundException("No train subscription found"),
-      _ => throw new ArgumentOutOfRangeException()
-    };
+      case nameof(SubscriptionType.Standard):
+        var prodSubscription = new TenantProdSubscription(package, tenant);
+        prodSubscription.Renew(today);
+        await _uow.Set<TenantProdSubscription>().AddAsync(prodSubscription);
+        tenant.SetProdSubscription(prodSubscription);
+        return prodSubscription;
+      case nameof(SubscriptionType.Demo):
+        var demoSubscription = new TenantDemoSubscription(package, tenant);
+        demoSubscription.Renew(today);
+        await _uow.Set<TenantDemoSubscription>().AddAsync(demoSubscription);
+        tenant.SetDemoSubscription(demoSubscription);
+        return demoSubscription;
+      case nameof(SubscriptionType.Train):
+        var trainSubscription = new TenantTrainSubscription(package, tenant);
+        trainSubscription.Renew(today);
+        await _uow.Set<TenantTrainSubscription>().AddAsync(trainSubscription);
+        tenant.SetTrainSubscription(trainSubscription);
+        return trainSubscription;
+      default:
+        throw new ArgumentOutOfRangeException();
+    }
   }
+
+  private Task<SubscriptionPackage?> GetPackageOrDefaultPackage(Guid? packageId) =>
+    packageId == null
+      ? _uow.Set<SubscriptionPackage>().FirstOrDefaultAsync(a => a.Default)
+        ?? throw new InvalidOperationException("No default subscription package configured")
+      : _uow.Set<SubscriptionPackage>().FirstOrDefaultAsync(a => a.Id == packageId);
 }

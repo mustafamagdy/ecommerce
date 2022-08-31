@@ -180,7 +180,7 @@ transfer operation works in two steps
 [x] add product, service, to form a service catalog item
 - cash register type (cash register, bank account)
 [x] cash register manager (what is the permissions)
-- cash register branch 
+[x] cash register branch 
 - cash register operations (description, debut, credit)
 [x] customer list with remaining balance
 [x] search customer with balance range
@@ -203,5 +203,23 @@ transfer operation works in two steps
 
 ////////////////////////////////////////////////////////////////
 
+subscription types:
+    each subscription has some features, but what feature is really mean? -> is it some permissions? no features are 
+    some limits, like how many branches tenant can have, how many active users, how many orders per day ...
+    but how can we implement that? so each endpoint can request to validate subscription feature before being called
+    like create new branch, if user tries to call that api endpoint, and the number branches have reached its subscription
+    limit, the system generates an error that your subscription doesn't support that.
+    However, each limit need to have its special cases, and its special response. we cannot generalize the limit feature
+    in general, but we can as the subscription validator to check if the limit reached or not and what is the output response 
+
+basic feature validator -> takes subscription, the action need to be executed (defined in the endpoint)
+                        -> it validates for the current subscription if that met or no
+
+Subscription 
+    Feature 1 (yes/no)
+    Feature 2 (limit of number of records)
+
+
+////////////////////////////////////////////////////////////////
 - test refactor with better more organized way
      

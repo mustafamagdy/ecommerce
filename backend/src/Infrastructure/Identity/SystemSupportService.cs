@@ -25,7 +25,7 @@ public class SystemSupportService : ISystemSupportService
     _repo = repo;
   }
 
-  public async Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, CancellationToken cancellationToken)
+  public async Task<TokenResponse> RemoteLoginAsAdminForTenant(string tenantId, string username, SubscriptionType subscription, CancellationToken cancellationToken)
   {
     if (tenantId == MultitenancyConstants.RootTenant.Id)
     {
@@ -49,7 +49,8 @@ public class SystemSupportService : ISystemSupportService
     return await tokenService.GenerateTokensAndUpdateUser(admin, "ROOT_ADMIN_REMOTE_SUPPORT");
   }
 
-  public async Task<string> ResetRemoteUserPassword(string tenantId, string username, string? newPassword, CancellationToken cancellationToken)
+  public async Task<string> ResetRemoteUserPassword(string tenantId, string username, string? newPassword,
+    SubscriptionType subscription, CancellationToken cancellationToken)
   {
     if (tenantId == MultitenancyConstants.RootTenant.Id)
     {

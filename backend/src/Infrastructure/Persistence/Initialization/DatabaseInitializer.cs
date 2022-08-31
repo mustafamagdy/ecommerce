@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,19 +36,50 @@ internal class DatabaseInitializer : IDatabaseInitializer
 
   public async Task InitializeApplicationDbForTenantAsync(FSHTenantInfo tenant, CancellationToken cancellationToken)
   {
-    // First create a new scope
-    using var scope = _serviceProvider.CreateScope();
-
-    // Then set current tenant so the right connectionstring is used
-    _serviceProvider.GetRequiredService<IMultiTenantContextAccessor>()
-      .MultiTenantContext = new MultiTenantContext<FSHTenantInfo>()
+    foreach (var subscriptionType in GetSubscriptions(tenant))
     {
-      TenantInfo = tenant
-    };
+      // First create a new scope
+      using var scope = _serviceProvider.CreateScope();
 
-    // Then run the initialization in the new scope
-    await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
-      .InitializeAsync(cancellationToken);
+      // Then set current tenant so the right connection string is used
+      _serviceProvider.GetRequiredService<IMultiTenantContextAccessor>()
+        .MultiTenantContext = new MultiTenantContext<FSHTenantInfo>()
+      {
+        TenantInfo = tenant,
+      };
+
+      // initialize per subscription type ?? (prod, demo, train)
+      _serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext ??= new DefaultHttpContext();
+      _serviceProvider.GetRequiredService<IHttpContextAccessor>()
+        .HttpContext!
+        .Request
+        .Headers[MultitenancyConstants.SubscriptionTypeHeaderName] = subscriptionType.Value;
+
+      // Then run the initialization in the new scope
+      await scope.ServiceProvider.GetRequiredService<ApplicationDbInitializer>()
+        .InitializeAsync(cancellationToken);
+    }
+  }
+
+  private static List<SubscriptionType> GetSubscriptions(FSHTenantInfo tenant)
+  {
+    var listSubscriptions = new List<SubscriptionType>();
+    if (tenant.ProdSubscriptionId != null || tenant.Id == MultitenancyConstants.RootTenant.Id)
+    {
+      listSubscriptions.Add(SubscriptionType.Standard);
+    }
+
+    if (tenant.DemoSubscriptionId != null)
+    {
+      listSubscriptions.Add(SubscriptionType.Demo);
+    }
+
+    if (tenant.TrainSubscriptionId != null)
+    {
+      listSubscriptions.Add(SubscriptionType.Train);
+    }
+
+    return listSubscriptions;
   }
 
   private async Task InitializeTenantDbAsync(CancellationToken cancellationToken)
@@ -73,6 +105,8 @@ internal class DatabaseInitializer : IDatabaseInitializer
       var rootTenant = new FSHTenantInfo(
         MultitenancyConstants.Root.Id,
         MultitenancyConstants.Root.Name,
+        string.Empty,
+        string.Empty,
         string.Empty,
         MultitenancyConstants.Root.EmailAddress,
         null, null, null, null, null, null, null);
