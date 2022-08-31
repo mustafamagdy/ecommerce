@@ -18,10 +18,10 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionAccessor subscriptionAccessor, DbContextOptions options, ICurrentUser currentUser,
+  public ApplicationDbContext(ITenantInfo currentTenant,SubscriptionTypeResolver subscriptionTypeResolver, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
     ITenantConnectionStringResolver tenantConnectionStringResolver)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionAccessor, tenantConnectionStringResolver)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionTypeResolver, tenantConnectionStringResolver)
   {
   }
 
