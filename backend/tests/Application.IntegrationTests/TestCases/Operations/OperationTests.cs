@@ -5,6 +5,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Specification;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Customers;
@@ -27,14 +28,7 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
     var users = await GetUserList(adminHeaders);
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
   }
 
   [Fact]
@@ -50,15 +44,7 @@ public class OperationsTests : TestFixture
     var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new CloseCashRegisterRequest()
     {
@@ -80,11 +66,7 @@ public class OperationsTests : TestFixture
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.FailedDependency);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     // try to create the order again
     _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
@@ -101,27 +83,15 @@ public class OperationsTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
+
   [Fact]
   public async Task can_open_cash_register()
   {
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
-
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
   }
 
   [Fact]
@@ -130,17 +100,9 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
     {
       Id = cashRegisterId
     }, adminHeaders);
@@ -159,21 +121,9 @@ public class OperationsTests : TestFixture
     var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     adminHeaders.Add("cash-register", cashRegisterId.ToString());
 
@@ -221,21 +171,9 @@ public class OperationsTests : TestFixture
     var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     adminHeaders.Add("cash-register", cashRegisterId.ToString());
 
@@ -299,23 +237,10 @@ public class OperationsTests : TestFixture
 
     var users = await GetUserList(adminHeaders);
 
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
@@ -364,26 +289,13 @@ public class OperationsTests : TestFixture
       Name = "customer name",
       PhoneNumber = "1234567"
     };
-    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
-
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -458,26 +370,13 @@ public class OperationsTests : TestFixture
       Name = "customer name",
       PhoneNumber = "1234567"
     };
-    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
-
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -527,23 +426,10 @@ public class OperationsTests : TestFixture
 
     var users = await GetUserList(adminHeaders);
 
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
     catalog.Data.Should().NotBeNullOrEmpty();
@@ -577,7 +463,7 @@ public class OperationsTests : TestFixture
       Name = Guid.NewGuid().ToString(),
       PhoneNumber = Guid.NewGuid().ToString()
     };
-    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
 
@@ -606,26 +492,13 @@ public class OperationsTests : TestFixture
       Name = "customer name",
       PhoneNumber = "1234567"
     };
-    var _ = await PostAsJsonAsync("api/v1/customers", newCustomer, adminHeaders);
+    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
-
-    _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -706,6 +579,7 @@ public class OperationsTests : TestFixture
     firstCustomer.Should().NotBeNull();
     firstCustomer.DueAmount.Should().Be(0);
   }
+
 
   /*
    * - cash_register

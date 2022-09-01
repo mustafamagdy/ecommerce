@@ -222,18 +222,6 @@ public class AdministrativeTests : TestFixture
   }
 
   [Fact]
-  public async Task root_admin_can_reset_any_user_password_in_any_tenant()
-  {
-    // Todo: find a solution for the multitenant scope
-  }
-
-  [Fact]
-  public async Task only_admins_can_reset_admins_password()
-  {
-    // Todo: is this right?
-  }
-
-  [Fact]
   public async Task admin_can_change_his_own_password()
   {
     var _ = await TryLoginAs(RootAdminEmail, RootAdminPassword, "root");
@@ -358,17 +346,8 @@ public class AdministrativeTests : TestFixture
   [Fact]
   public async Task can_login_as_tenant_admin_and_do_admin_stuff_on_that_tenant()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
     var username = $"{tenantId}.admin";
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -391,7 +370,7 @@ public class AdministrativeTests : TestFixture
     headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
     headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
 
-    _ = await GetAsync("api/users", headers);
+    _ = await GetAsync("/api/users", headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
     users.Should().NotBeNullOrEmpty();
@@ -400,17 +379,8 @@ public class AdministrativeTests : TestFixture
   [Fact]
   public async Task root_tenant_admin_can_reset_any_other_tenant_user_password()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
     var username = $"{tenantId}.admin";
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);

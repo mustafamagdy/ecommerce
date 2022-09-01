@@ -9,6 +9,12 @@ public class GetBrandRequest : IRequest<BrandDto>
   public GetBrandRequest(Guid id) => Id = id;
 }
 
+public class GetDefaultBrandSpec : Specification<Brand>, ISingleResultSpecification
+{
+  public GetDefaultBrandSpec() =>
+    Query.Where(p => p.SystemDefault);
+}
+
 public class BrandByIdSpec : Specification<Brand, BrandDto>, ISingleResultSpecification
 {
   public BrandByIdSpec(Guid id) =>

@@ -37,10 +37,13 @@ public class ServiceCatalog : AuditableEntity, IAggregateRoot
   public decimal Price { get; private set; }
   public ServicePriority Priority { get; private set; }
 
-  public ServiceCatalog Update(decimal price, ServicePriority priority)
+  public ServiceCatalog Update(Guid? productId, Guid? serviceId, decimal? price, ServicePriority? priority)
   {
-    Price = price;
-    Priority = priority;
+    if (productId.HasValue && productId.Value != Guid.Empty && !ProductId.Equals(productId.Value)) ProductId = productId.Value;
+    if (serviceId.HasValue && serviceId.Value != Guid.Empty && !ServiceId.Equals(serviceId.Value)) ServiceId = serviceId.Value;
+    if (price.HasValue && Price != price) Price = price.Value;
+    if (priority!=null && Priority != priority) Priority = priority;
+
     return this;
   }
 }

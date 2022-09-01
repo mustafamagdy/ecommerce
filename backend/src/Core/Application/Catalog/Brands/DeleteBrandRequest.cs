@@ -45,6 +45,11 @@ public class DeleteBrandRequestHandler : IRequestHandler<DeleteBrandRequest, Gui
 
     _ = brand ?? throw new NotFoundException(_t["Brand {0} Not Found.", request.Id]);
 
+    if (brand.SystemDefault)
+    {
+      throw new ConflictException(_t["Default brand cannot be deleted."]);
+    }
+
     brand.AddDomainEvent(EntityDeletedEvent.WithEntity(brand));
 
     await _brandRepo.DeleteAsync(brand, cancellationToken);

@@ -1,24 +1,24 @@
 namespace FSH.WebApi.Application.Catalog.Services;
 
-public class SearchServiceRequest : PaginationFilter, IRequest<PaginationResponse<ServiceDto>>
+public class SearchServicesRequest : PaginationFilter, IRequest<PaginationResponse<ServiceDto>>
 {
 }
 
 public class ServiceBySearchRequestSpec : EntitiesByPaginationFilterSpec<Service, ServiceDto>
 {
-    public ServiceBySearchRequestSpec(SearchServiceRequest request)
+    public ServiceBySearchRequestSpec(SearchServicesRequest request)
         : base(request) =>
         Query.OrderBy(c => c.Name, !request.HasOrderBy());
 }
 
-public class SearchServiceRequestHandler : IRequestHandler<SearchServiceRequest,
+public class SearchServiceRequestHandler : IRequestHandler<SearchServicesRequest,
 PaginationResponse<ServiceDto>>
 {
     private readonly IReadRepository<Service> _repository;
 
     public SearchServiceRequestHandler(IReadRepository<Service> repository) => _repository = repository;
 
-    public async Task<PaginationResponse<ServiceDto>> Handle(SearchServiceRequest request, CancellationToken
+    public async Task<PaginationResponse<ServiceDto>> Handle(SearchServicesRequest request, CancellationToken
     cancellationToken)
     {
         var spec = new ServiceBySearchRequestSpec(request);

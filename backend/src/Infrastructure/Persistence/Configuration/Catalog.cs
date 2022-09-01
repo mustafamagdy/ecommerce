@@ -73,7 +73,7 @@ public class ServiceConfig : BaseAuditableTenantEntityConfiguration<Service>
       .HasMaxLength(1024);
 
     builder
-      .Property(p => p.ImageUrl)
+      .Property(p => p.ImagePath)
       .HasMaxLength(2048);
   }
 }

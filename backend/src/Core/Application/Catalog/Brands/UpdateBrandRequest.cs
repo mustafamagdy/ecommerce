@@ -17,7 +17,7 @@ public class UpdateBrandRequestValidator : CustomValidator<UpdateBrandRequest>
       .MaximumLength(75)
       .MustAsync(async (brand, name, ct) =>
         await repository.FirstOrDefaultAsync(new BrandByNameSpec(name), ct)
-          is not Brand existingBrand || existingBrand.Id == brand.Id)
+          is not { } existingBrand || existingBrand.Id == brand.Id)
       .WithMessage((_, name) => T["Brand {0} already Exists.", name]);
 }
 
