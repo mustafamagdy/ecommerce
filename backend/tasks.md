@@ -192,14 +192,15 @@ transfer operation works in two steps
 - branch crud
 - activate/deactivate branch (deactivate all operations => filter)
 - subscription on branch level? how many branches
-- subscription types (what type of subscriptions? subscription allowed features)
+[x] subscription types (what type of subscriptions? subscription allowed features)
 - subscription invoices + payments
 - subscription payment goes through main cash register also 
 - update tenant info (full page details)
-- subscription support manager 
+[x] subscription support manager 
 - subscription credit note
 - subscription print
 - subscription send invoice by email, notifications 
+- reset train subscription every week
 
 ////////////////////////////////////////////////////////////////
 

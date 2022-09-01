@@ -187,7 +187,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("ImagePath")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
 

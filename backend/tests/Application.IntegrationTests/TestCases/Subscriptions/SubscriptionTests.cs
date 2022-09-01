@@ -24,19 +24,10 @@ public class SubscriptionTests : TestFixture
   {
     HostFixture.SYSTEM_TIME.DaysOffset = 10;
 
-    var tenantId = Guid.NewGuid().ToString();
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}"
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
 
     var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
     tenantResponse.Should().NotBeNull();
@@ -59,16 +50,7 @@ public class SubscriptionTests : TestFixture
   [Fact]
   public async Task expired_subscription_cannot_perform_any_operations_unless_renewed()
   {
-    var tenantId = Guid.NewGuid().ToString();
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}"
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);

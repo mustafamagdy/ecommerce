@@ -72,17 +72,20 @@ public abstract class BaseDbContext
     TenantMismatchMode = TenantMismatchMode.Overwrite;
     TenantNotSetMode = TenantNotSetMode.Overwrite;
 
-    var subscriptionType = _subscriptionTypeResolver.Resolve();
-    string connectionString = _currentTenant.Id != MultitenancyConstants.RootTenant.Id
-      ? _tenantConnectionStringResolver.Resolve(_currentTenant.Id, subscriptionType)
-      : _currentTenant.ConnectionString.IfNullOrEmpty(_dbSettings.ConnectionString);
-
-    if (string.IsNullOrWhiteSpace(connectionString))
+    if (_currentTenant != null)
     {
-      throw new InvalidOperationException($"Unable to create db context for tenant {_currentTenant.Id} for subscription {subscriptionType}");
-    }
+      var subscriptionType = _subscriptionTypeResolver.Resolve();
+      string connectionString = _currentTenant!.Id != MultitenancyConstants.RootTenant.Id
+        ? _tenantConnectionStringResolver.Resolve(_currentTenant!.Id, subscriptionType)
+        : _currentTenant!.ConnectionString.IfNullOrEmpty(_dbSettings.ConnectionString);
 
-    optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
+      if (string.IsNullOrWhiteSpace(connectionString))
+      {
+        throw new InvalidOperationException($"Unable to create db context for tenant {_currentTenant.Id} for subscription {subscriptionType}");
+      }
+
+      optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
+    }
   }
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())

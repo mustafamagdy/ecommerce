@@ -23,6 +23,9 @@ public class CreateTenantRequestValidator : CustomValidator<CreateTenantRequest>
       .NotEmpty()
       .EmailAddress();
 
+    RuleFor(t => t.TechSupportUserId)
+      .NotEmpty();
+
     RuleFor(a => a.ProdPackageId).NotEmpty().When(a => a.DemoPackageId == null);
     RuleFor(a => a.DemoPackageId).NotEmpty().When(a => a.ProdPackageId == null);
   }

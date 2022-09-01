@@ -7,7 +7,7 @@ public class CreateServiceRequest : IRequest<Guid>
 {
   public string Name { get; set; } = default!;
   public string? Description { get; set; }
-  public FileUploadRequest ImageFile { get; set; }
+  public FileUploadRequest? ImageFile { get; set; }
 }
 
 public class CreateServiceRequestValidator : CustomValidator<CreateServiceRequest>

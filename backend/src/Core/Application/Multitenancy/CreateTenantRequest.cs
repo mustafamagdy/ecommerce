@@ -1,13 +1,13 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy.EventHandlers;
 using FSH.WebApi.Application.Multitenancy.Services;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Shared.Multitenancy;
 using FSH.WebApi.Shared.Persistence;
-using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
@@ -38,10 +38,11 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
   private readonly ISystemTime _systemTime;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
   private readonly IRepository<Branch> _branchRepo;
+  private readonly UserManager<ApplicationUser> _userManager;
 
   public CreateTenantRequestHandler(ITenantUnitOfWork uow, ITenantConnectionStringBuilder cnBuilder,
     IMultiTenantStore<FSHTenantInfo> tenantStore, IDatabaseInitializer dbInitializer, ISystemTime systemTime,
-    IReadNonAggregateRepository<FSHTenantInfo> tenantRepo, IRepository<Branch> branchRepo, IApplicationUnitOfWork appUow)
+    IReadNonAggregateRepository<FSHTenantInfo> tenantRepo, IRepository<Branch> branchRepo, IApplicationUnitOfWork appUow, UserManager<ApplicationUser> userManager)
   {
     _uow = uow;
     _cnBuilder = cnBuilder;
@@ -51,6 +52,7 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
     _tenantRepo = tenantRepo;
     _branchRepo = branchRepo;
     _appUow = appUow;
+    _userManager = userManager;
   }
 
   public async Task<BasicTenantInfoDto> Handle(CreateTenantRequest request, CancellationToken cancellationToken)
@@ -65,9 +67,12 @@ public class CreateTenantRequestHandler : IRequestHandler<CreateTenantRequest, B
 
     string demoConnectionString = request.DemoPackageId != null ? _cnBuilder.BuildConnectionString(request.Id, SubscriptionType.Demo) : string.Empty;
 
+    var supportEng = await _userManager.FindByIdAsync(request.TechSupportUserId)
+                     ?? throw new NotFoundException($"Support user {request.TechSupportUserId} not found");
+
     var tenant = new FSHTenantInfo(request.Id, request.Name, prodConnectionString, demoConnectionString, trainConnectionString,
       request.AdminEmail, request.PhoneNumber, request.VatNo, request.Email, request.Address, request.AdminName, request.AdminPhoneNumber,
-      request.TechSupportUserId, request.Issuer);
+      supportEng.Id, request.Issuer);
 
     await _tenantStore.TryAddAsync(tenant);
 

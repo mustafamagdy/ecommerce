@@ -2,10 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
-using FSH.WebApi.Application.Identity.Tokens;
-using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
-using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,15 +19,7 @@ public class TenantManagementTests : TestFixture
   [Fact]
   public async Task can_create_new_tenants_when_submit_valid_data()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -42,15 +31,7 @@ public class TenantManagementTests : TestFixture
   [Fact]
   public async Task cannot_create_duplicate_tenants()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -65,17 +46,7 @@ public class TenantManagementTests : TestFixture
   [Fact]
   public async Task deactivated_tenants_cannot_login()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -93,17 +64,7 @@ public class TenantManagementTests : TestFixture
   [Fact]
   public async Task can_activate_deactivate_tenants()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -127,17 +88,7 @@ public class TenantManagementTests : TestFixture
   [Fact]
   public async Task can_pay_for_tenant_subscription()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -156,17 +107,7 @@ public class TenantManagementTests : TestFixture
   public async Task can_get_basic_tenant_info()
   {
     var today = HostFixture.SYSTEM_TIME.Now;
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -186,17 +127,7 @@ public class TenantManagementTests : TestFixture
   public async Task can_get_tenant_subscription_history()
   {
     var today = HostFixture.SYSTEM_TIME.Now;
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -228,17 +159,7 @@ public class TenantManagementTests : TestFixture
   public async Task can_get_tenant_subscription_with_payments()
   {
     var today = HostFixture.SYSTEM_TIME.Now;
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -323,20 +244,5 @@ public class TenantManagementTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
 
-  private string PrepareNewTenant(out string adminEmail, out CreateTenantRequest tenant, bool hasDemo = true)
-  {
-    var tenantId = Guid.NewGuid().ToString();
-    adminEmail = $"admin@{tenantId}.com";
-    var username = $"{tenantId}.admin";
-    tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      ProdPackageId = _packages.First().Id,
-      DemoPackageId = hasDemo ? _packages.First().Id : null,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-    };
-    return tenantId;
-  }
+
 }

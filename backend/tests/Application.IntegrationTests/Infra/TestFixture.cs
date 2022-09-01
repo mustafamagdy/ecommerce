@@ -4,6 +4,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Shared.Multitenancy;
 using netDumbster.smtp;
 using Xunit;
@@ -38,7 +39,7 @@ public abstract class TestFixture : IAsyncLifetime
     MailReceivedTask?.SetResult(e.Message);
   }
 
-  public Task<HttpResponseMessage> PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+  private Task<HttpResponseMessage> SendAsJsonAsync<TValue>(HttpMethod method, string requestUri, TValue? value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
   {
     _client.DefaultRequestHeaders.Clear();
     foreach ((string? key, string? val) in headers)
@@ -46,47 +47,48 @@ public abstract class TestFixture : IAsyncLifetime
       _client.DefaultRequestHeaders.Add(key, val);
     }
 
-    return _client.PostAsJsonAsync(requestUri, value, cancellationToken);
+    var message = new HttpRequestMessage
+    {
+      Method = method,
+      RequestUri = new Uri(requestUri),
+    };
+
+    if (value != null)
+    {
+      message.Content = JsonContent.Create(value);
+    }
+
+    return _client.SendAsync(message, cancellationToken);
   }
 
-  public Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  protected Task<HttpResponseMessage> DeleteAsJsonAsync<TValue>(string requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+    => SendAsJsonAsync(HttpMethod.Delete, requestUri, value, headers, cancellationToken);
+
+  protected Task<HttpResponseMessage> PostAsJsonAsync<TValue>(string requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+    => SendAsJsonAsync(HttpMethod.Post, requestUri, value, headers, cancellationToken);
+
+  protected Task<HttpResponseMessage> PutAsJsonAsync<TValue>(string requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+    => SendAsJsonAsync(HttpMethod.Put, requestUri, value, headers, cancellationToken);
+
+  protected Task<HttpResponseMessage> GetAsync(string requestUri, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
+    => SendAsJsonAsync(HttpMethod.Get, requestUri, (object)null, headers, cancellationToken);
+
+  protected Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
     => RootAdmin_PostAsJsonAsync(requestUri, (object)value, headers, cancellationToken);
 
-  public async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync(string? requestUri, object value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  protected async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync(string? requestUri, object value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await PostAsJsonAsync(requestUri, value, headers, cancellationToken);
   }
 
-  public Task<HttpResponseMessage> PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
-  {
-    _client.DefaultRequestHeaders.Clear();
-    foreach ((string? key, string? val) in headers)
-    {
-      _client.DefaultRequestHeaders.Add(key, val);
-    }
-
-    return _client.PutAsJsonAsync(requestUri, value, cancellationToken);
-  }
-
-  public async Task<HttpResponseMessage> RootAdmin_PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  protected async Task<HttpResponseMessage> RootAdmin_PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await PutAsJsonAsync(requestUri, value, headers, cancellationToken);
   }
 
-  public Task<HttpResponseMessage> GetAsync(string? requestUri, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
-  {
-    _client.DefaultRequestHeaders.Clear();
-    foreach ((string? key, string? val) in headers)
-    {
-      _client.DefaultRequestHeaders.Add(key, val);
-    }
-
-    return _client.GetAsync(requestUri, cancellationToken);
-  }
-
-  public async Task<HttpResponseMessage> RootAdmin_GetAsync(string? requestUri, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
+  protected async Task<HttpResponseMessage> RootAdmin_GetAsync(string? requestUri, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
     return await GetAsync(requestUri, headers, cancellationToken);
@@ -94,17 +96,7 @@ public abstract class TestFixture : IAsyncLifetime
 
   protected async Task<(Dictionary<string, string> Headers, Guid BranchId)> CreateTenantAndLogin()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    string adminEmail = $"admin@{tenantId}.com";
-
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = adminEmail,
-      Name = $"Tenant {tenantId}",
-      ProdPackageId = _packages.First().Id
-    };
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
     var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -164,17 +156,69 @@ public abstract class TestFixture : IAsyncLifetime
     return LoginAs(RootAdminEmail, RootAdminPassword, headers, "root", null, SubscriptionType.Standard, cancellationToken);
   }
 
+  protected string PrepareNewTenant(out string adminEmail, out CreateTenantRequest tenant, bool hasDemo = true)
+  {
+    var tenantId = Guid.NewGuid().ToString();
+    adminEmail = $"admin@{tenantId}.com";
+
+    var technicalSupportEngId = _rootTenantUsers.First().Id.ToString();
+
+    tenant = new CreateTenantRequest
+    {
+      Id = tenantId,
+      ProdPackageId = _packages.First().Id,
+      DemoPackageId = hasDemo ? _packages.First().Id : null,
+      Email = $"email@{tenantId}.com",
+      AdminEmail = adminEmail,
+      Name = $"Tenant {tenantId}",
+      TechSupportUserId = technicalSupportEngId
+    };
+    return tenantId;
+  }
+
   protected List<SubscriptionPackageDto>? _packages;
+  protected List<UserDetailsDto>? _rootTenantUsers;
 
   public async Task InitializeAsync()
   {
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();
+
+    var headers = new Dictionary<string, string>();
+    var adminHeaders = await LoginAsRootAdmin(headers, CancellationToken.None);
+    _ = await GetAsync("/api/users", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    _rootTenantUsers = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
+    _rootTenantUsers.Should().NotBeNullOrEmpty();
   }
 
   public Task DisposeAsync()
   {
     return Task.CompletedTask;
+  }
+
+  protected async Task openCashRegister(Guid cashRegisterId, Dictionary<string, string> adminHeaders)
+  {
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  protected async Task<Guid> createNewCashRegister(Guid branchId, List<BasicUserDataDto> users, Dictionary<string, string> adminHeaders)
+  {
+    HttpResponseMessage _;
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branchId,
+      ManagerId = users.First().Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    return cashRegisterId;
   }
 }

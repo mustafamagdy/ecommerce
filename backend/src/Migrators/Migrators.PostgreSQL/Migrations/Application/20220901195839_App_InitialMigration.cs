@@ -164,7 +164,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    ImagePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
