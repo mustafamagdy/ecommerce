@@ -22,7 +22,7 @@ public class AdministrativeTests : TestFixture
   public AdministrativeTests(HostFixture host, ITestOutputHelper output)
     : base(host, output)
   {
-    _output.WriteLine("Start testing ..");
+    Output.WriteLine("Start testing ..");
   }
 
   [Fact]
