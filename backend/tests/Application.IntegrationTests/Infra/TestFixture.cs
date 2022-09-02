@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Bogus;
 using FluentAssertions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
@@ -18,6 +19,7 @@ public abstract class TestFixture : IAsyncLifetime
 {
   private readonly HostFixture _host;
   private readonly HttpClient _client;
+  protected readonly Faker _faker = new();
   protected readonly ITestOutputHelper _output;
   protected static string RootAdminPassword = "123Pa$$word!";
   protected static string RootAdminEmail = "admin@root.com";
@@ -181,6 +183,8 @@ public abstract class TestFixture : IAsyncLifetime
 
   public async Task InitializeAsync()
   {
+    Randomizer.Seed = new Random(1234);
+
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();

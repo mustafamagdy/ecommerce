@@ -6,6 +6,22 @@ namespace FSH.WebApi.Host.Controllers.Operation;
 
 public class CashRegisterController : VersionedApiController
 {
+  [HttpGet("{id:guid}")]
+  [MustHavePermission(FSHAction.View, FSHResource.CashRegisters)]
+  [OpenApiOperation("Get cash register basic data with status.", "")]
+  public Task<BasicCashRegisterDto> GetCashRegister(Guid id)
+  {
+    return Mediator.Send(new GetCashRegisterRequest(id));
+  }
+
+  [HttpGet("{id:guid}/with-balance")]
+  [MustHavePermission(FSHAction.View, FSHResource.CashRegisters)]
+  [OpenApiOperation("Get cash register basic data with status and balance.", "")]
+  public Task<CashRegisterWithBalanceDto> GetCashRegisterWithBalance(Guid id)
+  {
+    return Mediator.Send(new GetCashRegisterWithBalanceRequest(id));
+  }
+
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.CashRegisters)]
   [OpenApiOperation("Create a cash register for a branch.", "")]
@@ -49,7 +65,7 @@ public class CashRegisterController : VersionedApiController
   [HttpPost("transfer")]
   [MustHavePermission(FSHAction.Transfer, FSHResource.CashRegisters)]
   [OpenApiOperation("Transfer between cash registers.", "")]
-  public Task TransferFromCashRegister(TransferFromCashRegisterRequest request)
+  public Task<Guid> TransferFromCashRegister(TransferFromCashRegisterRequest request)
   {
     return Mediator.Send(request);
   }
@@ -72,7 +88,7 @@ public class CashRegisterController : VersionedApiController
 
   [HttpPost("search-details")]
   [MustHavePermission(FSHAction.Search, FSHResource.CashRegisters)]
-  [OpenApiOperation("Search cash register basic info.", "")]
+  [OpenApiOperation("Search cash register basic info and balance.", "")]
   public Task<PaginationResponse<CashRegisterWithBalanceDto>> GetListAsync(SearchCashRegistersRequest request)
   {
     return Mediator.Send(request);

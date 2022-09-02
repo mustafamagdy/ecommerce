@@ -5,8 +5,6 @@ using FluentAssertions;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Specification;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Application.Operation.Orders;
@@ -29,6 +27,7 @@ public class OperationsTests : TestFixture
 
     var users = await GetUserList(adminHeaders);
     var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    cashRegisterId.Should().NotBeEmpty();
   }
 
   [Fact]
@@ -83,7 +82,6 @@ public class OperationsTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
-
   [Fact]
   public async Task can_open_cash_register()
   {
@@ -92,6 +90,12 @@ public class OperationsTests : TestFixture
 
     var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
     await openCashRegister(cashRegisterId, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeTrue();
   }
 
   [Fact]
@@ -107,6 +111,12 @@ public class OperationsTests : TestFixture
       Id = cashRegisterId
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeFalse();
   }
 
   [Fact]
@@ -208,25 +218,233 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task cash_register_active_operations_should_be_empty_when_open_cash_register()
   {
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+    var users = await GetUserList(adminHeaders);
+
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeTrue();
+
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    operations.Should().NotBeNull();
+    operations.Data.Should().BeEmpty();
   }
 
   [Fact]
   public async Task cash_register_active_operations_should_be_empty_when_close_cash_register()
   {
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+    var users = await GetUserList(adminHeaders);
+
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeTrue();
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    var order1 = await create_cash_order(adminHeaders, randomItem.Id);
+    var order2 = await create_cash_order(adminHeaders, randomItem.Id);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    operations.Should().NotBeNull();
+    operations.Data.Should().NotBeEmpty();
+    operations.Data.Should().HaveCount(2);
+
+    // act -> close the cash register
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeFalse();
+
+    // assert -> check active operations in cash register
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    operations.Should().NotBeNull();
+    operations.Data.Should().BeEmpty();
   }
 
   [Fact]
   public async Task active_operations_should_moved_to_archived_operations_when_close_cash_register()
   {
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+    var users = await GetUserList(adminHeaders);
+
+    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegisterId, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeTrue();
+
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+
+    var order1 = await create_cash_order(adminHeaders, randomItem.Id);
+    var order2 = await create_cash_order(adminHeaders, randomItem.Id);
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    var active_operations1 = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    active_operations1.Should().NotBeNull();
+    active_operations1.Data.Should().NotBeEmpty();
+    active_operations1.Data.Should().HaveCount(2);
+
+    // act -> close the cash register
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister = await _.Content.ReadFromJsonAsync<BasicCashRegisterDto>();
+    cashRegister.Should().NotBeNull();
+    cashRegister.Opened.Should().BeFalse();
+
+    // assert -> check active operations in cash register
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-active-operations", new SearchCashRegisterActiveOperationsRequest
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    operations.Should().NotBeNull();
+    operations.Data.Should().BeEmpty();
+
+    _ = await PostAsJsonAsync("/api/v1/cashRegister/search-archived-operations", new SearchCashRegisterArchivedOperationsRequest()
+    {
+      CashRegisterId = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var archived_operations = await _.Content.ReadFromJsonAsync<PaginationResponse<CashRegisterActiveOperationDto>>();
+    archived_operations.Should().NotBeNull();
+    archived_operations.Data.Should().NotBeEmpty();
+    archived_operations.Data.Should().HaveCount(2);
+    archived_operations.Data.Should().Contain(a => a.Amount == active_operations1.Data[0].Amount
+                                                   && a.PaymentMethodName == active_operations1.Data[0].PaymentMethodName);
+    archived_operations.Data.Should().Contain(a => a.Amount == active_operations1.Data[1].Amount
+                                                   && a.PaymentMethodName == active_operations1.Data[1].PaymentMethodName);
   }
 
   [Fact]
   public async Task can_transfer_between_cash_register()
   {
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+    var users = await GetUserList(adminHeaders);
+
+    var cashRegister1_Id = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegister1_Id, adminHeaders);
+
+    var cashRegister2_Id = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegister2_Id, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(0);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister2_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister2 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister2.Should().NotBeNull();
+    cashRegister2.Balance.Should().Be(0);
+
+    // do some operations on cash register 1 to add some balance
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegister1_Id.ToString());
+
+    var order1 = await create_cash_order(adminHeaders, randomItem.Id);
+    var order2 = await create_cash_order(adminHeaders, randomItem.Id);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().BeGreaterThan(0);
+
+    _ = await PostAsJsonAsync($"/api/v1/cashRegister/transfer", new TransferFromCashRegisterRequest()
+    {
+      SourceCashRegisterId = cashRegister1_Id,
+      DestCashRegisterId = cashRegister2_Id,
+      Amount = cashRegister1.Balance,
+      DateTime = HostFixture.SYSTEM_TIME.Now,
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var transferId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(0);
   }
 
   [Fact]
-  public async Task det_cash_register_had_to_accept_transfer_in_order_to_appear_in_its_balance()
+  public async Task dest_cash_register_had_to_accept_transfer_in_order_to_appear_in_its_balance()
   {
   }
 
@@ -456,33 +674,6 @@ public class OperationsTests : TestFixture
     customers.Should().Contain(a => a.Name == customer2.Name);
   }
 
-  private async Task<BasicCustomerDto> create_customer_and_order(Dictionary<string, string> adminHeaders, Guid orderItemId)
-  {
-    var newCustomer = new CreateSimpleCustomerRequest
-    {
-      Name = Guid.NewGuid().ToString(),
-      PhoneNumber = Guid.NewGuid().ToString()
-    };
-    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
-
-    _ = await PostAsJsonAsync("/api/v1/orders", new CreateOrderRequest()
-    {
-      CustomerId = customer.Id,
-      Items = new List<OrderItemRequest>()
-      {
-        new()
-        {
-          ItemId = orderItemId,
-          Qty = 1
-        }
-      }
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    return customer;
-  }
-
   [Fact]
   public async Task can_create_order_and_cancel_it_should_affect_customer_balance()
   {
@@ -581,6 +772,49 @@ public class OperationsTests : TestFixture
   }
 
 
+  private async Task<BasicCustomerDto> create_customer_and_order(Dictionary<string, string> adminHeaders, Guid orderItemId)
+  {
+    var newCustomer = new CreateSimpleCustomerRequest
+    {
+      Name = Guid.NewGuid().ToString(),
+      PhoneNumber = Guid.NewGuid().ToString()
+    };
+    var _ = await PostAsJsonAsync("/api/v1/customers", newCustomer, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
+
+    _ = await PostAsJsonAsync("/api/v1/orders", new CreateOrderRequest()
+    {
+      CustomerId = customer.Id,
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = orderItemId,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    return customer;
+  }
+
+  private async Task<OrderDto?> create_cash_order(Dictionary<string, string> adminHeaders, Guid orderItemId, int? qty = null)
+  {
+    var _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = orderItemId,
+          Qty = qty ?? _faker.Random.Int(1, 100)
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    return await _.Content.ReadFromJsonAsync<OrderDto>();
+  }
   /*
    * - cash_register
    * ? can_create_only_one_cash_register_per_branch

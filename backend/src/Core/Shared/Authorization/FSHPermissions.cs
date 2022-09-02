@@ -125,6 +125,7 @@ public static class FSHPermissions
     new("Update Cash Registers", FSHAction.Update, FSHResource.CashRegisters),
     new("Open Cash Register", FSHAction.Open, FSHResource.CashRegisters),
     new("Close Cash Registers", FSHAction.Close, FSHResource.CashRegisters),
+    new("Transfer amount between cash registers", FSHAction.Transfer, FSHResource.CashRegisters),
     new("Approve Cash Registers transfer", FSHAction.Approve, FSHResource.CashRegisters),
 
     // Service Catalogs
