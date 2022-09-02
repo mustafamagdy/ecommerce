@@ -26,7 +26,7 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
 
     var users = await GetUserList(adminHeaders);
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
     cashRegisterId.Should().NotBeEmpty();
   }
 
@@ -43,7 +43,7 @@ public class OperationsTests : TestFixture
     var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new CloseCashRegisterRequest()
     {
@@ -65,7 +65,7 @@ public class OperationsTests : TestFixture
     }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.FailedDependency);
 
-    await openCashRegister(cashRegisterId, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     // try to create the order again
     _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
@@ -88,8 +88,8 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -104,7 +104,7 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
 
     var _ = await PostAsJsonAsync("/api/v1/cashRegister/close", new OpenCashRegisterRequest()
     {
@@ -131,9 +131,9 @@ public class OperationsTests : TestFixture
     var users = await GetUserList(adminHeaders);
 
     var randomItem = catalog.Data[1];
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
 
-    await openCashRegister(cashRegisterId, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     adminHeaders.Add("cash-register", cashRegisterId.ToString());
 
@@ -182,8 +182,8 @@ public class OperationsTests : TestFixture
 
     var randomItem = catalog.Data[1];
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     adminHeaders.Add("cash-register", cashRegisterId.ToString());
 
@@ -221,8 +221,8 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -248,8 +248,8 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -310,8 +310,8 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegisterId}", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -386,11 +386,11 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegister1_Id = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegister1_Id, adminHeaders);
+    var cashRegister1_Id = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegister1_Id, adminHeaders);
 
-    var cashRegister2_Id = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegister2_Id, adminHeaders);
+    var cashRegister2_Id = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegister2_Id, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -449,11 +449,11 @@ public class OperationsTests : TestFixture
     var (adminHeaders, branchId) = await CreateTenantAndLogin();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegister1_Id = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegister1_Id, adminHeaders);
+    var cashRegister1_Id = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegister1_Id, adminHeaders);
 
-    var cashRegister2_Id = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegister2_Id, adminHeaders);
+    var cashRegister2_Id = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegister2_Id, adminHeaders);
 
     var _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -534,8 +534,8 @@ public class OperationsTests : TestFixture
 
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -591,8 +591,8 @@ public class OperationsTests : TestFixture
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -672,8 +672,8 @@ public class OperationsTests : TestFixture
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -723,8 +723,8 @@ public class OperationsTests : TestFixture
 
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -767,8 +767,8 @@ public class OperationsTests : TestFixture
     var customer = await _.Content.ReadFromJsonAsync<BasicCustomerDto>();
     var users = await GetUserList(adminHeaders);
 
-    var cashRegisterId = await createNewCashRegister(branchId, users, adminHeaders);
-    await openCashRegister(cashRegisterId, adminHeaders);
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
 
     _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -887,7 +887,7 @@ public class OperationsTests : TestFixture
         new()
         {
           ItemId = orderItemId,
-          Qty = qty ?? _faker.Random.Int(1, 100)
+          Qty = qty ?? Faker.Random.Int(1, 100)
         }
       }
     }, adminHeaders);

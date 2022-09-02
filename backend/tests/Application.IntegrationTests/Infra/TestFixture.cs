@@ -17,21 +17,23 @@ namespace Application.IntegrationTests.Infra;
 // public abstract class TestFixture : IClassFixture<HostFixture>
 public abstract class TestFixture : IAsyncLifetime
 {
-  private readonly HostFixture _host;
   private readonly HttpClient _client;
-  protected readonly Faker _faker = new();
-  protected readonly ITestOutputHelper _output;
+  protected readonly Faker Faker = new();
+  protected readonly ITestOutputHelper Output;
   protected static string RootAdminPassword = "123Pa$$word!";
-  protected static string RootAdminEmail = "admin@root.com";
+  protected static readonly string RootAdminEmail = "admin@root.com";
+  private List<SubscriptionPackageDto>? _packages;
+  private List<UserDetailsDto>? _rootTenantUsers;
 
   protected TestFixture(HostFixture host, ITestOutputHelper output)
   {
-    _host = host;
-    _output = output;
+    Output = output;
 
-    _client = _host.CreateClient();
-    _output.WriteLine("New http client created");
-    _host.MessageReceived += HostOnMessageReceived;
+    _client = host.CreateClient();
+    Output.WriteLine("New http client created");
+    host.MessageReceived += HostOnMessageReceived;
+
+    Randomizer.Seed = new Random(1234);
   }
 
   protected TaskCompletionSource<SmtpMessage>? MailReceivedTask;
@@ -73,27 +75,27 @@ public abstract class TestFixture : IAsyncLifetime
     => SendAsJsonAsync(HttpMethod.Put, requestUri, value, headers, cancellationToken);
 
   protected Task<HttpResponseMessage> GetAsync(string requestUri, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
-    => SendAsJsonAsync(HttpMethod.Get, requestUri, (object)null, headers, cancellationToken);
+    => SendAsJsonAsync(HttpMethod.Get, requestUri, (object)null!, headers, cancellationToken);
 
   protected Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
-    => RootAdmin_PostAsJsonAsync(requestUri, (object)value, headers, cancellationToken);
+    => RootAdmin_PostAsJsonAsync(requestUri, value! as object, headers, cancellationToken);
 
   protected async Task<HttpResponseMessage> RootAdmin_PostAsJsonAsync(string? requestUri, object value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
-    return await PostAsJsonAsync(requestUri, value, headers, cancellationToken);
+    return await PostAsJsonAsync(requestUri!, value, headers, cancellationToken);
   }
 
   protected async Task<HttpResponseMessage> RootAdmin_PutAsJsonAsync<TValue>(string? requestUri, TValue value, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
-    return await PutAsJsonAsync(requestUri, value, headers, cancellationToken);
+    return await PutAsJsonAsync(requestUri!, value, headers, cancellationToken);
   }
 
   protected async Task<HttpResponseMessage> RootAdmin_GetAsync(string? requestUri, Dictionary<string, string> headers = default!, CancellationToken cancellationToken = default)
   {
     headers = await LoginAsRootAdmin(headers, cancellationToken);
-    return await GetAsync(requestUri, headers, cancellationToken);
+    return await GetAsync(requestUri!, headers, cancellationToken);
   }
 
   protected async Task<(Dictionary<string, string> Headers, Guid BranchId)> CreateTenantAndLogin()
@@ -110,7 +112,7 @@ public abstract class TestFixture : IAsyncLifetime
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var tenantInfo = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
     tenantInfo.Should().NotBeNull();
-    tenantInfo.Branches.Should().NotBeEmpty();
+    tenantInfo!.Branches.Should().NotBeEmpty();
     var defaultBranch = tenantInfo.Branches.First();
 
     tenantAdminLoginHeaders = await LoginAs(adminEmail, MultitenancyConstants.DefaultPassword, null, tenantId, defaultBranch.Id);
@@ -119,7 +121,7 @@ public abstract class TestFixture : IAsyncLifetime
     return (tenantAdminLoginHeaders, defaultBranch.Id);
   }
 
-  protected async Task<List<BasicUserDataDto>> GetUserList(Dictionary<string, string> headers)
+  protected async Task<List<BasicUserDataDto>?> GetUserList(Dictionary<string, string> headers)
   {
     var _ = await GetAsync("/api/users/basic", headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -143,7 +145,7 @@ public abstract class TestFixture : IAsyncLifetime
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
-    _output.WriteLine("Token is " + tokenResult.Token);
+    Output.WriteLine("Token is " + tokenResult.Token);
 
     headers ??= new Dictionary<string, string>();
 
@@ -163,7 +165,7 @@ public abstract class TestFixture : IAsyncLifetime
     var tenantId = Guid.NewGuid().ToString();
     adminEmail = $"admin@{tenantId}.com";
 
-    var technicalSupportEngId = _rootTenantUsers.First().Id.ToString();
+    var technicalSupportEngId = _rootTenantUsers!.First().Id.ToString();
 
     tenant = new CreateTenantRequest
     {
@@ -178,13 +180,32 @@ public abstract class TestFixture : IAsyncLifetime
     return tenantId;
   }
 
-  protected List<SubscriptionPackageDto>? _packages;
-  protected List<UserDetailsDto>? _rootTenantUsers;
+  protected async Task OpenCashRegister(Guid cashRegisterId, Dictionary<string, string> adminHeaders)
+  {
+    var _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
+    {
+      Id = cashRegisterId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  protected async Task<Guid> CreateNewCashRegister(Guid branchId, List<BasicUserDataDto> users, Dictionary<string, string> adminHeaders)
+  {
+    HttpResponseMessage _;
+    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
+    {
+      Name = Guid.NewGuid().ToString(),
+      BranchId = branchId,
+      ManagerId = users.First().Id,
+      Color = "red"
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
+    return cashRegisterId;
+  }
 
   public async Task InitializeAsync()
   {
-    Randomizer.Seed = new Random(1234);
-
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();
@@ -200,29 +221,5 @@ public abstract class TestFixture : IAsyncLifetime
   public Task DisposeAsync()
   {
     return Task.CompletedTask;
-  }
-
-  protected async Task openCashRegister(Guid cashRegisterId, Dictionary<string, string> adminHeaders)
-  {
-    var _ = await PostAsJsonAsync("/api/v1/cashRegister/open", new OpenCashRegisterRequest()
-    {
-      Id = cashRegisterId
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-  }
-
-  protected async Task<Guid> createNewCashRegister(Guid branchId, List<BasicUserDataDto> users, Dictionary<string, string> adminHeaders)
-  {
-    HttpResponseMessage _;
-    _ = await PostAsJsonAsync("/api/v1/cashRegister", new CreateCashRegisterRequest()
-    {
-      Name = Guid.NewGuid().ToString(),
-      BranchId = branchId,
-      ManagerId = users.First().Id,
-      Color = "red"
-    }, adminHeaders);
-    _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var cashRegisterId = await _.Content.ReadFromJsonAsync<Guid>();
-    return cashRegisterId;
   }
 }
