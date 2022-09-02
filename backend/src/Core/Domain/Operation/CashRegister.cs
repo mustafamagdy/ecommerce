@@ -1,6 +1,5 @@
 using Ardalis.SmartEnum;
 using FSH.WebApi.Domain.Structure;
-using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Domain.Operation;
 
@@ -51,7 +50,7 @@ public class CashRegister : AuditableEntity, IAggregateRoot
                   || a.OperationType != PaymentOperationType.PendingOut)
       .ToList();
 
-    _archivedOperations.AddRange(committedOperations.Cast<ArchivedPaymentOperation>());
+    _archivedOperations.AddRange(committedOperations.Select(ArchivedPaymentOperation.From));
 
     _activeOperations = _activeOperations.Except(committedOperations).ToList();
   }
@@ -136,7 +135,7 @@ public class ActivePaymentOperation : PaymentOperation
   }
 
   public static (ActivePaymentOperation Source, ActivePaymentOperation Destination) CreateTransfer(Guid sourceCashRegisterId,
-    Guid destinationCashRegisterId, decimal amount, DateTime opDate)
+    Guid destinationCashRegisterId, decimal amount, DateTime opDate, Guid transferPaymentMethodId)
   {
     var src = new ActivePaymentOperation
     {
@@ -144,7 +143,8 @@ public class ActivePaymentOperation : PaymentOperation
       Amount = amount,
       OperationType = PaymentOperationType.PendingOut,
       DateTime = opDate,
-      CashRegisterId = sourceCashRegisterId
+      CashRegisterId = sourceCashRegisterId,
+      PaymentMethodId = transferPaymentMethodId
     };
 
     var dest = new ActivePaymentOperation
@@ -154,7 +154,8 @@ public class ActivePaymentOperation : PaymentOperation
       OperationType = PaymentOperationType.PendingIn,
       DateTime = opDate,
       CashRegisterId = destinationCashRegisterId,
-      PendingTransferId = src.Id
+      PendingTransferId = src.Id,
+      PaymentMethodId = transferPaymentMethodId
     };
 
     return (src, dest);
@@ -163,6 +164,17 @@ public class ActivePaymentOperation : PaymentOperation
 
 public class ArchivedPaymentOperation : PaymentOperation
 {
+  public static ArchivedPaymentOperation From(ActivePaymentOperation activeOp)
+  {
+    return new ArchivedPaymentOperation
+    {
+      Amount = activeOp.Amount,
+      CashRegisterId = activeOp.CashRegisterId,
+      OperationType = activeOp.OperationType,
+      PaymentMethodId = activeOp.PaymentMethodId,
+      PendingTransferId = activeOp.PendingTransferId,
+    };
+  }
 }
 
 public sealed class PaymentOperationType : SmartEnum<PaymentOperationType, string>

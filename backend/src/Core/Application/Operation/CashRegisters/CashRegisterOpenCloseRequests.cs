@@ -17,6 +17,14 @@ public class CloseCashRegisterRequest : CashRegisterRequest
 {
 }
 
+public class GetCashRegisterWithActiveOperationsSpec : Specification<CashRegister>
+{
+  public GetCashRegisterWithActiveOperationsSpec(Guid cashRegisterId)
+    => Query
+      .Include(a => a.ActiveOperations)
+      .Where(a => a.Id == cashRegisterId);
+}
+
 public class OpenCashRegisterRequestHandler : IRequestHandler<OpenCashRegisterRequest, string>
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
@@ -61,7 +69,7 @@ public class CloseCashRegisterRequestHandler : IRequestHandler<CloseCashRegister
 
   public async Task<string> Handle(CloseCashRegisterRequest request, CancellationToken cancellationToken)
   {
-    var cr = await _repository.GetByIdAsync(request.Id, cancellationToken);
+    var cr = await _repository.FirstOrDefaultAsync(new GetCashRegisterWithActiveOperationsSpec(request.Id), cancellationToken);
     if (cr == null)
     {
       throw new NotFoundException(_t["Cash Register not found"]);
