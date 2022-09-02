@@ -70,7 +70,7 @@ public class CashRegisterController : VersionedApiController
     return Mediator.Send(request);
   }
 
-  [HttpPost("approve-transfer")]
+  [HttpPost("accept-transfer")]
   [MustHavePermission(FSHAction.Approve, FSHResource.CashRegisters)]
   [OpenApiOperation("Approve a transfer for a cash register", "")]
   public Task<string> CommitTransfer(CommitCashRegisterTransferRequest request)

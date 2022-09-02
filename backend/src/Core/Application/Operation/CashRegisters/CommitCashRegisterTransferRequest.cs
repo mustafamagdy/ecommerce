@@ -26,13 +26,17 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
 
   public async Task<string> Handle(CommitCashRegisterTransferRequest request, CancellationToken cancellationToken)
   {
-    var tr = await _repository.GetByIdAsync(request.TransferId, cancellationToken);
+    var tr = await _repository.GetByIdAsync(request.TransferId, cancellationToken)
+             ?? throw new NotFoundException($"Transfer {request.TransferId} operation not found ");
+
     if (tr.OperationType != PaymentOperationType.PendingIn || tr.PendingTransferId == null)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }
 
-    var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId, cancellationToken);
+    var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId!, cancellationToken)
+                     ?? throw new NotFoundException($"Pending transfer operation {tr.PendingTransferId} not found");
+
     if (pendingOut == null || pendingOut.OperationType != PaymentOperationType.PendingOut)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
@@ -56,12 +60,9 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
     }
 
     destCr.AcceptPendingIn(tr);
-    await _repository.UpdateAsync(pendingOut, cancellationToken);
-
     sourceCr.CommitPendingOut(pendingOut);
-    await _repository.UpdateAsync(tr, cancellationToken);
-    await _uow.CommitAsync(cancellationToken);
 
+    await _uow.CommitAsync(cancellationToken);
     return _t["Transfer committed"];
   }
 }

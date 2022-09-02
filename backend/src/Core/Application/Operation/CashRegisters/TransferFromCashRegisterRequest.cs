@@ -35,7 +35,7 @@ public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashR
       throw new NotFoundException(_t["Source cash register not found"]);
     }
 
-    var destCr = await _repository.GetByIdAsync(request.SourceCashRegisterId, cancellationToken);
+    var destCr = await _repository.GetByIdAsync(request.DestCashRegisterId, cancellationToken);
     if (destCr == null)
     {
       throw new NotFoundException(_t["Destination cash register not found"]);

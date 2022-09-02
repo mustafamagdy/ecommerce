@@ -446,6 +446,85 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task dest_cash_register_had_to_accept_transfer_in_order_to_appear_in_its_balance()
   {
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+    var users = await GetUserList(adminHeaders);
+
+    var cashRegister1_Id = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegister1_Id, adminHeaders);
+
+    var cashRegister2_Id = await createNewCashRegister(branchId, users, adminHeaders);
+    await openCashRegister(cashRegister2_Id, adminHeaders);
+
+    var _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(0);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister2_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var cashRegister2 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister2.Should().NotBeNull();
+    cashRegister2.Balance.Should().Be(0);
+
+    // do some operations on cash register 1 to add some balance
+    _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var randomItem = catalog.Data[1];
+
+    adminHeaders.Add("cash-register", cashRegister1_Id.ToString());
+
+    var order1 = await create_cash_order(adminHeaders, randomItem.Id);
+    var order2 = await create_cash_order(adminHeaders, randomItem.Id);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().BeGreaterThan(0);
+
+    var transferAmount = cashRegister1.Balance;
+    _ = await PostAsJsonAsync($"/api/v1/cashRegister/transfer", new TransferFromCashRegisterRequest()
+    {
+      SourceCashRegisterId = cashRegister1_Id,
+      DestCashRegisterId = cashRegister2_Id,
+      Amount = transferAmount,
+      DateTime = HostFixture.SYSTEM_TIME.Now,
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var transferId = await _.Content.ReadFromJsonAsync<Guid>();
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister1_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(0);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister2_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(0);
+
+    _ = await PostAsJsonAsync($"/api/v1/cashRegister/accept-transfer", new CommitCashRegisterTransferRequest
+    {
+      TransferId = transferId
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await GetAsync($"/api/v1/cashRegister/{cashRegister2_Id}/with-balance", adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    cashRegister1 = await _.Content.ReadFromJsonAsync<CashRegisterWithBalanceDto>();
+    cashRegister1.Should().NotBeNull();
+    cashRegister1.Opened.Should().BeTrue();
+    cashRegister1.Balance.Should().Be(transferAmount);
   }
 
   [Fact]
@@ -815,6 +894,7 @@ public class OperationsTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     return await _.Content.ReadFromJsonAsync<OrderDto>();
   }
+
   /*
    * - cash_register
    * ? can_create_only_one_cash_register_per_branch
