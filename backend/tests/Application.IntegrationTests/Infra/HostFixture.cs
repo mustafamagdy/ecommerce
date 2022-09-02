@@ -113,7 +113,7 @@ public class HostFixture : IAsyncLifetime
   {
     await _factory.DisposeAsync();
 
-    await _dbContainer.StopAsync();
+    // await _dbContainer.StopAsync();
     _memoryConfigs.Dispose();
     _smtpServer.Dispose();
   }
