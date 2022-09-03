@@ -14,22 +14,24 @@ using Xunit.Abstractions;
 namespace Application.IntegrationTests.Infra;
 
 [Collection(nameof(TestConstants.WebHostTests))]
-// public abstract class TestFixture : IClassFixture<HostFixture>
 public abstract class TestFixture : IAsyncLifetime
+
+// public abstract class TestFixture : IClassFixture<HostFixture>, IAsyncLifetime
 {
-  private readonly HttpClient _client;
+  // private HttpClient _client;
   protected readonly Faker Faker = new();
+  private readonly HostFixture _host;
   protected readonly ITestOutputHelper Output;
   protected static string RootAdminPassword = "123Pa$$word!";
   protected static readonly string RootAdminEmail = "admin@root.com";
   private List<SubscriptionPackageDto>? _packages;
   private List<UserDetailsDto>? _rootTenantUsers;
+  private HttpClient _client;
 
   protected TestFixture(HostFixture host, ITestOutputHelper output)
   {
+    _host = host;
     Output = output;
-
-    _client = host.CreateClient();
     Output.WriteLine("New http client created");
     host.MessageReceived += HostOnMessageReceived;
 
@@ -145,8 +147,6 @@ public abstract class TestFixture : IAsyncLifetime
     response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
-    Output.WriteLine("Token is " + tokenResult.Token);
-
     headers ??= new Dictionary<string, string>();
 
     headers.Add("Authorization", $"Bearer {tokenResult.Token}");
@@ -165,7 +165,7 @@ public abstract class TestFixture : IAsyncLifetime
     var tenantId = Guid.NewGuid().ToString();
     adminEmail = $"admin@{tenantId}.com";
 
-    var technicalSupportEngId = _rootTenantUsers!.First().Id.ToString();
+    var technicalSupportEngId = _rootTenantUsers?.First().Id.ToString();
 
     tenant = new CreateTenantRequest
     {
@@ -206,6 +206,10 @@ public abstract class TestFixture : IAsyncLifetime
 
   public async Task InitializeAsync()
   {
+    Output.WriteLine("Initializing .... ");
+    // _host.Client = _host.CreateClient();
+    _client = _host.CreateClient();
+
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     _packages = await _.Content.ReadFromJsonAsync<List<SubscriptionPackageDto>>();
@@ -220,6 +224,9 @@ public abstract class TestFixture : IAsyncLifetime
 
   public Task DisposeAsync()
   {
+    Output.WriteLine("Disposing .... ");
+    // _host.Client.Dispose();
+    _client.Dispose();
     return Task.CompletedTask;
   }
 }

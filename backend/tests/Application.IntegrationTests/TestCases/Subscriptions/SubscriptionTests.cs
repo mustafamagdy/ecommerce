@@ -12,6 +12,7 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Subscriptions;
 
+// [Collection(nameof(TestConstants.WebHostTests))]
 public class SubscriptionTests : TestFixture
 {
   public SubscriptionTests(HostFixture host, ITestOutputHelper output)

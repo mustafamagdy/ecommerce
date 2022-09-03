@@ -5,31 +5,43 @@ using DotNet.Testcontainers.Containers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using netDumbster.smtp;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Application.IntegrationTests.Infra;
 
 public class HostFixture : IAsyncLifetime
 {
+  public Guid Instance;
   private int _dbPort = GetFreeTcpPort();
   private int _hostPort = GetFreeTcpPort();
-  private TestcontainersContainer _dbContainer;
+  private int _mailPort = GetFreeTcpPort();
 
+  private TestcontainersContainer _dbContainer;
   private WebApplicationFactory<Program> _factory;
   public static readonly TestSystemTime SYSTEM_TIME = new();
-  private IDisposable _memoryConfigs;
-
-  private readonly string dbProvider = "postgresql"; // postgresql // mysql
+  // private IDisposable _memoryConfigs;
+  private readonly IMessageSink _sink;
   private string _cnStringTemplate = "";
-
   private SimpleSmtpServer _smtpServer;
 
-  public HttpClient CreateClient() => _factory.CreateClient();
-
+  // public HttpClient CreateClient() => _factory.CreateClient();
+  // public HttpClient Client;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
 
+  public HostFixture(IMessageSink sink)
+  {
+    Instance = Guid.NewGuid();
+
+    this._sink = sink;
+    sink.OnMessage(new DiagnosticMessage("Host fixture is being created"));
+    Environment.SetEnvironmentVariable("db-provider", "postgresql"); // postgresql // mysql
+  }
+
+  private string DbProvider => Environment.GetEnvironmentVariable("db-provider")!;
   public async Task InitializeAsync()
   {
-    _cnStringTemplate = dbProvider switch
+    _cnStringTemplate = DbProvider switch
     {
       "postgresql" => "Server=127.0.0.1;Port={0};Database={1};Uid=postgres;Pwd=DeV12345",
       "mysql" => "Data Source=127.0.0.1;Port={0};Initial Catalog={1};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true;Allow User Variables=true;",
@@ -41,36 +53,43 @@ public class HostFixture : IAsyncLifetime
 
     var db_name = $"main_{Guid.NewGuid()}";
     var connectionString = string.Format(_cnStringTemplate, _dbPort, db_name);
-    var tenantDbConnectionStringTemplate = dbProvider switch
+    var tenantDbConnectionStringTemplate = DbProvider switch
     {
       "postgresql" => $"Server=127.0.0.1;Port={_dbPort};Database={{0}};Uid=postgres;Pwd=DeV12345",
       "mysql" => $"Data Source=127.0.0.1;Port={_dbPort};Initial Catalog={{0}};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true;Allow User Variables=true;",
       _ => throw new ArgumentOutOfRangeException()
     };
-    var mailPort = GetFreeTcpPort();
 
-    _memoryConfigs = Program.OverrideConfig(new Dictionary<string, string>
+    var testConfigs = new Dictionary<string, string>
     {
-      ["DatabaseSettings:DBProvider"] = dbProvider,
+      ["DatabaseSettings:DBProvider"] = DbProvider,
       ["DatabaseSettings:ConnectionString"] = connectionString,
       ["DatabaseSettings:ConnectionStringTemplate"] = tenantDbConnectionStringTemplate,
-      // ["HangfireSettings:Storage:ConnectionString"] = connectionString,
-      // ["HangfireSettings:Storage:StorageProvider"] = dbProvider,
       ["HangfireSettings:Storage:ConnectionString"] = "",
       ["HangfireSettings:Storage:StorageProvider"] = "",
-      ["MailSettings:Port"] = mailPort.ToString()
-    });
+      ["MailSettings:Port"] = _mailPort.ToString()
+    };
+
+    foreach (var config in testConfigs)
+    {
+      Environment.SetEnvironmentVariable(config.Key, config.Value);
+    }
 
     _factory = new TestWebApplicationFactory(_hostPort);
 
-    _smtpServer = SimpleSmtpServer.Start(mailPort);
+    _smtpServer = SimpleSmtpServer.Start(_mailPort);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
+
+
+    // Client = _factory.CreateClient();
   }
+
+  internal HttpClient CreateClient() => _factory.CreateClient();
 
   private TestcontainersContainer BuildContainer()
   {
     _dbPort = GetFreeTcpPort();
-    var internalPort = dbProvider switch
+    var internalPort = DbProvider switch
     {
       "postgresql" => 5432,
       "mysql" => 3306,
@@ -78,7 +97,7 @@ public class HostFixture : IAsyncLifetime
     };
 
     ITestcontainersBuilder<TestcontainersContainer> builder = new TestcontainersBuilder<TestcontainersContainer>();
-    builder = dbProvider switch
+    builder = DbProvider switch
     {
       "postgresql" => builder.WithImage("postgres:alpine")
         .WithEnvironment("POSTGRES_PASSWORD", "DeV12345"),
@@ -112,9 +131,9 @@ public class HostFixture : IAsyncLifetime
   public async Task DisposeAsync()
   {
     await _factory.DisposeAsync();
+    await _dbContainer.StopAsync();
 
-    // await _dbContainer.StopAsync();
-    _memoryConfigs.Dispose();
+    // _memoryConfigs.Dispose();
     _smtpServer.Dispose();
   }
 }
