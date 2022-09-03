@@ -13,21 +13,16 @@ namespace Application.IntegrationTests.Infra;
 public class HostFixture : IAsyncLifetime
 {
   public Guid Instance;
-  private int _dbPort = GetFreeTcpPort();
-  private int _hostPort = GetFreeTcpPort();
-  private int _mailPort = GetFreeTcpPort();
-
+  private readonly int _dbPort = GetFreeTcpPort();
+  private readonly int _hostPort = GetFreeTcpPort();
+  private readonly int _mailPort = GetFreeTcpPort();
   private TestcontainersContainer _dbContainer;
   private WebApplicationFactory<Program> _factory;
-  public static readonly TestSystemTime SYSTEM_TIME = new();
-  // private IDisposable _memoryConfigs;
   private readonly IMessageSink _sink;
   private string _cnStringTemplate = "";
   private SimpleSmtpServer _smtpServer;
-
-  // public HttpClient CreateClient() => _factory.CreateClient();
-  // public HttpClient Client;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
+  public static readonly TestSystemTime SYSTEM_TIME = new();
 
   public HostFixture(IMessageSink sink)
   {
@@ -39,6 +34,7 @@ public class HostFixture : IAsyncLifetime
   }
 
   private string DbProvider => Environment.GetEnvironmentVariable("db-provider")!;
+
   public async Task InitializeAsync()
   {
     _cnStringTemplate = DbProvider switch
@@ -79,16 +75,12 @@ public class HostFixture : IAsyncLifetime
 
     _smtpServer = SimpleSmtpServer.Start(_mailPort);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
-
-
-    // Client = _factory.CreateClient();
   }
 
   internal HttpClient CreateClient() => _factory.CreateClient();
 
   private TestcontainersContainer BuildContainer()
   {
-    _dbPort = GetFreeTcpPort();
     var internalPort = DbProvider switch
     {
       "postgresql" => 5432,
@@ -132,8 +124,6 @@ public class HostFixture : IAsyncLifetime
   {
     await _factory.DisposeAsync();
     await _dbContainer.StopAsync();
-
-    // _memoryConfigs.Dispose();
     _smtpServer.Dispose();
   }
 }

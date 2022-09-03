@@ -18,7 +18,6 @@ public abstract class TestFixture : IAsyncLifetime
 
 // public abstract class TestFixture : IClassFixture<HostFixture>, IAsyncLifetime
 {
-  // private HttpClient _client;
   protected readonly Faker Faker = new();
   private readonly HostFixture _host;
   protected readonly ITestOutputHelper Output;
@@ -207,7 +206,6 @@ public abstract class TestFixture : IAsyncLifetime
   public async Task InitializeAsync()
   {
     Output.WriteLine("Initializing .... ");
-    // _host.Client = _host.CreateClient();
     _client = _host.CreateClient();
 
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
@@ -225,7 +223,6 @@ public abstract class TestFixture : IAsyncLifetime
   public Task DisposeAsync()
   {
     Output.WriteLine("Disposing .... ");
-    // _host.Client.Dispose();
     _client.Dispose();
     return Task.CompletedTask;
   }
