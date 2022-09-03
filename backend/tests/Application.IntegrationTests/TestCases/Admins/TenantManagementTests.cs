@@ -9,7 +9,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class TenantManagementTests : TestFixture
 {
   public TenantManagementTests(HostFixture host, ITestOutputHelper output)
