@@ -16,18 +16,13 @@ public class HostFixture : IAsyncLifetime
   private int _dbPort = GetFreeTcpPort();
   private int _hostPort = GetFreeTcpPort();
   private int _mailPort = GetFreeTcpPort();
-
   private TestcontainersContainer _dbContainer;
   private WebApplicationFactory<Program> _factory;
-  public static readonly TestSystemTime SYSTEM_TIME = new();
-  // private IDisposable _memoryConfigs;
   private readonly IMessageSink _sink;
   private string _cnStringTemplate = "";
   private SimpleSmtpServer _smtpServer;
-
-  // public HttpClient CreateClient() => _factory.CreateClient();
-  // public HttpClient Client;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
+  public static readonly TestSystemTime SYSTEM_TIME = new();
 
   public HostFixture(IMessageSink sink)
   {
@@ -79,9 +74,6 @@ public class HostFixture : IAsyncLifetime
 
     _smtpServer = SimpleSmtpServer.Start(_mailPort);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
-
-
-    // Client = _factory.CreateClient();
   }
 
   internal HttpClient CreateClient() => _factory.CreateClient();
@@ -132,8 +124,6 @@ public class HostFixture : IAsyncLifetime
   {
     await _factory.DisposeAsync();
     await _dbContainer.StopAsync();
-
-    // _memoryConfigs.Dispose();
     _smtpServer.Dispose();
   }
 }
