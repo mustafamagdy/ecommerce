@@ -34,7 +34,6 @@ public class HostFixture : IAsyncLifetime
   }
 
   private string DbProvider => Environment.GetEnvironmentVariable("db-provider")!;
-
   public async Task InitializeAsync()
   {
     _cnStringTemplate = DbProvider switch
