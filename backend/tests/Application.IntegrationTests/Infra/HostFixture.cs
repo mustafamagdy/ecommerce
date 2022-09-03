@@ -16,11 +16,11 @@ public class HostFixture : IAsyncLifetime
   private readonly int _dbPort = GetFreeTcpPort();
   private readonly int _hostPort = GetFreeTcpPort();
   private readonly int _mailPort = GetFreeTcpPort();
-  private TestcontainersContainer _dbContainer;
-  private WebApplicationFactory<Program> _factory;
+  private TestcontainersContainer _dbContainer = null!;
+  private WebApplicationFactory<Program> _factory = null!;
   private readonly IMessageSink _sink;
   private string _cnStringTemplate = "";
-  private SimpleSmtpServer _smtpServer;
+  private SimpleSmtpServer _smtpServer = null!;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
   public static readonly TestSystemTime SYSTEM_TIME = new();
 

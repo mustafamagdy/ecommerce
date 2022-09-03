@@ -25,7 +25,7 @@ public abstract class TestFixture : IAsyncLifetime
   protected static readonly string RootAdminEmail = "admin@root.com";
   private List<SubscriptionPackageDto>? _packages;
   private List<UserDetailsDto>? _rootTenantUsers;
-  private HttpClient _client;
+  private HttpClient _client = null!;
 
   protected TestFixture(HostFixture host, ITestOutputHelper output)
   {
