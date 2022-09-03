@@ -60,18 +60,19 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 
 public partial class Program
 {
-  static Dictionary<string, string> s_ConfigOverride { get; set; } = new();
+  private static Dictionary<string, string> _configOverride { get; set; } = new();
 
   class ClearConfigOverride : IDisposable
   {
-    public void Dispose() => s_ConfigOverride = new Dictionary<string, string>();
+    public void Dispose() => _configOverride = new Dictionary<string, string>();
   }
 
-  public static IReadOnlyDictionary<string, string> InMemoryConfig => s_ConfigOverride;
+  public static IReadOnlyDictionary<string, string> InMemoryConfig => _configOverride;
 
   public static IDisposable OverrideConfig(Dictionary<string, string> config)
   {
-    s_ConfigOverride = config;
+    Log.Information("tooooot ....................");
+    _configOverride = config;
     return new ClearConfigOverride();
   }
 }

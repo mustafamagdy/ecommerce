@@ -17,12 +17,12 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests;
 
+// [Collection(nameof(TestConstants.WebHostTests))]
 public class AdministrativeTests : TestFixture
 {
   public AdministrativeTests(HostFixture host, ITestOutputHelper output)
     : base(host, output)
   {
-    Output.WriteLine("Start testing ..");
   }
 
   [Fact]
