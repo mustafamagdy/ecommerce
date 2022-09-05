@@ -2,7 +2,11 @@ using System.Net;
 using System.Net.Sockets;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
+using FSH.WebApi.Shared.Multitenancy;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using netDumbster.smtp;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,6 +27,8 @@ public class HostFixture : IAsyncLifetime
   private SimpleSmtpServer _smtpServer = null!;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
   public static readonly TestSystemTime SYSTEM_TIME = new();
+  private string? envName = "";
+  private string _rootTenantDbName;
 
   public HostFixture(IMessageSink sink)
   {
@@ -34,6 +40,7 @@ public class HostFixture : IAsyncLifetime
   }
 
   private string DbProvider => Environment.GetEnvironmentVariable("db-provider")!;
+
   public async Task InitializeAsync()
   {
     _cnStringTemplate = DbProvider switch
@@ -46,8 +53,8 @@ public class HostFixture : IAsyncLifetime
     _dbContainer = BuildContainer();
     await _dbContainer.StartAsync();
 
-    var db_name = $"main_{Guid.NewGuid()}";
-    var connectionString = string.Format(_cnStringTemplate, _dbPort, db_name);
+    _rootTenantDbName = $"main_{Guid.NewGuid()}";
+    var connectionString = string.Format(_cnStringTemplate, _dbPort, _rootTenantDbName);
     var tenantDbConnectionStringTemplate = DbProvider switch
     {
       "postgresql" => $"Server=127.0.0.1;Port={_dbPort};Database={{0}};Uid=postgres;Pwd=DeV12345",
@@ -74,9 +81,20 @@ public class HostFixture : IAsyncLifetime
 
     _smtpServer = SimpleSmtpServer.Start(_mailPort);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
+
+    envName = _factory.Services.GetService<IHostEnvironment>()?.EnvironmentName;
   }
 
   internal HttpClient CreateClient() => _factory.CreateClient();
+
+  internal string GetDbConnectionForTenantAndSubscriptionType(string tenantId, SubscriptionType subscriptionType)
+  {
+    var dbName = $"{envName}-{tenantId}-{subscriptionType}";
+    // var cnnString = string.Format(_cnStringTemplate, _dbPort, dbName);
+    return dbName;
+  }
+
+  internal string MainTenantConnectionString => string.Format(_cnStringTemplate, _dbPort, _rootTenantDbName);
 
   private TestcontainersContainer BuildContainer()
   {
