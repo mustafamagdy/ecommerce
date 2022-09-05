@@ -33,7 +33,7 @@ public abstract class TestFixture : IAsyncLifetime
   {
     _host = host;
     Output = output;
-    Output.WriteLine("New http client created");
+    // Output.WriteLine("New http client created");
     host.MessageReceived += HostOnMessageReceived;
 
     Randomizer.Seed = new Random(1234);
@@ -217,7 +217,7 @@ public abstract class TestFixture : IAsyncLifetime
 
   public async Task InitializeAsync()
   {
-    Output.WriteLine("Initializing .... ");
+    // Output.WriteLine("Initializing .... ");
     _client = _host.CreateClient();
 
     var _ = await GetAsync("/api/tenants/packages", new Dictionary<string, string>());
@@ -234,7 +234,7 @@ public abstract class TestFixture : IAsyncLifetime
 
   public async Task DisposeAsync()
   {
-    Output.WriteLine("Disposing .... ");
+    // Output.WriteLine("Disposing .... ");
     await CleanDbsAsync();
     _client.Dispose();
   }
