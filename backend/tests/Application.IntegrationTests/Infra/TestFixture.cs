@@ -8,6 +8,7 @@ using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Shared.Multitenancy;
 using netDumbster.smtp;
+using Npgsql;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,6 +27,7 @@ public abstract class TestFixture : IAsyncLifetime
   private List<SubscriptionPackageDto>? _packages;
   private List<UserDetailsDto>? _rootTenantUsers;
   private HttpClient _client = null!;
+  private Dictionary<string, SubscriptionType[]> tenantToBeCleaned = new();
 
   protected TestFixture(HostFixture host, ITestOutputHelper output)
   {
@@ -176,6 +178,8 @@ public abstract class TestFixture : IAsyncLifetime
       Name = $"Tenant {tenantId}",
       TechSupportUserId = technicalSupportEngId
     };
+
+    AddDbToBeCleaned(tenantId, true, hasDemo);
     return tenantId;
   }
 
@@ -203,6 +207,14 @@ public abstract class TestFixture : IAsyncLifetime
     return cashRegisterId;
   }
 
+  private void AddDbToBeCleaned(string tenantId, bool prod = false, bool demo = false)
+  {
+    var subs = new List<SubscriptionType>();
+    if (prod) subs.Add(SubscriptionType.Standard);
+    if (demo) subs.Add(SubscriptionType.Demo);
+    tenantToBeCleaned.Add(tenantId, subs.ToArray());
+  }
+
   public async Task InitializeAsync()
   {
     Output.WriteLine("Initializing .... ");
@@ -220,10 +232,28 @@ public abstract class TestFixture : IAsyncLifetime
     _rootTenantUsers.Should().NotBeNullOrEmpty();
   }
 
-  public Task DisposeAsync()
+  public async Task DisposeAsync()
   {
     Output.WriteLine("Disposing .... ");
+    await CleanDbsAsync();
     _client.Dispose();
-    return Task.CompletedTask;
+  }
+
+  private async Task CleanDbsAsync()
+  {
+    string mainTenantConnection = _host.MainTenantConnectionString;
+    foreach (var tenant in tenantToBeCleaned)
+    {
+      foreach (var db in tenant.Value)
+      {
+        var  dbName = _host.GetDbConnectionForTenantAndSubscriptionType(tenant.Key, db);
+        await using var cnn = new NpgsqlConnection(mainTenantConnection);
+        await cnn.OpenAsync();
+        var cmd = cnn.CreateCommand();
+        cmd.CommandText = $"DROP DATABASE IF EXISTS \"{dbName}\" WITH (FORCE)";
+        await cmd.ExecuteNonQueryAsync();
+        await cnn.CloseAsync();
+      }
+    }
   }
 }
