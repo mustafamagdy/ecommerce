@@ -67,17 +67,6 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
       throw new NotFoundException(_t["Order #{0} ({1}) not found", request.OrderNumber ?? string.Empty, request.OrderId ?? Guid.Empty]);
     }
 
-    order.Company = new CompanyDto
-    {
-      Address = new AddressDto
-      {
-        City = new City
-        {
-          Name = "test city name"
-        }
-      }
-    };
-
     var invoiceTemplate = await _templateInvoice.FirstOrDefaultAsync(
       new SingleResultSpecification<SimpleReceiptInvoice>()
         .Query

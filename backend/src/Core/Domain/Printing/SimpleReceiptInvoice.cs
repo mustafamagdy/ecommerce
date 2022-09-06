@@ -4,6 +4,10 @@ public class SimpleReceiptInvoice : PrintableDocument
 {
 }
 
+public class OrdersSummaryReport : PrintableDocument
+{
+}
+
 public class WideReceiptInvoice : PrintableDocument
 {
 }

@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Operation.Orders;
+﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Operation.Orders;
 using FSH.WebApi.Infrastructure.Finance;
 using FSH.WebApi.Shared.Multitenancy;
 
@@ -82,6 +83,16 @@ public class OrdersController : VersionedApiController
     return Mediator.Send(request, cancellationToken);
   }
 
+  [HttpPost("summary-report")]
+  [MustHavePermission(FSHAction.View, FSHResource.Orders)]
+  [OpenApiOperation("Generate orders summary report for requested filters.", "")]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Generate))]
+  public async Task<FileResult> ExportSummaryReport(OrderSummaryReportRequest request, ISystemTime time, CancellationToken cancellationToken)
+  {
+    var orderPdf = await Mediator.Send(request, cancellationToken);
+    var reportName = $"orders_summary_{time.Now.ToShortDateString()}";
+    return File(orderPdf, "application/octet-stream", $"{reportName}.pdf");
+  }
 
   // [HttpPut("{id:guid}")]
   // [MustHavePermission(FSHAction.Update, FSHResource.Orders)]

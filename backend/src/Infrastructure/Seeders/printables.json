@@ -22,14 +22,6 @@
         "BindingProperty": "$OrderNumber"
       },
       {
-        "Type": "Title",
-        "Order": 2,
-        "Alignment": "Center",
-        "Position": "Header",
-        "ShowDebug": false,
-        "BindingProperty": "$Company.Address.City.Name"
-      },
-      {
         "Type": "Barcode",
         "Order": 3,
         "Alignment": "Center",
@@ -63,6 +55,71 @@
         "Position": "Body",
         "ShowDebug": false,
         "BindingProperty": "Grand Total: ,$TotalAmount"
+      }
+    ]
+  },
+  {
+    "Type": "OrdersSummary",
+    "Active": true,
+    "Sections": [
+      {
+        "Type": "Title",
+        "Order": 1,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": false,
+        "BindingProperty": "تقرير اجماليات الطلبات"
+      },
+      {
+        "Type": "Title",
+        "Order": 2,
+        "Alignment": "Center",
+        "Position": "Header",
+        "ShowDebug": false,
+        "BindingProperty": "$DateFrom - $DateTo"
+      },
+      {
+        "Type": "Table",
+        "Order": 4,
+        "Alignment": "Center",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "$Orders[](OrderNumber,OrderDate,CustomerName,TotalAmount,TotalVat,NetAmount,TotalPaid)",
+        "HeaderTitle": "Qty%al,Price%al,Item Name%ar",
+        "ColumnDefs": "c25,c25,r,c25,c25,c25,c25",
+        "HeaderStyle": "font=8,semi-bold"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 5,
+        "Alignment": "Right",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "Grand Total: ,$TotalAmount"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 6,
+        "Alignment": "Right",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "Total Paid: ,$TotalPaid"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 7,
+        "Alignment": "Right",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "Total Vat: ,$TotalVat"
+      },
+      {
+        "Type": "TwoPartTitle",
+        "Order": 8,
+        "Alignment": "Right",
+        "Position": "Body",
+        "ShowDebug": false,
+        "BindingProperty": "Total Remaining: ,$TotalRemaining"
       }
     ]
   }
