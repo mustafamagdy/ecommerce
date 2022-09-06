@@ -24,8 +24,6 @@ public class BrandTests : TestFixture
   {
   }
 
-  // brands
-
   [Fact]
   public async Task can_create_brand_when_submit_valid_data()
   {

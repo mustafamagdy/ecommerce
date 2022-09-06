@@ -18,12 +18,13 @@ public class DtoCustomMapping
       .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
       ;
 
+    TypeAdapterConfig<Order, OrderSummaryDto>
+      .NewConfig();
+
     TypeAdapterConfig<Order, OrderExportDto>
-      .NewConfig()
+      .ForType()
       .Map(dest => dest.Base64QrCode, src => src.QrCodeBase64)
-      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber)
-      .Ignore(a => a.Company)
-      ;
+      .Map(dest => dest.PhoneNumber, src => src.Customer.PhoneNumber);
 
     TypeAdapterConfig<TenantProdSubscription, ProdTenantSubscriptionDto>
       .NewConfig()

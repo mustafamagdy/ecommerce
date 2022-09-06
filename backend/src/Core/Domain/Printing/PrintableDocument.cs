@@ -27,6 +27,7 @@ public class PrintableType : SmartEnum<PrintableType, string>
 {
   public static PrintableType Receipt = new(nameof(Receipt), nameof(Receipt));
   public static PrintableType Wide = new(nameof(Wide), nameof(Wide));
+  public static PrintableType OrdersSummary = new(nameof(OrdersSummary), nameof(OrdersSummary));
 
   public PrintableType(string name, string value)
     : base(name, value)

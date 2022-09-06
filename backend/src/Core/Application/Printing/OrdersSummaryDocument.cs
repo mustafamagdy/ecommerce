@@ -6,11 +6,11 @@ using Unit = QuestPDF.Infrastructure.Unit;
 
 namespace FSH.WebApi.Application.Printing;
 
-public class InvoiceDocument : BasePdfDocument
+public class OrdersSummaryDocument : BasePdfDocument
 {
   private readonly BoundTemplate _boundedTemplate;
 
-  public InvoiceDocument(BoundTemplate boundedTemplate)
+  public OrdersSummaryDocument(BoundTemplate boundedTemplate)
   {
     _boundedTemplate = boundedTemplate;
   }

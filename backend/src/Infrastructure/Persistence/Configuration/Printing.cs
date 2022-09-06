@@ -22,6 +22,7 @@ public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDo
     builder
       .HasDiscriminator<string>("template_type")
       .HasValue<SimpleReceiptInvoice>(PrintableType.Receipt.Name)
+      .HasValue<OrdersSummaryReport>(PrintableType.OrdersSummary.Name)
       .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name);
 
     // builder.HasMany(a => a.Sections).WithOne(a => a.Document).HasForeignKey(a => a.DocumentId);

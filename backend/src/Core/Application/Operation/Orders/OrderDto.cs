@@ -29,12 +29,20 @@ public class OrderItemDto : IDto
   public decimal ItemTotal { get; set; }
 }
 
-public class OrderExportDto : IDto
+public class OrderSummaryReportDto : IDto
 {
-  public OrderExportDto()
-  {
-  }
+  public string DateFrom { get; set; }
+  public string DateTo { get; set; }
+  public decimal TotalAmount { get; set; }
+  public decimal TotalPaid { get; set; }
+  public decimal TotalVat { get; set; }
+  public decimal TotalRemaining { get; set; }
 
+  public List<OrderSummaryDto> Orders { get; set; }
+}
+
+public class OrderSummaryDto : IDto
+{
   public string OrderNumber { get; set; }
   public DateTime OrderDate { get; set; }
   public string PhoneNumber { get; set; }
@@ -44,24 +52,14 @@ public class OrderExportDto : IDto
   public decimal NetAmount { get; set; }
   public decimal TotalPaid { get; set; }
   public bool Paid { get; set; }
+}
+
+public class OrderExportDto : OrderSummaryDto
+{
+  public OrderExportDto()
+  {
+  }
+
   public string Base64QrCode { get; set; }
   public List<OrderItemDto> OrderItems { get; set; }
-
-  public CompanyDto Company { get; set; }
-}
-
-public class CompanyDto
-{
-  public string CompanyName { get; set; }
-  public AddressDto Address { get; set; }
-}
-
-public class AddressDto
-{
-  public City City { get; set; }
-}
-
-public class City
-{
-  public string Name { get; set; }
 }
