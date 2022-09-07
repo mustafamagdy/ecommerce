@@ -17,7 +17,7 @@ public class TenantManagementTests : TestFixture
   }
 
   [Fact]
-  public async Task can_create_new_tenants_when_submit_valid_data()
+  public async Task can_create_new_tenant_when_submit_valid_data()
   {
     var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
@@ -26,6 +26,42 @@ public class TenantManagementTests : TestFixture
     var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
     tenantResponse.Should().NotBeNull();
     tenantResponse.Id.Should().Be(tenantId);
+  }
+
+
+  [Fact]
+  public async Task root_tenant_cannot_be_updated()
+  {
+    var _ = await RootAdmin_PutAsJsonAsync("/api/tenants", new UpdateTenantRequest
+    {
+      Id = "root",
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
+  [Fact]
+  public async Task can_update_tenant_and_that_reflects_in_its_data()
+  {
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
+
+
+    var updateTenantRequest = new UpdateTenantRequest
+    {
+      Id = tenant.Id,
+      Name = "test tenant"
+    };
+    _ = await RootAdmin_PutAsJsonAsync("/api/tenants", updateTenantRequest);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var updatedTenant = await _.Content.ReadFromJsonAsync<ViewTenantInfoDto>();
+    updatedTenant.Should().NotBeNull();
+    updatedTenant.Id.Should().Be(tenantId);
+    updatedTenant.Name.Should().Be(updateTenantRequest.Name);
   }
 
   [Fact]
@@ -243,6 +279,4 @@ public class TenantManagementTests : TestFixture
     _ = await TryLoginAs(adminEmail2, MultitenancyConstants.DefaultPassword, tenantId2, null, SubscriptionType.Demo);
     _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
   }
-
-
 }

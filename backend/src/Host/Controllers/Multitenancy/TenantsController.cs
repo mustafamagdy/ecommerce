@@ -38,6 +38,14 @@ public class TenantsController : VersionNeutralApiController
     return Mediator.Send(request);
   }
 
+  [HttpPut]
+  [MustHavePermission(FSHAction.Update, FSHResource.Tenants)]
+  [OpenApiOperation("Update tenant details.", "")]
+  public Task<ViewTenantInfoDto> UpdateTenant(UpdateTenantRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
   [HttpPost("{id}/activate")]
   [MustHavePermission(FSHAction.Update, FSHResource.Tenants)]
   [OpenApiOperation("Activate a tenant.", "")]

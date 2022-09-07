@@ -1,5 +1,18 @@
 namespace FSH.WebApi.Application.Multitenancy;
 
+public class ViewTenantInfoDto : IDto
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public string AdminEmail { get; set; }
+  public string PhoneNumber { get; set; }
+  public string VatNo { get; set; }
+  public string Email { get; set; }
+  public string Address { get; set; }
+  public string AdminName { get; set; }
+  public string AdminPhoneNumber { get; set; }
+  public string TechSupportUserId { get; set; }
+}
 public class BasicTenantInfoDto
 {
   public string Id { get; set; } = default!;
