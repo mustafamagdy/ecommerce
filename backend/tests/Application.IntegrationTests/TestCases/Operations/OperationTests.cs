@@ -851,6 +851,11 @@ public class OperationsTests : TestFixture
     firstCustomer.DueAmount.Should().Be(0);
   }
 
+  [Fact]
+  public async Task deactivating_branch_disables_its_cash_registers()
+  {
+    // todo
+  }
 
   private async Task<BasicCustomerDto> create_customer_and_order(Dictionary<string, string> adminHeaders, Guid orderItemId)
   {
@@ -899,9 +904,5 @@ public class OperationsTests : TestFixture
   /*
    * - cash_register
    * ? can_create_only_one_cash_register_per_branch
-
-   * - customers
-   * - orders
-   * - payments
    */
 }

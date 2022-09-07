@@ -18,6 +18,7 @@ public class PrintableDocumentJsonConverter : JsonConverter
     {
       nameof(PrintableType.Receipt) => typeof(SimpleReceiptInvoice),
       nameof(PrintableType.Wide) => typeof(WideReceiptInvoice),
+      nameof(PrintableType.OrdersSummary) => typeof(OrdersSummaryReport),
       _ => throw new ArgumentOutOfRangeException(typeToken)
     };
 

@@ -28,4 +28,20 @@ public class BranchController : VersionedApiController
   {
     return Mediator.Send(request);
   }
+
+  [HttpPost("activate")]
+  [MustHavePermission(FSHAction.Activate, FSHResource.Branches)]
+  [OpenApiOperation("Activate a branch.", "")]
+  public Task Activate(ActivateBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("deactivate")]
+  [MustHavePermission(FSHAction.Deactivate, FSHResource.Branches)]
+  [OpenApiOperation("Deactivate a branch.", "")]
+  public Task Deactivate(ActivateBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
 }

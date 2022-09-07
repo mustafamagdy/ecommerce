@@ -64,7 +64,7 @@ General
   - Service Catalog
  
 - Operations reports:
-  - Orders (by user, service catalog item, payment method, days of week, cash register, branch)
+  [x] Orders (by user, service catalog item, payment method, days of week, cash register, branch)
   - VAT report (vat per order with total)
 - 
     

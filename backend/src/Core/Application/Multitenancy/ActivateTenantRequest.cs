@@ -1,5 +1,7 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Domain.Structure;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
@@ -20,20 +22,26 @@ public class ActivateTenantRequestValidator : CustomValidator<ActivateTenantRequ
 public class ActivateTenantRequestHandler : IRequestHandler<ActivateTenantRequest, string>
 {
   private readonly INonAggregateRepository<FSHTenantInfo> _repo;
-  private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
+  private readonly IRepository<Branch> _branchRepo;
+  private readonly ITenantUnitOfWork _uow;
+  private readonly IApplicationUnitOfWork _appUow;
   private readonly IStringLocalizer _t;
 
-  public ActivateTenantRequestHandler(IMultiTenantStore<FSHTenantInfo> tenantStore, INonAggregateRepository<FSHTenantInfo> repo,
-    IStringLocalizer<ActivateTenantRequestHandler> localizer)
+  public ActivateTenantRequestHandler(INonAggregateRepository<FSHTenantInfo> repo,
+    IStringLocalizer<ActivateTenantRequestHandler> localizer, ITenantUnitOfWork uow, IApplicationUnitOfWork appUow,
+    IRepository<Branch> branchRepo)
   {
-    _tenantStore = tenantStore;
     _repo = repo;
     _t = localizer;
+    _uow = uow;
+    _appUow = appUow;
+    _branchRepo = branchRepo;
   }
 
   public async Task<string> Handle(ActivateTenantRequest request, CancellationToken cancellationToken)
   {
-    var tenant = await _repo.GetByIdAsync(request.TenantId, cancellationToken);
+    var tenant = await _repo.GetByIdAsync(request.TenantId, cancellationToken)
+      ?? throw new NotFoundException($"Tenant {request.TenantId} not found");
 
     if (tenant.Active)
     {
@@ -42,7 +50,11 @@ public class ActivateTenantRequestHandler : IRequestHandler<ActivateTenantReques
 
     tenant.Activate();
 
-    await _tenantStore.TryUpdateAsync(tenant);
+    await _uow.CommitAsync(cancellationToken);
+
+    var branches = await _branchRepo.ListAsync(new TenantBranchSpec(request.TenantId), cancellationToken);
+    branches.ForEach(a => a.Activate());
+    await _appUow.CommitAsync(cancellationToken);
 
     return _t["Tenant {0} is now Activated.", request.TenantId];
   }
