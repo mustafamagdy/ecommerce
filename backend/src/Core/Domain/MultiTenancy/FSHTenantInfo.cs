@@ -127,6 +127,23 @@ public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity
 
   public string? Key => Name?.ToLower().Replace(" ", "-");
 
+  public FSHTenantInfo Update(string? name, string? adminEmail, string? phoneNumber, string? vatNo, string? email,
+    string? address, string? adminName, string? adminPhoneNumber, string? techSupportUserId)
+  {
+    if (name is not null && Name?.Equals(name) is not true) Name = name;
+    if (adminEmail is not null && AdminEmail?.Equals(adminEmail) is not true) AdminEmail = adminEmail;
+    if (phoneNumber is not null && PhoneNumber?.Equals(phoneNumber) is not true) PhoneNumber = phoneNumber;
+    if (vatNo is not null && VatNo?.Equals(vatNo) is not true) VatNo = vatNo;
+    if (email is not null && Email?.Equals(email) is not true) Email = email;
+    if (address is not null && Address?.Equals(address) is not true) Address = address;
+    if (adminName is not null && AdminName?.Equals(adminName) is not true) AdminName = adminName;
+    if (adminPhoneNumber is not null && AdminPhoneNumber?.Equals(adminPhoneNumber) is not true) AdminPhoneNumber = adminPhoneNumber;
+    if (techSupportUserId is not null && TechSupportUserId?.Equals(techSupportUserId) is not true) TechSupportUserId = techSupportUserId;
+
+    return this;
+  }
+
+
   string? ITenantInfo.Id { get => Id; set => Id = value ?? throw new InvalidOperationException("Id can't be null."); }
 
   string? ITenantInfo.Identifier { get => Identifier; set => Identifier = value ?? throw new InvalidOperationException("Identifier can't be null."); }
