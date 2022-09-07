@@ -87,7 +87,8 @@ public class OrdersController : VersionedApiController
   [MustHavePermission(FSHAction.View, FSHResource.Orders)]
   [OpenApiOperation("Generate orders summary report for requested filters.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Generate))]
-  public async Task<FileResult> ExportSummaryReport(OrderSummaryReportRequest request, ISystemTime time, CancellationToken cancellationToken)
+  public async Task<FileResult> ExportSummaryReport(OrderSummaryReportRequest request,
+    [FromServices] ISystemTime time, CancellationToken cancellationToken)
   {
     var orderPdf = await Mediator.Send(request, cancellationToken);
     var reportName = $"orders_summary_{time.Now.ToShortDateString()}";

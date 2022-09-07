@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220901195839_App_InitialMigration")]
+    [Migration("20220907194239_App_InitialMigration")]
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -886,6 +886,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -1054,6 +1059,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasIndex("CashRegisterId");
 
                     b.HasDiscriminator().HasValue("archived");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.OrdersSummaryReport", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("OrdersSummary");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.BarcodeSection", b =>

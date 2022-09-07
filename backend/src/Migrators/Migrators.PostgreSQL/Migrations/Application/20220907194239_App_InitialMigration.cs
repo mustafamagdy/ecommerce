@@ -46,6 +46,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     TenantId = table.Column<string>(type: "text", nullable: false),

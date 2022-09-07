@@ -1,4 +1,6 @@
 using System.Reflection;
+using Ardalis.Specification;
+using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Shared.Exceptions;
@@ -27,7 +29,18 @@ public class RequireOpenCashRegisterFilter : IAsyncActionFilter
     if (attribute != null && string.Equals(attribute.HeaderName, MultitenancyConstants.CashRegisterHeaderName, StringComparison.CurrentCultureIgnoreCase))
     {
       var cashRegisterId = await _cashRegisterResolver.Resolve(context.HttpContext);
-      var cashRegister = await _cashRegisterRepo.GetByIdAsync(cashRegisterId);
+      var cashRegister = await _cashRegisterRepo.FirstOrDefaultAsync(new SingleResultSpecification<CashRegister>()
+        .Query
+        .Include(a => a.Branch)
+        .Where(a => a.Id == cashRegisterId)
+        .Specification)
+        ?? throw new NotFoundException($"Cash register {cashRegisterId} not found");
+
+      if (!cashRegister.Branch.Active)
+      {
+        throw new InvalidCashRegisterOperation("The branch this cash register is defined into is not active");
+      }
+
       if (!cashRegister.Opened)
       {
         throw new InvalidCashRegisterOperation("Cash register is not opened for operations");

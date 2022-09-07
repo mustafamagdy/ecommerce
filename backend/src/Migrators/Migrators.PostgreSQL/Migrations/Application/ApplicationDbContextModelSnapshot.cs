@@ -884,6 +884,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -1052,6 +1057,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasIndex("CashRegisterId");
 
                     b.HasDiscriminator().HasValue("archived");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.OrdersSummaryReport", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("OrdersSummary");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.BarcodeSection", b =>
