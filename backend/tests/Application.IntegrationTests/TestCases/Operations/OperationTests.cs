@@ -5,6 +5,7 @@ using FluentAssertions;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Specification;
+using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Application.Operation.Orders;
@@ -854,7 +855,54 @@ public class OperationsTests : TestFixture
   [Fact]
   public async Task deactivating_branch_disables_its_cash_registers()
   {
-    // todo
+    var (adminHeaders, branchId) = await CreateTenantAndLogin();
+
+    var _ = await PostAsJsonAsync("/api/v1/catalog/search", new SearchServiceCatalogRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var catalog = await _.Content.ReadFromJsonAsync<PaginationResponse<ServiceCatalogDto>>();
+    catalog.Data.Should().NotBeNullOrEmpty();
+
+    var users = await GetUserList(adminHeaders);
+
+    var randomItem = catalog.Data[1];
+    var cashRegisterId = await CreateNewCashRegister(branchId, users, adminHeaders);
+    await OpenCashRegister(cashRegisterId, adminHeaders);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/deactivate", new DeactivateBranchRequest(branchId), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    adminHeaders.Add("cash-register", cashRegisterId.ToString());
+    _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = randomItem.Id,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.FailedDependency);
+
+    _ = await PostAsJsonAsync("/api/v1/branch/activate", new ActivateBranchRequest(branchId), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    await OpenCashRegister(cashRegisterId, adminHeaders);
+
+    // try to create the order again
+    _ = await PostAsJsonAsync("/api/v1/orders/cash", new CreateCashOrderRequest()
+    {
+      Items = new List<OrderItemRequest>()
+      {
+        new()
+        {
+          ItemId = randomItem.Id,
+          Qty = 1
+        }
+      }
+    }, adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   private async Task<BasicCustomerDto> create_customer_and_order(Dictionary<string, string> adminHeaders, Guid orderItemId)

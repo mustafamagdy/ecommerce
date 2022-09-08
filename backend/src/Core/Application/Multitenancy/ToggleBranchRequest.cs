@@ -7,9 +7,9 @@ namespace FSH.WebApi.Application.Multitenancy;
 
 public class ActivateBranchRequest : IRequest<Unit>
 {
-  public string BranchId { get; set; }
+  public Guid BranchId { get; set; }
 
-  public ActivateBranchRequest(string tenantId) => BranchId = tenantId;
+  public ActivateBranchRequest(Guid branchId) => BranchId = branchId;
 }
 
 public class ActivateBranchRequestValidator : CustomValidator<ActivateBranchRequest>
@@ -21,11 +21,11 @@ public class ActivateBranchRequestValidator : CustomValidator<ActivateBranchRequ
 
 public class ActivateBranchRequestHandler : IRequestHandler<ActivateBranchRequest, Unit>
 {
-  private readonly INonAggregateRepository<Branch> _repo;
-  private readonly ITenantUnitOfWork _uow;
+  private readonly IRepository<Branch> _repo;
+  private readonly IApplicationUnitOfWork _uow;
   private readonly IStringLocalizer _t;
 
-  public ActivateBranchRequestHandler(INonAggregateRepository<Branch> repo, IStringLocalizer<ActivateBranchRequestHandler> localizer, ITenantUnitOfWork uow)
+  public ActivateBranchRequestHandler(IRepository<Branch> repo, IStringLocalizer<ActivateBranchRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _repo = repo;
     _t = localizer;
@@ -50,9 +50,9 @@ public class ActivateBranchRequestHandler : IRequestHandler<ActivateBranchReques
 
 public class DeactivateBranchRequest : IRequest<Unit>
 {
-  public string BranchId { get; set; }
+  public Guid BranchId { get; set; }
 
-  public DeactivateBranchRequest(string tenantId) => BranchId = tenantId;
+  public DeactivateBranchRequest(Guid branchId) => BranchId = branchId;
 }
 
 public class DeactivateBranchRequestValidator : CustomValidator<DeactivateBranchRequest>
@@ -64,11 +64,11 @@ public class DeactivateBranchRequestValidator : CustomValidator<DeactivateBranch
 
 public class DeactivateBranchRequestHandler : IRequestHandler<DeactivateBranchRequest, Unit>
 {
-  private readonly INonAggregateRepository<Branch> _repo;
-  private readonly ITenantUnitOfWork _uow;
+  private readonly IRepository<Branch> _repo;
+  private readonly IApplicationUnitOfWork _uow;
   private readonly IStringLocalizer _t;
 
-  public DeactivateBranchRequestHandler(INonAggregateRepository<Branch> repo, IStringLocalizer<DeactivateBranchRequestHandler> localizer, ITenantUnitOfWork uow)
+  public DeactivateBranchRequestHandler(IRepository<Branch> repo, IStringLocalizer<DeactivateBranchRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _repo = repo;
     _t = localizer;
@@ -80,13 +80,14 @@ public class DeactivateBranchRequestHandler : IRequestHandler<DeactivateBranchRe
     var branch = await _repo.GetByIdAsync(request.BranchId, cancellationToken)
                  ?? throw new NotFoundException($"Branch {request.BranchId} not found");
 
-    if (branch.Active)
+    if (!branch.Active)
     {
       throw new ConflictException(_t["Tenant is already deactivated."]);
     }
 
     branch.Deactivate();
     await _uow.CommitAsync(cancellationToken);
+
     return Unit.Value;
   }
 }

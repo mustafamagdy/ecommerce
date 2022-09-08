@@ -116,6 +116,8 @@ public static class FSHPermissions
     new("View Branches", FSHAction.View, FSHResource.Branches),
     new("Create Branches", FSHAction.Create, FSHResource.Branches),
     new("Update Branches", FSHAction.Update, FSHResource.Branches),
+    new("Update Branches", FSHAction.Activate, FSHResource.Branches),
+    new("Update Branches", FSHAction.Deactivate, FSHResource.Branches),
 
     // CashRegisters
     new("Search Cash Registers", FSHAction.Search, FSHResource.CashRegisters),

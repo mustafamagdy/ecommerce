@@ -54,7 +54,7 @@ public class DeactivateTenantRequestHandler : IRequestHandler<DeactivateTenantRe
     await _uow.CommitAsync(cancellationToken);
 
     var branches = await _branchRepo.ListAsync(new TenantBranchSpec(request.TenantId), cancellationToken);
-    branches.ForEach(a => a.Activate());
+    branches.ForEach(a => a.Deactivate());
     await _appUow.CommitAsync(cancellationToken);
 
 
