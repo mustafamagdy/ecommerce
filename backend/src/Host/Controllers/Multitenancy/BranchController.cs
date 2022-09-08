@@ -21,6 +21,14 @@ public class BranchController : VersionedApiController
     return Mediator.Send(request);
   }
 
+  [HttpDelete]
+  [MustHavePermission(FSHAction.Delete, FSHResource.Branches)]
+  [OpenApiOperation("Delete a branch for the current tenant.", "")]
+  public Task DeleteBranchAsync(DeleteBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Branches)]
   [OpenApiOperation("Search for a branch.", "")]
@@ -40,7 +48,7 @@ public class BranchController : VersionedApiController
   [HttpPost("deactivate")]
   [MustHavePermission(FSHAction.Deactivate, FSHResource.Branches)]
   [OpenApiOperation("Deactivate a branch.", "")]
-  public Task Deactivate(ActivateBranchRequest request)
+  public Task Deactivate(DeactivateBranchRequest request)
   {
     return Mediator.Send(request);
   }
