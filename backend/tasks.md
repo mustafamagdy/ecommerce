@@ -195,7 +195,7 @@ transfer operation works in two steps
 [x] subscription types (what type of subscriptions? subscription allowed features)
 - subscription invoices + payments
 - subscription payment goes through main cash register also 
-- update tenant info (full page details)
+[x] update tenant info (full page details)
 [x] subscription support manager 
 - subscription credit note
 - subscription print

@@ -48,6 +48,12 @@ public abstract class TestFixture : IAsyncLifetime
 
   private Task<HttpResponseMessage> SendAsJsonAsync<TValue>(HttpMethod method, string requestUri, TValue? value, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
   {
+    return SendAsJsonAsync<TValue>(method, requestUri, value, headers, null, cancellationToken);
+  }
+
+  private Task<HttpResponseMessage> SendAsJsonAsync<TValue>(HttpMethod method, string requestUri, TValue? value, Dictionary<string, string> headers, string? tenant, CancellationToken cancellationToken = default)
+  {
+    _client = _host.CreateClient();
     _client.DefaultRequestHeaders.Clear();
     foreach ((string? key, string? val) in headers)
     {
@@ -63,6 +69,14 @@ public abstract class TestFixture : IAsyncLifetime
     if (value != null)
     {
       message.Content = JsonContent.Create(value);
+    }
+
+    if (tenant != null)
+    {
+      var baseAddress = _client.BaseAddress;
+      var urlBuilder = new UriBuilder(baseAddress);
+      urlBuilder.Host = tenant + "." + urlBuilder.Host;
+      _client.BaseAddress = urlBuilder.Uri;
     }
 
     return _client.SendAsync(message, cancellationToken);
@@ -137,6 +151,14 @@ public abstract class TestFixture : IAsyncLifetime
     var tenantHeader = tenant != null ? new Dictionary<string, string> { { "tenant", tenant } } : new Dictionary<string, string> { { "tenant", "root" } };
     tenantHeader.Add(MultitenancyConstants.SubscriptionTypeHeaderName, subscriptionType ?? SubscriptionType.Standard);
     return PostAsJsonAsync("/api/tokens", new TokenRequest(username, password, branchId), tenantHeader, cancellationToken);
+  }
+
+  protected Task<HttpResponseMessage> TryLoginWithoutTenantHeaderAs(string username, string password, string? tenant,
+    Guid? branchId = null, SubscriptionType? subscriptionType = default, CancellationToken cancellationToken = default)
+  {
+    var headers = new Dictionary<string, string>();
+    headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, subscriptionType ?? SubscriptionType.Standard);
+    return SendAsJsonAsync(HttpMethod.Post, "/api/tokens", new TokenRequest(username, password, branchId), headers, tenant, cancellationToken);
   }
 
   protected async Task<Dictionary<string, string>> LoginAs(string username, string password,
@@ -246,7 +268,7 @@ public abstract class TestFixture : IAsyncLifetime
     {
       foreach (var db in tenant.Value)
       {
-        var  dbName = _host.GetDbConnectionForTenantAndSubscriptionType(tenant.Key, db);
+        var dbName = _host.GetDbConnectionForTenantAndSubscriptionType(tenant.Key, db);
         await using var cnn = new NpgsqlConnection(mainTenantConnection);
         await cnn.OpenAsync();
         var cmd = cnn.CreateCommand();

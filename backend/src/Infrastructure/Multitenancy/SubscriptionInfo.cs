@@ -1,6 +1,7 @@
 ﻿using Ardalis.Specification;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Exceptions;
@@ -14,13 +15,15 @@ public class SubscriptionTypeResolver
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
   private readonly ITenantInfo _currentTenant;
+  private readonly ISystemTime _systemTime;
 
   public SubscriptionTypeResolver(IHttpContextAccessor httpContextAccessor, ITenantInfo? currentTenant,
-    IReadNonAggregateRepository<FSHTenantInfo> tenantRepo)
+    IReadNonAggregateRepository<FSHTenantInfo> tenantRepo, ISystemTime systemTime)
   {
     _httpContextAccessor = httpContextAccessor;
     _currentTenant = currentTenant;
     _tenantRepo = tenantRepo;
+    _systemTime = systemTime;
   }
 
   public SubscriptionType Resolve()
@@ -44,34 +47,15 @@ public class SubscriptionTypeResolver
     }
 
     var tenant = _tenantRepo.FirstOrDefaultAsync(new SingleResultSpecification<FSHTenantInfo>()
-        .Query.Where(a => a.Id == _currentTenant.Id)
+        .Query
+        .Include(a => a.ProdSubscription)
+        .Include(a => a.DemoSubscription)
+        .Include(a => a.TrainSubscription)
+        .Where(a => a.Id == _currentTenant.Id)
         .Specification)
       .GetAwaiter().GetResult();
 
-    switch (subscriptionType.Name)
-    {
-      case nameof(SubscriptionType.Standard):
-        if (tenant.ProdSubscriptionId == null)
-        {
-          throw new UnauthorizedException($"Tenant {tenant.Id} has no {subscriptionType.Name} subscription");
-        }
-
-        break;
-      case nameof(SubscriptionType.Demo):
-        if (tenant.DemoSubscriptionId == null)
-        {
-          throw new UnauthorizedException($"Tenant {tenant.Id} has no {subscriptionType.Name} subscription");
-        }
-
-        break;
-      case nameof(SubscriptionType.Train):
-        if (tenant.TrainSubscriptionId == null)
-        {
-          throw new UnauthorizedException($"Tenant {tenant.Id} has no {subscriptionType.Name} subscription");
-        }
-
-        break;
-    }
+    subscriptionType.ValidateActiveSubscription(_systemTime.Now, tenant);
 
     return subscriptionType;
   }

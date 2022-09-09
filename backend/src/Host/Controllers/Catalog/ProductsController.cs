@@ -3,7 +3,7 @@ using FSH.WebApi.Infrastructure.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
 
-[HasValidSubscriptionType("")]
+[HasValidSubscription]
 public class ProductsController : VersionedApiController
 {
   [HttpPost("search")]

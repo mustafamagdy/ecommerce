@@ -68,6 +68,7 @@ public abstract class TenantSubscription : BaseEntity
 
   public DateTime ExpiryDate { get; private set; }
 
+  public bool IsActive(DateTime now) => ExpiryDate >= now;
   public Guid CurrentPackageId { get; set; }
   public SubscriptionPackage CurrentPackage { get; set; }
 
