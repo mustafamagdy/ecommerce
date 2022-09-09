@@ -5,4 +5,5 @@ namespace FSH.WebApi.Infrastructure.Common.Services;
 public class DefaultSystemTime : ISystemTime
 {
   public DateTime Now => DateTime.Now;
+  public DateTime UtcNow => DateTime.UtcNow;
 }

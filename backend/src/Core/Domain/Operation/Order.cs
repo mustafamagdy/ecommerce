@@ -39,10 +39,10 @@ public class Order : AuditableEntity, IAggregateRoot
   public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
   public IReadOnlyCollection<OrderPayment> OrderPayments => _orderPayments.AsReadOnly();
 
-  public decimal TotalAmount => OrderItems?.Sum(a => a.Price * a.Qty) ?? 0;
-  public decimal TotalVat => OrderItems?.Sum(a => a.VatAmount) ?? 0;
-  public decimal NetAmount => OrderItems?.Sum(a => a.ItemTotal) ?? 0;
-  public decimal TotalPaid => OrderPayments?.Sum(a => a.Amount) ?? 0;
+  public decimal TotalAmount { get; private set; }
+  public decimal TotalVat { get; private set; }
+  public decimal NetAmount { get; private set; }
+  public decimal TotalPaid { get; private set; }
   public bool Paid => TotalPaid >= NetAmount;
 
   public void SetInvoiceQrCode(string? invoiceQrCode)
@@ -55,6 +55,9 @@ public class Order : AuditableEntity, IAggregateRoot
   {
     item.SetOrderId(Id);
     _orderItems.Add(item);
+    TotalAmount += item.Price * item.Qty;
+    TotalVat += item.VatAmount;
+    NetAmount += item.ItemTotal;
   }
 
   public void AddItems(List<OrderItem> items)
@@ -66,6 +69,7 @@ public class Order : AuditableEntity, IAggregateRoot
   {
     Customer.PayDue(payment.Amount);
     _orderPayments.Add(payment);
+    TotalPaid += payment.Amount;
   }
 
   public void Cancel(DateTime cancellationTime)
