@@ -37,8 +37,9 @@ internal static class Startup
       })
       .AddTenantUnitOfWork()
       .AddMultiTenant<FSHTenantInfo>()
-      .WithClaimStrategy(FSHClaims.Tenant)
+      .WithHostStrategy()
       .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
+      .WithClaimStrategy(FSHClaims.Tenant)
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
       .AddScoped<SubscriptionTypeResolver>()

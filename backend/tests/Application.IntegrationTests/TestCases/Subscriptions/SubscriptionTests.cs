@@ -81,9 +81,9 @@ public class SubscriptionTests : TestFixture
       });
 
     _.StatusCode.Should().NotBe(HttpStatusCode.OK);
-    _.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     var errorResult = await _.Content.ReadFromJsonAsync<ErrorResult>();
-    errorResult.Exception.Should().Contain("Subscription expired");
+    errorResult.Exception.Should().Contain("has no active Standard subscription");
 
     _ = await RootAdmin_GetAsync($"/api/tenants/{tenantId}");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
