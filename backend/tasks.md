@@ -189,8 +189,8 @@ transfer operation works in two steps
 - add role + permissions 
 - permission group (for screens)
 - add/remote user to/from role
-- branch crud
-- activate/deactivate branch (deactivate all operations => filter)
+[x] branch crud
+[x] activate/deactivate branch (deactivate all operations => filter)
 - subscription on branch level? how many branches
 [x] subscription types (what type of subscriptions? subscription allowed features)
 - subscription invoices + payments

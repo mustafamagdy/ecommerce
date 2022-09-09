@@ -1,9 +1,11 @@
-﻿using Ardalis.Specification;
+﻿using System.Linq.Expressions;
+using Ardalis.Specification;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Persistence;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
@@ -30,9 +32,15 @@ public class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>,
   public async Task<List<T>> AddRangeAsync(List<T> entities,
     CancellationToken cancellationToken = default(CancellationToken))
   {
-    await _uow.Set<T>().AddRangeAsync(entities, cancellationToken);
-    await SaveChangesAsync(cancellationToken);
+    await _uow.Set<T>().AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
+    await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
     return entities;
+  }
+
+  public Task<decimal?> SumAsync(ISpecification<T> specification, Expression<Func<T, decimal?>> selector, CancellationToken cancellationToken = default)
+  {
+    var source = ApplySpecification(specification);
+    return source.SumAsync(selector, cancellationToken: cancellationToken);
   }
 }
