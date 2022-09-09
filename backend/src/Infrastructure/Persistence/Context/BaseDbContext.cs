@@ -22,7 +22,7 @@ public abstract class BaseDbContext
   : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
   private readonly ITenantInfo? _currentTenant;
-  private readonly SubscriptionTypeResolver _subscriptionTypeResolver;
+  private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;
   private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
@@ -31,7 +31,7 @@ public abstract class BaseDbContext
 
   protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    SubscriptionTypeResolver subscriptionTypeResolver, ITenantConnectionStringResolver tenantConnectionStringResolver)
+    ISubscriptionTypeResolver subscriptionTypeResolver, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;

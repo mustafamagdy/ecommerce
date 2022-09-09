@@ -19,11 +19,11 @@ namespace FSH.WebApi.Infrastructure.Multitenancy
     private readonly ITenantResolver _tenantResolver;
     private readonly ISystemTime _systemTime;
     private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
-    private readonly SubscriptionTypeResolver _subscriptionTypeResolver;
+    private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;
 
     public HasValidSubscriptionTypeFilter(ITenantResolver tenantResolver,
       ISystemTime systemTime, IReadNonAggregateRepository<FSHTenantInfo> tenantRepo,
-      SubscriptionTypeResolver subscriptionTypeResolver)
+      ISubscriptionTypeResolver subscriptionTypeResolver)
     {
       _tenantResolver = tenantResolver;
       _systemTime = systemTime;

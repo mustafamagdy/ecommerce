@@ -42,7 +42,7 @@ internal static class Startup
       .WithClaimStrategy(FSHClaims.Tenant)
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
-      .AddScoped<SubscriptionTypeResolver>()
+      .AddScoped<ISubscriptionTypeResolver, SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
   }
