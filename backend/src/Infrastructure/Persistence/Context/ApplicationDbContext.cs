@@ -39,8 +39,6 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
 
   public DbSet<PaymentOperation> PaymentOperations => Set<PaymentOperation>();
-  public DbSet<SimpleReceiptInvoice> SimpleReceiptInvoiceTemplates => Set<SimpleReceiptInvoice>();
-  public DbSet<WideReceiptInvoice> WideReceiptInvoiceTemplates => Set<WideReceiptInvoice>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -63,14 +61,10 @@ public class ApplicationDbContext : BaseDbContext
   private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
   {
     modelBuilder.Ignore<FSHTenantInfo>();
-    // modelBuilder.Ignore<Subscription>();
     modelBuilder.Ignore<TenantSubscription>();
     modelBuilder.Ignore<TenantProdSubscription>();
     modelBuilder.Ignore<TenantDemoSubscription>();
     modelBuilder.Ignore<TenantTrainSubscription>();
-    // modelBuilder.Ignore<StandardSubscription>();
-    // modelBuilder.Ignore<DemoSubscription>();
-    // modelBuilder.Ignore<TrainSubscription>();
     modelBuilder.Ignore<SubscriptionFeature>();
     modelBuilder.Ignore<SubscriptionPackage>();
     modelBuilder.Ignore<SubscriptionPayment>();
