@@ -4,6 +4,7 @@ using System.Reflection;
 using FSH.WebApi.Application.Common.Pdf;
 using FSH.WebApi.Application.Printing;
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -18,7 +19,8 @@ namespace FSH.WebApi.Application.Operation.Orders
     public OrderExportDto Model { get; }
     private byte[] _qrCode = null!;
 
-    public DemoInvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator)
+    public DemoInvoiceDocument(SubscriptionType subscriptionType, OrderExportDto model, IVatQrCodeGenerator qrGenerator)
+      : base(subscriptionType)
     {
       _qrGenerator = qrGenerator;
       Model = model;

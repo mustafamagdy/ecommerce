@@ -1,13 +1,24 @@
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace FSH.WebApi.Application.Common.Pdf;
 
 public abstract class BasePdfDocument : IDocument
 {
+  private readonly SubscriptionType _subscriptionType;
+
+  public BasePdfDocument(SubscriptionType subscriptionType)
+  {
+    _subscriptionType = subscriptionType;
+  }
+
   public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+
+  protected bool IsDemo => _subscriptionType != SubscriptionType.Standard;
 
   public void Compose(IDocumentContainer container)
   {
@@ -23,6 +34,16 @@ public abstract class BasePdfDocument : IDocument
 
       page.Footer()
         .Element(Footer);
+
+      if (IsDemo)
+      {
+        page.Foreground()
+          .AlignMiddle()
+          .AlignCenter()
+          .Text("DEMO - Training")
+          .FontSize(64)
+          .FontColor(Colors.Blue.Lighten3);
+      }
     });
   }
 

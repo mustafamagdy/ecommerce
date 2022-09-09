@@ -10,6 +10,7 @@ using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmartEnum.EFCore;
@@ -18,7 +19,7 @@ namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant,SubscriptionTypeResolver subscriptionTypeResolver, DbContextOptions options, ICurrentUser currentUser,
+  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionTypeResolver subscriptionTypeResolver, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
     ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionTypeResolver, tenantConnectionStringResolver)

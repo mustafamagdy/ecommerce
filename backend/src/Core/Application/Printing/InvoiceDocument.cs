@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Common.Pdf;
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using Unit = QuestPDF.Infrastructure.Unit;
@@ -10,7 +11,8 @@ public class InvoiceDocument : BasePdfDocument
 {
   private readonly BoundTemplate _boundedTemplate;
 
-  public InvoiceDocument(BoundTemplate boundedTemplate)
+  public InvoiceDocument(SubscriptionType subscriptionType, BoundTemplate boundedTemplate)
+    : base(subscriptionType)
   {
     _boundedTemplate = boundedTemplate;
   }

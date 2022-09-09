@@ -2,6 +2,7 @@
 using FSH.WebApi.Application.Printing;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -42,14 +43,17 @@ public class OrderSummaryReportRequestHandler : IRequestHandler<OrderSummaryRepo
   private readonly IReadRepository<OrdersSummaryReport> _templateInvoice;
   private readonly IPdfWriter _pdfWriter;
   private readonly IStringLocalizer _t;
+  private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;
 
   public OrderSummaryReportRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter,
-    IStringLocalizer<OrderSummaryReportRequestHandler> localizer, IReadRepository<OrdersSummaryReport> templateInvoice)
+    IStringLocalizer<OrderSummaryReportRequestHandler> localizer, IReadRepository<OrdersSummaryReport> templateInvoice,
+    ISubscriptionTypeResolver subscriptionTypeResolver)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
     _t = localizer;
     _templateInvoice = templateInvoice;
+    _subscriptionTypeResolver = subscriptionTypeResolver;
   }
 
   public async Task<Stream> Handle(OrderSummaryReportRequest request, CancellationToken cancellationToken)
@@ -78,7 +82,9 @@ public class OrderSummaryReportRequestHandler : IRequestHandler<OrderSummaryRepo
     var boundTemplate = new BoundTemplate(ordersSummaryReportTemplate);
     boundTemplate.BindTemplate(reportDto);
 
-    var pdf = new InvoiceDocument(boundTemplate);
+    var subscriptionType = _subscriptionTypeResolver.Resolve();
+
+    var pdf = new InvoiceDocument(subscriptionType, boundTemplate);
     return _pdfWriter.WriteToStream(pdf);
   }
 }

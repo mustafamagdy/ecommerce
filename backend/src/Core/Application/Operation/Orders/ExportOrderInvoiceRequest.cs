@@ -2,6 +2,7 @@
 using FSH.WebApi.Application.Printing;
 using FSH.WebApi.Domain.Operation;
 using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Application.Operation.Orders;
 
@@ -46,14 +47,18 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
   private readonly IPdfWriter _pdfWriter;
   private readonly IVatQrCodeGenerator _vatQrCodeGenerator;
   private readonly IStringLocalizer _t;
+  private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;
 
-  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter, IVatQrCodeGenerator vatQrCodeGenerator, IStringLocalizer<ExportOrderInvoiceRequestHandler> localizer, IReadRepository<SimpleReceiptInvoice> templateInvoice)
+  public ExportOrderInvoiceRequestHandler(IReadRepository<Order> repository, IPdfWriter pdfWriter,
+    IVatQrCodeGenerator vatQrCodeGenerator, IStringLocalizer<ExportOrderInvoiceRequestHandler> localizer,
+    IReadRepository<SimpleReceiptInvoice> templateInvoice, ISubscriptionTypeResolver subscriptionTypeResolver)
   {
     _repository = repository;
     _pdfWriter = pdfWriter;
     _vatQrCodeGenerator = vatQrCodeGenerator;
     _t = localizer;
     _templateInvoice = templateInvoice;
+    _subscriptionTypeResolver = subscriptionTypeResolver;
   }
 
   public async Task<(string OrderNumber, Stream PdfInvoice)> Handle(ExportOrderInvoiceRequest request, CancellationToken
@@ -77,7 +82,8 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     var boundTemplate = new BoundTemplate(invoiceTemplate);
     boundTemplate.BindTemplate(order);
 
-    var invoice = new InvoiceDocument(boundTemplate);
+    var subscriptionType = _subscriptionTypeResolver.Resolve();
+    var invoice = new InvoiceDocument(subscriptionType, boundTemplate);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }
