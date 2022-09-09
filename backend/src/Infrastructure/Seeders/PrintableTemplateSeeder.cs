@@ -36,17 +36,24 @@ public class PrintableDocumentsSeeder : ICustomSeeder
 
     var simpleReceipts = items.OfType<SimpleReceiptInvoice>().ToArray();
     var wideInvoices = items.OfType<WideReceiptInvoice>().ToArray();
+    var ordersSummaryReport = items.OfType<OrdersSummaryReport>().ToArray();
 
-    var hasSimpleSeeded = await _db.SimpleReceiptInvoiceTemplates.AnyAsync(cancellationToken: cancellationToken);
+    var hasSimpleSeeded = await _db.Set<SimpleReceiptInvoice>().AnyAsync(cancellationToken).ConfigureAwait(false);
     if (!hasSimpleSeeded && simpleReceipts.Length > 0)
     {
-      await SeedSimpleReceipts(simpleReceipts, cancellationToken);
+      await SeedTemplates(simpleReceipts, cancellationToken);
     }
 
-    var hasWideSeeded = await _db.SimpleReceiptInvoiceTemplates.AnyAsync(cancellationToken: cancellationToken);
+    var hasWideSeeded = await _db.Set<WideReceiptInvoice>().AnyAsync(cancellationToken).ConfigureAwait(false);
     if (!hasWideSeeded && wideInvoices.Length > 0)
     {
-      await SeedWideInvoices(wideInvoices, cancellationToken);
+      await SeedTemplates(wideInvoices, cancellationToken);
+    }
+
+    var hasOrderSummaryReport = await _db.Set<OrdersSummaryReport>().AnyAsync(cancellationToken).ConfigureAwait(false);
+    if (!hasOrderSummaryReport && ordersSummaryReport.Length > 0)
+    {
+      await SeedTemplates(ordersSummaryReport, cancellationToken);
     }
 
     await _db.SaveChangesAsync(cancellationToken);
@@ -54,23 +61,33 @@ public class PrintableDocumentsSeeder : ICustomSeeder
     _logger.LogInformation("Seeded Subscription");
   }
 
-  private async Task SeedWideInvoices(WideReceiptInvoice[] wideInvoices, CancellationToken cancellationToken)
+  private async Task SeedTemplates(WideReceiptInvoice[] templates, CancellationToken cancellationToken)
   {
-    wideInvoices = wideInvoices.Select(a =>
+    templates = templates.Select(a =>
     {
       a.Id = Guid.NewGuid();
       return a;
     }).ToArray();
-    await _db.AddRangeAsync(wideInvoices, cancellationToken);
+    await _db.AddRangeAsync(templates, cancellationToken);
   }
 
-  private async Task SeedSimpleReceipts(SimpleReceiptInvoice[] simpleReceipts, CancellationToken cancellationToken)
+  private async Task SeedTemplates(SimpleReceiptInvoice[] templates, CancellationToken cancellationToken)
   {
-    simpleReceipts = simpleReceipts.Select(a =>
+    templates = templates.Select(a =>
     {
       a.Id = Guid.NewGuid();
       return a;
     }).ToArray();
-    await _db.AddRangeAsync(simpleReceipts, cancellationToken);
+    await _db.AddRangeAsync(templates, cancellationToken);
+  }
+
+  private async Task SeedTemplates(OrdersSummaryReport[] tempates, CancellationToken cancellationToken)
+  {
+    tempates = tempates.Select(a =>
+    {
+      a.Id = Guid.NewGuid();
+      return a;
+    }).ToArray();
+    await _db.AddRangeAsync(tempates, cancellationToken);
   }
 }
