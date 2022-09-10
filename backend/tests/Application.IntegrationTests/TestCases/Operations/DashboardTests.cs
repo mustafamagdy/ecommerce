@@ -15,7 +15,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Operations;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class DashboardTests : TestFixture
 {
   public DashboardTests(HostFixture host, ITestOutputHelper output)

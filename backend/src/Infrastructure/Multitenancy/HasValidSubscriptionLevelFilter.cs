@@ -3,14 +3,10 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
-using FSH.WebApi.Application.Common.Specification;
-using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy
 {

@@ -12,7 +12,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Subscriptions;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class SubscriptionTests : TestFixture
 {
   public SubscriptionTests(HostFixture host, ITestOutputHelper output)
@@ -92,12 +91,22 @@ public class SubscriptionTests : TestFixture
     tenantInfo.Should().NotBeNull();
     tenantInfo.ProdSubscriptionId.Should().NotBeEmpty();
 
-    // response = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
-    // {
-    //   TenantId = tenantId,
-    //   SubscriptionId = tenantInfo.ProdSubscriptionId!.Value
-    // });
-    // response.StatusCode.Should().Be(HttpStatusCode.OK);
+    _ = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
+    {
+      TenantId = tenantId,
+      SubscriptionType = SubscriptionType.Standard
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/products/search",
+      new SearchProductsRequest(),
+      new Dictionary<string, string>
+      {
+        { "Authorization", $"Bearer {tokenResult.Token}" },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
+
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]

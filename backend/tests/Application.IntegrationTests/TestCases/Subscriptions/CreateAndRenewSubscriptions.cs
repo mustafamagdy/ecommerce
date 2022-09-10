@@ -4,7 +4,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Subscriptions;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class CreateAndRenewSubscriptions : TestFixture
 {
   public CreateAndRenewSubscriptions(HostFixture host, ITestOutputHelper output)
