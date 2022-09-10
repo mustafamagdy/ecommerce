@@ -4,7 +4,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.ParallelTests;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class ParallelTest1 : TestFixture
 {
   private readonly HostFixture _host;
@@ -23,7 +22,6 @@ public class ParallelTest1 : TestFixture
   }
 }
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class ParallelTest2 : TestFixture
 {
   private readonly HostFixture _host;

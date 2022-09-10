@@ -14,7 +14,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Operations;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class OperationsTests : TestFixture
 {
   public OperationsTests(HostFixture host, ITestOutputHelper output)

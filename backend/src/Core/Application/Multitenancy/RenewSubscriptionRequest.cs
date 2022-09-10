@@ -52,7 +52,16 @@ public class RenewSubscriptionRequestHandler : IRequestHandler<RenewSubscription
       nameof(SubscriptionType.Train) => tenant.TrainSubscriptionId,
       _ => throw new ArgumentOutOfRangeException(nameof(request.SubscriptionType))
     };
-    var tenantSubscription = await _tenantSubscriptionRepo.GetByIdAsync(subscriptionId.Value, cancellationToken);
+
+    var tenantSubscription = await _tenantSubscriptionRepo.FirstOrDefaultAsync(
+        new SingleResultSpecification<TenantSubscription>()
+          .Query
+          .Include(a => a.History)
+          .Include(a => a.CurrentPackage)
+          .Where(a => a.Id == subscriptionId!.Value)
+          .Specification, cancellationToken)
+      .ConfigureAwait(false);
+
     tenantSubscription.Renew(_systemTime.Now);
 
     tenantSubscription.AddDomainEvent(new SubscriptionRenewedEvent(tenant, tenantSubscription));

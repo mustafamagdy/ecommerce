@@ -16,7 +16,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Catalog;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class BrandTests : TestFixture
 {
   public BrandTests(HostFixture host, ITestOutputHelper output)

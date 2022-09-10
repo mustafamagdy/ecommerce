@@ -4,7 +4,6 @@ using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Basics;
 
-// [Collection(nameof(TestConstants.WebHostTests))]
 public class GeneralBasicTests : TestFixture
 {
   public GeneralBasicTests(HostFixture host, ITestOutputHelper output)

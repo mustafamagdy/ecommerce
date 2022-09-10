@@ -188,7 +188,7 @@ transfer operation works in two steps
 - arabic role + permissions
 - add role + permissions 
 - permission group (for screens)
-- add/remote user to/from role
+- add/remove user to/from role
 [x] branch crud
 [x] activate/deactivate branch (deactivate all operations => filter)
 - subscription on branch level? how many branches
