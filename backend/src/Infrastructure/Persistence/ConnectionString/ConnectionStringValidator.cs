@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 
 namespace FSH.WebApi.Infrastructure.Persistence.ConnectionString;
 
-internal class ConnectionStringValidator : IConnectionStringValidator
+internal sealed class ConnectionStringValidator : IConnectionStringValidator
 {
   private readonly DatabaseSettings _dbSettings;
   private readonly ILogger<ConnectionStringValidator> _logger;

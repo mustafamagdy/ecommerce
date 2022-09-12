@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FSH.WebApi.Infrastructure.Auditing;
 
-public class AuditTrail
+public sealed class AuditTrail
 {
   private readonly ISerializerService _serializer;
 

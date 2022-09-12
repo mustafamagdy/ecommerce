@@ -3,7 +3,7 @@ using FSH.WebApi.Domain.Structure;
 
 namespace FSH.WebApi.Domain.Operation;
 
-public class CashRegister : AuditableEntity, IAggregateRoot
+public sealed class CashRegister : AuditableEntity, IAggregateRoot
 {
   private CashRegister()
   {
@@ -117,7 +117,7 @@ public abstract class PaymentOperation : AuditableEntity, IAggregateRoot
   public Guid? PendingTransferId { get; set; }
 }
 
-public class ActivePaymentOperation : PaymentOperation
+public sealed class ActivePaymentOperation : PaymentOperation
 {
   private ActivePaymentOperation()
   {
@@ -162,7 +162,7 @@ public class ActivePaymentOperation : PaymentOperation
   }
 }
 
-public class ArchivedPaymentOperation : PaymentOperation
+public sealed class ArchivedPaymentOperation : PaymentOperation
 {
   public static ArchivedPaymentOperation From(ActivePaymentOperation activeOp)
   {

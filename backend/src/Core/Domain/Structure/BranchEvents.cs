@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.Structure;
 
-public class BranchActivatedEvent : DomainEvent
+public sealed class BranchActivatedEvent : DomainEvent
 {
   private readonly Branch _branch;
 
@@ -9,7 +9,8 @@ public class BranchActivatedEvent : DomainEvent
     _branch = branch;
   }
 }
-public class BranchDeactivatedEvent : DomainEvent
+
+public sealed class BranchDeactivatedEvent : DomainEvent
 {
   private readonly Branch _branch;
 

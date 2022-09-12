@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class BranchController : VersionedApiController
+public sealed class BranchController : VersionedApiController
 {
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Branches)]

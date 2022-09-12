@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Infrastructure.Mailing;
 
-public class MailSettings
+public sealed class MailSettings
 {
   public string? From { get; set; }
   public string? Host { get; set; }

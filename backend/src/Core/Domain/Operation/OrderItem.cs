@@ -2,7 +2,7 @@ using FSH.WebApi.Domain.Catalog;
 
 namespace FSH.WebApi.Domain.Operation;
 
-public class OrderItem : BaseEntity, IAggregateRoot
+public sealed class OrderItem : BaseEntity, IAggregateRoot
 {
   public OrderItem(Guid serviceCatalogId, int qty, decimal price, string productName, string serviceName, decimal vatPercent)
   {

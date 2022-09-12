@@ -3,26 +3,8 @@ using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
-//
-// public class SubscriptionConfig : BaseEntityConfiguration<Subscription, DefaultIdType>
-// {
-//   public override void Configure(EntityTypeBuilder<Subscription> builder)
-//   {
-//     base.Configure(builder);
-//
-//     builder
-//       .Property(b => b.Price)
-//       .HasPrecision(7, 3);
-//
-//     builder
-//       .HasDiscriminator<string>("subscription_type")
-//       .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
-//       .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
-//       .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
-//   }
-// }
 
-public class SubscriptionFeatureConfig : BaseEntityConfiguration<SubscriptionFeature, DefaultIdType>
+public sealed class SubscriptionFeatureConfig : BaseEntityConfiguration<SubscriptionFeature, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<SubscriptionFeature> builder)
   {
@@ -35,7 +17,7 @@ public class SubscriptionFeatureConfig : BaseEntityConfiguration<SubscriptionFea
   }
 }
 
-public class SubscriptionPackageConfig : BaseEntityConfiguration<SubscriptionPackage, DefaultIdType>
+public sealed class SubscriptionPackageConfig : BaseEntityConfiguration<SubscriptionPackage, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<SubscriptionPackage> builder)
   {
@@ -46,16 +28,10 @@ public class SubscriptionPackageConfig : BaseEntityConfiguration<SubscriptionPac
       .HasPrecision(7, 3);
 
     builder.HasMany(a => a.Features).WithOne(a => a.Package).HasForeignKey(a => a.PackageId);
-
-    // builder
-    //   .HasDiscriminator<string>("subscription_type")
-    //   .HasValue<StandardSubscription>(SubscriptionType.Standard.Name)
-    //   .HasValue<DemoSubscription>(SubscriptionType.Demo.Name)
-    //   .HasValue<TrainSubscription>(SubscriptionType.Train.Name);
   }
 }
 
-public class TenantSubscriptionConfig : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
+public sealed class TenantSubscriptionConfig : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<TenantSubscription> builder)
   {
@@ -70,7 +46,7 @@ public class TenantSubscriptionConfig : BaseEntityConfiguration<TenantSubscripti
   }
 }
 
-public class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<SubscriptionHistory>
+public sealed class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<SubscriptionHistory>
 {
   public override void Configure(EntityTypeBuilder<SubscriptionHistory> builder)
   {
@@ -82,7 +58,7 @@ public class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<Subscr
   }
 }
 
-public class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
+public sealed class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
 {
   public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
   {

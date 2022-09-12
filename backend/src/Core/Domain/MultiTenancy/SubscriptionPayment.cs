@@ -2,7 +2,7 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public class SubscriptionPayment : Payment
+public sealed class SubscriptionPayment : Payment
 {
   private SubscriptionPayment()
   {

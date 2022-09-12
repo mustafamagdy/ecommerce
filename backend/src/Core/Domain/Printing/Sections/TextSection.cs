@@ -10,7 +10,7 @@ public abstract class TextSection : DocumentSection
   }
 }
 
-public class TitleSection : TextSection
+public sealed class TitleSection : TextSection
 {
   private TitleSection()
     : this(-1, SectionAlignment.Center, SectionPosition.Header)

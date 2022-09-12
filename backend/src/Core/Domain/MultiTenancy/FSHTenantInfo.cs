@@ -13,7 +13,7 @@ public interface ITenantConnectionStrings
   string? TrainConnectionString { get; set; }
 }
 
-public class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity<string>
+public sealed class FSHTenantInfo : ITenantInfo, ITenantConnectionStrings, IEntity<string>
 {
   private readonly List<DomainEvent> _domainEvents = new();
 

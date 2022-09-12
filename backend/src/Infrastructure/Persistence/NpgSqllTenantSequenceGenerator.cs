@@ -10,12 +10,12 @@ using Npgsql;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class TableExist
+public sealed class TableExist
 {
   public int tableCount { get; set; }
 }
 
-public class NpgsqlTenantSequenceGenerator : ITenantSequenceGenerator
+public sealed class NpgsqlTenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
   private readonly IHostEnvironment _env;

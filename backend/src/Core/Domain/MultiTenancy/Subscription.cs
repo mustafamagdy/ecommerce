@@ -2,7 +2,7 @@ using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public class SubscriptionFeature : BaseEntity
+public sealed class SubscriptionFeature : BaseEntity
 {
   public SubscriptionFeatureType Feature { get; set; }
   public string Value { get; set; }
@@ -11,7 +11,7 @@ public class SubscriptionFeature : BaseEntity
   public SubscriptionPackage Package { get; set; }
 }
 
-public class SubscriptionPackage : BaseEntity
+public sealed class SubscriptionPackage : BaseEntity
 {
   public bool Default { get; set; }
   public int ValidForDays { get; set; }

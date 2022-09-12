@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public class DemoService : IHostedService
+public sealed class DemoService : IHostedService
 {
   private readonly IJobService _jobService;
 

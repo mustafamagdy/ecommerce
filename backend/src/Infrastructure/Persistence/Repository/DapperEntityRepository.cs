@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-public class DapperEntityRepository : IDapperEntityRepository
+public sealed class DapperEntityRepository : IDapperEntityRepository
 {
   private readonly ApplicationDbContext _dbContext;
 

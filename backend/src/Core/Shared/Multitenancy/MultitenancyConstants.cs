@@ -2,7 +2,7 @@ using Finbuckle.MultiTenant;
 
 namespace FSH.WebApi.Shared.Multitenancy;
 
-public class MultitenancyConstants
+public sealed class MultitenancyConstants
 {
   public static decimal MaxOneTimePaymentAmountForSubscription = 100000;
   public const string JobRunnerUserName = "JobRunner";

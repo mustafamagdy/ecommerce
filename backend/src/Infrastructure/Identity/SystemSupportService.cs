@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-public class SystemSupportService : ISystemSupportService
+public sealed class SystemSupportService : ISystemSupportService
 {
   private readonly IServiceProvider _serviceProvider;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;

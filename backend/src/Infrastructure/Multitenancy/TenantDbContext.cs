@@ -13,7 +13,7 @@ using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
+public sealed class TenantDbContext : EFCoreStoreDbContext<FSHTenantInfo>
 {
   private readonly DatabaseSettings _dbSettings;
 

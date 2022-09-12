@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-public class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
+public sealed class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
   where T : class, IAggregateRoot
 {
   private readonly ApplicationUnitOfWork _uow;

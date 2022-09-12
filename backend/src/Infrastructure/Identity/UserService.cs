@@ -21,7 +21,7 @@ using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal partial class UserService : IUserService
+internal sealed partial class UserService : IUserService
 {
   private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly UserManager<ApplicationUser> _userManager;

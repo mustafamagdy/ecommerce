@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace FSH.WebApi.Domain.Catalog;
 
 [JsonConverter(typeof(SmartEnumNameConverter<ServicePriority, string>))]
-public class ServicePriority : SmartEnum<ServicePriority, string>
+public sealed class ServicePriority : SmartEnum<ServicePriority, string>
 {
   public static readonly ServicePriority Normal = new(nameof(Normal), "normal");
   public static readonly ServicePriority Urgent = new(nameof(Urgent), "urgent");
@@ -18,7 +18,7 @@ public class ServicePriority : SmartEnum<ServicePriority, string>
   }
 }
 
-public class ServiceCatalog : AuditableEntity, IAggregateRoot
+public sealed class ServiceCatalog : AuditableEntity, IAggregateRoot
 {
   public ServiceCatalog(Guid serviceId, Guid productId, decimal price, ServicePriority priority)
   {

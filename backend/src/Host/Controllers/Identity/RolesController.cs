@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Identity.Roles;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
-public class RolesController : VersionNeutralApiController
+public sealed class RolesController : VersionNeutralApiController
 {
   private readonly IRoleService _roleService;
 

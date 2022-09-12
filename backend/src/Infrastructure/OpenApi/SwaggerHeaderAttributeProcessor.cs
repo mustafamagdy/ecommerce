@@ -5,7 +5,7 @@ using NSwag.Generation.Processors.Contexts;
 
 namespace FSH.WebApi.Infrastructure.OpenApi;
 
-public class SwaggerHeaderAttributeProcessor : IOperationProcessor
+public sealed class SwaggerHeaderAttributeProcessor : IOperationProcessor
 {
   public bool Process(OperationProcessorContext context)
   {

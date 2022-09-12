@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class DomainEventDispatcher : SaveChangesInterceptor
+public sealed class DomainEventDispatcher : SaveChangesInterceptor
 {
   private readonly IEventPublisher _eventPublisher;
 

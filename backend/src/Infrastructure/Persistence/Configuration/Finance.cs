@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashRegister>
+public sealed class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashRegister>
 {
   public override void Configure(EntityTypeBuilder<CashRegister> builder)
   {
@@ -26,7 +26,7 @@ public class CashRegisterConfig : BaseAuditableTenantEntityConfiguration<CashReg
   }
 }
 
-public class PaymentOperationConfig : BaseAuditableTenantEntityConfiguration<PaymentOperation>
+public sealed class PaymentOperationConfig : BaseAuditableTenantEntityConfiguration<PaymentOperation>
 {
   public override void Configure(EntityTypeBuilder<PaymentOperation> builder)
   {

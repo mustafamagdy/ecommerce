@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Identity.Users;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class SupportController : VersionNeutralApiController
+public sealed class SupportController : VersionNeutralApiController
 {
   [HttpPost("remote-admin-login")]
   [MustHavePermission(FSHAction.RemoteLogin, FSHResource.Tenants)]

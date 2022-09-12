@@ -2,7 +2,7 @@ using System.Net;
 
 namespace FSH.WebApi.Shared.Exceptions;
 
-public class MissingHeaderException : CustomException
+public sealed class MissingHeaderException : CustomException
 {
   public MissingHeaderException(string message, List<string>? errors = default,
     HttpStatusCode statusCode = HttpStatusCode.BadRequest)

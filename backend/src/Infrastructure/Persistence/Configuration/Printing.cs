@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDocument, DefaultIdType>
+public sealed class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDocument, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<PrintableDocument> builder)
   {
@@ -31,7 +31,7 @@ public class PrintableTemplateConfig : BaseTenantEntityConfiguration<PrintableDo
   }
 }
 
-public class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSection, DefaultIdType>
+public sealed class DocumentSectionConfig : BaseTenantEntityConfiguration<DocumentSection, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<DocumentSection> builder)
   {

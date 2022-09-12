@@ -2,7 +2,7 @@ using Ardalis.SmartEnum;
 
 namespace FSH.WebApi.Domain.Operation;
 
-public class OrderStatus : SmartEnum<OrderStatus, string>
+public sealed class OrderStatus : SmartEnum<OrderStatus, string>
 {
   public static readonly OrderStatus Normal = new(nameof(Normal), "normal");
   public static readonly OrderStatus Canceled = new(nameof(Canceled), "canceled");
@@ -13,7 +13,7 @@ public class OrderStatus : SmartEnum<OrderStatus, string>
   }
 }
 
-public class Order : AuditableEntity, IAggregateRoot
+public sealed class Order : AuditableEntity, IAggregateRoot
 {
   private readonly List<OrderItem> _orderItems = new();
   private readonly List<OrderPayment> _orderPayments = new();
@@ -72,7 +72,7 @@ public class Order : AuditableEntity, IAggregateRoot
     TotalPaid += payment.Amount;
   }
 
-  public void Cancel(DateTime cancellationTime)
+  public void Cancel()
   {
     Status = OrderStatus.Canceled;
     Customer.PayDue(-1 * (TotalPaid - NetAmount));

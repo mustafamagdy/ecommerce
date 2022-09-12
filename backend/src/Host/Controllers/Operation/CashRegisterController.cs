@@ -4,7 +4,7 @@ using FSH.WebApi.Application.Operation.Orders;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
-public class CashRegisterController : VersionedApiController
+public sealed class CashRegisterController : VersionedApiController
 {
   [HttpGet("{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.CashRegisters)]

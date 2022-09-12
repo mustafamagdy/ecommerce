@@ -227,4 +227,13 @@ Subscription
 ////////////////////////// Inventory & Stock mgmt //////////////////////
 - item card
 - purchase order, invoice, invoice payments
-- 
+
+////////////////////////// Self Service //////////////////////
+- as a guest I can browse the different service catalog
+- as a guest I can choose different items from service catalog and create an online order with either cash on delivery, card, or apple pay
+- as a guest I can register with my phone number + OTP, then fill in my profile
+- as a registered user I can login, logout, reset password
+- as a registered user I can see and update my profile
+- as a registered user I can create orders with different payment methods
+- as a registered user I can see my orders and follow up my order's status
+- as a registered user I should receive notifications when my order status updated

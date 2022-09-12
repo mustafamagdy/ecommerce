@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy
 {
-  public class HasValidSubscriptionTypeFilter : IAsyncActionFilter
+  public sealed class HasValidSubscriptionTypeFilter : IAsyncActionFilter
   {
     private readonly ITenantResolver _tenantResolver;
     private readonly ISystemTime _systemTime;

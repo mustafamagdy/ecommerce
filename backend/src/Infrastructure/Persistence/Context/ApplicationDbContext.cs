@@ -17,7 +17,7 @@ using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class ApplicationDbContext : BaseDbContext
+public sealed class ApplicationDbContext : BaseDbContext
 {
   public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionTypeResolver subscriptionTypeResolver, DbContextOptions options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,

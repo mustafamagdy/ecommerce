@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
-internal class ApplicationDbInitializer
+internal sealed class ApplicationDbInitializer
 {
   private readonly ApplicationDbContext _dbContext;
   private readonly ITenantInfo _currentTenant;

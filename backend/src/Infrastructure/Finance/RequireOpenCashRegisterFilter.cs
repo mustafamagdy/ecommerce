@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FSH.WebApi.Infrastructure.Finance;
 
-public class RequireOpenCashRegisterFilter : IAsyncActionFilter
+public sealed class RequireOpenCashRegisterFilter : IAsyncActionFilter
 {
   private readonly ICashRegisterResolver _cashRegisterResolver;
   private readonly IReadRepository<CashRegister> _cashRegisterRepo;
@@ -30,11 +30,11 @@ public class RequireOpenCashRegisterFilter : IAsyncActionFilter
     {
       var cashRegisterId = await _cashRegisterResolver.Resolve(context.HttpContext);
       var cashRegister = await _cashRegisterRepo.FirstOrDefaultAsync(new SingleResultSpecification<CashRegister>()
-        .Query
-        .Include(a => a.Branch)
-        .Where(a => a.Id == cashRegisterId)
-        .Specification)
-        ?? throw new NotFoundException($"Cash register {cashRegisterId} not found");
+                           .Query
+                           .Include(a => a.Branch)
+                           .Where(a => a.Id == cashRegisterId)
+                           .Specification)
+                         ?? throw new NotFoundException($"Cash register {cashRegisterId} not found");
 
       if (!cashRegister.Branch.Active)
       {

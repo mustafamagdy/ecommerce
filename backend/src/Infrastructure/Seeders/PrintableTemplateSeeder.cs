@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class PrintableDocumentsSeeder : ICustomSeeder
+public sealed class PrintableDocumentsSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;

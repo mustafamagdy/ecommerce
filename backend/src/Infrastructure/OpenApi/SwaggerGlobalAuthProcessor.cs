@@ -13,7 +13,7 @@ namespace FSH.WebApi.Infrastructure.OpenApi;
 /// Unless the AllowAnonymous attribute is defined, this processor will always add the security scheme
 /// when it's not already there, so effectively adding "Global Auth".
 /// </summary>
-public class SwaggerGlobalAuthProcessor : IOperationProcessor
+public sealed class SwaggerGlobalAuthProcessor : IOperationProcessor
 {
   private readonly string _name;
 

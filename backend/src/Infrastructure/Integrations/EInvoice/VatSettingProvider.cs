@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Settings.Vat;
 
 namespace FSH.WebApi.Infrastructure.Integrations.EInvoice;
 
-public class VatSettingProvider : IVatSettingProvider
+public sealed class VatSettingProvider : IVatSettingProvider
 {
   private readonly ITenantInfo _currentTenant;
 

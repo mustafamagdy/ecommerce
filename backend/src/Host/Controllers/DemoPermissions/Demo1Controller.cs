@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FSH.WebApi.Host.Controllers.DemoPermissions;
 
-public class Demo1Controller : VersionedApiController
+public sealed class Demo1Controller : VersionedApiController
 {
   private readonly RoleManager<ApplicationRole> _roleManager;
   private readonly UserManager<ApplicationUser> _userManager;

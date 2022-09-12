@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class ServiceCatalogSeeder : ICustomSeeder
+public sealed class ServiceCatalogSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;

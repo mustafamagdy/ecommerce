@@ -1,7 +1,7 @@
 namespace FSH.WebApi.Infrastructure.Auth;
 
-public class SecuritySettings
+public sealed class SecuritySettings
 {
-    public string? Provider { get; set; }
-    public bool RequireActiveTenantSubscription { get; set; }
+  public string? Provider { get; set; }
+  public bool RequireActiveTenantSubscription { get; set; }
 }

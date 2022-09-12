@@ -21,7 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal class OverrideTokenService : IOverrideTokenService
+internal sealed class OverrideTokenService : IOverrideTokenService
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly IdentitySettings _identitySettings;

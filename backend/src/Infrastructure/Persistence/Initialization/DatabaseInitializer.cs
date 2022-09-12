@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
-internal class DatabaseInitializer : IDatabaseInitializer
+internal sealed class DatabaseInitializer : IDatabaseInitializer
 {
   private readonly TenantDbContext _tenantDbContext;
   private readonly IServiceProvider _serviceProvider;

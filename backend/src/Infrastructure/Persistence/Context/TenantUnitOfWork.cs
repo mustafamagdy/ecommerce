@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class TenantUnitOfWork : ITenantUnitOfWork
+public sealed class TenantUnitOfWork : ITenantUnitOfWork
 {
   private readonly TenantDbContext _dbContext;
 

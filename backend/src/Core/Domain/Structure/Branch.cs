@@ -4,7 +4,7 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Domain.Structure;
 
-public class Branch : AuditableEntity, IAggregateRoot
+public sealed class Branch : AuditableEntity, IAggregateRoot
 {
   private readonly List<CashRegister> _cashRegisters = new();
 

@@ -5,7 +5,7 @@ using FSH.WebApi.Application.Common.Exporters;
 
 namespace FSH.WebApi.Infrastructure.Common.Export;
 
-public class ExcelWriter : IExcelWriter
+public sealed class ExcelWriter : IExcelWriter
 {
   public Stream WriteToStream<T>(IList<T> data)
   {

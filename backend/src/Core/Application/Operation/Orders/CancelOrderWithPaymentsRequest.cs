@@ -38,7 +38,7 @@ public class CancelOrderWithPaymentsRequestHandler : IRequestHandler<CancelOrder
                 ?? throw new NotFoundException($"Order {request.Id} not found");
 
     order.AddDomainEvent(new OrderCanceledEvent(order.Id, _systemTime.Now));
-    order.Cancel(_systemTime.Now);
+    order.Cancel();
 
     await _uow.CommitAsync(cancellationToken);
     return Unit.Value;

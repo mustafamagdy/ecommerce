@@ -1,13 +1,13 @@
 namespace FSH.WebApi.Domain.Printing;
 
-public class SimpleReceiptInvoice : PrintableDocument
+public sealed class SimpleReceiptInvoice : PrintableDocument
 {
 }
 
-public class OrdersSummaryReport : PrintableDocument
+public sealed class OrdersSummaryReport : PrintableDocument
 {
 }
 
-public class WideReceiptInvoice : PrintableDocument
+public sealed class WideReceiptInvoice : PrintableDocument
 {
 }
