@@ -9,7 +9,7 @@ using ObjectsComparer;
 
 namespace FSH.WebApi.Infrastructure.Auth.Permissions;
 
-internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+internal sealed class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
 {
   private readonly IUserService _userService;
   private readonly IOverrideTokenService _overrideTokenService;

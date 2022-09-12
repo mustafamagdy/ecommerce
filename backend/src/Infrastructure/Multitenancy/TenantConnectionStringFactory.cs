@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy
 {
-  public class TenantConnectionStringBuilder : ITenantConnectionStringBuilder
+  public sealed class TenantConnectionStringBuilder : ITenantConnectionStringBuilder
   {
     private readonly IConfiguration _config;
     private readonly IConnectionStringValidator _csValidator;

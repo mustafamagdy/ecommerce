@@ -16,7 +16,7 @@ using StackExchange.Redis;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal class RoleService : IRoleService
+internal sealed class RoleService : IRoleService
 {
   private readonly RoleManager<ApplicationRole> _roleManager;
   private readonly UserManager<ApplicationUser> _userManager;

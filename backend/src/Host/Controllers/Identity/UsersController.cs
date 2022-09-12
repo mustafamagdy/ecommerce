@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Identity.Users.Password;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
-public class UsersController : VersionNeutralApiController
+public sealed class UsersController : VersionNeutralApiController
 {
   private readonly IUserService _userService;
 

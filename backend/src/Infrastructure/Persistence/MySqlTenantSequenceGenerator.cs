@@ -11,7 +11,7 @@ using MySqlConnector;
 
 namespace FSH.WebApi.Application.Multitenancy;
 
-public class MySqlTenantSequenceGenerator : ITenantSequenceGenerator
+public sealed class MySqlTenantSequenceGenerator : ITenantSequenceGenerator
 {
   private readonly ITenantInfo _currentTenant;
   private readonly IHostEnvironment _env;

@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.Operation;
 
-public class PaymentMethod : BaseEntity, IAggregateRoot
+public sealed class PaymentMethod : BaseEntity, IAggregateRoot
 {
   private PaymentMethod()
   {

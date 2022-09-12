@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-internal class TenantService : ITenantService
+internal sealed class TenantService : ITenantService
 {
   private readonly IMultiTenantStore<FSHTenantInfo> _tenantStore;
   private readonly IConnectionStringSecurer _csSecurer;

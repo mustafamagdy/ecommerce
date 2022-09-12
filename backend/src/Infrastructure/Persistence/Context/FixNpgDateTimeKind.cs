@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class FixNpgDateTimeKind : SaveChangesInterceptor
+public sealed class FixNpgDateTimeKind : SaveChangesInterceptor
 {
   public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
   {

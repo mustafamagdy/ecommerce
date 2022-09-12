@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class ApplicationUnitOfWork : IApplicationUnitOfWork
+public sealed class ApplicationUnitOfWork : IApplicationUnitOfWork
 {
   private readonly ApplicationDbContext _dbContext;
 

@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class MyController : VersionedApiController
+public sealed class MyController : VersionedApiController
 {
   [HttpGet]
   [MustHavePermission(FSHAction.ViewBasic, FSHResource.Tenants)]

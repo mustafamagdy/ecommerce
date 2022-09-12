@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class TenantsController : VersionNeutralApiController
+public sealed class TenantsController : VersionNeutralApiController
 {
   [HttpGet("packages")]
   [AllowAnonymous]

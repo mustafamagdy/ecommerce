@@ -1,10 +1,10 @@
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-public class FeatureNotAllowedException : Exception
+public sealed class FeatureNotAllowedException : Exception
 {
 }
 
-public class SubscriptionExpiredException : Exception
+public sealed class SubscriptionExpiredException : Exception
 {
   public SubscriptionExpiredException(DateTime expiryDate, string message)
     : base(message)

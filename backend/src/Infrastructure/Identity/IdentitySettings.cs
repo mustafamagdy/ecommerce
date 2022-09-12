@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Infrastructure.Identity;
 
-public class IdentitySettings
+public sealed class IdentitySettings
 {
   public int PasswordMinLength { get; set; }
   public bool PasswordRequireDigit { get; set; }

@@ -23,7 +23,7 @@ public abstract class PrintableDocument : AuditableEntity, IAggregateRoot
 }
 
 [JsonConverter(typeof(SmartEnumNameConverter<PrintableType, string>))]
-public class PrintableType : SmartEnum<PrintableType, string>
+public sealed class PrintableType : SmartEnum<PrintableType, string>
 {
   public static PrintableType Receipt = new(nameof(Receipt), nameof(Receipt));
   public static PrintableType Wide = new(nameof(Wide), nameof(Wide));
@@ -36,7 +36,7 @@ public class PrintableType : SmartEnum<PrintableType, string>
 }
 
 [JsonConverter(typeof(SmartEnumNameConverter<SectionAlignment, string>))]
-public class SectionAlignment : SmartEnum<SectionAlignment, string>
+public sealed class SectionAlignment : SmartEnum<SectionAlignment, string>
 {
   public static SectionAlignment Center = new(nameof(Center), "ac");
   public static SectionAlignment Right = new(nameof(Right), "ar");
@@ -49,7 +49,7 @@ public class SectionAlignment : SmartEnum<SectionAlignment, string>
 }
 
 [JsonConverter(typeof(SmartEnumNameConverter<SectionPosition, string>))]
-public class SectionPosition : SmartEnum<SectionPosition, string>
+public sealed class SectionPosition : SmartEnum<SectionPosition, string>
 {
   public static SectionPosition Header = new(nameof(Header), nameof(Header));
   public static SectionPosition Body = new(nameof(Body), nameof(Body));
@@ -62,7 +62,7 @@ public class SectionPosition : SmartEnum<SectionPosition, string>
 }
 
 [JsonConverter(typeof(SmartEnumNameConverter<SectionType, string>))]
-public class SectionType : SmartEnum<SectionType, string>
+public sealed class SectionType : SmartEnum<SectionType, string>
 {
   public static SectionType Logo = new(nameof(Logo), nameof(Logo));
   public static SectionType Title = new(nameof(Title), nameof(Title));

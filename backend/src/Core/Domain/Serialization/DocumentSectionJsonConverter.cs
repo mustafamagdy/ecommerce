@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace FSH.WebApi.Domain.Serialization;
 
-public class DocumentSectionJsonConverter : JsonConverter
+public sealed class DocumentSectionJsonConverter : JsonConverter
 {
   public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
   {

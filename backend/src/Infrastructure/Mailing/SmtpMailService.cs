@@ -7,7 +7,7 @@ using MimeKit;
 
 namespace FSH.WebApi.Infrastructure.Mailing;
 
-public class SmtpMailService : IMailService
+public sealed class SmtpMailService : IMailService
 {
   private readonly MailSettings _settings;
   private readonly ILogger<SmtpMailService> _logger;

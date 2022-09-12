@@ -5,7 +5,7 @@ using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
 
-public class ServicesController : VersionedApiController
+public sealed class ServicesController : VersionedApiController
 {
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Services)]

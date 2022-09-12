@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
+public sealed class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
 {
   public override void Configure(EntityTypeBuilder<Brand> builder)
   {
@@ -19,7 +19,7 @@ public class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
   }
 }
 
-public class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
+public sealed class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
 {
   public override void Configure(EntityTypeBuilder<Product> builder)
   {
@@ -39,7 +39,7 @@ public class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
   }
 }
 
-public class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<ServiceCatalog>
+public sealed class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<ServiceCatalog>
 {
   public override void Configure(EntityTypeBuilder<ServiceCatalog> builder)
   {
@@ -62,7 +62,7 @@ public class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<Servi
   }
 }
 
-public class ServiceConfig : BaseAuditableTenantEntityConfiguration<Service>
+public sealed class ServiceConfig : BaseAuditableTenantEntityConfiguration<Service>
 {
   public override void Configure(EntityTypeBuilder<Service> builder)
   {

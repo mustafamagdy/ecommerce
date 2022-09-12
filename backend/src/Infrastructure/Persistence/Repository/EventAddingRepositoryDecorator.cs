@@ -12,7 +12,7 @@ namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 /// EntityCreated, EntityUpdated or EntityDeleted event
 /// before delegating to the decorated repository.
 /// </summary>
-public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
+public sealed class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   where T : class, IAggregateRoot
 {
   private readonly IRepository<T> _decorated;

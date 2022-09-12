@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Infrastructure.OpenApi;
 
-public class SwaggerSettings
+public sealed class SwaggerSettings
 {
   public bool Enable { get; set; }
   public string? Title { get; set; }

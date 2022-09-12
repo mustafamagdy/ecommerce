@@ -8,7 +8,7 @@ using Mapster;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-public class NonAggregateDbRepository<TEntity> : RepositoryBase<TEntity>,
+public sealed class NonAggregateDbRepository<TEntity> : RepositoryBase<TEntity>,
   IReadNonAggregateRepository<TEntity>, INonAggregateRepository<TEntity>
   where TEntity : class
 {

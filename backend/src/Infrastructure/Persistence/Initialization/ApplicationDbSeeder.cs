@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
-internal class ApplicationDbSeeder
+internal sealed class ApplicationDbSeeder
 {
   private readonly FSHTenantInfo _currentTenant;
   private readonly RoleManager<ApplicationRole> _roleManager;

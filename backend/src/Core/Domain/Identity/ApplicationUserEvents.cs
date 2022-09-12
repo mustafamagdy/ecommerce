@@ -7,7 +7,7 @@ public abstract class ApplicationUserEvent : DomainEvent
   protected ApplicationUserEvent(string userId) => UserId = userId;
 }
 
-public class ApplicationUserCreatedEvent : ApplicationUserEvent
+public sealed class ApplicationUserCreatedEvent : ApplicationUserEvent
 {
   public ApplicationUserCreatedEvent(string userId)
     : base(userId)

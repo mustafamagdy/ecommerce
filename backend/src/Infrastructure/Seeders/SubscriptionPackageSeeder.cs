@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class SubscriptionPackageSeeder : ICustomSeeder
+public sealed class SubscriptionPackageSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly TenantDbContext _db;

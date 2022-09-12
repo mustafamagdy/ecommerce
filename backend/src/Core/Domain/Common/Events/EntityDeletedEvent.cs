@@ -7,7 +7,7 @@ public static class EntityDeletedEvent
         => new(entity);
 }
 
-public class EntityDeletedEvent<TEntity> : DomainEvent
+public sealed class EntityDeletedEvent<TEntity> : DomainEvent
     where TEntity : IEntity
 {
     internal EntityDeletedEvent(TEntity entity) => Entity = entity;

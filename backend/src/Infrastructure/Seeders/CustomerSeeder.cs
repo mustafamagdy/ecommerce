@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class CustomerSeeder : ICustomSeeder
+public sealed class CustomerSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;

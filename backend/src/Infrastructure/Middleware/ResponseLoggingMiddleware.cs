@@ -5,7 +5,7 @@ using Serilog.Context;
 
 namespace FSH.WebApi.Infrastructure.Middleware;
 
-public class ResponseLoggingMiddleware : IMiddleware
+public sealed class ResponseLoggingMiddleware : IMiddleware
 {
   private readonly ICurrentUser _currentUser;
 

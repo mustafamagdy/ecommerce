@@ -6,7 +6,7 @@ using static FSH.WebApi.Shared.Notifications.NotificationConstants;
 
 namespace FSH.WebApi.Infrastructure.Notifications;
 
-public class NotificationSender : INotificationSender
+public sealed class NotificationSender : INotificationSender
 {
   private readonly IHubContext<NotificationHub> _notificationHubContext;
   private readonly ITenantInfo _currentTenant;

@@ -3,7 +3,7 @@ using FSH.WebApi.Infrastructure.Finance;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
-public class CustomersController : VersionedApiController
+public sealed class CustomersController : VersionedApiController
 {
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Customers)]

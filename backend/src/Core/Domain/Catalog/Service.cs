@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.Catalog;
 
-public class Service : AuditableEntity, IAggregateRoot, IHaveImage
+public sealed class Service : AuditableEntity, IAggregateRoot, IHaveImage
 {
   private Service()
   {

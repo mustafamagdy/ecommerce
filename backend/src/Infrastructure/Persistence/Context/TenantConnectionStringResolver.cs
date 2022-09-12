@@ -5,8 +5,7 @@ using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-
-public class TenantConnectionStringResolver : ITenantConnectionStringResolver
+public sealed class TenantConnectionStringResolver : ITenantConnectionStringResolver
 {
   private readonly TenantDbContext _tenantDb;
 

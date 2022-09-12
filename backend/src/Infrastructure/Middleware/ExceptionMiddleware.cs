@@ -8,7 +8,7 @@ using Serilog.Context;
 
 namespace FSH.WebApi.Infrastructure.Middleware;
 
-internal class ExceptionMiddleware : IMiddleware
+internal sealed class ExceptionMiddleware : IMiddleware
 {
   private readonly ICurrentUser _currentUser;
   private readonly IStringLocalizer _t;

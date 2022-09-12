@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Infrastructure.Multitenancy;
 
-
-public class SubscriptionTypeResolver : ISubscriptionTypeResolver
+public sealed class SubscriptionTypeResolver : ISubscriptionTypeResolver
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;

@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.Operation;
 
-public class Customer : BaseEntity, IAggregateRoot
+public sealed class Customer : BaseEntity, IAggregateRoot
 {
   private readonly List<Order> _orders = new();
   public string Name { get; private set; }

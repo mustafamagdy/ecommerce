@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class CustomerConfig : BaseTenantEntityConfiguration<Customer, DefaultIdType>
+public sealed class CustomerConfig : BaseTenantEntityConfiguration<Customer, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<Customer> builder)
   {
@@ -25,7 +25,7 @@ public class CustomerConfig : BaseTenantEntityConfiguration<Customer, DefaultIdT
   }
 }
 
-public class OrderConfig : BaseAuditableTenantEntityConfiguration<Order>
+public sealed class OrderConfig : BaseAuditableTenantEntityConfiguration<Order>
 {
   public override void Configure(EntityTypeBuilder<Order> builder)
   {
@@ -50,7 +50,7 @@ public class OrderConfig : BaseAuditableTenantEntityConfiguration<Order>
   }
 }
 
-public class OrderItemConfig : BaseTenantEntityConfiguration<OrderItem, DefaultIdType>
+public sealed class OrderItemConfig : BaseTenantEntityConfiguration<OrderItem, DefaultIdType>
 {
   public override void Configure(EntityTypeBuilder<OrderItem> builder)
   {
@@ -77,7 +77,7 @@ public class OrderItemConfig : BaseTenantEntityConfiguration<OrderItem, DefaultI
   }
 }
 
-public class OrderPaymentConfig : BaseAuditableTenantEntityConfiguration<OrderPayment>
+public sealed class OrderPaymentConfig : BaseAuditableTenantEntityConfiguration<OrderPayment>
 {
   public override void Configure(EntityTypeBuilder<OrderPayment> builder)
   {
