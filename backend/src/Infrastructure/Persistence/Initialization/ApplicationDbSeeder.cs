@@ -50,12 +50,6 @@ internal class ApplicationDbSeeder
       switch (roleName)
       {
         // Assign permissions
-        case FSHRoles.Basic:
-          await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Basic, role);
-          break;
-        case FSHRoles.Demo:
-          await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Demo, role);
-          break;
         case FSHRoles.Admin:
           await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Admin, role);
 

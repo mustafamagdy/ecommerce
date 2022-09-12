@@ -112,9 +112,7 @@ public class AdministrativeTests : TestFixture
     // login with the user and execute action => should fail
     var loginHeader = await LoginAs(user.Email, password, null, "root");
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
-    var productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
-    productResult.Should().NotBeNull();
-    productResult.TotalCount.Should().BeGreaterThan(1);
+    _.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
     // update role permissions
     _ = await RootAdmin_PutAsJsonAsync($"/api/roles/{role.Id}/permissions", new UpdateRolePermissionsRequest
@@ -122,7 +120,7 @@ public class AdministrativeTests : TestFixture
       RoleId = role.Id,
       Permissions = new List<string>
       {
-        "Permissions.Products.Search"
+        "permissions.products.search"
       }
     });
 
@@ -132,7 +130,8 @@ public class AdministrativeTests : TestFixture
     loginHeader = await LoginAs(user.Email, password, null, "root");
     // execute the same action => should succeed
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), loginHeader, CancellationToken.None);
-    productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
+    var productResult = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
     productResult.Should().NotBeNull();
     productResult.TotalCount.Should().BeGreaterThan(1);
   }
