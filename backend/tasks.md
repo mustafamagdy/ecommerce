@@ -223,4 +223,8 @@ Subscription
 
 ////////////////////////////////////////////////////////////////
 - test refactor with better more organized way
-     
+
+////////////////////////// Inventory & Stock mgmt //////////////////////
+- item card
+- purchase order, invoice, invoice payments
+- 
