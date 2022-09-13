@@ -31,6 +31,12 @@ csharp_style_var_elsewhere = true:warning
 
 csharp_new_line_before_members_in_anonymous_types = true:warning
 
+# CA2007 Do not directly await a Task
+dotnet_diagnostic.CA2007.severity = none
+
+# SA1117 The parameters should all be placed on the same line or each parameter should be placed on its own line
+dotnet_diagnostic.SA1117.severity = none
+
 # SA1623: Property summary documentation should match accessors
 dotnet_diagnostic.SA1623.severity = none
 

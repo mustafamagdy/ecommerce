@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.Specification" Version="6.1.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Dapper.FluentColumnMapping" Version="1.1.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.4.0" />
     <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.108" />
     <PackageReference Include="Mapster" Version="7.3.0" />
