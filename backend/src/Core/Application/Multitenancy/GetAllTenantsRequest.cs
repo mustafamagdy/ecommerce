@@ -1,8 +1,4 @@
-﻿using Dapper;
-using Dapper.FluentColumnMapping;
-using FSH.WebApi.Domain.MultiTenancy;
-
-namespace FSH.WebApi.Application.Multitenancy;
+﻿namespace FSH.WebApi.Application.Multitenancy;
 
 public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResponse<TenantDto>>
 {
