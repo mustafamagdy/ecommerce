@@ -15,10 +15,16 @@ namespace FSH.WebApi.Host.Controllers.DemoPermissions;
 [AllowAnonymous]
 public sealed class DemoController : VersionedApiController
 {
-  [HttpGet("test-workflow")]
+  [HttpGet("test-workflow1")]
   public async Task Test01([FromServices] IBuildsAndStartsWorkflow builder)
   {
     await builder.BuildAndStartWorkflowAsync<HelloWorldWorkflow>();
+  }
+
+  [HttpGet("test-workflow2")]
+  public async Task Test02([FromServices] IBuildsAndStartsWorkflow builder)
+  {
+    await builder.BuildAndStartWorkflowAsync<HelloWorldWorkflow2>();
   }
 
   [HttpGet("{id:guid}")]

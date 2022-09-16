@@ -1,15 +1,12 @@
-﻿using Elsa.Persistence.EntityFramework.Core;
+﻿using Elsa;
+using Elsa.Persistence.EntityFramework.Core;
 using Elsa.Persistence.EntityFramework.Core.Extensions;
-using FSH.WebApi.Application.Common.Caching;
-using FSH.WebApi.Infrastructure.Caching;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Elsa.Activities.Console;
+using FSH.WebApi.Application.Settings;
 
 namespace FSH.WebApi.Infrastructure.Workflows;
 
@@ -27,6 +24,9 @@ internal static class Startup
       }, autoRunMigrations: false);
 
       builder.AddConsoleActivities();
+      builder.AddQuartzTemporalActivities();
+
+      builder.AddWorkflowsFrom<Anchor>();
     });
     services
       .AddDbContext<ElsaContext>(builder => builder.UseDatabase(dbSettings.DBProvider, dbSettings.ConnectionString));
