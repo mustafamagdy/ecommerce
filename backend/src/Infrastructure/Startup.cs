@@ -17,6 +17,7 @@ using FSH.WebApi.Infrastructure.OpenApi;
 using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.SecurityHeaders;
+using FSH.WebApi.Infrastructure.Workflows;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -51,6 +52,7 @@ public static class Startup
       .AddPersistence(config)
       .AddRequestLogging(config)
       .AddRouting(options => options.LowercaseUrls = true)
+      .AddWorkflow(config)
       .AddServices()
       .AddHostedServices();
   }
