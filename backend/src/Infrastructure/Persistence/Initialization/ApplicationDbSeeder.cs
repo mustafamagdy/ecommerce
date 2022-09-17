@@ -42,7 +42,7 @@ internal sealed class ApplicationDbSeeder
       if (await _roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName) is not { } role)
       {
         // Create the role
-        _logger.LogInformation("Seeding {Role} Role for '{TenantId}' Tenant", roleName, _currentTenant.Id);
+        _logger.LogDebug("Seeding {Role} Role for '{TenantId}' Tenant", roleName, _currentTenant.Id);
         role = new ApplicationRole(roleName, $"{roleName} Role for {_currentTenant.Id} Tenant");
         await _roleManager.CreateAsync(role);
       }
@@ -73,7 +73,7 @@ internal sealed class ApplicationDbSeeder
         continue;
       }
 
-      _logger.LogInformation("Seeding {Role} Permission '{Permission}' for '{TenantId}' Tenant", role.Name, permission.Name, _currentTenant.Id);
+      _logger.LogDebug("Seeding {Role} Permission '{Permission}' for '{TenantId}' Tenant", role.Name, permission.Name, _currentTenant.Id);
       dbContext.RoleClaims.Add(new ApplicationRoleClaim
       {
         RoleId = role.Id,
@@ -109,7 +109,7 @@ internal sealed class ApplicationDbSeeder
         IsActive = true
       };
 
-      _logger.LogInformation("Seeding Default Admin User for '{TenantId}' Tenant", _currentTenant.Id);
+      _logger.LogDebug("Seeding Default Admin User for '{TenantId}' Tenant", _currentTenant.Id);
       var password = new PasswordHasher<ApplicationUser>();
       adminUser.PasswordHash = password.HashPassword(adminUser, MultitenancyConstants.DefaultPassword);
       await _userManager.CreateAsync(adminUser);
