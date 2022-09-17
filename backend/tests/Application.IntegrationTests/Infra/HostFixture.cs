@@ -27,7 +27,6 @@ public class HostFixture : IAsyncLifetime
   private SimpleSmtpServer _smtpServer = null!;
   public event EventHandler<MessageReceivedArgs>? MessageReceived = default;
   public static readonly TestSystemTime SYSTEM_TIME = new();
-  private string? envName = "";
   private string _rootTenantDbName;
 
   public HostFixture(IMessageSink sink)
@@ -79,23 +78,16 @@ public class HostFixture : IAsyncLifetime
 
     _factory = new TestWebApplicationFactory(_hostPort);
 
-    try
-    {
-      _smtpServer = SimpleSmtpServer.Start(_mailPort);
-      _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine("Failed to start mail server => " + ex.Message);
-    }
 
-    envName = _factory.Services.GetService<IHostEnvironment>()?.EnvironmentName;
+    _smtpServer = SimpleSmtpServer.Start(_mailPort);
+    _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
   }
 
   internal HttpClient CreateClient() => _factory.CreateClient();
 
   internal string GetDbConnectionForTenantAndSubscriptionType(string tenantId, SubscriptionType subscriptionType)
   {
+    var envName = _factory.Services.GetService<IHostEnvironment>()?.EnvironmentName;
     var dbName = $"{envName}-{tenantId}-{subscriptionType}";
     // var cnnString = string.Format(_cnStringTemplate, _dbPort, dbName);
     return dbName;
