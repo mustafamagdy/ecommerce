@@ -19,11 +19,11 @@ internal static class Startup
     return services;
   }
 
-
   internal static IServiceCollection AddServices(this IServiceCollection services, Type interfaceType, ServiceLifetime lifetime)
   {
     var interfaceTypes =
       AppDomain.CurrentDomain.GetAssemblies()
+        .Where(a => !a.FullName.Contains("Microsoft.EntityFrameworkCore"))
         .SelectMany(s => s.GetTypes())
         .Where(t => interfaceType.IsAssignableFrom(t)
                     && t.IsClass && !t.IsAbstract)
