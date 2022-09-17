@@ -2,9 +2,9 @@ using FSH.WebApi.Domain.Operation;
 
 namespace FSH.WebApi.Domain.MultiTenancy;
 
-public class SubscriptionPayment : Payment
+public sealed class SubscriptionPayment : Payment
 {
-  public SubscriptionPayment()
+  private SubscriptionPayment()
   {
   }
 
@@ -13,23 +13,6 @@ public class SubscriptionPayment : Payment
   {
   }
 
-  public Guid SubscriptionId { get; set; }
-
-  public SubscriptionPayment SetSubscription(Guid subscriptionId)
-  {
-    SubscriptionId = subscriptionId;
-    return this;
-  }
-
-  public SubscriptionPayment SetAmount(decimal amount)
-  {
-    Amount = amount;
-    return this;
-  }
-
-  public SubscriptionPayment SetPaymentMethodId(Guid paymentMethodId)
-  {
-    PaymentMethodId = paymentMethodId;
-    return this;
-  }
+  public Guid TenantProdSubscriptionId { get; set; }
+  public TenantProdSubscription TenantProdSubscription { get; set; }
 }

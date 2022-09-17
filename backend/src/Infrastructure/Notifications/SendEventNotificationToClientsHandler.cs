@@ -8,7 +8,7 @@ namespace FSH.WebApi.Infrastructure.Notifications;
 // Sends all events that are also an INotificationMessage to all clients
 // Note: for this to work, the Event/NotificationMessage class needs to be in the
 // shared project (i.e. have the same FullName - so with namespace - on both sides)
-public class SendEventNotificationToClientsHandler<TNotification> : INotificationHandler<TNotification>
+public sealed class SendEventNotificationToClientsHandler<TNotification> : INotificationHandler<TNotification>
   where TNotification : INotification
 {
   private readonly INotificationSender _notifications;

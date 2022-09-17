@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
@@ -12,25 +13,31 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
   private readonly IReadRepository<CashRegister> _cashRegisterRepo;
   private readonly IRepositoryWithEvents<ActivePaymentOperation> _repository;
   private readonly IStringLocalizer<TransferFromCashRegisterHandler> _t;
+  private readonly IApplicationUnitOfWork _uow;
 
   public CommitCashRegisterTransferHandler(IReadRepository<CashRegister> cashRegisterRepo,
-    IStringLocalizer<TransferFromCashRegisterHandler> localizer, IRepositoryWithEvents<ActivePaymentOperation> repository)
+    IStringLocalizer<TransferFromCashRegisterHandler> localizer, IRepositoryWithEvents<ActivePaymentOperation> repository, IApplicationUnitOfWork uow)
   {
     _cashRegisterRepo = cashRegisterRepo;
     _t = localizer;
     _repository = repository;
+    _uow = uow;
   }
 
   public async Task<string> Handle(CommitCashRegisterTransferRequest request, CancellationToken cancellationToken)
   {
-    var tr = await _repository.GetByIdAsync(request.TransferId, cancellationToken);
-    if (tr.Type != PaymentOperationType.PendingIn || tr.PendingTransferId == null)
+    var tr = await _repository.GetByIdAsync(request.TransferId, cancellationToken)
+             ?? throw new NotFoundException($"Transfer {request.TransferId} operation not found ");
+
+    if (tr.OperationType != PaymentOperationType.PendingIn || tr.PendingTransferId == null)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }
 
-    var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId, cancellationToken);
-    if (pendingOut == null || pendingOut.Type != PaymentOperationType.PendingOut)
+    var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId!, cancellationToken)
+                     ?? throw new NotFoundException($"Pending transfer operation {tr.PendingTransferId} not found");
+
+    if (pendingOut == null || pendingOut.OperationType != PaymentOperationType.PendingOut)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }
@@ -53,11 +60,9 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
     }
 
     destCr.AcceptPendingIn(tr);
-    await _repository.UpdateAsync(pendingOut, cancellationToken);
-
     sourceCr.CommitPendingOut(pendingOut);
-    await _repository.UpdateAsync(tr, cancellationToken);
 
+    await _uow.CommitAsync(cancellationToken);
     return _t["Transfer committed"];
   }
 }

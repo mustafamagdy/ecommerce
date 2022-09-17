@@ -1,4 +1,5 @@
 using Application.IntegrationTests.Infra;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace Application.IntegrationTests.TestCases.Subscriptions;

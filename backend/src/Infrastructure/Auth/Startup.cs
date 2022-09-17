@@ -19,7 +19,7 @@ internal static class Startup
             .AddPermissions()
 
             // Must add identity before adding auth!
-            .AddIdentity();
+            .AddIdentity(config);
         services.Configure<SecuritySettings>(config.GetSection(nameof(SecuritySettings)));
         return config["SecuritySettings:Provider"].Equals("AzureAd", StringComparison.OrdinalIgnoreCase)
             ? services.AddAzureAdAuth(config)

@@ -13,7 +13,7 @@ internal partial class UserService
     EnsureValidTenant();
 
     var user = await _userManager.FindByEmailAsync(request.Email.Normalize());
-    if (user is null || !await _userManager.IsEmailConfirmedAsync(user))
+    if (user is null || (_identitySettings.RequireConfirmedAccount && !await _userManager.IsEmailConfirmedAsync(user)))
     {
       // Don't reveal that the user does not exist or is not confirmed
       throw new InternalServerException(_t["An Error has occurred!"]);

@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.WebApi.Infrastructure.Auth.Jwt;
 
-public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
+public sealed class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
 {
   private readonly JwtSettings _jwtSettings;
 

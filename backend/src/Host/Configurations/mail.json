@@ -5,6 +5,7 @@
     "Host": "smtp.ethereal.email",
     "Password": "kfXxaJKEWJpZQpQSg5",
     "Port": 587,
-    "UserName": "tycbsywp2xu5smz3@ethereal.email"
+    "UserName": "tycbsywp2xu5smz3@ethereal.email",
+    "UseTLS": true
   }
 }

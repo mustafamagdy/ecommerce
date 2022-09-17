@@ -7,4 +7,6 @@ public class Range<T>
   public T? To { get; set; }
 
   public Range<T> Between(T from, T to) => new() { From = from, To = to };
+
+  public static Range<T> With(T from, T to) => new() { From = from, To = to };
 }

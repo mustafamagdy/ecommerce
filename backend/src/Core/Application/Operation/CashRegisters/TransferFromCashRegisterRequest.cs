@@ -1,8 +1,10 @@
+using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
-public class TransferFromCashRegisterRequest : IRequest<string>
+public class TransferFromCashRegisterRequest : IRequest<Guid>
 {
   public Guid SourceCashRegisterId { get; set; }
   public Guid DestCashRegisterId { get; set; }
@@ -10,20 +12,22 @@ public class TransferFromCashRegisterRequest : IRequest<string>
   public DateTime DateTime { get; set; }
 }
 
-public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashRegisterRequest, string>
+public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashRegisterRequest, Guid>
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
-  private readonly IRepository<ActivePaymentOperation> _activeOpRepo;
+  private readonly IReadRepository<PaymentMethod> _paymentMethodRepo;
   private readonly IStringLocalizer<TransferFromCashRegisterHandler> _t;
-
-  public TransferFromCashRegisterHandler(IRepositoryWithEvents<CashRegister> repository, IStringLocalizer<TransferFromCashRegisterHandler> localizer, IRepository<ActivePaymentOperation> activeOpRepo)
+  private readonly IApplicationUnitOfWork _uow;
+  public TransferFromCashRegisterHandler(IRepositoryWithEvents<CashRegister> repository,
+    IStringLocalizer<TransferFromCashRegisterHandler> localizer, IApplicationUnitOfWork uow, IReadRepository<PaymentMethod> paymentMethodRepo)
   {
     _repository = repository;
     _t = localizer;
-    _activeOpRepo = activeOpRepo;
+    _uow = uow;
+    _paymentMethodRepo = paymentMethodRepo;
   }
 
-  public async Task<string> Handle(TransferFromCashRegisterRequest request, CancellationToken cancellationToken)
+  public async Task<Guid> Handle(TransferFromCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var sourceCr = await _repository.GetByIdAsync(request.SourceCashRegisterId, cancellationToken);
     if (sourceCr == null)
@@ -31,7 +35,7 @@ public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashR
       throw new NotFoundException(_t["Source cash register not found"]);
     }
 
-    var destCr = await _repository.GetByIdAsync(request.SourceCashRegisterId, cancellationToken);
+    var destCr = await _repository.GetByIdAsync(request.DestCashRegisterId, cancellationToken);
     if (destCr == null)
     {
       throw new NotFoundException(_t["Destination cash register not found"]);
@@ -47,13 +51,19 @@ public class TransferFromCashRegisterHandler : IRequestHandler<TransferFromCashR
       throw new InvalidOperationException(_t["Not enough balance in the source cash register"]);
     }
 
+    var cashPaymentMethod = await _paymentMethodRepo.FirstOrDefaultAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
+    if (cashPaymentMethod is null)
+    {
+      throw new NotFoundException(_t["Cash payment method not configured"]);
+    }
+
     var (src, dest) = ActivePaymentOperation.CreateTransfer(request.SourceCashRegisterId, request.DestCashRegisterId,
-      request.Amount, request.DateTime);
+      request.Amount, request.DateTime, cashPaymentMethod.Id);
 
-    await _activeOpRepo.AddAsync(src, cancellationToken);
-    await _activeOpRepo.AddAsync(dest, cancellationToken);
+    sourceCr.AddOperation(src);
+    destCr.AddOperation(dest);
 
-    await _repository.UpdateAsync(sourceCr, cancellationToken);
-    return _t["Cash register opened"];
+    await _uow.CommitAsync(cancellationToken);
+    return dest.Id;
   }
 }

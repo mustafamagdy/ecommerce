@@ -2,7 +2,7 @@
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
-internal class CustomSeederRunner
+internal sealed class CustomSeederRunner
 {
   private readonly ICustomSeeder[] _seeders;
 

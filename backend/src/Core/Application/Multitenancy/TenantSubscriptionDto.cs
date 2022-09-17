@@ -1,3 +1,5 @@
+using FSH.WebApi.Shared.Multitenancy;
+
 namespace FSH.WebApi.Application.Multitenancy;
 
 public abstract class TenantSubscriptionDto
@@ -7,7 +9,7 @@ public abstract class TenantSubscriptionDto
     History = new();
   }
 
-  public Guid Id { get; set; } = default!;
+  public Guid SubscriptionId { get; set; } = default!;
   public string TenantId { get; set; } = default!;
   public DateTime ExpiryDate { get; set; }
   public List<SubscriptionHistoryDto> History { get; set; }
@@ -15,7 +17,11 @@ public abstract class TenantSubscriptionDto
 
 public class ProdTenantSubscriptionDto : TenantSubscriptionDto
 {
-  public ProdTenantSubscriptionDto()
+}
+
+public class ProdTenantSubscriptionWithPaymentDto : ProdTenantSubscriptionDto
+{
+  public ProdTenantSubscriptionWithPaymentDto()
   {
     Payments = new();
   }
@@ -42,5 +48,5 @@ public class SubscriptionPaymentDto
 public class SubscriptionHistoryDto
 {
   public DateTime StartDate { get; set; }
-  public DateTime ExpireDate { get; set; }
+  public DateTime ExpiryDate { get; set; }
 }

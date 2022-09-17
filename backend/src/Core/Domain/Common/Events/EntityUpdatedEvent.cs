@@ -7,7 +7,7 @@ public static class EntityUpdatedEvent
         => new(entity);
 }
 
-public class EntityUpdatedEvent<TEntity> : DomainEvent
+public sealed class EntityUpdatedEvent<TEntity> : DomainEvent
     where TEntity : IEntity
 {
     internal EntityUpdatedEvent(TEntity entity) => Entity = entity;
