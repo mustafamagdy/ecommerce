@@ -79,8 +79,15 @@ public class HostFixture : IAsyncLifetime
 
     _factory = new TestWebApplicationFactory(_hostPort);
 
-    _smtpServer = SimpleSmtpServer.Start(_mailPort);
-    _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
+    try
+    {
+      _smtpServer = SimpleSmtpServer.Start(_mailPort);
+      _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine("Failed to start mail server => " + ex.Message);
+    }
 
     envName = _factory.Services.GetService<IHostEnvironment>()?.EnvironmentName;
   }
