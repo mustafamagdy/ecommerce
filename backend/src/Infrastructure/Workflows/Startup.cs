@@ -20,27 +20,27 @@ internal static class Startup
   {
     var settings = config.GetSection(nameof(WorkflowsSettings)).Get<WorkflowsSettings>();
     var dbSettings = config.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
-    services.AddElsa(builder =>
+    services.AddElsa(elsa =>
     {
-      builder.UseEntityFrameworkPersistence((sp, optionsBuilder) =>
+      elsa.UseEntityFrameworkPersistence(optionsBuilder =>
       {
-        optionsBuilder.UseDatabase(dbSettings.DBProvider, dbSettings.ConnectionString);
+        optionsBuilder.UseDatabaseForElsa(dbSettings.DBProvider, dbSettings.ConnectionString);
       }, autoRunMigrations: false);
 
-      builder.AddConsoleActivities();
-      builder.AddHangfireTemporalActivities(hangfire =>
+      elsa.AddConsoleActivities();
+      elsa.AddHangfireTemporalActivities(hangfire =>
       {
         hangfire.UseDatabase(dbSettings.DBProvider, dbSettings.ConnectionString, config);
       });
 
-      builder.AddWorkflowsFrom<Anchor>();
+      elsa.AddWorkflowsFrom<Anchor>();
     });
     services
-      .AddDbContext<ElsaContext>(builder => builder.UseDatabase(dbSettings.DBProvider, dbSettings.ConnectionString));
+      .AddDbContext<ElsaContext>(builder => builder.UseDatabaseForElsa(dbSettings.DBProvider, dbSettings.ConnectionString));
     return services;
   }
 
-  internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
+  internal static DbContextOptionsBuilder UseDatabaseForElsa(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
   {
     return dbProvider.ToLowerInvariant() switch
     {
