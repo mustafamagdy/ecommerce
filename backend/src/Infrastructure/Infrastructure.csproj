@@ -13,6 +13,12 @@
         <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="6.1.0" />
         <PackageReference Include="ClosedXML" Version="0.96.0" />
         <PackageReference Include="Dapper" Version="2.0.123" />
+        <PackageReference Include="Elsa" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.8.2" />
+        <PackageReference Include="Elsa.Persistence.EntityFramework.Core" Version="2.8.2" />
+        <PackageReference Include="Elsa.Persistence.EntityFramework.MySql" Version="2.8.2" />
+        <PackageReference Include="Elsa.Persistence.EntityFramework.PostgreSql" Version="2.8.2" />
+        <PackageReference Include="Elsa.Persistence.EntityFramework.SqlServer" Version="2.8.2" />
         <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.7.2" />
         <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.7.2" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="10.4.0" />

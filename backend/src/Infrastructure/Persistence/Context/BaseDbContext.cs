@@ -29,7 +29,7 @@ public abstract class BaseDbContext
   private readonly DatabaseSettings _dbSettings;
   private readonly ITenantConnectionStringResolver _tenantConnectionStringResolver;
 
-  protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
+  protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
     ISubscriptionTypeResolver subscriptionTypeResolver, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)

@@ -39,7 +39,7 @@ internal static class Startup
 
     if (string.IsNullOrEmpty(connectionString))
       throw new Exception("Hangfire Storage Provider ConnectionString is not configured.");
-    _logger.Information($"Hangfire: Current Storage Provider : {storageSettings.StorageProvider}");
+    _logger.Information($"Hangfire: Current Storage Provider : {storageProvider}");
 
     services.AddSingleton<JobActivator, FSHJobActivator>();
 
@@ -53,7 +53,7 @@ internal static class Startup
     return services;
   }
 
-  private static IGlobalConfiguration UseDatabase(this IGlobalConfiguration hangfireConfig, string dbProvider,
+  internal static IGlobalConfiguration UseDatabase(this IGlobalConfiguration hangfireConfig, string dbProvider,
     string connectionString, IConfiguration config) =>
     dbProvider.ToLowerInvariant() switch
     {
