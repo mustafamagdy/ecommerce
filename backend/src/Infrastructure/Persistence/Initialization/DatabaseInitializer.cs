@@ -1,4 +1,5 @@
-﻿using Finbuckle.MultiTenant;
+﻿using Elsa.Persistence.EntityFramework.Core;
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -13,20 +14,23 @@ namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 internal sealed class DatabaseInitializer : IDatabaseInitializer
 {
   private readonly TenantDbContext _tenantDbContext;
+  private readonly ElsaContext _workflowContext;
   private readonly IServiceProvider _serviceProvider;
   private readonly ILogger<DatabaseInitializer> _logger;
 
-  public DatabaseInitializer(TenantDbContext tenantDbContext, IServiceProvider serviceProvider,
-    ILogger<DatabaseInitializer> logger)
+  public DatabaseInitializer(IServiceProvider serviceProvider, TenantDbContext tenantDbContext,
+    ElsaContext workflowContext, ILogger<DatabaseInitializer> logger)
   {
-    _tenantDbContext = tenantDbContext;
     _serviceProvider = serviceProvider;
+    _tenantDbContext = tenantDbContext;
+    _workflowContext = workflowContext;
     _logger = logger;
   }
 
   public async Task InitializeDatabasesAsync(CancellationToken cancellationToken)
   {
     await InitializeTenantDbAsync(cancellationToken);
+    await InitializeRootWorkflowDbAsync(cancellationToken);
 
     foreach (var tenant in await _tenantDbContext.TenantInfo.ToListAsync(cancellationToken))
     {
@@ -95,6 +99,25 @@ internal sealed class DatabaseInitializer : IDatabaseInitializer
       _logger.LogInformation("Connection to main tenant database succeeded");
       await SeedRootTenantAsync(cancellationToken);
     }
+  }
+
+  private async Task InitializeRootWorkflowDbAsync(CancellationToken cancellationToken)
+  {
+    if ((await _workflowContext.Database.GetPendingMigrationsAsync(cancellationToken)).Any())
+    {
+      _logger.LogInformation("Applying Root Workflow Migrations");
+      await _workflowContext.Database.MigrateAsync(cancellationToken);
+    }
+
+    if (await _workflowContext.Database.CanConnectAsync(cancellationToken))
+    {
+      await SeedRootWorkflowsAsync(cancellationToken);
+    }
+  }
+
+  private Task SeedRootWorkflowsAsync(CancellationToken cancellationToken)
+  {
+    return Task.CompletedTask;
   }
 
   private async Task SeedRootTenantAsync(CancellationToken cancellationToken)

@@ -1,5 +1,6 @@
 using System.Reflection;
 using FSH.WebApi.Application.Mappings;
+using FSH.WebApi.Application.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Application;
