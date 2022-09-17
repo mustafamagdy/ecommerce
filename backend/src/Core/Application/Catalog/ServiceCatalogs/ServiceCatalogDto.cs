@@ -8,5 +8,5 @@ public class ServiceCatalogDto : IDto
   public string ProductName { get; set; } = default!;
   public string? ProductImageUrl { get; set; }
   public decimal Price { get; set; }
-  public ServicePriority Priority { get; set; }
+  public string Priority { get; set; }
 }

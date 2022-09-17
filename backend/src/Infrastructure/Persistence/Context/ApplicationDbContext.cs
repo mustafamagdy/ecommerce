@@ -1,24 +1,28 @@
 using Finbuckle.MultiTenant;
-using FSH.WebApi.Application.Common.Events;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmartEnum.EFCore;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public class ApplicationDbContext : BaseDbContext
+public sealed class ApplicationDbContext : BaseDbContext
 {
-  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionInfo subscriptionInfo, DbContextOptions options, ICurrentUser currentUser,
-    ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events, TenantDbContext tenantDb)
-    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, events, subscriptionInfo, tenantDb)
+  public ApplicationDbContext(ITenantInfo currentTenant, ISubscriptionTypeResolver subscriptionTypeResolver,
+    DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser, ISerializerService serializer,
+    ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings, ITenantConnectionStringResolver tenantConnectionStringResolver)
+    : base(currentTenant, options, currentUser, serializer, csBuilder, dbSettings, subscriptionTypeResolver, tenantConnectionStringResolver)
   {
   }
 
@@ -34,9 +38,18 @@ public class ApplicationDbContext : BaseDbContext
   public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
 
+  public DbSet<PaymentOperation> PaymentOperations => Set<PaymentOperation>();
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    if (Database.IsNpgsql())
+    {
+      AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
     base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<PaymentMethod>().IsMultiTenant();
 
     IgnoreMultiTenantEntities(modelBuilder);
 
@@ -48,10 +61,12 @@ public class ApplicationDbContext : BaseDbContext
   private static void IgnoreMultiTenantEntities(ModelBuilder modelBuilder)
   {
     modelBuilder.Ignore<FSHTenantInfo>();
-    modelBuilder.Ignore<Subscription>();
-    modelBuilder.Ignore<StandardSubscription>();
-    modelBuilder.Ignore<DemoSubscription>();
-    modelBuilder.Ignore<TrainSubscription>();
+    modelBuilder.Ignore<TenantSubscription>();
+    modelBuilder.Ignore<TenantProdSubscription>();
+    modelBuilder.Ignore<TenantDemoSubscription>();
+    modelBuilder.Ignore<TenantTrainSubscription>();
+    modelBuilder.Ignore<SubscriptionFeature>();
+    modelBuilder.Ignore<SubscriptionPackage>();
     modelBuilder.Ignore<SubscriptionPayment>();
     modelBuilder.Ignore<SubscriptionHistory>();
   }

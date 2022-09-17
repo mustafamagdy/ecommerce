@@ -1,0 +1,12 @@
+{
+  "IdentitySettings": {
+    "PasswordMinLength": 6,
+    "PasswordRequireDigit": false,
+    "PasswordRequireLowercase": false,
+    "PasswordRequireNonAlphanumeric": false,
+    "PasswordRequireUppercase": false,
+    "UserRequireUniqueEmail": true,
+    "SignInRequireConfirmedEmail": true,
+    "RequireConfirmedAccount": true
+  }
+}

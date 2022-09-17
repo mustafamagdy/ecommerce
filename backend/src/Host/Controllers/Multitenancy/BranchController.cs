@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class BranchController : VersionedApiController
+public sealed class BranchController : VersionedApiController
 {
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Branches)]
@@ -21,10 +21,34 @@ public class BranchController : VersionedApiController
     return Mediator.Send(request);
   }
 
+  [HttpDelete]
+  [MustHavePermission(FSHAction.Delete, FSHResource.Branches)]
+  [OpenApiOperation("Delete a branch for the current tenant.", "")]
+  public Task DeleteBranchAsync(DeleteBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Branches)]
   [OpenApiOperation("Search for a branch.", "")]
-  public Task<BranchDto> GetListAsync(SearchBranchRequest request)
+  public Task<List<BranchDto>> GetListAsync(SearchBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("activate")]
+  [MustHavePermission(FSHAction.Activate, FSHResource.Branches)]
+  [OpenApiOperation("Activate a branch.", "")]
+  public Task Activate(ActivateBranchRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("deactivate")]
+  [MustHavePermission(FSHAction.Deactivate, FSHResource.Branches)]
+  [OpenApiOperation("Deactivate a branch.", "")]
+  public Task Deactivate(DeactivateBranchRequest request)
   {
     return Mediator.Send(request);
   }

@@ -19,8 +19,6 @@ public class SearchServiceCatalogRequestHandler : IRequestHandler<SearchServiceC
 
   public async Task<PaginationResponse<ServiceCatalogDto>> Handle(SearchServiceCatalogRequest request, CancellationToken
     cancellationToken)
-  {
-    var spec = new SearchServiceCatalogRequestSpec(request);
-    return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
-  }
+    => await _repository.PaginatedListAsync(new SearchServiceCatalogRequestSpec(request),
+      request.PageNumber, request.PageSize, cancellationToken);
 }

@@ -1,6 +1,6 @@
 ﻿namespace FSH.WebApi.Infrastructure.Mapping;
 
-public class MapsterSettings
+public static class MapsterSettings
 {
   public static void Configure()
   {

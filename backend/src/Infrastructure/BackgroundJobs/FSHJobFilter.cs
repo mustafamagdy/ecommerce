@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Infrastructure.BackgroundJobs;
 
-public class FSHJobFilter : IClientFilter
+public sealed class FSHJobFilter : IClientFilter
 {
   private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 

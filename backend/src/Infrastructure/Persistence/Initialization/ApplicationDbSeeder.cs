@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.MultiTenancy;
+﻿using FSH.WebApi.Domain.Identity;
+using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Persistence.Context;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization;
 
-internal class ApplicationDbSeeder
+internal sealed class ApplicationDbSeeder
 {
   private readonly FSHTenantInfo _currentTenant;
   private readonly RoleManager<ApplicationRole> _roleManager;
@@ -41,7 +42,7 @@ internal class ApplicationDbSeeder
       if (await _roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName) is not { } role)
       {
         // Create the role
-        _logger.LogInformation("Seeding {Role} Role for '{TenantId}' Tenant", roleName, _currentTenant.Id);
+        _logger.LogDebug("Seeding {Role} Role for '{TenantId}' Tenant", roleName, _currentTenant.Id);
         role = new ApplicationRole(roleName, $"{roleName} Role for {_currentTenant.Id} Tenant");
         await _roleManager.CreateAsync(role);
       }
@@ -49,12 +50,6 @@ internal class ApplicationDbSeeder
       switch (roleName)
       {
         // Assign permissions
-        case FSHRoles.Basic:
-          await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Basic, role);
-          break;
-        case FSHRoles.Demo:
-          await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Demo, role);
-          break;
         case FSHRoles.Admin:
           await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Admin, role);
 
@@ -68,7 +63,7 @@ internal class ApplicationDbSeeder
     }
   }
 
-  private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyList<FSHPermission> permissions, ApplicationRole role)
+  private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyCollection<FSHPermission> permissions, ApplicationRole role)
   {
     var currentClaims = await _roleManager.GetClaimsAsync(role);
     foreach (var permission in permissions)
@@ -78,7 +73,7 @@ internal class ApplicationDbSeeder
         continue;
       }
 
-      _logger.LogInformation("Seeding {Role} Permission '{Permission}' for '{TenantId}' Tenant", role.Name, permission.Name, _currentTenant.Id);
+      _logger.LogDebug("Seeding {Role} Permission '{Permission}' for '{TenantId}' Tenant", role.Name, permission.Name, _currentTenant.Id);
       dbContext.RoleClaims.Add(new ApplicationRoleClaim
       {
         RoleId = role.Id,
@@ -114,7 +109,7 @@ internal class ApplicationDbSeeder
         IsActive = true
       };
 
-      _logger.LogInformation("Seeding Default Admin User for '{TenantId}' Tenant", _currentTenant.Id);
+      _logger.LogDebug("Seeding Default Admin User for '{TenantId}' Tenant", _currentTenant.Id);
       var password = new PasswordHasher<ApplicationUser>();
       adminUser.PasswordHash = password.HashPassword(adminUser, MultitenancyConstants.DefaultPassword);
       await _userManager.CreateAsync(adminUser);

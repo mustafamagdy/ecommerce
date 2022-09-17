@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FSH.WebApi.Infrastructure.Auth.Jwt;
 
-public class JwtSettings : IValidatableObject
+public sealed class JwtSettings : IValidatableObject
 {
   public string Key { get; set; } = string.Empty;
   public string OverrideTokenKey { get; set; } = string.Empty;

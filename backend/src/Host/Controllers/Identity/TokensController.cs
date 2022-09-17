@@ -1,4 +1,6 @@
 using FSH.WebApi.Application.Identity.Tokens;
+using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
@@ -17,6 +19,7 @@ public sealed class TokensController : VersionNeutralApiController
   [AllowAnonymous]
   [TenantIdHeader]
   [OpenApiOperation("Request an access token using credentials.", "")]
+  [HasValidSubscription]
   public Task<TokenResponse> GetTokenAsync(TokenRequest request, CancellationToken cancellationToken)
   {
     return _tokenService.GetTokenAsync(request, GetIpAddress(), cancellationToken);

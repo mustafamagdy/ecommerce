@@ -1,14 +1,10 @@
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using FluentValidation.AspNetCore;
 using FSH.WebApi.Application;
 using FSH.WebApi.Host.Configurations;
 using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
-using FSH.WebApi.Infrastructure.Multitenancy;
-using FSH.WebApi.Infrastructure.Seeders;
+using FSH.WebApi.Infrastructure.Registrations;
 using QuestPDF.Drawing;
 using Serilog;
 
@@ -27,14 +23,10 @@ try
       .ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionTypeFilter>(); })
-    .AddFluentValidation()
-    .AddJsonOptions(opt =>
-    {
-      opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-      opt.JsonSerializerOptions.Converters.Clear();
-      opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
-    });
+  builder.Services
+    .AddApplicationControllers()
+    .AddApplicationFluentValidation()
+    .AddApplicationJsonOptions();
 
   builder.Services.AddInfrastructure(builder.Configuration);
   builder.Services.AddApplication();
@@ -52,7 +44,8 @@ try
 
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
-  app.Run();
+
+  await app.RunAsync();
 }
 catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", StringComparison.Ordinal))
 {
@@ -67,18 +60,5 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 
 public partial class Program
 {
-  static Dictionary<string, string> s_ConfigOverride { get; set; } = new();
-
-  class ClearConfigOverride : IDisposable
-  {
-    public void Dispose() => s_ConfigOverride = new Dictionary<string, string>();
-  }
-
-  public static IReadOnlyDictionary<string, string> InMemoryConfig => s_ConfigOverride;
-
-  public static IDisposable OverrideConfig(Dictionary<string, string> config)
-  {
-    s_ConfigOverride = config;
-    return new ClearConfigOverride();
-  }
+  // Only anchor for integration tests
 }

@@ -1,9 +1,19 @@
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.MultiTenancy;
+using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Multitenancy;
 
-public class TenantsController : VersionNeutralApiController
+public sealed class TenantsController : VersionNeutralApiController
 {
+  [HttpGet("packages")]
+  [AllowAnonymous]
+  [OpenApiOperation("Get list of subscription packages.", "")]
+  public Task<List<SubscriptionPackageDto>> GetSubscriptionPackages()
+  {
+    return Mediator.Send(new GetSubscriptionPackagesRequest());
+  }
+
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Tenants)]
   [OpenApiOperation("Search all tenants.", "")]
@@ -23,7 +33,15 @@ public class TenantsController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Tenants)]
   [OpenApiOperation("Create a new tenant.", "")]
-  public Task<string> CreateAsync(CreateTenantRequest request)
+  public Task<BasicTenantInfoDto> CreateAsync(CreateTenantRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPut]
+  [MustHavePermission(FSHAction.Update, FSHResource.Tenants)]
+  [OpenApiOperation("Update tenant details.", "")]
+  public Task<ViewTenantInfoDto> UpdateTenant(UpdateTenantRequest request)
   {
     return Mediator.Send(request);
   }
@@ -58,6 +76,14 @@ public class TenantsController : VersionNeutralApiController
   [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
   [OpenApiOperation("Renew subscription for a tenant", "")]
   public Task<string> RenewSubscription(RenewSubscriptionRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
+  [HttpPost("pay")]
+  [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
+  [OpenApiOperation("Pay for tenant subscription", "")]
+  public Task<Unit> RenewSubscription(PayForSubscriptionRequest request)
   {
     return Mediator.Send(request);
   }

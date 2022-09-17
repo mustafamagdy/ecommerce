@@ -3,9 +3,9 @@ using FSH.WebApi.Application.Auditing;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
 
-namespace FSH.WebApi.Host.Controllers.Identity;
+namespace FSH.WebApi.Host.Controllers.Personal;
 
-public class PersonalController : VersionNeutralApiController
+public sealed class PersonalController : VersionNeutralApiController
 {
   private readonly IUserService _userService;
 

@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Infrastructure.Middleware;
+using FSH.WebApi.Shared.Multitenancy;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,102 +24,89 @@ public class SubscriptionTests : TestFixture
   {
     HostFixture.SYSTEM_TIME.DaysOffset = 10;
 
-    var tenantId = Guid.NewGuid().ToString();
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } });
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
-    };
+    _ = await PostAsJsonAsync("/api/tokens",
+      new TokenRequest(tenant.AdminEmail, MultitenancyConstants.DefaultPassword),
+      new Dictionary<string, string>
+      {
+        { "tenant", tenantId },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
 
-    response = await PostAsJsonAsync("/api/tenants", tenant, new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
-
-    RemoveThisDbAfterFinish(newTenantId);
-
-    response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", tenantId } });
-
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var tenant_admin_token = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    var tenant_admin_token = await _.Content.ReadFromJsonAsync<TokenResponse>();
     tenant_admin_token.Token.Should().NotBeEmpty();
   }
 
   [Fact]
   public async Task expired_subscription_cannot_perform_any_operations_unless_renewed()
   {
-    var tenantId = Guid.NewGuid().ToString();
-    var response = await PostAsJsonAsync("/api/tokens",
-      new TokenRequest("admin@root.com", "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", "root" } });
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var root_token_response = await response.Content.ReadFromJsonAsync<TokenResponse>();
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
 
-    var tenant = new CreateTenantRequest
-    {
-      Id = tenantId,
-      Email = $"email@{tenantId}.com",
-      AdminEmail = $"admin@{tenantId}.com",
-      Name = $"Tenant {tenantId}",
-      DatabaseName = $"{tenantId}-db",
-    };
-
-    var root_admin_headers = new Dictionary<string, string> { { "Authorization", $"Bearer {root_token_response.Token}" } };
-    response = await PostAsJsonAsync("/api/tenants", tenant, root_admin_headers);
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-    var newTenantId = await response.Content.ReadAsStringAsync();
-    newTenantId.Should().NotBeEmpty().And.BeEquivalentTo(tenant.Id);
-
-    RemoveThisDbAfterFinish(newTenantId);
-
-    response = await PostAsJsonAsync("/api/tokens",
+    _ = await PostAsJsonAsync("/api/tokens",
       new TokenRequest(tenant.AdminEmail, "123Pa$$word!"),
-      new Dictionary<string, string> { { "tenant", tenantId } });
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
-    var tokenResult = await response.Content.ReadFromJsonAsync<TokenResponse>();
+      new Dictionary<string, string>
+      {
+        { "tenant", tenantId },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tokenResult = await _.Content.ReadFromJsonAsync<TokenResponse>();
 
     HostFixture.SYSTEM_TIME.DaysOffset = 100;
 
-    response = await PostAsJsonAsync("/api/v1/products/search",
+    _ = await PostAsJsonAsync("/api/v1/products/search",
       new SearchProductsRequest(),
-      new Dictionary<string, string> { { "Authorization", $"Bearer {tokenResult.Token}" } });
+      new Dictionary<string, string>
+      {
+        { "Authorization", $"Bearer {tokenResult.Token}" },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
 
-    response.StatusCode.Should().NotBe(HttpStatusCode.OK);
-    response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-    var errorResult = await response.Content.ReadFromJsonAsync<ErrorResult>();
-    errorResult.Exception.Should().Contain("Subscription expired");
+    _.StatusCode.Should().NotBe(HttpStatusCode.OK);
+    _.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    var errorResult = await _.Content.ReadFromJsonAsync<ErrorResult>();
+    errorResult.Exception.Should().Contain("has no active Standard subscription");
 
-    response = await GetAsync($"/api/tenants/{tenantId}", root_admin_headers);
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    _ = await RootAdmin_GetAsync($"/api/tenants/{tenantId}");
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    var tenantInfo = await response.Content.ReadFromJsonAsync<TenantDto>();
+    var tenantInfo = await _.Content.ReadFromJsonAsync<TenantDto>();
     tenantInfo.Should().NotBeNull();
     tenantInfo.ProdSubscriptionId.Should().NotBeEmpty();
 
-    response = await PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
+    _ = await RootAdmin_PostAsJsonAsync("/api/tenants/renew", new RenewSubscriptionRequest
     {
       TenantId = tenantId,
-      SubscriptionId = tenantInfo.ProdSubscriptionId!.Value
-    }, root_admin_headers);
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+      SubscriptionType = SubscriptionType.Standard
+    });
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    _ = await PostAsJsonAsync("/api/v1/products/search",
+      new SearchProductsRequest(),
+      new Dictionary<string, string>
+      {
+        { "Authorization", $"Bearer {tokenResult.Token}" },
+        { MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard }
+      });
+
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]

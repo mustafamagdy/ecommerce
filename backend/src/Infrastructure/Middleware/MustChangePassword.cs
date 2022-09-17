@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Infrastructure.Middleware;
 
-public class MustChangePasswordMiddleware : IMiddleware
+public sealed class MustChangePasswordMiddleware : IMiddleware
 {
   public async Task InvokeAsync(HttpContext context, RequestDelegate next)
   {

@@ -8,9 +8,16 @@ namespace Application.IntegrationTests.Infra;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
+  private readonly int _hostPort;
+
+  public TestWebApplicationFactory(int hostPort)
+  {
+    _hostPort = hostPort;
+  }
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
+    builder.UseUrls($"http://localhost:{_hostPort}");
     builder.UseEnvironment(TestConstants.TestEnvironmentName);
     builder.ConfigureServices(services =>
     {
