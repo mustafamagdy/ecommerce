@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FSH.WebApi.Application.Settings;
+using FSH.WebApi.Infrastructure.BackgroundJobs;
+using Hangfire;
+using Hangfire.MySql;
+using Hangfire.PostgreSql;
 
 namespace FSH.WebApi.Infrastructure.Workflows;
 
@@ -24,7 +28,10 @@ internal static class Startup
       }, autoRunMigrations: false);
 
       builder.AddConsoleActivities();
-      builder.AddQuartzTemporalActivities();
+      builder.AddHangfireTemporalActivities(hangfire =>
+      {
+        hangfire.UseDatabase(dbSettings.DBProvider, dbSettings.ConnectionString, config);
+      });
 
       builder.AddWorkflowsFrom<Anchor>();
     });
