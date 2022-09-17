@@ -28,7 +28,7 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
         <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
         <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.108" />
+        <PackageReference Include="HarfBuzzSharp" Version="2.8.2.2" />
         <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
         <PackageReference Include="MailKit" Version="3.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
@@ -55,9 +55,9 @@
         <PackageReference Include="ObjectsComparer" Version="1.4.1" />
         <PackageReference Include="QuestPDF" Version="2022.6.3" />
         <PackageReference Include="RazorEngineCore" Version="2022.8.1" />
-        <PackageReference Include="SkiaSharp" Version="2.88.1-preview.91" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.1-preview.91" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.1-preview.91" />
+        <PackageReference Include="SkiaSharp" Version="2.88.2" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.2" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.2" />
         <PackageReference Include="SkiaSharp.QrCode" Version="0.6.0" />
         <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" Version="0.6.1" />
         <PackageReference Include="Oracle.EntityFrameworkCore" Version="6.21.61" />
