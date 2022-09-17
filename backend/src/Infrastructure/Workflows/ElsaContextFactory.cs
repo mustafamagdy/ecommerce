@@ -18,7 +18,7 @@ public class ElsaContextFactory : IDesignTimeDbContextFactory<ElsaContext>
 
     var dbContextBuilder = new DbContextOptionsBuilder();
     var db = config.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
-    dbContextBuilder.UseDatabase(db.DBProvider, db.ConnectionString);
+    dbContextBuilder.UseDatabaseForElsa(db.DBProvider, db.ConnectionString);
     return new ElsaContext(dbContextBuilder.Options);
   }
 }
