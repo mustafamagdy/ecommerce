@@ -11,7 +11,7 @@
     <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.8.2" />
     <PackageReference Include="Elsa.Core" Version="2.8.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.4.0" />
-    <PackageReference Include="HarfBuzzSharp" Version="2.8.2.1-preview.108" />
+    <PackageReference Include="HarfBuzzSharp" Version="2.8.2.2" />
     <PackageReference Include="Mapster" Version="7.3.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
