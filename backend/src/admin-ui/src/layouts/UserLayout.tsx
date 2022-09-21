@@ -79,7 +79,7 @@ const UserLayout = ({ children }: Props) => {
           })}
     >
       {children}
-      
+
     </Layout>
   )
 }
