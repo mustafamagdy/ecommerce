@@ -5,12 +5,13 @@ import Link from 'next/link'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { styled, useTheme } from '@mui/material/styles'
+import {styled, useTheme} from '@mui/material/styles'
+import Logo from '../../Logo';
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
 
-const StyledLink = styled('a')(({ theme }) => ({
+const StyledLink = styled('a')(({theme}) => ({
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
@@ -32,7 +33,8 @@ const BlankLayoutAppBar = () => {
       >
         <Link href='/' passHref>
           <StyledLink>
-            <Typography variant='h6' sx={{ ml: 2, fontWeight: 700, lineHeight: 1.2 }}>
+            <Logo/>
+            <Typography variant='h6' sx={{ml: 2, fontWeight: 700, lineHeight: 1.2}}>
               {themeConfig.templateName}
             </Typography>
           </StyledLink>

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import {ReactNode} from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -7,13 +7,14 @@ import Link from 'next/link'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { styled, useTheme } from '@mui/material/styles'
+import {styled, useTheme} from '@mui/material/styles'
 
 // ** Type Import
-import { Settings } from 'src/@core/context/settingsContext'
+import {Settings} from 'src/@core/context/settingsContext'
 
 // ** Theme Config Import
 import themeConfig from 'src/configs/themeConfig'
+import Logo from "src/@core/layouts/Logo";
 
 interface Props {
   hidden: boolean
@@ -23,7 +24,7 @@ interface Props {
   horizontalAppBarBranding?: (props?: any) => ReactNode
 }
 
-const StyledLink = styled('a')(({ theme }) => ({
+const StyledLink = styled('a')(({theme}) => ({
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
@@ -38,16 +39,17 @@ const AppBarContent = (props: Props) => {
   } = props
 
   // ** Hooks
-  const theme = useTheme()
+  // const theme = useTheme()
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
       {userHorizontalAppBarBranding ? (
         userHorizontalAppBarBranding(props)
       ) : (
         <Link href='/' passHref>
           <StyledLink>
-            <Typography variant='h6' sx={{ ml: 2, fontWeight: 700, lineHeight: 1.2 }}>
+            <Logo/>
+            <Typography variant='h6' sx={{ml: 2, fontWeight: 700, lineHeight: 1.2}}>
               {themeConfig.templateName}
             </Typography>
           </StyledLink>
