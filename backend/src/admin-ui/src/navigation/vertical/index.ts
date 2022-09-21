@@ -4,26 +4,88 @@ import EmailOutline from 'mdi-material-ui/EmailOutline'
 import ShieldOutline from 'mdi-material-ui/ShieldOutline'
 
 // ** Type import
-import { VerticalNavItemsType } from 'src/@core/layouts/types'
+import {VerticalNavItemsType} from 'src/@core/layouts/types'
 
+//icon: HomeOutline,
 const navigation = (): VerticalNavItemsType => {
   return [
     {
-      title: 'Home',
+      title: 'Dashboard',
+      path: '/home',
       icon: HomeOutline,
-      path: '/home'
     },
     {
-      title: 'Second Page',
-      icon: EmailOutline,
-      path: '/second-page'
+      title: 'Tenants',
+      icon: HomeOutline,
+      children: [
+        {
+          title: 'Tenants',
+          path: '/tenants',
+          icon: HomeOutline
+        },
+        {
+          title: 'History',
+          path: '/history',
+          icon: HomeOutline
+        },
+        {
+          title: 'Payments',
+          path: '/payments',
+          icon: HomeOutline
+        },
+        {
+          title: 'Support',
+          path: '/support',
+          icon: HomeOutline
+        },
+        {
+          title: 'Packages',
+          path: '/packages',
+          icon: HomeOutline
+        }
+      ]
     },
     {
-      title: 'Access Control',
-      icon: ShieldOutline,
-      path: '/acl',
-      action: 'read',
-      subject: 'acl-page'
+      title: 'System',
+      path: '/system',
+      icon: HomeOutline,
+      children: [
+        {
+          title: 'Users',
+          path: '/users',
+          icon: HomeOutline
+        },
+        {
+          title: 'Roles',
+          path: '/roles',
+          icon: HomeOutline
+        },
+        {
+          title: 'Maintenance',
+          path: '/maintenance',
+          icon: HomeOutline
+        },
+        {
+          title: 'Workflows',
+          path: '/workflows',
+          icon: HomeOutline
+        },
+        {
+          title: 'Settings',
+          path: '/settings',
+          icon: HomeOutline
+        },
+        {
+          title: 'Monitoring',
+          path: '/monitoring',
+          icon: HomeOutline
+        },
+        {
+          title: 'Updates',
+          path: '/updates',
+          icon: HomeOutline
+        }
+      ]
     }
   ]
 }
