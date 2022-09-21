@@ -43,6 +43,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import Logo from "src/@core/layouts/Logo";
 
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
@@ -186,6 +187,7 @@ const LoginPage = () => {
                 justifyContent: 'center'
               }}
             >
+              <Logo/>
               <Typography variant='h6' sx={{ ml: 2, lineHeight: 1, fontWeight: 700, fontSize: '1.5rem !important' }}>
                 {themeConfig.templateName}
               </Typography>

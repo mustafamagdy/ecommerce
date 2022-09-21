@@ -37,6 +37,7 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import Logo from "src/@core/layouts/Logo";
 
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
@@ -196,6 +197,7 @@ const Register = () => {
                 justifyContent: 'center'
               }}
             >
+              <Logo/>
               <Typography variant='h6' sx={{ ml: 2, lineHeight: 1, fontWeight: 700, fontSize: '1.5rem !important' }}>
                 {themeConfig.templateName}
               </Typography>

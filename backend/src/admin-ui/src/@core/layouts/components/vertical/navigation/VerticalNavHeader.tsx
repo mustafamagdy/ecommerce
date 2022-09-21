@@ -18,6 +18,7 @@ import { Settings } from 'src/@core/context/settingsContext'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import Logo from "src/@core/layouts/Logo";
 
 interface Props {
   hidden: boolean
@@ -136,6 +137,7 @@ const VerticalNavHeader = (props: Props) => {
       ) : (
         <Link href='/' passHref>
           <StyledLink>
+            <Logo/>
             <HeaderTitle variant='h6' sx={{ ...menuCollapsedStyles, ...(navCollapsed && !navHover ? {} : { ml: 2 }) }}>
               {themeConfig.templateName}
             </HeaderTitle>
