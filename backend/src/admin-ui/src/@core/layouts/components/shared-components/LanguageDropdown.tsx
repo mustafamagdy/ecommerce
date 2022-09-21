@@ -20,6 +20,7 @@ interface Props {
   saveSettings: (values: Settings) => void
 }
 
+type AllowedLanguages = 'en' | 'ar';
 const LanguageDropdown = ({ settings, saveSettings }: Props) => {
   // ** State
   const [anchorEl, setAnchorEl] = useState<any>(null)
@@ -49,7 +50,8 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
     setAnchorEl(null)
   }
 
-  const handleLangItemClick = (lang: 'en' | 'fr' | 'ar') => {
+
+  const handleLangItemClick = (lang: AllowedLanguages) => {
     debugger;
     i18n.changeLanguage(lang)
     handleLangDropdownClose()
@@ -70,26 +72,6 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
       >
         <MenuItem
           sx={{ py: 2 }}
-          selected={i18n.language === 'en'}
-          onClick={() => {
-            handleLangItemClick('en')
-            saveSettings({ ...settings, direction: 'ltr' })
-          }}
-        >
-          English
-        </MenuItem>
-        <MenuItem
-          sx={{ py: 2 }}
-          selected={i18n.language === 'fr'}
-          onClick={() => {
-            handleLangItemClick('fr')
-            saveSettings({ ...settings, direction: 'ltr' })
-          }}
-        >
-          French
-        </MenuItem>
-        <MenuItem
-          sx={{ py: 2 }}
           selected={i18n.language === 'ar'}
           onClick={() => {
             handleLangItemClick('ar')
@@ -97,6 +79,16 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
           }}
         >
           Arabic
+        </MenuItem>
+        <MenuItem
+          sx={{ py: 2 }}
+          selected={i18n.language === 'en'}
+          onClick={() => {
+            handleLangItemClick('en')
+            saveSettings({ ...settings, direction: 'ltr' })
+          }}
+        >
+          English
         </MenuItem>
       </Menu>
     </Fragment>
