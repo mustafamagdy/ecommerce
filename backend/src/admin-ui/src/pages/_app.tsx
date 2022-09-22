@@ -7,6 +7,10 @@ import {Router} from 'next/router'
 import type {NextPage} from 'next'
 import type {AppProps} from 'next/app'
 
+// ** Store Imports
+import {store} from 'src/store'
+import {Provider} from 'react-redux'
+
 // ** Loader Import
 import NProgress from 'nprogress'
 
@@ -111,39 +115,41 @@ const App = (props: ExtendedAppProps) => {
   const aclAbilities = Component.acl ?? defaultACLObj
 
   return (
-    <CacheProvider value={emotionCache}>
-      <Head>
-        <title>{`${themeConfig.templateName} - Admin for tenant management`}</title>
-        <meta
-          name='description'
-          content={`${themeConfig.templateName} – Admin for tenant management`}
-        />
-        <meta name='keywords' content='ecommerce, multi tenant'/>
-        <meta name='viewport' content='initial-scale=1, width=device-width'/>
-      </Head>
-      <AuthProvider>
-        <SettingsProvider {...(setConfig ? {pageSettings: setConfig()} : {})}>
-          <SettingsConsumer>
-            {({settings}) => {
-              return (
-                <ThemeComponent settings={settings}>
-                  <WindowWrapper>
-                    <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                        {getLayout(<Component {...pageProps} />)}
-                      </AclGuard>
-                    </Guard>
-                  </WindowWrapper>
-                  <ReactHotToast>
-                    <Toaster position={settings.toastPosition} toastOptions={{className: 'react-hot-toast'}}/>
-                  </ReactHotToast>
-                </ThemeComponent>
-              )
-            }}
-          </SettingsConsumer>
-        </SettingsProvider>
-      </AuthProvider>
-    </CacheProvider>
+    <Provider store={store}>
+      <CacheProvider value={emotionCache}>
+        <Head>
+          <title>{`${themeConfig.templateName} - Admin for tenant management`}</title>
+          <meta
+            name='description'
+            content={`${themeConfig.templateName} – Admin for tenant management`}
+          />
+          <meta name='keywords' content='ecommerce, multi tenant'/>
+          <meta name='viewport' content='initial-scale=1, width=device-width'/>
+        </Head>
+        <AuthProvider>
+          <SettingsProvider {...(setConfig ? {pageSettings: setConfig()} : {})}>
+            <SettingsConsumer>
+              {({settings}) => {
+                return (
+                  <ThemeComponent settings={settings}>
+                    <WindowWrapper>
+                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                        <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                          {getLayout(<Component {...pageProps} />)}
+                        </AclGuard>
+                      </Guard>
+                    </WindowWrapper>
+                    <ReactHotToast>
+                      <Toaster position={settings.toastPosition} toastOptions={{className: 'react-hot-toast'}}/>
+                    </ReactHotToast>
+                  </ThemeComponent>
+                )
+              }}
+            </SettingsConsumer>
+          </SettingsProvider>
+        </AuthProvider>
+      </CacheProvider>
+    </Provider>
   )
 }
 
