@@ -45,7 +45,7 @@ type ThemeConfig = {
 const themeConfig: ThemeConfig = {
   // ** Layout Configs
   templateName: 'Admin Section' /* App Name */,
-  layout: 'horizontal' /* vertical | horizontal */,
+  layout: 'vertical' /* vertical | horizontal */,
   mode: 'light' /* light | dark */,
   direction: 'rtl' /* ltr | rtl */,
   skin: 'default' /* default | bordered | semi-dark /*! Note: semi-dark value will only work for Vertical Layout */,
