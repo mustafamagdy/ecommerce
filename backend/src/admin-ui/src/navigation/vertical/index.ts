@@ -19,7 +19,7 @@ const navigation = (): VerticalNavItemsType => {
       icon: HomeOutline,
       children: [
         {
-          title: 'Tenants',
+          title: 'All Tenants',
           path: '/tenants',
           icon: HomeOutline
         },
