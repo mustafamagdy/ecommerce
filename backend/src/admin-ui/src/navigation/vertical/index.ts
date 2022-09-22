@@ -30,7 +30,7 @@ const navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Payments',
-          path: '/payments',
+          path: '/invoice/list',
           icon: HomeOutline
         },
         {
@@ -52,7 +52,7 @@ const navigation = (): VerticalNavItemsType => {
       children: [
         {
           title: 'Users',
-          path: '/users',
+          path: '/user/list',
           icon: HomeOutline
         },
         {
