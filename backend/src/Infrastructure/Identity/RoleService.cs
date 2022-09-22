@@ -27,11 +27,8 @@ internal sealed class RoleService : IRoleService
   private readonly IApplicationUnitOfWork _uow;
 
   public RoleService(
-    RoleManager<ApplicationRole> roleManager,
-    UserManager<ApplicationUser> userManager,
-    IStringLocalizer<RoleService> localizer,
-    ICurrentUser currentUser,
-    ITenantInfo currentTenant,
+    RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager,
+    IStringLocalizer<RoleService> localizer, ICurrentUser currentUser, ITenantInfo currentTenant,
     IEventPublisher events, IApplicationUnitOfWork uow)
   {
     _roleManager = roleManager;
@@ -129,7 +126,7 @@ internal sealed class RoleService : IRoleService
     if (_currentTenant.Id != MultitenancyConstants.Root.Id)
     {
       // Remove Root Permissions if the Role is not created for Root Tenant.
-      request.Permissions.RemoveAll(u => u.StartsWith("Permissions.Root."));
+      request.Permissions.RemoveAll(u => u.StartsWith("root."));
     }
 
     var currentClaims = await _roleManager.GetClaimsAsync(role);
@@ -190,5 +187,30 @@ internal sealed class RoleService : IRoleService
     await _events.PublishAsync(new ApplicationRoleDeletedEvent(role.Id, role.Name));
 
     return string.Format(_t["Role {0} Deleted."], role.Name);
+  }
+
+  public async Task<List<AbilityPerRoleDto>> GetRolesAndAbilities(CancellationToken cancellationToken)
+  {
+    var roles = (await _roleManager.Roles.ToListAsync(cancellationToken)).Adapt<List<AbilityPerRoleDto>>();
+    var permissions = await _uow.Set<ApplicationRoleClaim>().ToListAsync(cancellationToken: cancellationToken);
+
+    foreach (var role in roles)
+    {
+      var roleClaims = permissions
+        .Where(a => a.RoleId == role.Id && a.ClaimType == FSHClaims.Permission)
+        .ToArray();
+      var abilities = roleClaims.Select(a => new
+      {
+        Resource = a.ClaimValue.Split(".")[0],
+        Permission = a.ClaimValue.Split(".")[1]
+      }).ToArray();
+
+      role.Abilities = abilities
+        .GroupBy(a => a.Resource)
+        .Select(a => new AbilityDto { Actions = a.Select(x => x.Permission).ToArray(), Resource = a.Key })
+        .ToList();
+    }
+
+    return roles;
   }
 }
