@@ -1,33 +1,29 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import {ReactNode} from 'react'
 
 // ** Next Imports
 import Head from 'next/head'
-import { Router } from 'next/router'
-import type { NextPage } from 'next'
-import type { AppProps } from 'next/app'
-
-
-
-
+import {Router} from 'next/router'
+import type {NextPage} from 'next'
+import type {AppProps} from 'next/app'
 
 // ** Loader Import
 import NProgress from 'nprogress'
 
 // ** Emotion Imports
-import { CacheProvider } from '@emotion/react'
-import type { EmotionCache } from '@emotion/cache'
+import {CacheProvider} from '@emotion/react'
+import type {EmotionCache} from '@emotion/cache'
 
 // ** Config Imports
 import 'src/configs/i18n'
-import { defaultACLObj } from 'src/configs/acl'
+import {defaultACLObj} from 'src/configs/acl'
 import themeConfig from 'src/configs/themeConfig'
 
 // ** Fake-DB Import
 import 'src/@fake-db'
 
 // ** Third Party Import
-import { Toaster } from 'react-hot-toast'
+import {Toaster} from 'react-hot-toast'
 
 // ** Component Imports
 import UserLayout from 'src/layouts/UserLayout'
@@ -41,14 +37,14 @@ import WindowWrapper from 'src/@core/components/window-wrapper'
 import Spinner from 'src/@core/components/spinner'
 
 // ** Contexts
-import { AuthProvider } from 'src/context/AuthContext'
-import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
+import {AuthProvider} from 'src/context/AuthContext'
+import {SettingsConsumer, SettingsProvider} from 'src/@core/context/settingsContext'
 
 // ** Styled Components
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 
 // ** Utils Imports
-import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
+import {createEmotionCache} from 'src/@core/utils/create-emotion-cache'
 
 // ** Prismjs Styles
 import 'prismjs'
@@ -89,19 +85,19 @@ if (themeConfig.routingLoader) {
   })
 }
 
-const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
+const Guard = ({children, authGuard, guestGuard}: GuardProps) => {
   if (guestGuard) {
-    return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
+    return <GuestGuard fallback={<Spinner/>}>{children}</GuestGuard>
   } else if (!guestGuard && !authGuard) {
     return <>{children}</>
   } else {
-    return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
+    return <AuthGuard fallback={<Spinner/>}>{children}</AuthGuard>
   }
 }
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const {Component, emotionCache = clientSideEmotionCache, pageProps} = props
 
   // Variables
   const getLayout = Component.getLayout ?? (page => <UserLayout>{page}</UserLayout>)
@@ -115,42 +111,39 @@ const App = (props: ExtendedAppProps) => {
   const aclAbilities = Component.acl ?? defaultACLObj
 
   return (
-
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <title>{`${themeConfig.templateName} - Admin for tenant management`}</title>
-          <meta
-            name='description'
-            content={`${themeConfig.templateName} – Admin for tenant management`}
-          />
-          <meta name='keywords' content='ecommerce, multi tenant' />
-          <meta name='viewport' content='initial-scale=1, width=device-width' />
-        </Head>
-
-        <AuthProvider>
-          <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
-            <SettingsConsumer>
-              {({ settings }) => {
-                return (
-                  <ThemeComponent settings={settings}>
-                    <WindowWrapper>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                          {getLayout(<Component {...pageProps} />)}
-                        </AclGuard>
-                      </Guard>
-                    </WindowWrapper>
-                    <ReactHotToast>
-                      <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
-                    </ReactHotToast>
-                  </ThemeComponent>
-                )
-              }}
-            </SettingsConsumer>
-          </SettingsProvider>
-        </AuthProvider>
-      </CacheProvider>
-
+    <CacheProvider value={emotionCache}>
+      <Head>
+        <title>{`${themeConfig.templateName} - Admin for tenant management`}</title>
+        <meta
+          name='description'
+          content={`${themeConfig.templateName} – Admin for tenant management`}
+        />
+        <meta name='keywords' content='ecommerce, multi tenant'/>
+        <meta name='viewport' content='initial-scale=1, width=device-width'/>
+      </Head>
+      <AuthProvider>
+        <SettingsProvider {...(setConfig ? {pageSettings: setConfig()} : {})}>
+          <SettingsConsumer>
+            {({settings}) => {
+              return (
+                <ThemeComponent settings={settings}>
+                  <WindowWrapper>
+                    <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                        {getLayout(<Component {...pageProps} />)}
+                      </AclGuard>
+                    </Guard>
+                  </WindowWrapper>
+                  <ReactHotToast>
+                    <Toaster position={settings.toastPosition} toastOptions={{className: 'react-hot-toast'}}/>
+                  </ReactHotToast>
+                </ThemeComponent>
+              )
+            }}
+          </SettingsConsumer>
+        </SettingsProvider>
+      </AuthProvider>
+    </CacheProvider>
   )
 }
 

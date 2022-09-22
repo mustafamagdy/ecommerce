@@ -1,8 +1,8 @@
 // ** React Imports
-import { createContext, useEffect, useState, ReactNode } from 'react'
+import {createContext, useEffect, useState, ReactNode} from 'react'
 
 // ** Next Import
-import { useRouter } from 'next/router'
+import {useRouter} from 'next/router'
 
 // ** Axios
 import axios from 'axios'
@@ -11,7 +11,7 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
+import {AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType} from './types'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -32,7 +32,7 @@ type Props = {
   children: ReactNode
 }
 
-const AuthProvider = ({ children }: Props) => {
+const AuthProvider = ({children}: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
@@ -55,7 +55,7 @@ const AuthProvider = ({ children }: Props) => {
           })
           .then(async response => {
             setLoading(false)
-            setUser({ ...response.data.userData })
+            setUser({...response.data.userData})
           })
           .catch(() => {
             localStorage.removeItem('userData')
@@ -87,7 +87,7 @@ const AuthProvider = ({ children }: Props) => {
           .then(async response => {
             const returnUrl = router.query.returnUrl
 
-            setUser({ ...response.data.userData })
+            setUser({...response.data.userData})
             await window.localStorage.setItem('userData', JSON.stringify(response.data.userData))
 
             const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
@@ -115,7 +115,7 @@ const AuthProvider = ({ children }: Props) => {
         if (res.data.error) {
           if (errorCallback) errorCallback(res.data.error)
         } else {
-          handleLogin({ email: params.email, password: params.password })
+          handleLogin({email: params.email, password: params.password})
         }
       })
       .catch((err: { [key: string]: string }) => (errorCallback ? errorCallback(err) : null))
@@ -136,4 +136,4 @@ const AuthProvider = ({ children }: Props) => {
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
 }
 
-export { AuthContext, AuthProvider }
+export {AuthContext, AuthProvider}

@@ -1,24 +1,24 @@
 // ** React Imports
-import { ReactNode, useState } from 'react'
+import {ReactNode, useState} from 'react'
 
 // ** Next Imports
-import { useRouter } from 'next/router'
+import {useRouter} from 'next/router'
 
 // ** Types
-import type { ACLObj, AppAbility } from 'src/configs/acl'
+import type {ACLObj, AppAbility} from 'src/configs/acl'
 
 // ** Context Imports
-import { AbilityContext } from 'src/layouts/components/acl/Can'
+import {AbilityContext} from 'src/layouts/components/acl/Can'
 
 // ** Config Import
-import { buildAbilityFor } from 'src/configs/acl'
+import {buildAbilityFor} from 'src/configs/acl'
 
 // ** Component Import
 import NotAuthorized from 'src/pages/401'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
-import { useAuth } from 'src/hooks/useAuth'
+import {useAuth} from 'src/hooks/useAuth'
 
 interface AclGuardProps {
   children: ReactNode
@@ -28,7 +28,7 @@ interface AclGuardProps {
 
 const AclGuard = (props: AclGuardProps) => {
   // ** Props
-  const { aclAbilities, children, guestGuard } = props
+  const {aclAbilities, children, guestGuard} = props
 
   const [ability, setAbility] = useState<AppAbility | undefined>(undefined)
 
@@ -54,7 +54,7 @@ const AclGuard = (props: AclGuardProps) => {
   // Render Not Authorized component if the current user has limited access
   return (
     <BlankLayout>
-      <NotAuthorized />
+      <NotAuthorized/>
     </BlankLayout>
   )
 }
