@@ -1,4 +1,4 @@
-import { AbilityBuilder, Ability } from '@casl/ability'
+import {AbilityBuilder, Ability} from '@casl/ability'
 
 export type Subjects = string
 export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete'
@@ -17,7 +17,7 @@ export type ACLObj = {
  * admin can manage everything and client can just visit ACL page
  */
 const defineRulesFor = (role: string, subject: string) => {
-  const { can, rules } = new AbilityBuilder(AppAbility)
+  const {can, rules} = new AbilityBuilder(AppAbility)
 
   if (role === 'admin') {
     can('manage', 'all')
