@@ -52,7 +52,7 @@ public class AdministrativeTests : TestFixture
       RoleId = role.Id,
       Permissions = new List<string>
       {
-        "Permissions.Products.Search"
+        "products.search"
       }
     };
     _ = await RootAdmin_PutAsJsonAsync($"/api/roles/{role.Id}/permissions", newRolePermissionsRequest);
@@ -120,7 +120,7 @@ public class AdministrativeTests : TestFixture
       RoleId = role.Id,
       Permissions = new List<string>
       {
-        "permissions.products.search"
+        "products.search"
       }
     });
 
