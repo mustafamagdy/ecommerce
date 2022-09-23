@@ -11,7 +11,7 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from './types'
+import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from 'src/types/apps/auth'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -57,9 +57,7 @@ const AuthProvider = ({children}: Props) => {
             setUser({...response.data.userData})
           })
           .catch(() => {
-            localStorage.removeItem('userData')
-            localStorage.removeItem('refreshToken')
-            localStorage.removeItem('accessToken')
+            clearUserData()
             setUser(null)
             setLoading(false)
           })
@@ -75,7 +73,8 @@ const AuthProvider = ({children}: Props) => {
       .post(authConfig.loginEndpoint, params)
       .then(async res => {
         window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.token)
-        window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.token)
+        window.localStorage.setItem(authConfig.storageRefreshTokenKeyName, res.data.refreshToken)
+        window.localStorage.setItem(authConfig.storageRefreshTokenExpiryDateKeyName, res.data.refreshTokenExpiryTime)
       })
       .then(() => {
         axios
@@ -89,10 +88,8 @@ const AuthProvider = ({children}: Props) => {
 
             setUser({...response.data.userData})
             await window.localStorage.setItem('userData', JSON.stringify(response.data.userData))
-
             const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-
-            router.replace(redirectURL as string)
+            await router.replace(redirectURL as string)
           })
       })
       .catch(err => {
@@ -100,11 +97,17 @@ const AuthProvider = ({children}: Props) => {
       })
   }
 
+  const clearUserData = () => {
+    window.localStorage.removeItem('userData')
+    window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    window.localStorage.removeItem(authConfig.storageRefreshTokenKeyName)
+    window.localStorage.removeItem(authConfig.storageRefreshTokenExpiryDateKeyName)
+  }
+
   const handleLogout = () => {
     setUser(null)
     setIsInitialized(false)
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    clearUserData();
     router.push('/login')
   }
 
