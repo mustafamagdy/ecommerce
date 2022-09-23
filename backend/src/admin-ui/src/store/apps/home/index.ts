@@ -8,8 +8,8 @@ const initialState: InitialState = {};
 
 export const homeSlice = createSlice({
   name: 'home',
+  initialState,
   reducers: {},
-  initialState
 });
 
 export default homeSlice.reducer;
