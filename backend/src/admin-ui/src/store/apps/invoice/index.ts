@@ -1,50 +1,20 @@
-// ** Redux Imports
-import {Dispatch} from 'redux'
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit'
+import {fetchData} from "./apis";
+import {InitialState} from "src/types/apps/generics";
+import {InvoiceType} from "src/types/apps/invoiceTypes";
 
-// ** Axios Imports
-import axios from 'axios'
 
-interface DataParams {
-  q: string
-  dates?: Date[]
-  status: string
-}
+const initialState: InitialState<InvoiceType> = {
+  data: [],
+  total: 1,
+  params: {},
+  allData: []
+};
 
-interface Redux {
-  getState: any
-  dispatch: Dispatch<any>
-}
-
-// ** Fetch Invoices
-export const fetchData = createAsyncThunk('appInvoice/fetchData', async (params: DataParams) => {
-  const response = await axios.get('/apps/invoice/invoices', {
-    params
-  })
-
-  return response.data
-})
-
-export const deleteInvoice = createAsyncThunk('appInvoice/deleteData',
-  async (id: number | string, {getState, dispatch}: Redux) => {
-    const response = await axios.delete('/apps/invoice/delete', {
-      data: id
-    })
-    await dispatch(fetchData(getState().invoice.params))
-
-    return response.data
-  }
-)
-
-export const appInvoiceSlice = createSlice(
+export const invoiceSlice = createSlice(
   {
-    name: 'appInvoice',
-    initialState: {
-      data: [],
-      total: 1,
-      params: {},
-      allData: []
-    },
+    name: 'invoices',
+    initialState,
     reducers: {},
     extraReducers: builder => {
       builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -56,4 +26,4 @@ export const appInvoiceSlice = createSlice(
     }
   })
 
-export default appInvoiceSlice.reducer
+export default invoiceSlice.reducer
