@@ -1,6 +1,6 @@
 // ** Redux Imports
-import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import {Dispatch} from 'redux'
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
@@ -29,7 +29,7 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: D
 // ** Add User
 export const addUser = createAsyncThunk(
   'appUsers/addUser',
-  async (data: { [key: string]: number | string }, { getState, dispatch }: Redux) => {
+  async (data: { [key: string]: number | string }, {getState, dispatch}: Redux) => {
     const response = await axios.post('/apps/users/add-user', {
       data
     })
@@ -42,7 +42,7 @@ export const addUser = createAsyncThunk(
 // ** Delete User
 export const deleteUser = createAsyncThunk(
   'appUsers/deleteUser',
-  async (id: number | string, { getState, dispatch }: Redux) => {
+  async (id: number | string, {getState, dispatch}: Redux) => {
     const response = await axios.delete('/apps/users/delete', {
       data: id
     })
@@ -52,23 +52,24 @@ export const deleteUser = createAsyncThunk(
   }
 )
 
-export const appUsersSlice = createSlice({
-  name: 'appUsers',
-  initialState: {
-    data: [],
-    total: 1,
-    params: {},
-    allData: []
-  },
-  reducers: {},
-  extraReducers: builder => {
-    builder.addCase(fetchData.fulfilled, (state, action) => {
-      state.data = action.payload.users
-      state.total = action.payload.total
-      state.params = action.payload.params
-      state.allData = action.payload.allData
-    })
-  }
-})
+export const appUsersSlice = createSlice(
+  {
+    name: 'appUsers',
+    initialState: {
+      data: [],
+      total: 1,
+      params: {},
+      allData: []
+    },
+    reducers: {},
+    extraReducers: builder => {
+      builder.addCase(fetchData.fulfilled, (state, action) => {
+        state.data = action.payload.users
+        state.total = action.payload.total
+        state.params = action.payload.params
+        state.allData = action.payload.allData
+      })
+    }
+  })
 
 export default appUsersSlice.reducer
