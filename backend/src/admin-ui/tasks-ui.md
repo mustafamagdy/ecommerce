@@ -41,9 +41,9 @@ Navigation menu
 
 state:
 - app:
-  - current user
+  - current user => [context]
+  - menu, theme, settings => [context]
   - roles/permissions (for acl)
-  - menu, theme, settings
   - dashboard
 - system:
   - users list

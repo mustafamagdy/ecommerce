@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Domain.Catalog;
 
-public sealed class Product : AuditableEntity, IAggregateRoot
+public sealed class Product : AuditableEntity, IAggregateRoot, IHasImage
 {
   public string Name { get; private set; }
   public string? Description { get; private set; }

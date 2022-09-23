@@ -1,17 +1,12 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
-import {Dispatch} from "redux";
+import {Redux} from "src/types/apps/generics";
 
 
 interface DataParams {
   q: string
   dates?: Date[]
   status: string
-}
-
-interface Redux {
-  getState: any
-  dispatch: Dispatch<any>
 }
 
 

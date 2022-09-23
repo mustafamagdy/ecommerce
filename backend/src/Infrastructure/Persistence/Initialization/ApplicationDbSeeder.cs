@@ -106,7 +106,7 @@ internal sealed class ApplicationDbSeeder
         PhoneNumberConfirmed = true,
         NormalizedEmail = _currentTenant.AdminEmail?.ToUpperInvariant(),
         NormalizedUserName = adminUserName.ToUpperInvariant(),
-        IsActive = true
+        Active = true
       };
 
       _logger.LogDebug("Seeding Default Admin User for '{TenantId}' Tenant", _currentTenant.Id);
