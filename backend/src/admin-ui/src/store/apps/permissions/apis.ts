@@ -7,7 +7,7 @@ interface DataParams {
 }
 
 // ** Fetch Invoices
-export const fetchData = createAsyncThunk('appPermissions/fetchData', async (params: DataParams) => {
+export const fetchData = createAsyncThunk('permissions/fetchData', async (params: DataParams) => {
   const response = await axios.get('/apps/permissions/data', {
     params
   })

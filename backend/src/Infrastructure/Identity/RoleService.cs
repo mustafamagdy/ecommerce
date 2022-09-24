@@ -61,10 +61,21 @@ internal sealed class RoleService : IRoleService
   {
     var role = await GetByIdAsync(roleId);
 
-    role.Permissions = await _uow.Set<ApplicationRoleClaim>()
+    var roleClaims = await _uow.Set<ApplicationRoleClaim>()
       .Where(c => c.RoleId == roleId && c.ClaimType == FSHClaims.Permission)
       .Select(c => c.ClaimValue)
       .ToListAsync(cancellationToken);
+
+    var abilities = roleClaims.Select(a => new
+    {
+      Resource = a.Split(".")[0],
+      Permission = a.Split(".")[1]
+    }).ToArray();
+
+    role.Abilities = abilities
+      .GroupBy(a => a.Resource)
+      .Select(a => new AbilityDto { Actions = a.Select(x => x.Permission).ToArray(), Resource = a.Key })
+      .ToList();
 
     return role;
   }
@@ -189,9 +200,9 @@ internal sealed class RoleService : IRoleService
     return string.Format(_t["Role {0} Deleted."], role.Name);
   }
 
-  public async Task<List<AbilityPerRoleDto>> GetRolesAndAbilities(CancellationToken cancellationToken)
+  public async Task<List<RoleDto>> GetRolesAndAbilities(CancellationToken cancellationToken)
   {
-    var roles = (await _roleManager.Roles.ToListAsync(cancellationToken)).Adapt<List<AbilityPerRoleDto>>();
+    var roles = (await _roleManager.Roles.ToListAsync(cancellationToken)).Adapt<List<RoleDto>>();
     var permissions = await _uow.Set<ApplicationRoleClaim>().ToListAsync(cancellationToken: cancellationToken);
 
     foreach (var role in roles)

@@ -1,3 +1,5 @@
+import {AbilityType} from "./roleTypes";
+
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
 export type LoginParams = {
@@ -23,5 +25,7 @@ export type AuthValuesType = {
   user: UserDataType | null
   setUser: (value: UserDataType | null) => void
   setIsInitialized: (value: boolean) => void
-  login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
+  login: (params: LoginParams, errorCallback?: ErrCallbackType) => void,
+  abilities: AbilityType[] | null
+  setAbilities: (abilities: AbilityType[] | null) => void;
 }
