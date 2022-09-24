@@ -21,12 +21,12 @@ public sealed class BranchController : VersionedApiController
     return Mediator.Send(request);
   }
 
-  [HttpDelete]
+  [HttpDelete("{id:guid}")]
   [MustHavePermission(FSHAction.Delete, FSHResource.Branches)]
   [OpenApiOperation("Delete a branch for the current tenant.", "")]
-  public Task DeleteBranchAsync(DeleteBranchRequest request)
+  public Task DeleteBranchAsync(Guid id)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(new DeleteBranchRequest(id));
   }
 
   [HttpPost("search")]

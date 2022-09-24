@@ -52,7 +52,7 @@ public class AdministrativeTests : TestFixture
       RoleId = role.Id,
       Permissions = new List<string>
       {
-        "products.search"
+        "permission.products.search"
       }
     };
     _ = await RootAdmin_PutAsJsonAsync($"/api/roles/{role.Id}/permissions", newRolePermissionsRequest);
@@ -61,10 +61,12 @@ public class AdministrativeTests : TestFixture
     _ = await RootAdmin_GetAsync($"/api/roles/{role.Id}/permissions");
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var rolePermissions = await _.Content.ReadFromJsonAsync<RoleDto>();
-    rolePermissions.Permissions
+    var resource = newRolePermissionsRequest.Permissions[0].Split(".")[1];
+    var permission = newRolePermissionsRequest.Permissions[0].Split(".")[2];
+    rolePermissions.Abilities
       .Should()
       .NotBeNull().And
-      .BeEquivalentTo(newRolePermissionsRequest.Permissions);
+      .Contain(a => a.Resource == resource && a.Actions.Contains(permission));
   }
 
   [Fact]
@@ -120,7 +122,7 @@ public class AdministrativeTests : TestFixture
       RoleId = role.Id,
       Permissions = new List<string>
       {
-        "products.search"
+        "permission.products.search"
       }
     });
 
@@ -143,7 +145,7 @@ public class AdministrativeTests : TestFixture
     _.StatusCode.Should().Be(HttpStatusCode.OK);
     var roles = await _.Content.ReadFromJsonAsync<List<RoleDto>>();
     roles.Should().NotBeNull().And.NotBeEmpty();
-    roles.Should().NotContain(a => a.Permissions != null);
+    roles.Should().NotContain(a => a.Abilities != null);
   }
 
   [Fact]

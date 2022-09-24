@@ -7,6 +7,11 @@ namespace FSH.WebApi.Application.Multitenancy;
 
 public class DeleteBranchRequest : IRequest
 {
+  public DeleteBranchRequest(Guid id)
+  {
+    Id = id;
+  }
+
   public Guid Id { get; set; }
 }
 
