@@ -64,7 +64,7 @@ public sealed class RolesController : VersionNeutralApiController
   [HttpGet("abilities")]
   [AllowAnonymous]
   [OpenApiOperation("Get roles with abilities.", "")]
-  public Task<List<AbilityPerRoleDto>> GetRolesWithItsAbilities(CancellationToken cancellationToken)
+  public Task<List<RoleDto>> GetRolesWithItsAbilities(CancellationToken cancellationToken)
   {
     return _roleService.GetRolesAndAbilities(cancellationToken);
   }

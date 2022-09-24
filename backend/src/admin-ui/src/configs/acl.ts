@@ -1,9 +1,9 @@
 import {AbilityBuilder, Ability} from '@casl/ability'
 
-export type Subjects = string
+export type Subject = string
 export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete'
 
-export type AppAbility = Ability<[Actions, Subjects]> | undefined
+export type AppAbility = Ability<[Actions, Subject]> | undefined
 
 export const AppAbility = Ability as any
 export type ACLObj = {

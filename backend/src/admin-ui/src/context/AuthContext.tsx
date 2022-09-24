@@ -12,6 +12,7 @@ import authConfig from 'src/configs/auth'
 
 // ** Types
 import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from 'src/types/apps/auth'
+import {AbilityType} from "../types/apps/roleTypes";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -23,6 +24,8 @@ const defaultProvider: AuthValuesType = {
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   setIsInitialized: () => Boolean,
+  abilities: [],
+  setAbilities: () => null
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -34,6 +37,7 @@ type Props = {
 const AuthProvider = ({children}: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
+  const [abilities, setAbilities] = useState<AbilityType[] | null>(defaultProvider.abilities)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const [isInitialized, setIsInitialized] = useState<boolean>(defaultProvider.isInitialized)
 
@@ -42,26 +46,34 @@ const AuthProvider = ({children}: Props) => {
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
-      setIsInitialized(true)
-      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
-      if (storedToken) {
+      try {
+        setIsInitialized(true)
+        // ** Get abilities
         setLoading(true)
-        await axios
-          .get(authConfig.meEndpoint, {
+
+        let _ = await axios.get(authConfig.abilities, {
+          headers: {tenant: 'root'}
+        });
+        setAbilities({..._.data});
+
+        // ** Set user token
+        const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
+        if (storedToken) {
+          _ = await axios.get(authConfig.meEndpoint, {
             headers: {
-              Authorization: storedToken
+              Authorization: storedToken,
+              tenant: 'root'
             }
-          })
-          .then(async response => {
-            setLoading(false)
-            setUser({...response.data.userData})
-          })
-          .catch(() => {
-            clearUserData()
-            setUser(null)
-            setLoading(false)
-          })
-      } else {
+          });
+          setUser({..._.data.userData})
+        } else {
+          setLoading(false)
+        }
+
+      } catch (e) {
+        clearUserData()
+        setUser(null)
+        setAbilities(null)
         setLoading(false)
       }
     }
@@ -120,6 +132,8 @@ const AuthProvider = ({children}: Props) => {
     setIsInitialized,
     login: handleLogin,
     logout: handleLogout,
+    abilities,
+    setAbilities
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
