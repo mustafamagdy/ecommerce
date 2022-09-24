@@ -3,16 +3,20 @@ import {configureStore} from '@reduxjs/toolkit'
 
 // ** Reducers
 import home from 'src/store/apps/home'
-import user from 'src/store/apps/user'
+import users from 'src/store/apps/users'
 import permissions from 'src/store/apps/permissions'
-import invoice from 'src/store/apps/invoice'
+import invoices from 'src/store/apps/invoices'
+import tenants from 'src/store/apps/tenants'
+import subscriptions from 'src/store/apps/subscriptions'
 
 export const store = configureStore({
   reducer: {
     home,
-    user,
+    users,
     permissions,
-    invoice,
+    tenants,
+    subscriptions,
+    invoices,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -68,8 +68,8 @@ internal sealed class RoleService : IRoleService
 
     var abilities = roleClaims.Select(a => new
     {
-      Resource = a.Split(".")[0],
-      Permission = a.Split(".")[1]
+      Resource = a.Split(".")[1],
+      Permission = a.Split(".")[2]
     }).ToArray();
 
     role.Abilities = abilities
@@ -212,8 +212,8 @@ internal sealed class RoleService : IRoleService
         .ToArray();
       var abilities = roleClaims.Select(a => new
       {
-        Resource = a.ClaimValue.Split(".")[0],
-        Permission = a.ClaimValue.Split(".")[1]
+        Resource = a.ClaimValue.Split(".")[1],
+        Permission = a.ClaimValue.Split(".")[2]
       }).ToArray();
 
       role.Abilities = abilities

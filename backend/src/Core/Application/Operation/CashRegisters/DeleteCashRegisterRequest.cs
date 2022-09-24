@@ -5,6 +5,11 @@ namespace FSH.WebApi.Application.Operation.CashRegisters;
 
 public class DeleteCashRegisterRequest : IRequest
 {
+  public DeleteCashRegisterRequest(Guid id)
+  {
+    Id = id;
+  }
+
   public Guid Id { get; set; }
 }
 

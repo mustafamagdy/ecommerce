@@ -176,5 +176,5 @@ public record FSHPermission(string Description, string Action, string Resource, 
   bool IsRoot = false, bool IsDemo = false)
 {
   public string Name => NameFor(Action, Resource);
-  public static string NameFor(string action, string resource) => $"{resource}.{action}".ToLower();
+  public static string NameFor(string action, string resource) => $"{FSHClaims.Permission}.{resource}.{action}".ToLower();
 }
