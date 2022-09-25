@@ -38,12 +38,12 @@ public sealed class CashRegisterController : VersionedApiController
     return Mediator.Send(request);
   }
 
-  [HttpDelete]
+  [HttpDelete("{id:guid}")]
   [MustHavePermission(FSHAction.Delete, FSHResource.CashRegisters)]
   [OpenApiOperation("Delete a cash register for a branch.", "")]
-  public Task DeleteCashRegister(DeleteCashRegisterRequest request)
+  public Task DeleteCashRegister(Guid id)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(new DeleteCashRegisterRequest(id));
   }
 
   [HttpPost("open")]

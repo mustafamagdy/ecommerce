@@ -87,7 +87,7 @@ internal partial class UserService
         NormalizedUserName = username.ToUpperInvariant(),
         EmailConfirmed = true,
         PhoneNumberConfirmed = true,
-        IsActive = true
+        Active = true
       };
       result = await _userManager.CreateAsync(user);
 
@@ -111,7 +111,7 @@ internal partial class UserService
       LastName = request.LastName,
       UserName = request.UserName,
       PhoneNumber = request.PhoneNumber,
-      IsActive = true
+      Active = true
     };
 
     var result = await _userManager.CreateAsync(user, request.Password);
@@ -154,10 +154,10 @@ internal partial class UserService
 
     _ = user ?? throw new NotFoundException(_t["User Not Found."]);
 
-    string currentImage = user.ImageUrl ?? string.Empty;
+    string currentImage = user.ImagePath ?? string.Empty;
     if (request.Image != null || request.DeleteCurrentImage)
     {
-      user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
+      user.SetAvatar(await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image));
       if (request.DeleteCurrentImage && !string.IsNullOrEmpty(currentImage))
       {
         string root = Directory.GetCurrentDirectory();

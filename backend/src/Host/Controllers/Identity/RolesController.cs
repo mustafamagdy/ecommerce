@@ -60,4 +60,12 @@ public sealed class RolesController : VersionNeutralApiController
   {
     return _roleService.DeleteRole(id);
   }
+
+  [HttpGet("abilities")]
+  [AllowAnonymous]
+  [OpenApiOperation("Get roles with abilities.", "")]
+  public Task<List<RoleDto>> GetRolesWithItsAbilities(CancellationToken cancellationToken)
+  {
+    return _roleService.GetRolesAndAbilities(cancellationToken);
+  }
 }

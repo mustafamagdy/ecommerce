@@ -60,7 +60,7 @@ internal sealed class TokenService : ITokenService
       throw new UnauthorizedException(_t["Authentication Failed."]);
     }
 
-    if (!user.IsActive)
+    if (!user.Active)
     {
       throw new UnauthorizedException(_t["User Not Active. Please contact the administrator."]);
     }
@@ -152,7 +152,7 @@ internal sealed class TokenService : ITokenService
       new(FSHClaims.IpAddress, ipAddress),
       new(FSHClaims.Tenant, _currentTenant!.Id),
       new(FSHClaims.Branch, (string.IsNullOrEmpty(user.LastUsedBranchId.ToString()) ? branchId?.ToString() : user.LastUsedBranchId.ToString()) ?? string.Empty),
-      new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
+      new(FSHClaims.ImageUrl, user.ImagePath ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
     };
 

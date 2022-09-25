@@ -148,7 +148,7 @@ internal sealed partial class UserService : IUserService
       throw new ConflictException(_t["Administrators Profile's Status cannot be toggled"]);
     }
 
-    user.IsActive = request.ActivateUser;
+    user.Active = request.ActivateUser;
 
     await _userManager.UpdateAsync(user);
 

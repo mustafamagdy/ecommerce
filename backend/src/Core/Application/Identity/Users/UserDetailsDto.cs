@@ -6,7 +6,8 @@ public class BasicUserDataDto : IDto
   public string? FirstName { get; set; }
   public string? LastName { get; set; }
   public string? Email { get; set; }
-  public bool IsActive { get; set; } = true;
+  public bool Active { get; set; }
+  public string FullName => $"{FirstName} {LastName}";
 }
 
 public class UserDetailsDto : BasicUserDataDto
@@ -14,7 +15,20 @@ public class UserDetailsDto : BasicUserDataDto
   public string? UserName { get; set; }
   public bool EmailConfirmed { get; set; }
   public string? PhoneNumber { get; set; }
-  public string? ImageUrl { get; set; }
+  public string? ImagePath { get; set; }
+
+
+  public string Status {
+    get
+    {
+      if (!EmailConfirmed)
+      {
+        return "pending";
+      }
+
+      return !Active ? "inactive" : "active";
+    }
+  }
 }
 
 public class CreateUserResponseDto : UserDetailsDto

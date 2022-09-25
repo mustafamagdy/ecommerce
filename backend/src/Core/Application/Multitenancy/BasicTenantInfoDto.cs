@@ -12,7 +12,9 @@ public class ViewTenantInfoDto : IDto
   public string AdminName { get; set; }
   public string AdminPhoneNumber { get; set; }
   public string TechSupportUserId { get; set; }
+  public string TechSupportName { get; set; }
 }
+
 public class BasicTenantInfoDto
 {
   public string Id { get; set; } = default!;
