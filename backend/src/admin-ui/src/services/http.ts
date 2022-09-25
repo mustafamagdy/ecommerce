@@ -1,6 +1,7 @@
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders} from 'axios'
 import {endPoints} from "./endpoints";
 import authConfig from 'src/configs/auth'
+import storage from './storage'
 
 const BASE_URL = (process.env.BASE_URL ?? "https://localhost:5001").replace(/\/+$/, "");
 
@@ -30,7 +31,7 @@ export class Http {
       return config;
 
     if (config.headers)
-      config.headers ['Authorization'] = window.localStorage.getItem(authConfig.storageTokenKeyName)!;
+      config.headers ['Authorization'] = storage.getItem(authConfig.storageTokenKeyName)!;
     return config;
 
   }
@@ -71,9 +72,9 @@ export class Http {
     }
   }
 
-  async put(path: string) {
+  async put(path: string, body: object) {
     try {
-      const response = await this._axios.put(path);
+      const response = await this._axios.put(path, body);
       if (response) {
         return response.data;
       }
