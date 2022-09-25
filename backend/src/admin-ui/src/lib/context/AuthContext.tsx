@@ -9,12 +9,12 @@ import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
-import storage from 'src/services/storage'
-import {endPoints} from 'src/services/endpoints'
+import storage from 'src/lib/services/storage'
+import {endPoints} from 'src/lib/services/endpoints'
 
 // ** Types
 import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from 'src/types/apps/auth'
-import {AbilityType} from "../types/apps/roleTypes";
+import {AbilityType} from "src/types/apps/roleTypes";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {

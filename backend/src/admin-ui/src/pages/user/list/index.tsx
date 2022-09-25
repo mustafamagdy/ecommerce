@@ -41,16 +41,16 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import {getInitials} from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import {fetchData, deleteUser} from 'src/store/apps/user/apis'
+import {fetchData, deleteUser} from 'src/lib/store/apps/users/apis'
 
 // ** Types Imports
-import {RootState, AppDispatch} from 'src/store'
+import {RootState, AppDispatch} from 'src/lib/store'
 import {ThemeColor} from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
-import {AppUser} from "src/types/apps/userTypes";
+import {UserType} from "src/types/apps/userTypes";
 
 interface UserRoleType {
   [key: string]: ReactElement
@@ -69,7 +69,7 @@ const userRoleObj: UserRoleType = {
 }
 
 interface CellType {
-  row: AppUser
+  row: UserType
 }
 
 const userStatusObj: UserStatusType = {
@@ -90,7 +90,7 @@ const AvatarWithoutImageLink = styled(Link)(({theme}) => ({
 }))
 
 // ** renders client column
-const renderClient = (row: AppUser) => {
+const renderClient = (row: UserType) => {
   if (row.imagePath.length) {
     return (
       <AvatarWithImageLink href={`/user/view/${row.id}`}>
@@ -283,7 +283,7 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.user)
+  const store = useSelector((state: RootState) => state.users)
 
   useEffect(() => {
     dispatch(

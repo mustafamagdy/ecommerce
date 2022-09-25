@@ -36,11 +36,11 @@ import PageHeader from 'src/@core/components/page-header'
 import TableHeader from 'src/views/apps/permissions/TableHeader'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
+import { RootState, AppDispatch } from 'src/lib/store'
 import { PermissionRowType } from 'src/types/apps/permissionTypes'
 
 // ** Actions Imports
-import { fetchData } from 'src/store/apps/permissions'
+import { fetchData } from 'src/lib/store/apps/permissions/apis'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'

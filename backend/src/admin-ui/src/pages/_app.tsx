@@ -8,7 +8,7 @@ import type {NextPage} from 'next'
 import type {AppProps} from 'next/app'
 
 // ** Store Imports
-import {store} from 'src/store'
+import {store} from 'src/lib/store'
 import {Provider} from 'react-redux'
 
 // ** Loader Import
@@ -41,7 +41,7 @@ import WindowWrapper from 'src/@core/components/window-wrapper'
 import Spinner from 'src/@core/components/spinner'
 
 // ** Contexts
-import {AuthProvider} from 'src/context/AuthContext'
+import {AuthProvider} from 'src/lib/context/AuthContext'
 import {SettingsConsumer, SettingsProvider} from 'src/@core/context/settingsContext'
 
 // ** Styled Components

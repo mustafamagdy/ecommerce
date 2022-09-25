@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import Spinner from 'src/@core/components/spinner'
 
 // ** Hook Imports
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth } from 'src/lib/hooks/useAuth'
 
 /**
  *  Set Home URL based on User Roles

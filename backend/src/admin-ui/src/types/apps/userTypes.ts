@@ -19,5 +19,6 @@ export interface UserType {
   imagePath: string
   status: string | 'active' | 'pending' | 'inactive'
   fullName: string;
+  avatarColor?: "primary" | "secondary" | "error" | "warning" | "info" | "success" | undefined
 }
 
