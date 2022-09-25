@@ -1,4 +1,5 @@
 using Finbuckle.MultiTenant;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy.EventHandlers;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Identity;
@@ -39,11 +40,14 @@ public class UpdateTenantRequestHandler : IRequestHandler<UpdateTenantRequest, V
 {
   private readonly ITenantUnitOfWork _uow;
   private readonly IReadNonAggregateRepository<FSHTenantInfo> _tenantRepo;
+  private readonly UserManager<ApplicationUser> _userManager;
 
-  public UpdateTenantRequestHandler(ITenantUnitOfWork uow, IReadNonAggregateRepository<FSHTenantInfo> tenantRepo)
+  public UpdateTenantRequestHandler(ITenantUnitOfWork uow, IReadNonAggregateRepository<FSHTenantInfo> tenantRepo,
+    UserManager<ApplicationUser> userManager)
   {
     _uow = uow;
     _tenantRepo = tenantRepo;
+    _userManager = userManager;
   }
 
   public async Task<ViewTenantInfoDto> Handle(UpdateTenantRequest request, CancellationToken cancellationToken)
@@ -55,7 +59,15 @@ public class UpdateTenantRequestHandler : IRequestHandler<UpdateTenantRequest, V
       request.Address, request.AdminName, request.AdminPhoneNumber, request.TechSupportUserId);
 
     await _uow.CommitAsync(cancellationToken);
+    var dto = tenant.Adapt<ViewTenantInfoDto>();
+    if (!string.IsNullOrEmpty(dto.TechSupportUserId))
+    {
+      var supportUser = (await _userManager.FindByIdAsync(dto.TechSupportUserId) ??
+                         throw new NotFoundException("Support user not found"))
+        .Adapt<BasicUserDataDto>();
+      dto.TechSupportName = supportUser.FullName;
+    }
 
-    return tenant.Adapt<ViewTenantInfoDto>();
+    return dto;
   }
 }

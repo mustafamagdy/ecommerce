@@ -128,4 +128,7 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0D80036-558A-4A3A-A0BE-00CED864A4DD}
 	EndGlobalSection
+	GlobalSection(RiderSharedRunConfigurations) = postSolution
+		File = admin-ui.run\debug-ui.run.xml
+	EndGlobalSection
 EndGlobal
