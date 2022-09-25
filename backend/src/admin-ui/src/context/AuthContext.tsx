@@ -9,6 +9,8 @@ import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+import storage from 'src/services/storage'
+import {endPoints} from 'src/services/endpoints'
 
 // ** Types
 import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from 'src/types/apps/auth'
@@ -51,15 +53,15 @@ const AuthProvider = ({children}: Props) => {
         // ** Get abilities
         setLoading(true)
 
-        let _ = await axios.get(authConfig.abilities, {
+        let _ = await axios.get(endPoints.abilities.url, {
           headers: {tenant: 'root'}
         });
         setAbilities({..._.data});
 
         // ** Set user token
-        const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
+        const storedToken = storage.getItem(authConfig.storageTokenKeyName)!
         if (storedToken) {
-          _ = await axios.get(authConfig.meEndpoint, {
+          _ = await axios.get(endPoints.meEndpoint.url, {
             headers: {
               Authorization: storedToken,
               tenant: 'root'
@@ -82,24 +84,24 @@ const AuthProvider = ({children}: Props) => {
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
     axios
-      .post(authConfig.loginEndpoint, params)
+      .post(endPoints.loginEndpoint.url, params)
       .then(async res => {
-        window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.token)
-        window.localStorage.setItem(authConfig.storageRefreshTokenKeyName, res.data.refreshToken)
-        window.localStorage.setItem(authConfig.storageRefreshTokenExpiryDateKeyName, res.data.refreshTokenExpiryTime)
+        storage.setItem(authConfig.storageTokenKeyName, res.data.token)
+        storage.setItem(authConfig.storageRefreshTokenKeyName, res.data.refreshToken)
+        storage.setItem(authConfig.storageRefreshTokenExpiryDateKeyName, res.data.refreshTokenExpiryTime)
       })
       .then(() => {
         axios
-          .get(authConfig.meEndpoint, {
+          .get(endPoints.meEndpoint.url, {
             headers: {
-              Authorization: window.localStorage.getItem(authConfig.storageTokenKeyName)!
+              Authorization: storage.getItem(authConfig.storageTokenKeyName)!
             }
           })
           .then(async response => {
             const returnUrl = router.query.returnUrl
 
             setUser({...response.data.userData})
-            await window.localStorage.setItem('userData', JSON.stringify(response.data.userData))
+            await storage.setItem('userData', JSON.stringify(response.data.userData))
             const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
             await router.replace(redirectURL as string)
           })
@@ -110,10 +112,10 @@ const AuthProvider = ({children}: Props) => {
   }
 
   const clearUserData = () => {
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
-    window.localStorage.removeItem(authConfig.storageRefreshTokenKeyName)
-    window.localStorage.removeItem(authConfig.storageRefreshTokenExpiryDateKeyName)
+    storage.removeItem('userData')
+    storage.removeItem(authConfig.storageTokenKeyName)
+    storage.removeItem(authConfig.storageRefreshTokenKeyName)
+    storage.removeItem(authConfig.storageRefreshTokenExpiryDateKeyName)
   }
 
   const handleLogout = () => {
