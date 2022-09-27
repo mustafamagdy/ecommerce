@@ -110,16 +110,40 @@ internal sealed partial class UserService : IUserService
     }
   }
 
-  public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken) =>
-    (await _userManager.Users
+  public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+  {
+    var users = _userManager.Users
       .AsNoTracking()
-      .ToListAsync(cancellationToken))
-    .Adapt<List<UserDetailsDto>>();
+      .ToList();
 
-  public Task<List<BasicUserDataDto>> GetListBasicDataAsync(CancellationToken cancellationToken) =>
-    Task.FromResult(_userManager.Users
+    var userList = users.Adapt<List<UserDetailsDto>>();
+    foreach (var user in users)
+    {
+      var userRoles = await _userManager.GetRolesAsync(user);
+      var idx = userList.FindIndex(a => a.Id.ToString() == user.Id);
+      userList[idx].Role = (userRoles.FirstOrDefault() ?? string.Empty).ToLower();
+    }
+
+    return userList;
+  }
+
+
+  public async Task<List<BasicUserDataDto>> GetListBasicDataAsync(CancellationToken cancellationToken)
+  {
+    var users = _userManager.Users
       .AsNoTracking()
-      .Adapt<List<BasicUserDataDto>>());
+      .ToList();
+
+    var userList = users.Adapt<List<BasicUserDataDto>>();
+    foreach (var user in users)
+    {
+      var userRoles = await _userManager.GetRolesAsync(user);
+      var idx = userList.FindIndex(a => a.Id.ToString() == user.Id);
+      userList[idx].Role = (userRoles.FirstOrDefault() ?? string.Empty).ToLower();
+    }
+
+    return userList;
+  }
 
   public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
     _userManager.Users.AsNoTracking().CountAsync(cancellationToken);
@@ -133,7 +157,10 @@ internal sealed partial class UserService : IUserService
 
     _ = user ?? throw new NotFoundException(_t["User Not Found."]);
 
-    return user.Adapt<UserDetailsDto>();
+    var userData = user.Adapt<UserDetailsDto>();
+    var roles = await _userManager.GetRolesAsync(user);
+    userData.Role = (roles.FirstOrDefault() ?? string.Empty).ToLower();
+    return userData;
   }
 
   public async Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken)
