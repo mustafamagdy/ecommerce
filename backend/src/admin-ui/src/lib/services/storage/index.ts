@@ -11,5 +11,4 @@ const localStorage = (): Storage => {
   return inMemoryStorage;
 }
 
-
 export default localStorage();
