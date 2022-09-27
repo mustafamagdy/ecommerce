@@ -4,13 +4,11 @@ import {createContext, useEffect, useState, ReactNode} from 'react'
 // ** Next Import
 import {useRouter} from 'next/router'
 
-// ** Axios
-import axios from 'axios'
-
 // ** Config
 import authConfig from 'src/configs/auth'
 import storage from 'src/lib/services/storage'
 import {endPoints} from 'src/lib/services/endpoints'
+import {Http} from 'src/lib/services/http'
 
 // ** Types
 import {AuthValuesType, LoginParams, ErrCallbackType, UserDataType} from 'src/types/apps/auth'
@@ -53,25 +51,19 @@ const AuthProvider = ({children}: Props) => {
         // ** Get abilities
         setLoading(true)
 
-        let _ = await axios.get(endPoints.abilities.url, {
-          headers: {tenant: 'root'}
-        });
-        setAbilities({..._.data});
+        const rolesAndAbilities = await Http.get(endPoints.abilities.url);
+        debugger
+        setAbilities({...rolesAndAbilities});
 
         // ** Set user token
         const storedToken = storage.getItem(authConfig.storageTokenKeyName)!
         if (storedToken) {
-          _ = await axios.get(endPoints.meEndpoint.url, {
-            headers: {
-              Authorization: storedToken,
-              tenant: 'root'
-            }
-          });
-          setUser({..._.data.userData})
-        } else {
-          setLoading(false)
+          const userData = await Http.get(endPoints.meEndpoint.url);
+          debugger
+          setUser({...userData})
         }
 
+        setLoading(false)
       } catch (e) {
         clearUserData()
         setUser(null)
@@ -83,25 +75,20 @@ const AuthProvider = ({children}: Props) => {
   }, [])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
-    axios
+    Http
       .post(endPoints.loginEndpoint.url, params)
-      .then(async res => {
-        storage.setItem(authConfig.storageTokenKeyName, res.data.token)
-        storage.setItem(authConfig.storageRefreshTokenKeyName, res.data.refreshToken)
-        storage.setItem(authConfig.storageRefreshTokenExpiryDateKeyName, res.data.refreshTokenExpiryTime)
+      .then(async data => {
+        storage.setItem(authConfig.storageTokenKeyName, data.token)
+        storage.setItem(authConfig.storageRefreshTokenKeyName, data.refreshToken)
+        storage.setItem(authConfig.storageRefreshTokenExpiryDateKeyName, data.refreshTokenExpiryTime)
       })
       .then(() => {
-        axios
-          .get(endPoints.meEndpoint.url, {
-            headers: {
-              Authorization: storage.getItem(authConfig.storageTokenKeyName)!
-            }
-          })
-          .then(async response => {
+        Http
+          .get(endPoints.meEndpoint.url)
+          .then(async data => {
             const returnUrl = router.query.returnUrl
-
-            setUser({...response.data.userData})
-            await storage.setItem('userData', JSON.stringify(response.data.userData))
+            setUser({...data})
+            await storage.setItem('userData', JSON.stringify(data))
             const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
             await router.replace(redirectURL as string)
           })
