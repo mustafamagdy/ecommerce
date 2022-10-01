@@ -370,9 +370,9 @@ public class AdministrativeTests : TestFixture
     headers.Add("Authorization", $"Bearer {tokenResponse.Token}");
     headers.Add(MultitenancyConstants.SubscriptionTypeHeaderName, SubscriptionType.Standard);
 
-    _ = await GetAsync("/api/users", headers);
+    _ = await PostAsJsonAsync("/api/users/search", new PaginationFilter { PageNumber = 1, PageSize = 1000 }, headers);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    var users = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
+    var users = (await _.Content.ReadFromJsonAsync<PaginationResponse<UserDetailsDto>>()).Data;
     users.Should().NotBeNullOrEmpty();
   }
 

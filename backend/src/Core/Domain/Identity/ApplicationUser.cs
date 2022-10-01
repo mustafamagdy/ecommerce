@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FSH.WebApi.Domain.Identity;
 
-public sealed class ApplicationUser : IdentityUser, IHasImage
+public class ApplicationUser : IdentityUser, IHasImage
 {
   public string? FirstName { get; set; }
   public string? LastName { get; set; }
@@ -14,6 +14,7 @@ public sealed class ApplicationUser : IdentityUser, IHasImage
   public bool MustChangePassword { get; set; }
   public string? ImagePath { get; private set; }
 
+  public virtual ICollection<ApplicationUserRole> UserRoles { get; set; } = new List<ApplicationUserRole>();
   public void SetAvatar(string? imagePath) => ImagePath = imagePath;
 
   public ApplicationUser ClearImagePath()
