@@ -9,10 +9,12 @@ export const isAnonymous = (path: string): boolean => {
 }
 
 export const endPoints: Record<string, Endpoint> = {
-  abilities: {url: '/roles/abilities', anonymous: true},
-  meEndpoint: {url: '/personal/profile'},
-  loginEndpoint: {url: '/tokens'},
-  storageTokenKeyName: {url: 'token'},
-  storageRefreshTokenKeyName: {url: 'refreshToken'},
-  storageRefreshTokenExpiryDateKeyName: {url: 'refreshTokenExpiryTime'},
+  // ** Auth
+  abilities: {url: '/api/roles/abilities', anonymous: true},
+  meEndpoint: {url: '/api/personal/profile'},
+  loginEndpoint: {url: '/api/tokens'},
+
+  // ** Users
+  userList: {url: '/api/Users/search'},
+  userCreate: {url: '/api/Users'},
 }

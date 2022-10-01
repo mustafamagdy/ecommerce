@@ -78,6 +78,7 @@ internal sealed partial class UserService : IUserService
       .WithSpecification(spec)
       .ProjectToType<UserDetailsDto>()
       .ToListAsync(cancellationToken);
+
     int count = await _userManager.Users
       .CountAsync(cancellationToken);
 
@@ -110,39 +111,31 @@ internal sealed partial class UserService : IUserService
     }
   }
 
-  public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+  public async Task<PaginationResponse<UserDetailsDto>> GetListAsync(PaginationFilter filter, CancellationToken cancellationToken)
   {
-    var users = _userManager.Users
-      .AsNoTracking()
-      .ToList();
+    var spec = new EntitiesByPaginationFilterSpec<ApplicationUser>(filter);
 
-    var userList = users.Adapt<List<UserDetailsDto>>();
-    foreach (var user in users)
-    {
-      var userRoles = await _userManager.GetRolesAsync(user);
-      var idx = userList.FindIndex(a => a.Id.ToString() == user.Id);
-      userList[idx].Role = (userRoles.FirstOrDefault() ?? string.Empty).ToLower();
-    }
+    var users = await _db.Users
+      .Include(a => a.UserRoles)
+      .ThenInclude(a => a.Role)
+      .WithSpecification(spec)
+      .ProjectToType<UserDetailsDto>()
+      .ToListAsync(cancellationToken);
 
-    return userList;
+    int count = await _userManager.Users
+      .CountAsync(cancellationToken);
+
+    return new PaginationResponse<UserDetailsDto>(users, count, filter.PageNumber, filter.PageSize);
   }
-
 
   public async Task<List<BasicUserDataDto>> GetListBasicDataAsync(CancellationToken cancellationToken)
   {
-    var users = _userManager.Users
-      .AsNoTracking()
-      .ToList();
-
-    var userList = users.Adapt<List<BasicUserDataDto>>();
-    foreach (var user in users)
-    {
-      var userRoles = await _userManager.GetRolesAsync(user);
-      var idx = userList.FindIndex(a => a.Id.ToString() == user.Id);
-      userList[idx].Role = (userRoles.FirstOrDefault() ?? string.Empty).ToLower();
-    }
-
-    return userList;
+    var users = await _db.Users
+      .Include(a => a.UserRoles)
+      .ThenInclude(a => a.Role)
+      .ProjectToType<BasicUserDataDto>()
+      .ToListAsync(cancellationToken);
+    return users;
   }
 
   public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
@@ -150,17 +143,12 @@ internal sealed partial class UserService : IUserService
 
   public async Task<UserDetailsDto> GetAsync(string userId, CancellationToken cancellationToken)
   {
-    var user = await _userManager.Users
-      .AsNoTracking()
-      .Where(u => u.Id == userId)
-      .FirstOrDefaultAsync(cancellationToken);
-
-    _ = user ?? throw new NotFoundException(_t["User Not Found."]);
-
-    var userData = user.Adapt<UserDetailsDto>();
-    var roles = await _userManager.GetRolesAsync(user);
-    userData.Role = (roles.FirstOrDefault() ?? string.Empty).ToLower();
-    return userData;
+    var user = (await _db.Users
+        .Include(a => a.UserRoles)
+        .ThenInclude(a => a.Role)
+        .FirstOrDefaultAsync(a => a.Id == userId)
+      ).Adapt<UserDetailsDto>();
+    return user;
   }
 
   public async Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken)

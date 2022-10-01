@@ -1,12 +1,14 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import axios from "axios";
 import {Dispatch} from "redux";
+import {Http} from 'src/lib/services/http'
+import {endPoints} from "src/lib/services/endpoints";
 
-
-interface DataParams {
-  q: string
-  role: string
-  status: string
+export interface DataParams {
+  q?: string
+  role?: string
+  status?: string,
+  pageNumber: number,
+  pageSize: number
 }
 
 interface Redux {
@@ -15,36 +17,26 @@ interface Redux {
 }
 
 // ** Fetch Users
-export const fetchData = createAsyncThunk('appUsers/fetchData', async (params: DataParams) => {
-  const response = await axios.get('/apps/users/list', {
-    params
-  })
-
-  return response.data
+export const fetchData = createAsyncThunk('users/fetchData', async (params: DataParams) => {
+  return await Http.post(endPoints.userList.url, params)
 })
 
 // ** Add User
-export const addUser = createAsyncThunk(
-  'appUsers/addUser',
+export const addUser = createAsyncThunk('users/addUser',
   async (data: { [key: string]: number | string }, {getState, dispatch}: Redux) => {
-    const response = await axios.post('/apps/users/add-user', {
+    const response = await Http.post(endPoints.userList.url, {
       data
     })
     dispatch(fetchData(getState().user.params))
-
     return response.data
   }
 )
 
 // ** Delete User
-export const deleteUser = createAsyncThunk(
-  'appUsers/deleteUser',
+export const deleteUser = createAsyncThunk('users/deleteUser',
   async (id: number | string, {getState, dispatch}: Redux) => {
-    const response = await axios.delete('/apps/users/delete', {
-      data: id
-    })
+    const response = await Http.delete(`${endPoints.userDelete.url}/${id}`)
     dispatch(fetchData(getState().user.params))
-
     return response.data
   }
 )

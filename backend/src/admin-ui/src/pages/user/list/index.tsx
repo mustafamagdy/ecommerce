@@ -91,7 +91,7 @@ const AvatarWithoutImageLink = styled(Link)(({theme}) => ({
 
 // ** renders client column
 const renderClient = (row: UserType) => {
-  if (row.imagePath.length) {
+  if (row.imagePath?.length) {
     return (
       <AvatarWithImageLink href={`/user/view/${row.id}`}>
         <CustomAvatar src={row.imagePath} sx={{mr: 3, width: 34, height: 34}}/>
@@ -235,16 +235,15 @@ const columns = [
     field: 'role',
     minWidth: 150,
     headerName: 'Role',
-    renderCell: ({row}: CellType) => {
-      return (
-        <Box sx={{display: 'flex', alignItems: 'center'}}>
-          {userRoleObj[row.role]}
+    renderCell: ({row}: CellType) =>
+      row.roles.map(role => (
+        <Box key={role} sx={{display: 'flex', alignItems: 'center'}}>
+          {userRoleObj[role]}
           <Typography noWrap sx={{color: 'text.secondary', textTransform: 'capitalize'}}>
-            {row.role}
+            {role}
           </Typography>
         </Box>
-      )
-    }
+      ))
   },
   {
     flex: 0.1,
@@ -291,6 +290,8 @@ const UserList = () => {
         role,
         status,
         q: value,
+        pageNumber: 1,
+        pageSize: 10
       })
     )
   }, [dispatch, role, status, value])

@@ -52,14 +52,12 @@ const AuthProvider = ({children}: Props) => {
         setLoading(true)
 
         const rolesAndAbilities = await Http.get(endPoints.abilities.url);
-        debugger
         setAbilities({...rolesAndAbilities});
 
         // ** Set user token
         const storedToken = storage.getItem(authConfig.storageTokenKeyName)!
         if (storedToken) {
           const userData = await Http.get(endPoints.meEndpoint.url);
-          debugger
           setUser({...userData})
         }
 
@@ -94,6 +92,7 @@ const AuthProvider = ({children}: Props) => {
           })
       })
       .catch(err => {
+
         if (errorCallback) errorCallback(err)
       })
   }

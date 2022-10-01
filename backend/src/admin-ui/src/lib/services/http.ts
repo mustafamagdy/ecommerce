@@ -3,7 +3,7 @@ import authConfig from 'src/configs/auth'
 import storage from './storage'
 import {isAnonymous} from './endpoints'
 
-const BASE_URL = (process.env.BASE_URL ?? "https://localhost:5001/api").replace(/\/+$/, "")
+const BASE_URL = (process.env.BASE_URL ?? "https://localhost:5001").replace(/\/+$/, "")
 
 class HttpService {
 
