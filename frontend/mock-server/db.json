@@ -1,0 +1,14 @@
+{
+  "services": [
+    {
+      "id": "8529eab0-df42-48d0-b381-fb34dfc84d82",
+      "name": "اسم الخدمة 341",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8529eab0-df42-48d0-b381-fb34dfc89d83",
+      "name": "اسم الخدمة 341",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    }
+  ]
+}

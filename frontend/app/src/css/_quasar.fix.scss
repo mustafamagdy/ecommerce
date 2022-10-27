@@ -1,0 +1,33 @@
+.q-pagination {
+    div.row {
+        flex-wrap: nowrap;
+    }
+}
+
+.q-stepper--horizontal {
+    display: flex;
+    flex-direction: column;
+
+    .q-stepper__content {
+        flex-grow: 1;
+
+        .q-stepper__step-content {
+            width: 100%;
+            height: 100%;
+
+            .q-stepper__step-inner {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                padding: unset;
+            }
+        }
+    }
+}
+
+.q-field__control{
+    height: unset;
+}
+.q-tab-panels{
+    background: unset;
+}
