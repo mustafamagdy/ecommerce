@@ -3,7 +3,7 @@
         <!-- App header -->
         <q-header class="transparent text-blue-grey">
             <q-toolbar class="">
-                <q-btn  @click="toggleLeftDrawer" dense icon="menu" class="bg-color-dark"></q-btn>
+                <q-btn @click="toggleLeftDrawer" dense icon="menu" class="bg-color-dark"></q-btn>
                 <!-- App logo and name -->
                 <q-btn no-caps flat stretch to="/home" class="q-mr-lg">
                     <q-toolbar-title class="text-blue-grey">{{ $appName }}</q-toolbar-title>
@@ -21,11 +21,15 @@
                         v-if="!menu.submenu.length"
                         :key="`topleftmenubtn-${index}`"
                     ></q-btn>
-                    <q-btn-dropdown no-caps :icon="menu.icon" stretch flat :label="menu.label" v-else
-                                    :key="`topleftmenudrop-${index}`">
+                    <q-btn-dropdown no-caps :icon="menu.icon" stretch flat :label="menu.label" v-else :key="`topleftmenudrop-${index}`">
                         <q-list dense>
-                            <q-item v-for="(submenu, subindex) in menu.submenu" :key="`topleftsubmenu-${subindex}`"
-                                    clickable v-ripple :to="submenu.path">
+                            <q-item
+                                v-for="(submenu, subindex) in menu.submenu"
+                                :key="`topleftsubmenu-${subindex}`"
+                                clickable
+                                v-ripple
+                                :to="submenu.path"
+                            >
                                 <q-item-section avatar v-if="submenu.icon">
                                     <q-avatar :icon="submenu.icon"></q-avatar>
                                 </q-item-section>
@@ -49,8 +53,7 @@
                         v-if="!menu.submenu.length"
                         :key="`toprightmenu-${index}`"
                     ></q-btn>
-                    <q-btn-dropdown no-caps :icon="menu.icon" stretch flat :label="menu.label" v-else
-                                    :key="`toprightmenudrop-${index}`">
+                    <q-btn-dropdown no-caps :icon="menu.icon" stretch flat :label="menu.label" v-else :key="`toprightmenudrop-${index}`">
                         <q-list dense>
                             <q-item
                                 v-for="(submenu, subindex) in menu.submenu"
@@ -72,13 +75,12 @@
             </q-toolbar>
         </q-header>
         <!-- App left drawer -->
-        <q-drawer v-model="leftDrawer"  :width="250" :breakpoint="500" :mini="leftDrawerMini" >
+        <q-drawer v-model="leftDrawer" :width="250" :breakpoint="500" :mini="leftDrawerMini">
             <q-scroll-area class="fit">
                 <q-separator></q-separator>
                 <q-list>
                     <template v-for="(menu, index) in navbarSideLeftItems">
-                        <q-item clickable q-ripple :to="menu.path" v-if="!menu.submenu.length"
-                                :key="`sideleftmenu-${index}`">
+                        <q-item clickable q-ripple :to="menu.path" v-if="!menu.submenu.length" :key="`sideleftmenu-${index}`">
                             <q-item-section avatar v-if="menu.icon">
                                 <q-icon :color="menu.iconcolor || 'primary'" :name="menu.icon"></q-icon>
                                 <q-tooltip
@@ -97,8 +99,14 @@
                                 {{ menu.label }}
                             </q-item-section>
                         </q-item>
-                        <q-expansion-item expand-separator :content-inset-level="0.5" group="leftmenu" v-else
-                                          :key="`sideleftmenudrop-${index}`">
+
+                        <q-expansion-item
+                            expand-separator
+                            :content-inset-level="0.5"
+                            group="leftmenu"
+                            v-else
+                            :key="`sideleftmenudrop-${index}`"
+                        >
                             <template v-slot:header>
                                 <q-item-section avatar v-if="menu.icon">
                                     <q-icon :color="menu.iconcolor || 'primary'" :name="menu.icon"></q-icon>
@@ -171,7 +179,7 @@
         <!-- App layout container -->
         <q-page-container>
             <q-page class="column q-pa-md">
-                <router-view/>
+                <router-view />
             </q-page>
         </q-page-container>
         <!-- Page display dialog -->
@@ -190,8 +198,15 @@
                     :api-path="pageDialog.pageUrl"
                     :page-data="pageDialog.pageUrl"
                 />
-                <q-btn style="position: absolute; top: 2px; right: 2px" v-if="pageDialog.closeBtn" icon="close" flat
-                       round dense v-close-popup/>
+                <q-btn
+                    style="position: absolute; top: 2px; right: 2px"
+                    v-if="pageDialog.closeBtn"
+                    icon="close"
+                    flat
+                    round
+                    dense
+                    v-close-popup
+                />
             </q-card>
         </q-dialog>
         <!-- image preview dialog-->
@@ -211,9 +226,8 @@
                 height="auto"
                 class="bg-dark rounded-borders"
             >
-                <q-carousel-slide class="no-padding" v-for="(img, index) in imageDialog.images" :key="index"
-                                  :name="index">
-                    <img style="max-width: 100%; max-height: 100%" :src="img"/>
+                <q-carousel-slide class="no-padding" v-for="(img, index) in imageDialog.images" :key="index" :name="index">
+                    <img style="max-width: 100%; max-height: 100%" :src="img" />
                 </q-carousel-slide>
             </q-carousel>
         </q-dialog>
@@ -224,22 +238,22 @@
                     <q-avatar text-color="negative" size="40px" font-size="36px" icon="error"></q-avatar>
                     <div class="q-ml-sm">
                         <div class="text-weight-bold text-negative">{{ $t("unableToCompleteRequest") }}</div>
-                        <q-separator class="q-my-sm"/>
+                        <q-separator class="q-my-sm" />
                         <div class="text-capitalize" v-for="(msg, index) in pageErrors" :key="index">
                             {{ msg }}
                         </div>
                     </div>
-                    <q-space/>
-                    <q-btn icon="close" flat round dense v-close-popup/>
+                    <q-space />
+                    <q-btn icon="close" flat round dense v-close-popup />
                 </q-card-section>
             </q-card>
         </q-dialog>
     </q-layout>
 </template>
 <script>
-import {defineAsyncComponent, defineComponent, computed} from "vue";
-import {useApp} from "src/composables/app";
-import {useStore} from "vuex";
+import { defineAsyncComponent, defineComponent, computed } from "vue";
+import { useApp } from "src/composables/app";
+import { useStore } from "vuex";
 
 export default defineComponent({
     setup(props) {
@@ -404,6 +418,4 @@ export default defineComponent({
 </script>
 
 <style></style>
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>
