@@ -2,30 +2,23 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="text-h6 q-mb-md">{{ $t("addNewSampletable") }}</div>
         <q-form ref="observer" @submit.prevent="submitForm()">
-            <div>
+            <!-- <div>
                 <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
-            </div>
+            </div> -->
             <div class="col-12 row">
-                <div class="col-sm-3 col-12">
-                    {{ $t("service_name") }} *
-                </div>
+                <div class="col-sm-3 col-12">{{ $t("service_name") }} *</div>
                 <div class="col-sm-9 col-12">
-                    <q-input v-model.trim="formData.name" :error="v$.name.$error"
-                             :error-message="getFieldErrorsMsg(v$.name)">
-                    </q-input>
+                    <q-input v-model.trim="formData.name" :error="v$.name.$error" :error-message="getFieldErrorsMsg(v$.name)"> </q-input>
                 </div>
             </div>
             <div class="col-12 row">
-                <div class="col-sm-3 col-12">
-                    {{ $t("service_description") }} *
-                </div>
+                <div class="col-sm-3 col-12">{{ $t("service_description") }} *</div>
                 <div class="col-sm-9 col-12">
                     <q-input v-model.trim="formData.description" type="textarea"></q-input>
                 </div>
             </div>
             <div class="row flex-center no-wrap q-my-md">
-                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="saving"
-                       class="bg-color-positive">
+                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="saving" class="bg-color-positive">
                     <template v-slot:loading>
                         <q-spinner-oval />
                     </template>
@@ -55,8 +48,8 @@ const options = reactive({
         name: "",
         description: "",
         imageFile: {},
-        imageUrl: ""
-    }
+        imageUrl: "",
+    },
 });
 const app = useApp();
 const formData = reactive({ ...options.formInputs });
@@ -78,27 +71,19 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) }
+    name: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData); // form validation
 
 const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
 
-const {
-    saving
-} = toRefs(page.state);
+const { saving } = toRefs(page.state);
 const { showAdd, showEdit } = page.computedProps;
-const {
-    submitForm,
-    getFieldErrorsMsg,
-    addRecordToList,
-    updateRecordInList,
-    load
-} = page.methods;
+const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList, load } = page.methods;
 
 useMeta(() => {
     return {
-        title: $t("addNewSampletable")
+        title: $t("addNewSampletable"),
     };
 });
 
@@ -107,6 +92,6 @@ onMounted(() => {
 });
 
 defineExpose({
-    page
+    page,
 });
 </script>

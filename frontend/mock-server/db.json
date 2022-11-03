@@ -1,14 +1,460 @@
 {
   "services": [
     {
-      "id": "8529eab0-df42-48d0-b381-fb34dfc84d82",
-      "name": "اسم الخدمة 341",
+      "id": "8529eab0d83",
+      "name": "  Product 1",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
-      "id": "8529eab0-df42-48d0-b381-fb34dfc89d83",
-      "name": "اسم الخدمة 341",
+      "id": "85299d83",
+      "name": "product 2  ",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "889d83",
+      "name": "product 3",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "889d22283",
+      "name": "product 4",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "11889d22283",
+      "name": "product 5",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "889d2283",
+      "name": "product 6",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "82283",
+      "name": "product 7",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8228333",
+      "name": "product 8",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "822833377",
+      "name": "product 9",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "822833387",
+      "name": "product 10",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8223387",
+      "name": "product 11",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    }
+  ],
+  "financialBoxes": [
+    {
+      "id": 1,
+      "type": "box",
+      "boxName": "Brand",
+      "managerName": "Andrew Hayes",
+      "typeOfBox": "box"
+    },
+    {
+      "id": 2,
+      "type": "bank account",
+      "boxName": "Fiat",
+      "managerName": "Krista Kunze",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": 3,
+      "type": "box",
+      "boxName": "Van",
+      "managerName": "Beth Gerlach",
+      "typeOfBox": "box"
+    },
+    {
+      "id": 4,
+      "type": "bank account",
+      "boxName": "invoice",
+      "managerName": "Patrick Schinner",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": 5,
+      "type": "bank account",
+      "boxName": "ack",
+      "managerName": "Jimmie Quigley",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": 6,
+      "type": "box",
+      "boxName": "Handcrafted",
+      "managerName": "Evelyn Smitham",
+      "typeOfBox": "box"
+    },
+    {
+      "id": 11,
+      "type": "bank account",
+      "boxName": "Lead",
+      "managerName": "Roberto Bogisich",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": 7,
+      "type": "box",
+      "boxName": "wilted",
+      "managerName": "Jeffery Ullrich DDS",
+      "typeOfBox": "box"
+    },
+    {
+      "id": 8,
+      "type": "box",
+      "boxName": "rigidly",
+      "managerName": "Justin Hackett",
+      "typeOfBox": "box"
+    },
+    {
+      "id": 9,
+      "type": "box",
+      "boxName": "Litas",
+      "managerName": "Lena Hackett",
+      "typeOfBox": "box"
+    }
+  ],
+  "customers": [
+    {
+      "id": "1",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "2",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "3",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "4",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "5",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "6",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "7",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "9",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "10",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    }
+  ],
+  "bills": [
+    {
+      "id": "1",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "2",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "3",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "4",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "5",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "6",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "7",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "8",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    }
+  ],
+  "branches": [
+    {
+      "id": "1",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "2",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "3",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "4",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "5",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "6",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "7",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "8",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "9",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "11",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "12",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "1",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "2",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "3",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "4",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "5",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "6",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "7",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "8",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "9",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "10",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "status": "active",
+      "recentPackage": "package",
+      "balance": "2000"
     }
   ]
 }

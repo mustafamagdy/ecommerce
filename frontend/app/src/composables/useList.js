@@ -5,8 +5,12 @@ import { useStore } from "vuex";
 import { useApp } from "src/composables/app";
 
 export const useList = ({
-                            primaryKey = "id", apiPath = "", storeModule = "", listName = "records", pageSize = 10
-                        }) => {
+    primaryKey = "id",
+    apiPath = "",
+    storeModule = "",
+    listName = "records",
+    pageSize = 10,
+}) => {
     const app = useApp();
     const store = useStore();
     const loading = ref(false);
@@ -16,10 +20,12 @@ export const useList = ({
     let records = computed({
         get() {
             return store.getters[`${storeModule}/${listName}`];
-        }, set(value) {
-            const upperListName = listName.charAt(0).toUpperCase() + listName.slice(1);
+        },
+        set(value) {
+            const upperListName =
+                listName.charAt(0).toUpperCase() + listName.slice(1);
             store.commit(`${storeModule}/set${upperListName}`, value);
-        }
+        },
     });
 
     async function load() {
@@ -38,6 +44,11 @@ export const useList = ({
     }
 
     return {
-        loading, currentPage, totalRecords, totalPages, records, load
+        loading,
+        currentPage,
+        totalRecords,
+        totalPages,
+        records,
+        load,
     };
 };

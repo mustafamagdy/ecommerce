@@ -4,13 +4,21 @@
             <span>{{ $t("products_groups") }}</span>
             <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
             <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
+
             <div class="row no-wrap">
                 <q-btn icon="mdi-magnify" :label="app.btnLabel('btn_filters')" padding="xs" class="bg-color-dark" />
-                <q-btn icon="mdi-plus" :label="app.btnLabel('btn_add_new')" padding="xs"
-                       class="bg-color-primary" @click="page.showAdd=true" />
+                <q-btn
+                    icon="mdi-plus"
+                    :label="app.btnLabel('btn_add_new')"
+                    padding="xs"
+                    class="bg-color-primary"
+                    @click="page.showAdd = true"
+                />
             </div>
         </div>
+
         <q-separator class="q-mt-sm" />
+
         <q-scroll-area class="col-grow" visible>
             <q-table
                 card-container-class="q-col-gutter-md justify-start"
@@ -20,13 +28,13 @@
                 row-key="id"
                 :loading="page.loading"
                 hide-pagination
-                :pagination="{rowsPerPage:0}"
+                :pagination="{ rowsPerPage: 0 }"
                 dense
                 flat
                 hide-header
             >
                 <template v-slot:body="props">
-                    <q-tr @click="page.clickedRecord=props.row">
+                    <q-tr @click="page.clickedRecord = props.row">
                         <q-td>
                             <q-avatar size="md">
                                 <img :src="props.row.imageUrl" alt="" />
@@ -37,13 +45,14 @@
                         </q-td>
                         <q-td>
                             <div class="row no-wrap">
-                                <q-btn icon="mdi-playlist-edit"
-                                       :label="app.btnLabel('btn_edit')" padding="xs"
-                                       class="bg-color-info"
-                                       @click="page.showEdit={show:true,editId:props.row.id}" />
-                                <q-btn icon="mdi-cog-outline"
-                                       :label="app.btnLabel('btn_actions')" padding="xs"
-                                       class="bg-color-dark">
+                                <q-btn
+                                    icon="mdi-playlist-edit"
+                                    :label="app.btnLabel('btn_edit')"
+                                    padding="xs"
+                                    class="bg-color-info"
+                                    @click="page.showEdit = { show: true, editId: props.row.id }"
+                                />
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
                                             <q-item clickable v-ripple @click="page.deleteItem(props.row.id)">
@@ -56,8 +65,10 @@
                                             </q-item>
                                             <q-item clickable v-ripple>
                                                 <q-item-section>
-                                                    <q-icon size="md"
-                                                            :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"></q-icon>
+                                                    <q-icon
+                                                        size="md"
+                                                        :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"
+                                                    ></q-icon>
                                                 </q-item-section>
                                                 <q-item-section>
                                                     {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
@@ -65,17 +76,13 @@
                                             </q-item>
                                         </q-list>
                                     </q-menu>
-                                </q-btn
-                                >
+                                </q-btn>
                             </div>
                         </q-td>
                     </q-tr>
                 </template>
                 <template v-slot:item="props">
-                    <div
-                        class="col-12 col-md-6"
-                        :style="props.selected ? 'transform: scale(0.95);' : ''"
-                    >
+                    <div class="col-12 col-md-6" :style="props.selected ? 'transform: scale(0.95);' : ''">
                         <q-card class="">
                             <div class="row no-wrap items-center">
                                 <q-avatar>
@@ -86,23 +93,29 @@
                             </div>
                             <q-separator class="q-my-sm" />
                             <div class="row justify-center">
-                                <q-btn icon="mdi-delete-outline"
-                                       :label="app.btnLabel('btn_delete')" padding="xs"
-                                       class="bg-color-negative" @click="page.deleteItem(props.row.id)" />
-                                <q-btn icon="mdi-playlist-edit"
-                                       :label="app.btnLabel('btn_edit')" padding="xs"
-                                       class="bg-color-info"
-                                       @click="page.showEdit={show:true,editId:props.row.id}" />
-                                <q-btn icon="mdi-cog-outline"
-                                       :label="app.btnLabel('btn_actions')" padding="xs"
-                                       class="bg-color-dark"
-                                >
+                                <q-btn
+                                    icon="mdi-delete-outline"
+                                    :label="app.btnLabel('btn_delete')"
+                                    padding="xs"
+                                    class="bg-color-negative"
+                                    @click="page.deleteItem(props.row.id)"
+                                />
+                                <q-btn
+                                    icon="mdi-playlist-edit"
+                                    :label="app.btnLabel('btn_edit')"
+                                    padding="xs"
+                                    class="bg-color-info"
+                                    @click="page.showEdit = { show: true, editId: props.row.id }"
+                                />
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list rounded nav>
                                             <q-item link clickable v-ripple>
                                                 <q-item-section>
-                                                    <q-icon size="md"
-                                                            :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"></q-icon>
+                                                    <q-icon
+                                                        size="md"
+                                                        :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"
+                                                    ></q-icon>
                                                 </q-item-section>
                                                 <q-item-section>
                                                     {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
@@ -110,8 +123,7 @@
                                             </q-item>
                                         </q-list>
                                     </q-menu>
-                                </q-btn
-                                >
+                                </q-btn>
                             </div>
                         </q-card>
                     </div>
@@ -157,10 +169,12 @@ import { useCRUDList } from "src/composables/useCRUDList";
 
 const app = useApp();
 
-const page = reactive(useCRUDList({
-    apiPath: serverApis.services,
-    storeModule: storeModules.services
-}));
+const page = reactive(
+    useCRUDList({
+        apiPath: serverApis.services,
+        storeModule: storeModules.services,
+    })
+);
 
 onMounted(() => {
     page.load();

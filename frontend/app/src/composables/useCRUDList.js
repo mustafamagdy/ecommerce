@@ -8,20 +8,27 @@ import { useList } from "src/composables/useList";
 import { useShowAddEdit } from "src/composables/useShowAddEdit";
 
 export const useCRUDList = ({
-                                primaryKey = "id",
-                                apiPath = "",
-                                storeModule = "",
-                                listName = "records",
-                                recordName = "record",
-                                pageSize = 10
-                            }) => {
+    primaryKey = "id",
+    apiPath = "",
+    storeModule = "",
+    listName = "records",
+    recordName = "record",
+    pageSize = 10,
+}) => {
     const list = useList({
-        primaryKey: primaryKey, apiPath: apiPath, storeModule: storeModule, listName: listName, pageSize: pageSize
+        primaryKey: primaryKey,
+        apiPath: apiPath,
+        storeModule: storeModule,
+        listName: listName,
+        pageSize: pageSize,
     });
     const $q = useQuasar();
     const app = useApp();
     const store = useStore();
-    const { showAdd, showEdit, showAddOrEdit } = useShowAddEdit(storeModule,recordName);
+    const { showAdd, showEdit, showAddOrEdit } = useShowAddEdit(
+        storeModule,
+        recordName
+    );
 
     async function deleteItem(id) {
         if (Array.isArray(id)) {
@@ -31,7 +38,10 @@ export const useCRUDList = ({
             let title = $t("delete_confirmation_dialog_title");
             let msg = $t("delete_confirmation_dialog_message");
             $q.dialog({
-                title: title, message: msg, cancel: true, persistent: true
+                title: title,
+                message: msg,
+                cancel: true,
+                persistent: true,
             })
                 .onOk(async () => {
                     try {
@@ -62,6 +72,6 @@ export const useCRUDList = ({
         showEdit,
         showAddOrEdit,
         load: list.load,
-        deleteItem
+        deleteItem,
     };
 };

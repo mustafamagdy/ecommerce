@@ -13,15 +13,20 @@ import { pointOfSales } from "./moduls/pointOfSales.js";
  * with the Store instance.
  */
 
-export default store(function(/* { ssrContext } */) {
+export default store(function (/* { ssrContext } */) {
     return createStore({
         modules: {
             app: app,
             services: crud,
             products: crud,
             serviceCatalog: crud,
-            pointOfSales: pointOfSales
-        }
+            financialBoxes: crud,
+            customers: crud,
+            pointOfSales: pointOfSales,
+            bills: crud,
+            branches: crud,
+            subscriptions: crud,
+        },
         // enable strict mode (adds overhead!)
         // for dev mode and --debug builds only
         // strict: process.env.DEBUGGING

@@ -5,14 +5,14 @@
             <q-input readonly :label="$t('pos-invoice-no')" />
             <q-btn icon="mdi-magnify" class="bg-color-dark" />
         </div>
+
         <div class="row items-center">
             <!--            <q-toggle v-model="order.isForward" keep-color color="red" :label="$t('pos-is-forward')" />-->
             <div>
                 <q-input readonly :label="$t('pos-client-name')" />
             </div>
             <div>
-                <q-btn icon="mdi-dots-horizontal" padding="xs"
-                       class="bg-color-dark">
+                <q-btn icon="mdi-dots-horizontal" padding="xs" class="bg-color-dark">
                     <q-menu persistent style="width: 50%">
                         <search-add-customer />
                     </q-menu>
@@ -21,20 +21,9 @@
         </div>
     </div>
     <div class="col-grow row">
-        <q-stepper
-            v-model="step"
-            ref="stepper"
-            color="primary"
-            animated
-            class="col-12"
-            header-class="hidden"
-            flat
-        >
-            <q-step
-                :name="1"
-                class="row col-grow no-wrap"
-                title="">
-                <div class="row col-grow ">
+        <q-stepper v-model="step" ref="stepper" color="primary" animated class="col-12" header-class="hidden" flat>
+            <q-step :name="1" class="row col-grow no-wrap" title="">
+                <div class="row col-grow">
                     <div class="col-grow column col-3">
                         <q-scroll-area class="col-grow panel q-mr-sm" visible>
                             <div class="row">
@@ -42,8 +31,7 @@
                                     <q-btn class="bg-color-dark">
                                         <div class="column flex-center">
                                             <q-img :src="service.imageUrl" alt="" />
-                                            <span class="text-body1">{{ service.name
-                                                }}</span>
+                                            <span class="text-body1">{{ service.name }}</span>
                                         </div>
                                     </q-btn>
                                 </div>
@@ -59,8 +47,7 @@
                                             <q-img :src="product.imagePath" alt="" />
                                             <span class="text-body1">{{ product.name }}</span>
                                         </div>
-                                        <q-badge class="text-body1 bg-color-info q-my-sm" floating>{{ product.price }}
-                                        </q-badge>
+                                        <q-badge class="text-body1 bg-color-info q-my-sm" floating>{{ product.price }} </q-badge>
                                     </q-btn>
                                 </div>
                             </div>
@@ -73,15 +60,14 @@
                             <span class="col-3 q-pa-xs">{{ $t("pos-order-dtl-price") }}</span>
                         </div>
                         <q-separator />
-                        <q-scroll-area class="col-grow " visible>
+                        <q-scroll-area class="col-grow" visible>
                             <div class="col-grow">
-                                <div class="row items-center" v-for="(item,index) in order.items">
+                                <div class="row items-center" v-for="(item, index) in order.items">
                                     <span class="col-6 q-pa-xs">{{ item.name }}</span>
                                     <span class="col-2 q-pa-xs">{{ item.qty }}</span>
                                     <span class="col-2 q-pa-xs">{{ item.price }}</span>
                                     <div class="col-2 q-pa-xs">
-                                        <q-btn class="bg-color-negative" icon="mdi-minus-circle-outline"
-                                               @click="removeItem(index)" />
+                                        <q-btn class="bg-color-negative" icon="mdi-minus-circle-outline" @click="removeItem(index)" />
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +78,7 @@
                             <span class="col-3 q-pa-xs">{{ totalQty }}</span>
                             <span class="col-3 q-pa-xs">{{ totalPrice }}</span>
                         </div>
-                        <q-btn class="bg-color-primary" @click="step=2" v-if="step===1" :disable="totalPrice===0">
+                        <q-btn class="bg-color-primary" @click="step = 2" v-if="step === 1" :disable="totalPrice === 0">
                             <div class="row items-center q-py-sm">
                                 <q-icon name="mdi-cash-100" class="q-mr-sm" size="50px" />
                                 <span>{{ $t("pos-order-pay") }}</span>
@@ -101,9 +87,7 @@
                     </div>
                 </div>
             </q-step>
-            <q-step
-                :name="2"
-                title="">
+            <q-step :name="2" title="">
                 <div class="row items-stretch">
                     <div class="col-8 column">
                         <payment-kit v-model="paymentMethods.records" class="col-grow panel q-mr-sm" />
@@ -111,9 +95,7 @@
                     <div class="column col-4 panel">
                         <div class="column col-grow items-center pos-totals text-body1">
                             <span>{{ $t("pos-total-due") }}</span>
-                            <span
-                                class="pos-totals-item bg-color-info text-h4 text-center ">{{ totalPrice
-                                }}</span>
+                            <span class="pos-totals-item bg-color-info text-h4 text-center">{{ totalPrice }}</span>
                             <q-separator class="self-stretch" />
                             <span class="pos-totals-item">{{ $t("pos-paid") }}</span>
                             <div class="column items-center self-stretch">
@@ -124,18 +106,18 @@
                                 </div>
                                 <q-separator class="self-stretch" />
                                 <span>{{ $t("pos-paid-total") }}</span>
-                                <span
-                                    class="pos-totals-item bg-color-positive text-h4 text-center ">{{ totalPaid
-                                    }}</span>
+                                <span class="pos-totals-item bg-color-positive text-h4 text-center">{{ totalPaid }}</span>
                             </div>
                             <q-separator class="self-stretch" />
                             <span>{{ $t("pos-remain") }}</span>
-                            <span class="pos-totals-item text-h4"
-                                  :class="remain<0?'bg-color-negative':remain>0?'bg-color-primary':''">{{ remain
-                                }}</span>
+                            <span
+                                class="pos-totals-item text-h4"
+                                :class="remain < 0 ? 'bg-color-negative' : remain > 0 ? 'bg-color-primary' : ''"
+                                >{{ remain }}</span
+                            >
                         </div>
-                        <div class="row" v-if="step===2">
-                            <q-btn class="bg-color-light" @click="step=1">
+                        <div class="row" v-if="step === 2">
+                            <q-btn class="bg-color-light" @click="step = 1">
                                 <div class="row items-center q-py-sm">
                                     <q-icon name="mdi-arrow-left" class="q-mr-sm" size="50px" />
                                 </div>
@@ -161,12 +143,14 @@ import SearchAddCustomer from "pages/stakeholders/search-add-stakeholder";
 import { useList } from "src/composables/useList";
 import { pages, serverApis, storeModules } from "src/enums";
 
-const servicesList = reactive(useList({
-    apiPath: serverApis.services,
-    storeModule: storeModules.pointOfSales,
-    listName: pages.services,
-    pageSize: 0
-}));
+const servicesList = reactive(
+    useList({
+        apiPath: serverApis.services,
+        storeModule: storeModules.pointOfSales,
+        listName: pages.services,
+        pageSize: 0,
+    })
+);
 console.log(servicesList);
 const productsList = {
     records: [
@@ -174,45 +158,45 @@ const productsList = {
             id: "8529eab0-df42-48d0-b381-fb34dfc88d38",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc84d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb36dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d6-b381-fb34dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d1-b381-fb34dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc84d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc89d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
-        }
-    ]
+            price: 2.5,
+        },
+    ],
 };
 const paymentMethods = reactive({
     records: [
@@ -222,7 +206,7 @@ const paymentMethods = reactive({
             label: "Cash",
             type: "cash",
             icon: "mdi-cash-100",
-            paid: 0
+            paid: 0,
         },
         {
             id: "2",
@@ -230,14 +214,14 @@ const paymentMethods = reactive({
             label: "ATM",
             type: "atm",
             icon: "mdi-credit-card-outline",
-            paid: 0
-        }
-    ]
+            paid: 0,
+        },
+    ],
 });
 const order = reactive({
     isForward: false,
     items: [],
-    payments: []
+    payments: [],
 });
 const step = ref(1);
 
@@ -250,10 +234,10 @@ watch(
     () => paymentMethods.records,
     (newVal) => {
         let payments = [];
-        newVal.forEach(p => {
+        newVal.forEach((p) => {
             payments.push({
                 paymentMethodId: p.id,
-                amount: p.paid
+                amount: p.paid,
             });
         });
         order.payments = payments;
@@ -262,14 +246,14 @@ watch(
 );
 
 const addItem = (product) => {
-    const itemIndex = order.items.findIndex(i => i.itemId === product.id);
+    const itemIndex = order.items.findIndex((i) => i.itemId === product.id);
     if (itemIndex === -1) {
         order.items.push({
             itemId: product.id,
             name: product.name,
             qty: 1,
             unitPrice: product.price,
-            price: product.price
+            price: product.price,
         });
     } else {
         order.items[itemIndex].qty += 1;

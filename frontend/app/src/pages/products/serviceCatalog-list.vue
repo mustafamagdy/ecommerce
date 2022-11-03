@@ -4,8 +4,7 @@
             <span>{{ $t("products_groups") }}</span>
             <span>{{ $t("count") }} : {{ totalRecords }}</span>
             <span>{{ $t("pages") }} : {{ totalPages }}</span>
-            <q-btn icon="mdi-plus" :label="app.btnLabel('btn_add_new')" padding="xs" class=""
-                   @click="showAdd=true" />
+            <q-btn icon="mdi-plus" :label="app.btnLabel('btn_add_new')" padding="xs" class="" @click="showAdd = true" />
         </div>
         <div>
             {{ props.service ? props.service.name : "" }}
@@ -20,9 +19,10 @@
                 row-key="id"
                 :loading="loading"
                 hide-pagination
-                :pagination="{rowsPerPage:0}"
+                :pagination="{ rowsPerPage: 0 }"
                 table-style="max-height:100%"
-                dense flat
+                dense
+                flat
                 hide-header
             >
                 <template v-slot:body="props">
@@ -37,13 +37,14 @@
                         </q-td>
                         <q-td>
                             <div class="row no-wrap">
-                                <q-btn icon="mdi-playlist-edit"
-                                       :label="app.btnLabel('btn_edit')" padding="xs"
-                                       class="bg-color-info"
-                                       @click="showEdit={show:true,editId:props.row.id}" />
-                                <q-btn icon="mdi-cog-outline"
-                                       :label="app.btnLabel('btn_actions')" padding="xs"
-                                       class="bg-color-dark">
+                                <q-btn
+                                    icon="mdi-playlist-edit"
+                                    :label="app.btnLabel('btn_edit')"
+                                    padding="xs"
+                                    class="bg-color-info"
+                                    @click="showEdit = { show: true, editId: props.row.id }"
+                                />
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
                                             <q-item clickable v-ripple @click="deleteItem(props.row.id)">
@@ -56,8 +57,10 @@
                                             </q-item>
                                             <q-item clickable v-ripple>
                                                 <q-item-section>
-                                                    <q-icon size="md"
-                                                            :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"></q-icon>
+                                                    <q-icon
+                                                        size="md"
+                                                        :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"
+                                                    ></q-icon>
                                                 </q-item-section>
                                                 <q-item-section>
                                                     {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
@@ -65,8 +68,7 @@
                                             </q-item>
                                         </q-list>
                                     </q-menu>
-                                </q-btn
-                                >
+                                </q-btn>
                             </div>
                         </q-td>
                     </q-tr>
@@ -87,23 +89,29 @@
                             </div>
                             <q-separator class="q-my-sm" />
                             <div class="row justify-center">
-                                <q-btn icon="mdi-delete-outline"
-                                       :label="app.btnLabel('btn_delete')" padding="xs"
-                                       class="bg-color-negative" @click="deleteItem(props.row.id)" />
-                                <q-btn icon="mdi-playlist-edit"
-                                       :label="app.btnLabel('btn_edit')" padding="xs"
-                                       class="bg-color-info"
-                                       @click="showEdit={show:true,editId:props.row.id}" />
-                                <q-btn icon="mdi-cog-outline"
-                                       :label="app.btnLabel('btn_actions')" padding="xs"
-                                       class="bg-color-dark"
-                                >
+                                <q-btn
+                                    icon="mdi-delete-outline"
+                                    :label="app.btnLabel('btn_delete')"
+                                    padding="xs"
+                                    class="bg-color-negative"
+                                    @click="deleteItem(props.row.id)"
+                                />
+                                <q-btn
+                                    icon="mdi-playlist-edit"
+                                    :label="app.btnLabel('btn_edit')"
+                                    padding="xs"
+                                    class="bg-color-info"
+                                    @click="showEdit = { show: true, editId: props.row.id }"
+                                />
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list rounded nav>
                                             <q-item link clickable v-ripple>
                                                 <q-item-section>
-                                                    <q-icon size="md"
-                                                            :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"></q-icon>
+                                                    <q-icon
+                                                        size="md"
+                                                        :name="props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"
+                                                    ></q-icon>
                                                 </q-item-section>
                                                 <q-item-section>
                                                     {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
@@ -111,8 +119,7 @@
                                             </q-item>
                                         </q-list>
                                     </q-menu>
-                                </q-btn
-                                >
+                                </q-btn>
                             </div>
                         </q-card>
                     </div>
@@ -134,15 +141,7 @@
             </template>
         </q-scroll-area>
         <div class="q-mt-md flex flex-center">
-            <q-pagination
-                v-model="currentPage"
-                :max="totalPages"
-                boundary-links
-                direction-links
-                input
-                @update:model-value="load"
-                dense
-            />
+            <q-pagination v-model="currentPage" :max="totalPages" boundary-links direction-links input @update:model-value="load" dense />
         </div>
         <q-dialog v-model="showAddOrEdit" persistent>
             <ProductAddEdit />
@@ -161,38 +160,27 @@ const options = reactive({
     storeModule: "serviceCatalog",
     pageSize: 50,
     filter: {},
-    orderBy: []
+    orderBy: [],
 });
 const props = defineProps({
-    service: Object || null
+    service: Object || null,
 });
 const app = useApp();
 
 const page = useList(options);
 
-const {
-    totalRecords,
-    loading,
-    currentPage,
-    totalPages
-} = toRefs(page.state);
+const { totalRecords, loading, currentPage, totalPages } = toRefs(page.state);
 
-const {
-    records,
-    showAdd,
-    showEdit,
-    showAddOrEdit
-} = page.computedProps;
+const { records, showAdd, showEdit, showAddOrEdit } = page.computedProps;
 
-const {
-    load,
-    isCurrentRecord,
-    deleteItem
-} = page.methods;
+const { load, isCurrentRecord, deleteItem } = page.methods;
 
-watch(() => props.service, (val) => {
-    if (val && val.id && val.id !== "") {
-        load();
+watch(
+    () => props.service,
+    (val) => {
+        if (val && val.id && val.id !== "") {
+            load();
+        }
     }
-});
+);
 </script>
