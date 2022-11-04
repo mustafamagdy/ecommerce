@@ -50,9 +50,10 @@
                                     :label="app.btnLabel('btn_edit')"
                                     padding="xs"
                                     class="bg-color-info"
-                                    @click="page.showEdit = { show: true, editId: props.row.id }"
+                                    @click="page.showEdit = { show: true, id: props.row.id }"
                                 />
-                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs"
+                                       class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
                                             <q-item clickable v-ripple @click="page.deleteItem(props.row.id)">
@@ -107,7 +108,8 @@
                                     class="bg-color-info"
                                     @click="page.showEdit = { show: true, editId: props.row.id }"
                                 />
-                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs" class="bg-color-dark">
+                                <q-btn icon="mdi-cog-outline" :label="app.btnLabel('btn_actions')" padding="xs"
+                                       class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list rounded nav>
                                             <q-item link clickable v-ripple>
@@ -172,7 +174,7 @@ const app = useApp();
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.services,
-        storeModule: storeModules.services,
+        storeModule: storeModules.services
     })
 );
 
