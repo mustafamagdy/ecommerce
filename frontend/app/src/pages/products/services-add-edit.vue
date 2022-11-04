@@ -8,7 +8,8 @@
             <div class="col-12 row">
                 <div class="col-sm-3 col-12">{{ $t("service_name") }} *</div>
                 <div class="col-sm-9 col-12">
-                    <q-input v-model.trim="formData.name" :error="v$.name.$error" :error-message="getFieldErrorsMsg(v$.name)"> </q-input>
+                    <q-input v-model.trim="formData.name" :error="v$.name.$error"
+                             :error-message="getFieldErrorsMsg(v$.name)"></q-input>
                 </div>
             </div>
             <div class="col-12 row">
@@ -18,7 +19,8 @@
                 </div>
             </div>
             <div class="row flex-center no-wrap q-my-md">
-                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="saving" class="bg-color-positive">
+                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="saving"
+                       class="bg-color-positive">
                     <template v-slot:loading>
                         <q-spinner-oval />
                     </template>
@@ -42,14 +44,14 @@ import { serverApis, storeModules } from "src/enums";
 
 const options = reactive({
     apiPath: serverApis.services,
-    pageName: storeModules.services,
+    storeModule: storeModules.services,
     formInputs: {
         id: "",
         name: "",
         description: "",
         imageFile: {},
-        imageUrl: "",
-    },
+        imageUrl: ""
+    }
 });
 const app = useApp();
 const formData = reactive({ ...options.formInputs });
@@ -71,7 +73,7 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    name: { required: required, maxLength: maxLength(75) }
 };
 const v$ = useVuelidate(rules, formData); // form validation
 
@@ -79,19 +81,19 @@ const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit
 
 const { saving } = toRefs(page.state);
 const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList, load } = page.methods;
+const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
 
 useMeta(() => {
     return {
-        title: $t("addNewSampletable"),
+        title: $t("addNewSampletable")
     };
 });
 
 onMounted(() => {
-    load();
+    page.load();
 });
 
 defineExpose({
-    page,
+    page
 });
 </script>

@@ -81,7 +81,8 @@ export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSub
         state.loading = true;
         state.item = null;
         try {
-            currentRecord.value = await fetchRecord(apiPath, editId.value);
+            const data = await fetchRecord(apiPath, editId.value);
+            currentRecord.value = data.data;
             state.loading = false;
             Object.assign(formData, currentRecord.value);
         } catch (e) {
@@ -123,6 +124,7 @@ export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSub
         formData,
         state,
         computedProps,
-        methods
+        methods,
+        load
     };
 }

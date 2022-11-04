@@ -1,11 +1,6 @@
 {
   "services": [
     {
-      "id": "8529eab0d83",
-      "name": "  Product 1",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
-    },
-    {
       "id": "85299d83",
       "name": "product 2  ",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
@@ -358,26 +353,6 @@
   "subscriptions": [
     {
       "id": "1",
-      "name": "Subscriper name",
-      "Tel": "0555555555",
-      "email": "abc@examplc.com",
-      "subscriptionDate": "1/4/2022",
-      "status": "active",
-      "recentPackage": "package",
-      "balance": "2000"
-    },
-    {
-      "id": "2",
-      "name": "Subscriper name",
-      "Tel": "0555555555",
-      "email": "abc@examplc.com",
-      "subscriptionDate": "1/4/2022",
-      "status": "active",
-      "recentPackage": "package",
-      "balance": "2000"
-    },
-    {
-      "id": "3",
       "name": "Subscriper name",
       "Tel": "0555555555",
       "email": "abc@examplc.com",

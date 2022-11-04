@@ -1,4 +1,4 @@
-import {ApiService} from "src/services/api-service";
+import { ApiService } from "src/services/api-service";
 
 export const crud = {
     namespaced: true,
@@ -9,7 +9,7 @@ export const crud = {
         showAddRecord: false,
         showEditRecord: false,
         editRecordId: null,
-        clickedRecord: null,
+        clickedRecord: null
     }),
     getters: {
         records(state) {
@@ -29,7 +29,7 @@ export const crud = {
         },
         clickedRecord(state) {
             return state.clickedRecord;
-        },
+        }
     },
     mutations: {
         setRecords(state, records) {
@@ -83,11 +83,11 @@ export const crud = {
             }
         },
         setShowEditRecord(state, value) {
-            let {show = false, editRecordId = null} = value;
+            let { show = false, id = null } = value;
             if (!show && value === true) show = true;
-            if (!show) editRecordId = null;
+            if (!show) id = null;
             state.showEditRecord = show;
-            state.editRecordId = editRecordId;
+            state.editRecordId = id;
             if (show === true) state.showAddRecord = false;
         },
         setEditRecordId(state, value) {
@@ -98,10 +98,10 @@ export const crud = {
         },
         setClickedRecord(state, value) {
             state.clickedRecord = value;
-        },
+        }
     },
     actions: {
-        search: ({commit}, payload) => {
+        search: ({ commit }, payload) => {
             return new Promise((resolve, reject) => {
                 let url = payload.url;
                 let body = payload.criteria;
@@ -126,7 +126,7 @@ export const crud = {
                 });
             });
         },
-        fetchRecord: ({commit}, data) => {
+        fetchRecord: ({ commit }, data) => {
             let url = data.url;
             let id = data.id;
             return new Promise((resolve, reject) => {
@@ -139,7 +139,7 @@ export const crud = {
                     });
             });
         },
-        saveRecord: ({commit}, data) => {
+        saveRecord: ({ commit }, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
@@ -151,7 +151,7 @@ export const crud = {
                     });
             });
         },
-        updateRecord: ({commit}, data) => {
+        updateRecord: ({ commit }, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
@@ -163,7 +163,7 @@ export const crud = {
                     });
             });
         },
-        deleteRecord: ({commit}, data) => {
+        deleteRecord: ({ commit }, data) => {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let id = data.id;
