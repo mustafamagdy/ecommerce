@@ -1,7 +1,7 @@
 <template>
-    <div class="column justify-between q-mb-sm col-grow">
+    <div class="column justify-around q-mb-sm col-grow">
         <div class="colum">
-            <div class="row justify-between">
+            <div class="row justify-between no-wrap">
                 <div class="row items-center q-ma-sm">
                     <span class="q-mr-sm">{{ $t("Customer name") }} </span>
                     <q-input readonly :label="$t('customer-name')" class="q-mr-sm" />
@@ -41,13 +41,13 @@
         <q-separator class="q-mt-sm" inset />
         <q-scroll-area class="col-grow panel" visible>
             <div class="row q-pa-md items-start justify-around q-gutter-md">
-                <div class="col-6 col-sm-4 col-md-3 col-lg-3 q-ma-sm" v-for="record in page.records" :key="record.id">
+                <div class="q-ma-sm" v-for="record in page.records" :key="record.id" style="min-width: 250px">
                     <q-card class="my-card items-start row text-center" clickable>
                         <q-card-section class="column" horizontal>
                             <q-item>
                                 <q-item-section avatar>
                                     <q-avatar>
-                                        <img src="https://loremflickr.com/300/300/abstract" />
+                                        <img :src="record.imageUrl" />
                                     </q-avatar>
                                 </q-item-section>
                                 <q-item-section>
@@ -116,22 +116,21 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <create-box /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <customersAddEdit /> </q-dialog>
     </div>
 </template>
 <script setup>
-import { useList } from "src/composables/useList";
+import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-
+import customersAddEdit from "./customersAddEdit.vue";
 const page = reactive(
-    useList({
+    useCRUDList({
         apiPath: serverApis.customers,
         storeModule: storeModules.customers,
         pageSize: 9,
     })
 );
-
 onMounted(() => {
     page.load();
 });

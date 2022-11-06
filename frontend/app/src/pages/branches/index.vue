@@ -14,15 +14,10 @@
         <q-separator class="q-mt-sm" inset />
         <q-scroll-area class="col-grow panel" visible>
             <div class="row q-pa-sm items-start justify-around q-gutter-md">
-                <div class="col-6 col-sm-3 col-md-3 col-lg-3 q-ma-sm" v-for="record in page.records" :key="record.id">
+                <div class="q-ma-sm" v-for="record in page.records" :key="record.id">
                     <q-card class="my-card items-start row text-center" clickable>
                         <q-card-section class="column">
                             <q-item>
-                                <q-item-section avatar>
-                                    <q-avatar rounded size="60px">
-                                        <img src="https://loremflickr.com/300/300/abstract" />
-                                    </q-avatar>
-                                </q-item-section>
                                 <q-separator vertical inset class="q-mr-md" />
                                 <q-item-section>
                                     <q-item-label class="q-mb-sm">{{ record.name }}</q-item-label>
@@ -106,14 +101,14 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <create-box /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <branchesAddEdit /> </q-dialog>
     </div>
 </template>
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-
+import branchesAddEdit from "./branchesAddEdit.vue";
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.branches,

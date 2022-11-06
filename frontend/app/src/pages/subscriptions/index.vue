@@ -1,10 +1,12 @@
 <template>
     <div class="column justify-between q-mb-sm col-grow">
-        <div class="colum">
-            <div class="row justify-between">
+        <div class="column">
+            <div class="row no-wrap justify-around">
                 <div class="row items-center q-ma-sm">
-                    <span class="q-mr-sm">{{ $t("Name : ") }} </span>
-                    <q-select :options="options" transition-show="scale" transition-hide="scale" label="Names" />
+                    <span class="q-mr-sm q-gutter-md">{{ $t("Name : ") }} </span>
+                    <q-select v-model="names" :options="options" transition-show="scale" transition-hide="scale" label="Names">
+                        <template v-slot:label> Names </template>
+                    </q-select>
                 </div>
                 <div class="row items-center q-ma-sm">
                     <span class="q-mr-sm">{{ $t("Mobile number") }} </span>
@@ -45,7 +47,7 @@
             </div>
         </div>
         <div class="column">
-            <div class="row justify-between">
+            <div class="row justify-between no-wrap">
                 <div class="row items-center q-ma-sm">
                     <span class="q-mr-sm">{{ $t("Balance from :") }} </span>
                     <q-input readonly :label="$t('from_date')" class="q-mr-sm" />
@@ -57,15 +59,21 @@
                 <div class="row items-center q-ma-sm">
                     <span class="q-mr-sm">{{ $t("Status : ") }} </span>
                     <div class="q-gutter-sm">
-                        <q-radio v-model="status" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="active" label="Active" />
                         <q-radio
-                            v-model="status"
+                            v-model="isActive"
+                            checked-icon="task_alt"
+                            unchecked-icon="panorama_fish_eye"
+                            val="active"
+                            label="Active"
+                        />
+                        <q-radio
+                            v-model="isActive"
                             checked-icon="task_alt"
                             unchecked-icon="panorama_fish_eye"
                             val="inactive"
                             label="Inactive"
                         />
-                        <q-radio v-model="status" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="all" label="All" />
+                        <q-radio v-model="isActive" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="all" label="All" />
                     </div>
                 </div>
             </div>
@@ -116,7 +124,9 @@
                                 <span class="col-grow text-body1">{{ props.row.subscriptionDate }}</span>
                             </q-td>
                             <q-td>
-                                <span class="col-grow text-body1">{{ props.row.status }}</span>
+                                <span class="col-grow text-body1">
+                                    {{ props.row.isActive ? $t("active") : $t("deactive") }}
+                                </span>
                             </q-td>
                             <q-td>
                                 <span class="col-grow text-body1">{{ props.row.recentPackage }}</span>
@@ -141,6 +151,36 @@
                                                     </q-item-section>
                                                     <q-item-section>
                                                         {{ $t("btn_delete") }}
+                                                    </q-item-section>
+                                                </q-item>
+                                                <q-item clickable v-ripple>
+                                                    <q-item-section>
+                                                        <q-icon
+                                                            size="md"
+                                                            :name="
+                                                                props.row.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'
+                                                            "
+                                                        ></q-icon>
+                                                    </q-item-section>
+                                                    <q-item-section>
+                                                        {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
+                                                    </q-item-section>
+                                                </q-item>
+                                                <q-item clickable v-ripple>
+                                                    <q-item-section>
+                                                        <q-icon size="md" name="login" />
+                                                    </q-item-section>
+                                                    <q-item-section>
+                                                        {{ $t("manager") }}
+                                                    </q-item-section>
+                                                </q-item>
+
+                                                <q-item clickable v-ripple>
+                                                    <q-item-section>
+                                                        <q-icon size="md" name="highlight_off" />
+                                                    </q-item-section>
+                                                    <q-item-section>
+                                                        {{ $t("close") }}
                                                     </q-item-section>
                                                 </q-item>
                                             </q-list>
@@ -170,7 +210,7 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive, ref } from "vue-demi";
-
+const names = ref("Names");
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.subscriptions,
@@ -178,8 +218,9 @@ const page = reactive(
         pageSize: 8,
     })
 );
-const status = ref("all");
+const isActive = ref("all");
 const date = ref("2022/11/03");
+
 const options = ["subscriper 1 name", "subscriper 2 name", "subscriper 3 name", "subscriper 4 name", "subscriper 5 name"];
 onMounted(() => {
     page.load();

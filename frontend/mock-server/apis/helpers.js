@@ -8,18 +8,19 @@ export const doSearch = async (req, tableName) => {
     await db.read();
     const totalCount = db.data[tableName].length;
     const pageSize = req.body.pageSize > 0 ? req.body.pageSize : totalCount;
-    const totalPages = totalCount > pageSize ? Math.ceil(totalCount / pageSize) : 1;
+    const totalPages =
+      totalCount > pageSize ? Math.ceil(totalCount / pageSize) : 1;
     const currentPage = req.body.pageNumber;
     const startIndex = pageSize * (currentPage - 1);
     let arr = db.data[tableName].slice(startIndex, startIndex + pageSize);
     return {
-      "data": arr,
-      "currentPage": currentPage,
-      "totalPages": totalPages,
-      "totalCount": totalCount,
-      "pageSize": pageSize,
-      "hasPreviousPage": req.body.pageNumber !== 1,
-      "hasNextPage": req.body.pageNumber !== totalPages
+      data: arr,
+      currentPage: currentPage,
+      totalPages: totalPages,
+      totalCount: totalCount,
+      pageSize: pageSize,
+      hasPreviousPage: req.body.pageNumber !== 1,
+      hasNextPage: req.body.pageNumber !== totalPages,
     };
   } catch (err) {
     throw err;
@@ -46,4 +47,3 @@ export const update = (app, api) => {
     res.send(req.params.id);
   });
 };
-

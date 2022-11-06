@@ -10,7 +10,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
 
 <template>
     <div class="col-grow column items-stretch justify-start">
-        <div class="col-12 col-sm-6 column q-pa-sm">
+        <div class="q-pa-sm">
             <div class="row justify-between items-center">
                 <span>{{ $t("Boxes_Categories") }} : {{ selectedCategorie }}</span>
                 <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
@@ -38,13 +38,13 @@ import ViewBoxesList from "./ViewBoxes.vue";
         </div>
         <q-scroll-area class="col-grow panel" visible>
             <div class="row q-pa-md items-start justify-around q-gutter-md">
-                <div class="col-6 col-sm-4 col-md-3 col-lg-3 q-ma-sm" v-for="record in page.records" :key="record.id">
+                <div class="q-ma-sm" v-for="record in page.records" :key="record.id" style="min-width: 250px">
                     <q-card class="my-card text-center" clickable>
                         <q-card-section class="column">
                             <q-item>
                                 <q-item-section avatar>
-                                    <q-icon v-if="record.type === 'box'" color="primary" name="inventory" />
-                                    <q-icon v-else-if="record.type === 'bank account'" color="primary" name="account_balance" />
+                                    <q-icon v-if="record.typeOfBox === 'box'" color="primary" name="inventory" />
+                                    <q-icon v-else-if="record.typeOfBox === 'bank account'" color="primary" name="account_balance" />
                                 </q-item-section>
                                 <q-item-section>
                                     <q-item-label>{{ record.boxName }}</q-item-label>
@@ -130,7 +130,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <create-box /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit"><financialBoxesAddEdit /></q-dialog>
     </div>
 </template>
 
@@ -138,8 +138,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive, ref } from "vue-demi";
-import EditBox from "./EditBox.vue";
-
+import financialBoxesAddEdit from "./financialBoxesAddEdit";
 const selectedCategorie = ref("all");
 
 const page = reactive(
