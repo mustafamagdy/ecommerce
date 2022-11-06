@@ -52,6 +52,7 @@
                                             icon="preview"
                                             padding="xs"
                                             class="bg-color-info"
+                                            :label="app.btnLabel('btn_filters')"
                                             @click="page.showEdit = { show: true, editId: props.row.id }"
                                         />
                                         <!-- <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
@@ -75,11 +76,35 @@
                     </q-table>
                 </q-scroll-area>
                 <div class="column q-pa-md">
-                    <q-table title="Totals" dense :rows="rows" :columns="columns" row-key="name" hide-bottom />
+                    <q-markup-table :separator="separator" flat bordered>
+                        <thead>
+                            <tr>
+                                <th class="text-center"></th>
+                                <th class="text-center">{{ $t("total") }}</th>
+                                <th class="text-center">{{ $t("paid") }}</th>
+                                <th class="text-center">{{ $t("rest") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">{{ $t("Total") }}</td>
+                                <td class="text-center">{{ page.totals.total }}</td>
+                                <td class="text-center">{{ page.totals.paid }}</td>
+                                <td class="text-center">{{ page.totals.rest }}</td>
+                            </tr>
+                        </tbody></q-markup-table
+                    >
                 </div>
-                <q-dialog v-model="page.showAddOrEdit" persistent>
-                    <ServicesAddEdit />
-                </q-dialog>
+                <div class="column q-mt-md flex flex-center">
+                    <q-pagination
+                        v-model="page.currentPage"
+                        :max="page.totalPages"
+                        boundary-links
+                        direction-links
+                        input
+                        @update:model-value="page.load"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -87,12 +112,15 @@
 <script setup>
 import { useList } from "src/composables/useList";
 import { serverApis, storeModules } from "src/enums";
-import { onMounted, reactive } from "vue-demi";
+import { onMounted, reactive, ref } from "vue-demi";
+import { useApp } from "src/composables/app";
 
+const app = useApp();
 const page = reactive(
     useList({
         apiPath: serverApis.bills,
         storeModule: storeModules.bills,
+        pageSize: 5,
     })
 );
 
@@ -110,15 +138,19 @@ const columns = [
     { name: "rest", align: "center", label: "Rest", field: "rest" },
 ];
 
-const rows = [
-    {
-        name: "",
-        all: 292992929,
-        paid: 28828828,
-        rest: 20000,
-    },
-];
 onMounted(() => {
     page.load();
 });
+const all = page.totals.total;
+const paid = page.totals.paid;
+const rest = page.totals.rest;
+
+const rows = [
+    {
+        name: "",
+        all,
+        paid,
+        rest,
+    },
+];
 </script>

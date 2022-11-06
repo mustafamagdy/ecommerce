@@ -1,18 +1,15 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
-        <div class="text-h6 q-mb-md">{{ $t("addNewSampletable") }}</div>
+        <div class="text-h6 q-mb-md">{{ $t("addNewBranch") }}</div>
         <q-form ref="observer" @submit.prevent="submitForm()">
-            <!-- <div>
-                <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
-            </div> -->
             <div class="row q-ma-md">
-                <div class="col">{{ $t("service_name") }} *</div>
+                <div class="col">{{ $t("branch-name") }} *</div>
                 <div class="col">
                     <q-input v-model.trim="formData.name" :error="v$.name.$error" :error-message="getFieldErrorsMsg(v$.name)"></q-input>
                 </div>
             </div>
-            <div class="col-12 row q-ma-md">
-                <div class="col">{{ $t("service_description") }} *</div>
+            <div class="row q-ma-md">
+                <div class="col">{{ $t("branch-descriptions") }} *</div>
                 <div class="col">
                     <q-input v-model.trim="formData.description" type="textarea"></q-input>
                 </div>
@@ -41,23 +38,18 @@ import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
 const options = reactive({
-    apiPath: serverApis.services,
-    storeModule: storeModules.services,
+    apiPath: serverApis.branches,
+    storeModule: storeModules.branches,
     formInputs: {
         id: "",
         name: "",
         description: "",
-        imageFile: {},
-        imageUrl: "",
     },
 });
 const app = useApp();
 const formData = reactive({ ...options.formInputs });
 
 function beforeSubmit() {
-    delete formData.imageUrl;
-    formData.imageFile.name = uid();
-    if (showAdd.value) delete formData.id;
     return true;
 }
 

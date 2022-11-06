@@ -17,6 +17,7 @@ export const useList = ({
     const currentPage = ref(1);
     const totalRecords = ref(0);
     const totalPages = ref(0);
+    let totals = reactive({});
     let records = computed({
         get() {
             return store.getters[`${storeModule}/${listName}`];
@@ -34,9 +35,11 @@ export const useList = ({
         try {
             let data = await search(apiPath + "/search", criteria);
             records.value = data.data;
+            console.log(data);
             totalRecords.value = data.totalCount;
             totalPages.value = data.totalPages;
             loading.value = false;
+            Object.assign(totals, data.totals);
         } catch (e) {
             loading.value = false;
             app.showPageRequestError(e);
@@ -49,6 +52,7 @@ export const useList = ({
         totalRecords,
         totalPages,
         records,
+        totals,
         load,
     };
 };
