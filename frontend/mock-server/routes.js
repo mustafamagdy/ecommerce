@@ -11,4 +11,5 @@ export const initRoutes = (app) => {
   billsApis(app, "bills");
   crudApis(app, "branches");
   crudApis(app, "subscriptions");
+  crudApis(app, "financialBoxesTransactions");
 };

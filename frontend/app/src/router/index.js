@@ -40,6 +40,13 @@ let routes = [
                 props: true,
             },
             {
+                path: "/productsPricingManagement",
+                name: "productsPricingManagement",
+                component: () =>
+                    import("src/pages/products/products-pricing-management"),
+                props: true,
+            },
+            {
                 path: "/pointOfSales",
                 name: "pointOfSales",
                 component: () => import("src/pages/point-of-sales/index.vue"),
@@ -52,15 +59,25 @@ let routes = [
                 props: true,
             },
             {
+                path: "/financialBoxesTransactions",
+                name: "financialBoxesTransactions",
+                component: () =>
+                    import(
+                        "src/pages/financial-boxes/financialBoxes-transactions.vue"
+                    ),
+                props: true,
+            },
+            {
                 path: "/customers",
                 name: "customers",
                 component: () => import("src/pages/customers/index.vue"),
                 props: true,
             },
             {
-                path: "/bills",
-                name: "bills",
-                component: () => import("src/pages/customers/bills"),
+                path: "/customerBills",
+                name: "customerBills",
+                component: () =>
+                    import("src/pages/customers/customer-bills.vue"),
                 props: true,
             },
             {

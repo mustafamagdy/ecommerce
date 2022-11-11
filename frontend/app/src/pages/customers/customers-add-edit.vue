@@ -1,10 +1,10 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
-            <div class="q-ma-xl text-center">
+            <div class="q-ma-sm text-center">
                 <div class="text-h5 q-pa-md">{{ $t(" Add new Customer") }}</div>
 
-                <div class="column q-pa-md" style="max-width: 400px">
+                <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
                         <div class="row justify-between no-wrap">
                             <q-input

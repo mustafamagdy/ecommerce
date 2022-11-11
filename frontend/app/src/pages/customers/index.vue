@@ -84,7 +84,7 @@
                                                             {{ record.isActive ? $t("deactivate") : $t("activate") }}
                                                         </q-item-section>
                                                     </q-item>
-                                                    <q-item clickable v-ripple to="bills">
+                                                    <q-item clickable v-ripple to="customerBills">
                                                         <q-item-section>
                                                             <q-icon size="md" name="receipt_long" />
                                                         </q-item-section>
@@ -123,7 +123,7 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import customersAddEdit from "./customersAddEdit.vue";
+import customersAddEdit from "./customers-add-edit.vue";
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.customers,

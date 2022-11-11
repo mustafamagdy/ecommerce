@@ -26,6 +26,7 @@ export default store(function (/* { ssrContext } */) {
             bills: crud,
             branches: crud,
             subscriptions: crud,
+            financialBoxesTransactions: crud,
         },
         // enable strict mode (adds overhead!)
         // for dev mode and --debug builds only
