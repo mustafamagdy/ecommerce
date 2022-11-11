@@ -7,4 +7,5 @@ export const storeModules = {
     bills: "bills",
     branches: "branches",
     subscriptions: "subscriptions",
+    financialBoxesTransactions: "financialBoxesTransactions",
 };

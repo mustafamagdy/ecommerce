@@ -108,7 +108,7 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import branchesAddEdit from "./branchesAddEdit.vue";
+import branchesAddEdit from "./branches-add-edit.vue";
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.branches,

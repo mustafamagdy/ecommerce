@@ -1,10 +1,10 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
         <div class="row">
-            <div class="q-ma-xl text-center">
+            <div class="q-ma-sm text-center">
                 <div class="text-h5 q-pa-md">{{ $t(" Add Box") }}</div>
 
-                <div class="q-pa-md" style="max-width: 400px">
+                <div class="q-pa-md" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
                         <q-select
                             filled

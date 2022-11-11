@@ -417,5 +417,71 @@
       "recentPackage": "package",
       "balance": "2000"
     }
+  ],
+  "financialBoxesTransactions": [
+    {
+      "id": "1",
+      "oprertionType": "Type3",
+      "date": "5/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "false"
+    },
+    {
+      "id": "2",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "true",
+      "creditor": "false"
+    },
+    {
+      "id": "3",
+      "oprertionType": "Type2",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false;",
+      "creditor": "false"
+    },
+    {
+      "id": "4",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "true"
+    },
+    {
+      "id": "5",
+      "oprertionType": "Type3",
+      "date": "5/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "false"
+    },
+    {
+      "id": "6",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "true",
+      "creditor": "false"
+    },
+    {
+      "id": "7",
+      "oprertionType": "Type2",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false;",
+      "creditor": "false"
+    },
+    {
+      "id": "8",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "true"
+    }
   ]
 }
