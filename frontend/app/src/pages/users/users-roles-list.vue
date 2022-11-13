@@ -15,13 +15,13 @@
         <q-separator class="q-mt-sm" inset />
 
         <q-scroll-area class="col-grow panel" visible>
-            <div class="row q-pa-md items-start justify-around q-gutter-md">
+            <div class="row items-start justify-around q-gutter-md">
                 <div class="q-ma-sm" v-for="record in page.records" :key="record.id" style="max-width: 200px">
                     <q-card class="my-card items-start row text-center" clickable>
                         <q-card-section class="column" horizontal>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label class="q-mb-sm">{{ record.jobTitle }}</q-item-label>
+                                    <q-item-label class="q-mb-sm">{{ record.roleTitle }}</q-item-label>
                                     <div class="row">
                                         <q-btn
                                             icon="mdi-playlist-edit"
@@ -79,11 +79,11 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import employeeAddJob from "./employee-add-job.vue";
+import employeeAddJob from "./users-add-role.vue";
 const page = reactive(
     useCRUDList({
-        apiPath: serverApis.employeesJobs,
-        storeModule: storeModules.employeesJobs,
+        apiPath: serverApis.roles,
+        storeModule: storeModules.roles,
         pageSize: 9,
     })
 );

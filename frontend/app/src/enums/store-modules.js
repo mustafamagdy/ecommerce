@@ -9,6 +9,6 @@ export const storeModules = {
     subscriptions: "subscriptions",
     financialBoxesTransactions: "financialBoxesTransactions",
     subscriptionAccountStatement: "subscriptionAccountStatement",
-    employeesJobs: "employeesJobs",
-    employees: "employees",
+    roles: "roles",
+    users: "users",
 };

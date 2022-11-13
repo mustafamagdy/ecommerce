@@ -102,9 +102,9 @@ let routes = [
                 props: true,
             },
             {
-                path: "/employees",
-                name: "employees",
-                component: () => import("src/pages/employees/index"),
+                path: "/users",
+                name: "users",
+                component: () => import("src/pages/users/index"),
                 props: true,
             },
             //Error pages

@@ -26,7 +26,7 @@
                                     </q-avatar>
                                 </q-item-section>
                                 <q-item-section>
-                                    <q-item-label class="q-mb-sm">{{ record.employeeName }} </q-item-label>
+                                    <q-item-label class="q-mb-sm">{{ record.name }} </q-item-label>
                                     <div class="row">
                                         <q-btn
                                             icon="mdi-playlist-edit"
@@ -66,18 +66,18 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <employeeAddEmployee /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddUser /> </q-dialog>
     </div>
 </template>
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import employeeAddEmployee from "./employee-add-employee.vue";
+import usersAddUser from "./users-add-user.vue";
 const page = reactive(
     useCRUDList({
-        apiPath: serverApis.employees,
-        storeModule: storeModules.employees,
+        apiPath: serverApis.users,
+        storeModule: storeModules.users,
         pageSize: 9,
     })
 );
