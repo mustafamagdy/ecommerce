@@ -87,9 +87,24 @@ let routes = [
                 props: true,
             },
             {
+                path: "/subscriptionsManagement",
+                name: "subscriptionsManagement",
+                component: () =>
+                    import(
+                        "src/pages/subscriptions/subscriptions-management.vue"
+                    ),
+                props: true,
+            },
+            {
                 path: "/branches",
                 name: "branches",
                 component: () => import("src/pages/branches/index.vue"),
+                props: true,
+            },
+            {
+                path: "/employees",
+                name: "employees",
+                component: () => import("src/pages/employees/index"),
                 props: true,
             },
             //Error pages

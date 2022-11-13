@@ -418,6 +418,44 @@
       "balance": "2000"
     }
   ],
+  "subscriptionAccountStatement": [
+    {
+      "billNum": "1",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "2",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "3",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "4",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    }
+  ],
   "financialBoxesTransactions": [
     {
       "id": "1",
@@ -482,6 +520,75 @@
       "statement": "no-statement",
       "debtor": "false",
       "creditor": "true"
+    }
+  ],
+  "employeesJobs": [
+    {
+      "id": "1",
+      "jobTitle": "manager",
+      "isActive": "true"
+    },
+    {
+      "id": "2",
+      "jobTitle": "employee",
+      "isActive": "false"
+    },
+    {
+      "id": "3",
+      "jobTitle": "employee",
+      "isActive": "true"
+    },
+    {
+      "id": "4",
+      "jobTitle": "employee",
+      "isActive": "false"
+    },
+    {
+      "id": "5",
+      "jobTitle": "employee",
+      "isActive": "true"
+    }
+  ],
+  "employees": [
+    {
+      "id": "1",
+      "employeeName": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "2",
+      "employeeName": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "3",
+      "employeeName": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "4",
+      "employeeName": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
     }
   ]
 }

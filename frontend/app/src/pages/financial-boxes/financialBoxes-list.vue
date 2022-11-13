@@ -117,7 +117,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="page.showAddOrEdit"> <financialBoxesAddEdit /></q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" :showAdd="page.showAdd"> <financialBoxesAddEdit /></q-dialog>
     </div>
 </template>
 
