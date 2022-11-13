@@ -2,15 +2,15 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t(" Add new Employee") }}</div>
+                <div class="text-h5 q-pa-md">{{ $t(" Add new User") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
                         <q-input
                             class="q-ma-sm"
                             filled
-                            v-model="formData.employeeName"
-                            :label="$t('Employee-name')"
+                            v-model="formData.name"
+                            :label="$t('User-name')"
                             lazy-rules
                             :rules="[(val) => (val && val.length > 0) || 'Please type something']"
                         />
@@ -63,12 +63,12 @@
                         </div>
                         <q-field readonly class="q-my-sm">
                             <template v-slot:control>
-                                <div class="self-center full-width no-outline">Or choose recent employee</div>
+                                <div class="self-center full-width no-outline">Or choose recent user</div>
                             </template>
                         </q-field>
-                        <q-select filled v-model="formData.employeeName" :options="employeeOptions" :label="$t('choose employee')" />
+                        <q-select filled v-model="formData.nameame" :options="userOptions" :label="$t('choose user')" />
                         <div class="row flex-center q-my-sm">
-                            <q-btn :label="$t('Add-employee')" icon="add" type="submit" :loading="saving" class="bg-color-positive">
+                            <q-btn :label="$t('Add-user')" icon="add" type="submit" :loading="saving" class="bg-color-positive">
                                 <template v-slot:loading>
                                     <q-spinner-oval />
                                 </template>
@@ -97,7 +97,7 @@ const options = reactive({
     storeModule: storeModules.customers,
     formInputs: {
         id: "",
-        employeeName: "",
+        name: "",
         username: "",
         Password: "",
         email: "",
@@ -108,7 +108,7 @@ const options = reactive({
 });
 const app = useApp();
 const formData = reactive({ ...options.formInputs });
-const employeeOptions = ["emp1", "emp2", "emp3"];
+const userOptions = ["emp1", "emp2", "emp3"];
 
 function beforeSubmit() {
     delete formData.imageUrl;

@@ -8,6 +8,6 @@ export const serverApis = {
     subscriptions: `${baseURL}/subscriptions`,
     financialBoxesTransactions: `${baseURL}/financialBoxesTransactions`,
     subscriptionAccountStatement: `${baseURL}/subscriptionAccountStatement`,
-    employeesJobs: `${baseURL}/employeesJobs`,
-    employees: `${baseURL}/employees`,
+    roles: `${baseURL}/roles`,
+    users: `${baseURL}/users`,
 };

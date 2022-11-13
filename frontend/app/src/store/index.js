@@ -28,8 +28,8 @@ export default store(function (/* { ssrContext } */) {
             subscriptions: crud,
             financialBoxesTransactions: crud,
             subscriptionAccountStatement: crud,
-            employeesJobs: crud,
-            employees: crud,
+            roles: crud,
+            users: crud,
         },
         // enable strict mode (adds overhead!)
         // for dev mode and --debug builds only

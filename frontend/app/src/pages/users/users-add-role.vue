@@ -2,7 +2,7 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t(" Add new job") }}</div>
+                <div class="text-h5 q-pa-md">{{ $t(" Add new role") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="text-right">
@@ -10,8 +10,8 @@
                             <q-input
                                 class="q-ma-sm flex"
                                 filled
-                                v-model="formData.jobName"
-                                :label="$t('job-Name')"
+                                v-model="formData.roleName"
+                                :label="$t('role-Name')"
                                 lazy-rules
                                 :rules="[(val) => (val && val.length > 0) || 'Please type something']"
                             />
@@ -49,11 +49,11 @@ import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
 const options = reactive({
-    apiPath: serverApis.employeesJobs,
-    storeModule: storeModules.employeesJobs,
+    apiPath: serverApis.roles,
+    storeModule: storeModules.roles,
     formInputs: {
         id: "",
-        jobName: "",
+        roleName: "",
     },
 });
 const app = useApp();

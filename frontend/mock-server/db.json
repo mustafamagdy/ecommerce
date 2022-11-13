@@ -522,37 +522,37 @@
       "creditor": "true"
     }
   ],
-  "employeesJobs": [
+  "roles": [
     {
       "id": "1",
-      "jobTitle": "manager",
+      "roleTitle": "manager",
       "isActive": "true"
     },
     {
       "id": "2",
-      "jobTitle": "employee",
+      "roleTitle": "employee",
       "isActive": "false"
     },
     {
       "id": "3",
-      "jobTitle": "employee",
+      "roleTitle": "employee",
       "isActive": "true"
     },
     {
       "id": "4",
-      "jobTitle": "employee",
+      "roleTitle": "employee",
       "isActive": "false"
     },
     {
       "id": "5",
-      "jobTitle": "employee",
+      "roleTitle": "employee",
       "isActive": "true"
     }
   ],
-  "employees": [
+  "users": [
     {
       "id": "1",
-      "employeeName": "Ali Ahmed",
+      "name": "Ali Ahmed",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
@@ -562,7 +562,7 @@
     },
     {
       "id": "2",
-      "employeeName": "Ali Ahmed",
+      "name": "Ali Ahmed",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
@@ -572,7 +572,7 @@
     },
     {
       "id": "3",
-      "employeeName": "Ali Ahmed",
+      "name": "Ali Ahmed",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
@@ -582,7 +582,7 @@
     },
     {
       "id": "4",
-      "employeeName": "Ali Ahmed",
+      "name": "Ali Ahmed",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
