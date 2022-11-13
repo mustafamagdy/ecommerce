@@ -4,8 +4,9 @@
             <div class="row no-wrap justify-around">
                 <div class="row items-center q-ma-sm">
                     <span class="q-mr-sm q-gutter-md">{{ $t("Name : ") }} </span>
-                    <q-select v-model="names" :options="options" transition-show="scale" transition-hide="scale" label="Names">
-                        <template v-slot:label> Names </template>
+                    <q-select v-model="names" :options="options" transition-show="scale" transition-hide="scale"
+                              label="Names">
+                        <template v-slot:label> Names</template>
                     </q-select>
                 </div>
                 <div class="row items-center q-ma-sm">
@@ -73,7 +74,8 @@
                             val="inactive"
                             label="Inactive"
                         />
-                        <q-radio v-model="isActive" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="all" label="All" />
+                        <q-radio v-model="isActive" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="all"
+                                 label="All" />
                     </div>
                 </div>
             </div>
@@ -106,7 +108,7 @@
                 >
                     <template v-slot:body="props">
                         <q-tr @click="page.clickedRecord = props.row">
-                            <q-td> </q-td>
+                            <q-td></q-td>
 
                             <q-td>
                                 <span class="col-grow text-body1">{{ props.row.id }}</span>
@@ -166,7 +168,7 @@
                                                         {{ props.row.isActive ? $t("deactivate") : $t("activate") }}
                                                     </q-item-section>
                                                 </q-item>
-                                                <q-item clickable v-ripple>
+                                                <q-item clickable to="subscriptionsManagement" v-ripple>
                                                     <q-item-section>
                                                         <q-icon size="md" name="login" />
                                                     </q-item-section>
@@ -203,19 +205,22 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <create-box /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent>
+            <create-box />
+        </q-dialog>
     </div>
 </template>
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive, ref } from "vue-demi";
+
 const names = ref("Names");
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.subscriptions,
         storeModule: storeModules.subscriptions,
-        pageSize: 8,
+        pageSize: 8
     })
 );
 const isActive = ref("all");

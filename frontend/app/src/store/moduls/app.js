@@ -32,7 +32,7 @@ export const app = {
         settings: {
             ui: {
                 btn: {
-                    showLabel:false
+                    showLabel:true
                 }
             }
         }

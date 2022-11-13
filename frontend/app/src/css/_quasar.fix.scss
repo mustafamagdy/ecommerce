@@ -25,11 +25,16 @@
     }
 }
 
-.q-field__control{
+.q-field__control {
     height: unset;
 }
-.q-tab-panels{
+
+.q-tab-panels {
     background: unset;
+
+    .q-panel {
+        position: absolute;
+    }
 }
 
 .q-scrollarea__container {

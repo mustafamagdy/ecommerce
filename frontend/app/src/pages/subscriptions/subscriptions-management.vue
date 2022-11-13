@@ -1,5 +1,5 @@
 <template>
-    <div class="column justify-around q-mb-sm">
+    <div class="column col-grow justify-around q-mb-sm">
         <div class="column no-wrap">
             <div class="row justify-between items-center q-ma-sm">
                 <q-avatar>
@@ -55,7 +55,7 @@
                 <q-tabs
                     v-model="tab"
                     dense
-                    class="text-grey column"
+                    class="text-grey"
                     active-color="primary"
                     indicator-color="primary"
                     align="justify"
@@ -65,11 +65,10 @@
                     <q-tab name="PackageManagementAndSupport" :label="$t('Package management and support')" />
                     <q-tab name="AccountStatement" :label="$t('Account statement')" />
                 </q-tabs>
-
                 <q-separator />
-                <q-tab-panels v-model="tab" animated class="column col-grow panel">
-                    <q-tab-panel name="data">
-                        <q-scroll-area class="col-grow panel" visible>
+                <q-tab-panels v-model="tab" animated class="col-grow">
+                    <q-tab-panel name="data" class="column col-grow" v-scroll>
+                        <q-scroll-area class="col-grow" visible>
                             <subscriberDataManagement />
                         </q-scroll-area>
                     </q-tab-panel>
