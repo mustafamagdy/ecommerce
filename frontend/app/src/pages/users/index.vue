@@ -1,12 +1,13 @@
 <template>
-    <div class="col-grow row items-stretch justify-start">
-        <div class="col column q-pa-sm">
+    <div class="col-grow row items-stretch justify-around">
+        <div class="column q-pa-sm">
             <usersRuleList />
         </div>
-        <div class="column col-grow justify-between">
-            <div class="row col-grow">
+        <div class="column col col-grow items-stretch">
+            <div class="row col-grow justify-around">
                 <div class="column">
-                    <q-input readonly :label="$t('Selected-role')" class="q-mr-sm" />
+                    <span>{{ $t("Selected-role") }}</span>
+
                     <div class="q-pa-md flex flex-center">
                         <q-option-group :options="options" type="checkbox" v-model="screens" />
                     </div>
@@ -14,7 +15,8 @@
                 <q-separator vertical inset />
 
                 <div class="column">
-                    <q-input readonly :label="$t('Selected-Screen')" class="q-mr-sm" />
+                    <span>{{ $t("Selected-Screen") }} </span>
+
                     <div class="q-pa-md">
                         <q-option-group :options="options" type="checkbox" v-model="screens" />
                     </div>
@@ -24,7 +26,7 @@
                 </div>
                 <q-separator vertical inset />
 
-                <div class="col column col-grow">
+                <div class="column">
                     <usersList class="col-grow" />
                 </div>
             </div>

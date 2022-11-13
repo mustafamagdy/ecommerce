@@ -2,13 +2,13 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t(" Add new role") }}</div>
+                <div class="text-h5">{{ $t(" Add new role") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="text-right">
                         <div class="row flex flex-center">
                             <q-input
-                                class="q-ma-sm flex"
+                                class="q-ma-sm flex full-width"
                                 filled
                                 v-model="formData.roleName"
                                 :label="$t('role-Name')"
