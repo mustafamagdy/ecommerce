@@ -61,6 +61,14 @@ export const AppMenus = {
             submenu: [],
         },
         {
+            path: "/employees",
+            label: $t("employees"),
+            icon: "contacts",
+            iconcolor: "",
+            target: "",
+            submenu: [],
+        },
+        {
             path: "/test",
             label: "test",
             icon: "",
