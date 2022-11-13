@@ -2,7 +2,7 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="row">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t(" Add Box") }}</div>
+                <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Box") : $t(" Edit Box") }}</div>
 
                 <div class="q-pa-md" style="min-width: 400px">
                     <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
@@ -66,10 +66,9 @@ const options = reactive({
     storeModule: storeModules.financialBoxes,
     formInputs: {
         id: "",
-        name: "",
         typeOfBox: "",
         boxName: "",
-        primary: "",
+        isprimary: "",
         managerName: "",
         branch: "",
     },
@@ -128,7 +127,9 @@ const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = p
 //         storeModule: storeModules.branches,
 //     })
 // );
-
+const props = defineProps({
+    showAdd: Object || null,
+});
 const branchOptions = ["branch1", "branch2"];
 
 // page.records.map(function (obj) {

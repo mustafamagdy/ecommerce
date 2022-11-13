@@ -12,4 +12,7 @@ export const initRoutes = (app) => {
   crudApis(app, "branches");
   crudApis(app, "subscriptions");
   crudApis(app, "financialBoxesTransactions");
+  crudApis(app, "subscriptionAccountStatement");
+  crudApis(app, "employeesJobs");
+  crudApis(app, "employees");
 };

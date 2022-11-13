@@ -7,4 +7,7 @@ export const serverApis = {
     branches: `${baseURL}/branches`,
     subscriptions: `${baseURL}/subscriptions`,
     financialBoxesTransactions: `${baseURL}/financialBoxesTransactions`,
+    subscriptionAccountStatement: `${baseURL}/subscriptionAccountStatement`,
+    employeesJobs: `${baseURL}/employeesJobs`,
+    employees: `${baseURL}/employees`,
 };

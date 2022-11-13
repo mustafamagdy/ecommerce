@@ -8,4 +8,7 @@ export const storeModules = {
     branches: "branches",
     subscriptions: "subscriptions",
     financialBoxesTransactions: "financialBoxesTransactions",
+    subscriptionAccountStatement: "subscriptionAccountStatement",
+    employeesJobs: "employeesJobs",
+    employees: "employees",
 };
