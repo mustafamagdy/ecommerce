@@ -20,13 +20,28 @@ export const doSearch = async (req, tableName) => {
       totalCount: totalCount,
       pageSize: pageSize,
       hasPreviousPage: req.body.pageNumber !== 1,
-      hasNextPage: req.body.pageNumber !== totalPages,
+      hasNextPage: req.body.pageNumber !== totalPages
     };
   } catch (err) {
     throw err;
   }
 };
-export const deleteItem = async (id, tableName) => {
+export const getRecord = async (req, tableName) => {
+  try {
+    const db = initDB();
+    await db.read();
+    const id = req.params.id;
+    const rec = db.data[tableName].find(x => x.id === id);
+    if (rec && rec.id) {
+      return rec;
+    } else {
+      throw new Error("record not found");
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+export const deleteRecord = async (id, tableName) => {
   try {
     const db = initDB();
     await db.read();
@@ -37,13 +52,31 @@ export const deleteItem = async (id, tableName) => {
     throw err;
   }
 };
-export const add = (app, api) => {
-  return app.post(`/api/v1/${api}`, cors(), (req, res) => {
-    res.send(faker.datatype.uuid());
-  });
+export const addRecord = async (data, tableName) => {
+  try {
+    const db = initDB();
+    await db.read();
+    data.id = faker.datatype.uuid();
+    db.data[tableName].push(data);
+    await db.write();
+    return data.id;
+  } catch (err) {
+    throw err;
+  }
 };
-export const update = (app, api) => {
-  return app.put(`/api/v1/${api}`, cors(), (req, res) => {
-    res.send(req.params.id);
-  });
+export const updateRecord = async (id, data, tableName) => {
+  try {
+    const db = initDB();
+    await db.read();
+    const index = db.data[tableName].findIndex(x => x.id === id);
+    if (index !== -1) {
+      Object.assign(db.data[tableName][index], data);
+    } else {
+      throw new Error("no record found");
+    }
+    await db.write();
+    return data.id;
+  } catch (err) {
+    throw err;
+  }
 };

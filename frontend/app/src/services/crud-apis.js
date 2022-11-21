@@ -23,10 +23,27 @@ export const deleteRecord = (url, id) => {
         });
     });
 };
-
 export const fetchRecord = (url, id) => {
     return new Promise((resolve, reject) => {
         ApiService.get(`${url}/${id.toString()}`).then(resp => {
+            resolve(resp);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};
+export const saveRecord = (url, payload) => {
+    return new Promise((resolve, reject) => {
+        ApiService.post(url, payload).then(resp => {
+            resolve(resp);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};
+export const updateRecord = (url, payload) => {
+    return new Promise((resolve, reject) => {
+        ApiService.put(url, payload).then(resp => {
             resolve(resp);
         }).catch(err => {
             reject(err);

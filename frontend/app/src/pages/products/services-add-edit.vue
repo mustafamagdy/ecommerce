@@ -1,14 +1,15 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
         <div class="text-h6 q-mb-md">{{ $t("addNewSampletable") }}</div>
-        <q-form ref="observer" @submit.prevent="submitForm()">
+        <q-form ref="observer" @submit.prevent="page.submitForm()">
             <!-- <div>
                 <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
             </div> -->
             <div class="row q-ma-md">
                 <div class="col">{{ $t("service_name") }} *</div>
                 <div class="col">
-                    <q-input v-model.trim="formData.name" :error="v$.name.$error" :error-message="getFieldErrorsMsg(v$.name)"></q-input>
+                    <q-input v-model.trim="formData.name" :error="v$.name.$error"
+                             :error-message="page.getFieldErrorsMsg(v$.name)"></q-input>
                 </div>
             </div>
             <div class="col-12 row q-ma-md">
@@ -18,7 +19,8 @@
                 </div>
             </div>
             <div class="row flex-center no-wrap q-my-md">
-                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="saving" class="bg-color-positive">
+                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="pageState.saving"
+                       class="bg-color-positive">
                     <template v-slot:loading>
                         <q-spinner-oval />
                     </template>
@@ -26,7 +28,6 @@
                 <q-btn :label="$t('btn_close')" icon="mdi-close" class="bg-color-light" v-close-popup />
             </div>
         </q-form>
-        <slot :submit="submitForm" :saving="saving"></slot>
     </q-card>
 </template>
 <script setup>
@@ -40,58 +41,45 @@ import ImagePicker from "src/components/image-picker";
 import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
-const options = reactive({
-    apiPath: serverApis.services,
-    storeModule: storeModules.services,
-    formInputs: {
-        id: "",
-        name: "",
-        description: "",
-        imageFile: {},
-        imageUrl: "",
-    },
-});
+const formInputs = {
+    id: "",
+    name: "",
+    description: "",
+    imageFile: {},
+    imageUrl: ""
+};
 const app = useApp();
-const formData = reactive({ ...options.formInputs });
+const formData = reactive({ ...formInputs });
 
 function beforeSubmit() {
     delete formData.imageUrl;
     formData.imageFile.name = uid();
-    if (showAdd.value) delete formData.id;
+    if (page.showAdd.value) delete formData.id;
     return true;
 }
 
 const onFormSubmitted = (data) => {
-    if (showAdd.value) {
+    if (page.showAdd.value) {
         let record = { id: data, ...formData };
-        addRecordToList(record);
-    } else if (showEdit.value) {
-        updateRecordInList(formData);
+        page.addRecordToList(record);
+    } else if (page.showEdit.value) {
+        page.updateRecordInList(formData);
     }
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    name: { required: required, maxLength: maxLength(75) }
 };
-const v$ = useVuelidate(rules, formData); // form validation
+const v$ = useVuelidate(rules, formData);
 
-const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
-
-const { saving } = toRefs(page.state);
-const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
-
-useMeta(() => {
-    return {
-        title: $t("addNewSampletable"),
-    };
+const page = useAddEditPage({
+    apiPath: serverApis.services,
+    storeModule: storeModules.services,
+    formInputs, formData, v$, onFormSubmitted, beforeSubmit
 });
+const pageState = reactive({ ...page.state });
 
 onMounted(() => {
     page.load();
-});
-
-defineExpose({
-    page,
 });
 </script>
