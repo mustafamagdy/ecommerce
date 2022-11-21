@@ -4,16 +4,19 @@ import { useApp } from "src/composables/app";
 import { useStore } from "vuex";
 import { $t } from "src/services/i18n";
 import { useShowAddEdit } from "src/composables/useShowAddEdit";
-import { fetchRecord } from "src/services/crud-apis";
+import { fetchRecord, saveRecord, updateRecord } from "src/services/crud-apis";
 
-export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit) {
-    const {
-        apiPath = "",
-        storeModule = "",
-        listName = "records",
-        recordName = "record",
-        formInputs = {}
-    } = options;
+export function useAddEditPage({
+                                   apiPath = "",
+                                   storeModule = "",
+                                   listName = "records",
+                                   recordName = "record",
+                                   formInputs = {},
+                                   formData = {},
+                                   v$,
+                                   onFormSubmitted,
+                                   beforeSubmit
+                               }) {
     const upperRecordName = recordName.charAt(0).toUpperCase() + recordName.slice(1);
     const app = useApp();
     const store = useStore();
@@ -40,28 +43,25 @@ export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSub
         return !v$.value.$invalid;
     };
     const submitForm = async () => {
-
         if (beforeSubmit !== undefined) {
             if (!beforeSubmit()) {
                 return;
             }
         }
-
         if (!validateForm()) {
             app.flashMsg($t("formIsInvalid"), $t("pleaseCompleteTheForm"), "negative");
             return;
         }
-
         state.saving = true;
         let url = apiPath;
         let data = { url, payload: formData };
         try {
             let response;
             if (showAdd.value) {
-                response = await store.dispatch(`${storeModule}/saveRecord`, data);
+                response = await saveRecord(apiPath, formData);
                 app.flashMsg($t("msg_after_add"));
             } else if (showEdit.value) {
-                response = await store.dispatch(`${storeModule}/updateRecord`, data);
+                response = await updateRecord(apiPath + `/${editId.value}`, formData);
                 app.flashMsg($t("msg_after_update"));
             } else {
                 throw new Error($t("msg_default_error"));
@@ -107,24 +107,18 @@ export function useAddEditPage(options, formData, v$, onFormSubmitted, beforeSub
         }
         return null;
     };
-    const computedProps = {
-        showAdd,
-        showEdit
-    };
-    const methods = {
-        submitForm,
-        getFieldErrorsMsg: getFieldErrorsMsg,
-        addRecordToList,
-        updateRecordInList,
-        load
-    };
+    const computedProps = {};
     return {
         validateForm,
         resetForm,
         formData,
         state,
-        computedProps,
-        methods,
-        load
+        showAdd,
+        showEdit,
+        getFieldErrorsMsg,
+        addRecordToList,
+        updateRecordInList,
+        load,
+        submitForm
     };
 }

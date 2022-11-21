@@ -1,6 +1,6 @@
 import cors from "cors";
 import { faker } from "@faker-js/faker";
-import { add, deleteItem, doSearch, update } from "./helpers.js";
+import { addRecord, deleteRecord, doSearch, updateRecord } from "./helpers.js";
 
 export const billsApis = (app, api) => {
   app.post(`/api/v1/${api}/search`, cors(), async (req, res) => {
@@ -41,12 +41,10 @@ export const billsApis = (app, api) => {
   });
   app.delete(`/api/v1/${api}/:id`, cors(), async (req, res) => {
     try {
-      await deleteItem(req.params.id, api);
+      await deleteRecord(req.params.id, api);
       res.send(req.params.id);
     } catch (err) {
       res.status(500).send(err);
     }
   });
-  add(app, api);
-  update(app, api);
 };
