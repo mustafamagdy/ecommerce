@@ -101,7 +101,7 @@
       "type": "bank account",
       "boxName": "Fiat",
       "managerName": "Krista Kunze",
-      "typeOfBox": "box",
+      "typeOfBox": "bank_account",
       "isprimary": "",
       "branch": "branch2"
     },
@@ -204,7 +204,7 @@
       "email": "abc@example.com",
       "isActive": true,
       "emailConfirmed": true,
-      "phoneNumber": "0555555555",
+      "phoneNumber": "055",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
@@ -637,7 +637,7 @@
   "roles": [
     {
       "id": "1",
-      "roleTitle": "manager",
+      "roleTitle": "sales manager",
       "isActive": "true"
     },
     {
@@ -663,12 +663,16 @@
     {
       "roleTitle": "new role edited",
       "id": "287395f1-8f06-4783-8744-947807d3462f"
+    },
+    {
+      "roleTitle": "neww",
+      "id": "8f384bb7-fc28-49a5-900f-6d2ae5e42cff"
     }
   ],
   "users": [
     {
       "id": "1",
-      "name": "Ahmed",
+      "name": "Ahmed Khairy",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
