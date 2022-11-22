@@ -5,59 +5,31 @@
                 <div class="text-h5 q-pa-md">{{ $t(" Add new Customer") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
                         <div class="row justify-between no-wrap">
-                            <q-input
-                                class="q-ma-sm"
-                                filled
-                                v-model="formData.firstName"
-                                :label="$t('first_name')"
-                                lazy-rules
-                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                            />
-                            <q-input
-                                class="q-ma-sm"
-                                filled
-                                v-model="formData.lastName"
-                                :label="$t('last_name')"
-                                lazy-rules
-                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                            />
+                            <q-input class="q-ma-sm" filled v-model.trim="formData.firstName" :label="$t('first_name')"></q-input>
+                            <q-input class="q-ma-sm" filled v-model.trim="formData.lastName" :label="$t('last_name')"></q-input>
                         </div>
                         <div class="column">
-                            <q-input
-                                class="q-ma-sm"
-                                filled
-                                v-model="formData.email"
-                                :label="$t('email')"
-                                lazy-rules
-                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                            />
+                            <q-input class="q-ma-sm" filled v-model.trim="formData.email" :label="$t('email')"></q-input>
                         </div>
                         <div class="column">
-                            <q-input
-                                class="q-ma-sm"
-                                filled
-                                v-model="formData.phoneNumber"
-                                :label="$t('phoneNumber')"
-                                lazy-rules
-                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                            />
+                            <q-input class="q-ma-sm" filled v-model.trim="formData.phoneNumber" :label="$t('phone')"></q-input>
                         </div>
 
                         <div class="row flex-center no-wrap q-my-md">
                             <q-btn
-                                :label="$t('save')"
+                                :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"
                                 type="submit"
-                                :loading="saving"
+                                :loading="pageState.saving"
                                 class="bg-color-positive"
                             >
                                 <template v-slot:loading>
                                     <q-spinner-oval />
                                 </template>
                             </q-btn>
-                            <q-btn :label="$t('close')" icon="mdi-close" class="bg-color-light" v-close-popup />
+                            <q-btn :label="$t('btn_close')" icon="mdi-close" class="bg-color-light" v-close-popup />
                         </div>
                     </q-form>
                 </div>
@@ -76,63 +48,54 @@ import ImagePicker from "src/components/image-picker";
 import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
-const options = reactive({
-    apiPath: serverApis.customers,
-    storeModule: storeModules.customers,
-    formInputs: {
-        id: "",
-        userName: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        isActive: "",
-        emailConfirmed: "",
-        phoneNumber: "",
-        imageUrl: "",
-    },
-});
+const formInputs = {
+    id: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    isActive: "",
+    emailConfirmed: "",
+    phoneNumber: "",
+    imageUrl: "",
+};
 const app = useApp();
-const formData = reactive({ ...options.formInputs });
+const formData = reactive({ ...formInputs });
 
 function beforeSubmit() {
     delete formData.imageUrl;
-    formData.imageFile.name = uid();
-    if (showAdd.value) delete formData.id;
+    // formData.imageFile.name = uid();
+    if (page.showAdd.value) delete formData.id;
     return true;
 }
 
 const onFormSubmitted = (data) => {
-    if (showAdd.value) {
+    if (page.showAdd.value) {
         let record = { id: data, ...formData };
-        addRecordToList(record);
-    } else if (showEdit.value) {
-        updateRecordInList(formData);
+        page.addRecordToList(record);
+    } else if (page.showEdit.value) {
+        page.updateRecordInList(formData);
     }
 };
 
 const rules = {
     name: { required: required, maxLength: maxLength(75) },
 };
-const v$ = useVuelidate(rules, formData); // form validation
+const v$ = useVuelidate(rules, formData);
 
-const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
-
-const { saving } = toRefs(page.state);
-const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
-
-useMeta(() => {
-    return {
-        title: $t("addNewSampletable"),
-    };
+const page = useAddEditPage({
+    apiPath: serverApis.customers,
+    storeModule: storeModules.customers,
+    formInputs,
+    formData,
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
 });
+const pageState = reactive({ ...page.state });
 
 onMounted(() => {
     page.load();
-});
-
-defineExpose({
-    page,
 });
 </script>
 <style></style>
