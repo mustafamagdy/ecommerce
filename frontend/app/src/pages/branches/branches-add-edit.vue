@@ -51,17 +51,17 @@ const app = useApp();
 const formData = reactive({ ...formInputs });
 
 function beforeSubmit() {
-    formData.id = uid();
     if (page.showAdd.value) delete formData.id;
     return true;
 }
 
 const onFormSubmitted = (data) => {
+    let record = { id: data, ...formData };
+
     if (page.showAdd.value) {
-        let record = { id: data, ...formData };
         page.addRecordToList(record);
     } else if (page.showEdit.value) {
-        page.updateRecordInList(formData);
+        page.updateRecordInList(record);
     }
 };
 

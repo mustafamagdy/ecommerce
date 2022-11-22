@@ -9,7 +9,7 @@ export const crud = {
         showAddRecord: false,
         showEditRecord: false,
         editRecordId: null,
-        clickedRecord: null
+        clickedRecord: null,
     }),
     getters: {
         records(state) {
@@ -29,7 +29,7 @@ export const crud = {
         },
         clickedRecord(state) {
             return state.clickedRecord;
-        }
+        },
     },
     mutations: {
         setRecords(state, records) {
@@ -52,21 +52,27 @@ export const crud = {
             }
         },
         updateRecord(state, record) {
-            const item = state.records.find(item => item["id"] === record["id"]);
-            if (item) {
-                Object.assign(item, record);
+            const index = state.records.findIndex(
+                (item) => item["id"] == record["id"]
+            );
+            if (index !== -1) {
+                Object.assign(state.records[index], record);
             }
         },
         deleteRecord(state, id) {
             if (Array.isArray(id)) {
                 id.forEach((itemId) => {
-                    let itemIndex = state.records.findIndex(item => item["id"] === itemId);
+                    let itemIndex = state.records.findIndex(
+                        (item) => item["id"] === itemId
+                    );
                     if (itemIndex !== -1) {
                         state.records.splice(itemIndex, 1);
                     }
                 });
             } else {
-                let itemIndex = state.records.findIndex(item => item["id"] === id);
+                let itemIndex = state.records.findIndex(
+                    (item) => item["id"] === id
+                );
                 if (itemIndex !== -1) {
                     state.records.splice(itemIndex, 1);
                 }
@@ -98,7 +104,7 @@ export const crud = {
         },
         setClickedRecord(state, value) {
             state.clickedRecord = value;
-        }
+        },
     },
     actions: {
         search: ({ commit }, payload) => {
@@ -106,35 +112,38 @@ export const crud = {
                 let url = payload.url;
                 let body = payload.criteria;
                 let merge = payload.merge;
-                ApiService.post(url, body).then(resp => {
-                    let data = resp?.data;
-                    if (data?.data) {
-                        let records = data.data;
-                        if (merge) {
-                            commit("mergeRecords", records);
+                ApiService.post(url, body)
+                    .then((resp) => {
+                        let data = resp?.data;
+                        if (data?.data) {
+                            let records = data.data;
+                            if (merge) {
+                                commit("mergeRecords", records);
+                            } else {
+                                commit("setRecords", records);
+                            }
+                            resolve(data);
                         } else {
-                            commit("setRecords", records);
+                            // if json data received does not have record object
+                            // or is invalid
+                            reject("Unknown record form");
                         }
-                        resolve(data);
-                    } else {
-                        // if json data received does not have record object
-                        // or is invalid
-                        reject("Unknown record form");
-                    }
-                }).catch(err => {
-                    reject(err);
-                });
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
             });
         },
         fetchRecord: ({ commit }, data) => {
             let url = data.url;
             let id = data.id;
             return new Promise((resolve, reject) => {
-                ApiService.get(`${url}/${id.toString()}`).then(resp => {
-                    commit("setCurrentRecord", resp.data);
-                    resolve(resp);
-                })
-                    .catch(err => {
+                ApiService.get(`${url}/${id.toString()}`)
+                    .then((resp) => {
+                        commit("setCurrentRecord", resp.data);
+                        resolve(resp);
+                    })
+                    .catch((err) => {
                         reject(err);
                     });
             });
@@ -143,10 +152,11 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
-                ApiService.post(url, payload).then(resp => {
-                    resolve(resp);
-                })
-                    .catch(err => {
+                ApiService.post(url, payload)
+                    .then((resp) => {
+                        resolve(resp);
+                    })
+                    .catch((err) => {
                         reject(err);
                     });
             });
@@ -155,10 +165,11 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let payload = data.payload;
-                ApiService.put(url, payload).then(resp => {
-                    resolve(resp);
-                })
-                    .catch(err => {
+                ApiService.put(url, payload)
+                    .then((resp) => {
+                        resolve(resp);
+                    })
+                    .catch((err) => {
                         reject(err);
                     });
             });
@@ -167,14 +178,15 @@ export const crud = {
             return new Promise((resolve, reject) => {
                 let url = data.url;
                 let id = data.id;
-                ApiService.delete(`${url}/${id.toString()}`).then(resp => {
-                    commit("deleteRecord", id);
-                    resolve(resp);
-                })
-                    .catch(err => {
+                ApiService.delete(`${url}/${id.toString()}`)
+                    .then((resp) => {
+                        commit("deleteRecord", id);
+                        resolve(resp);
+                    })
+                    .catch((err) => {
                         reject(err);
                     });
             });
-        }
-    }
+        },
+    },
 };
