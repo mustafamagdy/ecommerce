@@ -42,7 +42,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
                         <q-item>
                             <q-item-section avatar>
                                 <q-icon v-if="record.typeOfBox === 'box'" color="primary" name="inventory" />
-                                <q-icon v-else-if="record.typeOfBox === 'bank account'" color="primary" name="account_balance" />
+                                <q-icon v-else-if="record.typeOfBox === 'bank_account'" color="primary" name="account_balance" />
                             </q-item-section>
                             <q-item-section>
                                 <q-item-label>{{ record.boxName }}</q-item-label>
@@ -61,7 +61,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
                                 icon="mdi-playlist-edit"
                                 padding="xs"
                                 class="bg-color-info"
-                                @click="page.showEdit = { show: true, editId: record.id }"
+                                @click="page.showEdit = { show: true, id: record.id }"
                             />
                             <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
                                 <q-menu auto-close>

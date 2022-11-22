@@ -79,7 +79,8 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    firstName: { required: required, maxLength: maxLength(75) },
+    lastName: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 

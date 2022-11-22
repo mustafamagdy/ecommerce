@@ -5,24 +5,24 @@
                 <div class="text-h5 q-pa-md">{{ $t(" Add new User") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md text-right">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
                         <q-input
                             class="q-ma-sm"
                             filled
-                            v-model="formData.name"
-                            :label="$t('User-name')"
-                            lazy-rules
-                            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                        />
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            v-model="formData.username"
-                            :label="$t('user-name')"
-                            lazy-rules
-                            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                        />
+                            :label="$t('name')"
+                            v-model.trim="formData.name"
+                            :error="v$.name.$error"
+                            :error-message="page.getFieldErrorsMsg(v$.name)"
+                        ></q-input>
 
+                        <q-input
+                            class="q-ma-sm"
+                            filled
+                            :label="$t('User-name')"
+                            v-model.trim="formData.username"
+                            :error="v$.username.$error"
+                            :error-message="page.getFieldErrorsMsg(v$.username)"
+                        ></q-input>
                         <q-input
                             class="q-ma-sm"
                             filled
@@ -50,10 +50,10 @@
                         />
                         <div class="row flex-center no-wrap q-my-sm">
                             <q-btn
-                                :label="$t('save')"
+                                :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"
                                 type="submit"
-                                :loading="saving"
+                                :loading="pageState.saving"
                                 class="bg-color-positive"
                             >
                                 <template v-slot:loading>
@@ -92,63 +92,52 @@ import ImagePicker from "src/components/image-picker";
 import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
-const options = reactive({
-    apiPath: serverApis.customers,
-    storeModule: storeModules.customers,
-    formInputs: {
-        id: "",
-        name: "",
-        username: "",
-        Password: "",
-        email: "",
-        Tel: "",
-        isActive: "",
-        imageUrl: "",
-    },
-});
+const formInputs = {
+    id: "",
+    name: "",
+    username: "",
+    Password: "",
+    email: "",
+    Tel: "",
+    isActive: "",
+    imageUrl: "",
+};
 const app = useApp();
-const formData = reactive({ ...options.formInputs });
-const userOptions = ["emp1", "emp2", "emp3"];
+const formData = reactive({ ...formInputs });
 
 function beforeSubmit() {
-    delete formData.imageUrl;
-    formData.imageFile.name = uid();
-    if (showAdd.value) delete formData.id;
+    if (page.showAdd.value) delete formData.id;
     return true;
 }
 
 const onFormSubmitted = (data) => {
-    if (showAdd.value) {
+    if (page.showAdd.value) {
         let record = { id: data, ...formData };
-        addRecordToList(record);
-    } else if (showEdit.value) {
-        updateRecordInList(formData);
+        page.addRecordToList(record);
+    } else if (page.showEdit.value) {
+        page.updateRecordInList(formData);
     }
 };
 
 const rules = {
     name: { required: required, maxLength: maxLength(75) },
+    username: { required: required, maxLength: maxLength(75) },
 };
-const v$ = useVuelidate(rules, formData); // form validation
+const v$ = useVuelidate(rules, formData);
 
-const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
-
-const { saving } = toRefs(page.state);
-const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
-
-useMeta(() => {
-    return {
-        title: $t("addNewSampletable"),
-    };
+const page = useAddEditPage({
+    apiPath: serverApis.users,
+    storeModule: storeModules.users,
+    formInputs,
+    formData,
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
 });
+const pageState = reactive({ ...page.state });
 
 onMounted(() => {
     page.load();
-});
-
-defineExpose({
-    page,
 });
 </script>
 <style></style>
