@@ -16,8 +16,8 @@
                         <q-input
                             filled
                             v-model.trim="formData.boxName"
-                            :error="v$.name.$error"
-                            :error-message="page.getFieldErrorsMsg(v$.name)"
+                            :error="v$.boxName.$error"
+                            :error-message="page.getFieldErrorsMsg(v$.boxName)"
                             :label="$t('box name')"
                         ></q-input>
 
@@ -90,7 +90,7 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    boxName: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 
