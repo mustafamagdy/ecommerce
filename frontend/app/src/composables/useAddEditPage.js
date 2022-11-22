@@ -7,24 +7,25 @@ import { useShowAddEdit } from "src/composables/useShowAddEdit";
 import { fetchRecord, saveRecord, updateRecord } from "src/services/crud-apis";
 
 export function useAddEditPage({
-                                   apiPath = "",
-                                   storeModule = "",
-                                   listName = "records",
-                                   recordName = "record",
-                                   formInputs = {},
-                                   formData = {},
-                                   v$,
-                                   onFormSubmitted,
-                                   beforeSubmit
-                               }) {
-    const upperRecordName = recordName.charAt(0).toUpperCase() + recordName.slice(1);
+    apiPath = "",
+    storeModule = "",
+    listName = "records",
+    recordName = "record",
+    formInputs = {},
+    formData = {},
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
+}) {
+    const upperRecordName =
+        recordName.charAt(0).toUpperCase() + recordName.slice(1);
     const app = useApp();
     const store = useStore();
     const state = reactive({
         id: null,
         submitted: false,
         saving: false,
-        loading: false
+        loading: false,
     });
     let currentRecord = computed({
         get() {
@@ -32,11 +33,16 @@ export function useAddEditPage({
         },
         set(value) {
             store.commit(`${storeModule}/setCurrent${upperRecordName}`, value);
-        }
+        },
     });
-    const addRecordToList = (record) => store.commit(`${storeModule}/add${upperRecordName}`, record);
-    const updateRecordInList = (record) => store.commit(`${storeModule}/update${upperRecordName}`, record);
-    const { showAddOrEdit, showAdd, showEdit, editId } = useShowAddEdit(storeModule, recordName);
+    const addRecordToList = (record) =>
+        store.commit(`${storeModule}/add${upperRecordName}`, record);
+    const updateRecordInList = (record) =>
+        store.commit(`${storeModule}/update${upperRecordName}`, record);
+    const { showAddOrEdit, showAdd, showEdit, editId } = useShowAddEdit(
+        storeModule,
+        recordName
+    );
     const validateForm = () => {
         state.submitted = true;
         v$.value.$validate();
@@ -49,7 +55,11 @@ export function useAddEditPage({
             }
         }
         if (!validateForm()) {
-            app.flashMsg($t("formIsInvalid"), $t("pleaseCompleteTheForm"), "negative");
+            app.flashMsg(
+                $t("formIsInvalid"),
+                $t("pleaseCompleteTheForm"),
+                "negative"
+            );
             return;
         }
         state.saving = true;
@@ -61,7 +71,10 @@ export function useAddEditPage({
                 response = await saveRecord(apiPath, formData);
                 app.flashMsg($t("msg_after_add"));
             } else if (showEdit.value) {
-                response = await updateRecord(apiPath + `/${editId.value}`, formData);
+                response = await updateRecord(
+                    apiPath + `/${editId.value}`,
+                    formData
+                );
                 app.flashMsg($t("msg_after_update"));
             } else {
                 throw new Error($t("msg_default_error"));
@@ -94,7 +107,7 @@ export function useAddEditPage({
 
     const resetForm = () => {
         if (Array.isArray(formData)) {
-            formData = [{ ...formInputs }];  //reset form data
+            formData = [{ ...formInputs }]; //reset form data
         } else {
             Object.assign(formData, formInputs); //reset form data
         }
@@ -119,6 +132,6 @@ export function useAddEditPage({
         addRecordToList,
         updateRecordInList,
         load,
-        submitForm
+        submitForm,
     };
 }

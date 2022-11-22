@@ -20,7 +20,7 @@ export const doSearch = async (req, tableName) => {
       totalCount: totalCount,
       pageSize: pageSize,
       hasPreviousPage: req.body.pageNumber !== 1,
-      hasNextPage: req.body.pageNumber !== totalPages
+      hasNextPage: req.body.pageNumber !== totalPages,
     };
   } catch (err) {
     throw err;
@@ -31,7 +31,7 @@ export const getRecord = async (req, tableName) => {
     const db = initDB();
     await db.read();
     const id = req.params.id;
-    const rec = db.data[tableName].find(x => x.id === id);
+    const rec = db.data[tableName].find((x) => x.id === id);
     if (rec && rec.id) {
       return rec;
     } else {
@@ -59,6 +59,7 @@ export const addRecord = async (data, tableName) => {
     data.id = faker.datatype.uuid();
     db.data[tableName].push(data);
     await db.write();
+    console.log(data);
     return data.id;
   } catch (err) {
     throw err;
@@ -68,7 +69,7 @@ export const updateRecord = async (id, data, tableName) => {
   try {
     const db = initDB();
     await db.read();
-    const index = db.data[tableName].findIndex(x => x.id === id);
+    const index = db.data[tableName].findIndex((x) => x.id === id);
     if (index !== -1) {
       Object.assign(db.data[tableName][index], data);
     } else {

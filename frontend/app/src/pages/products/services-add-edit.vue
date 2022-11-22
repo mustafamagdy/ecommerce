@@ -8,8 +8,11 @@
             <div class="row q-ma-md">
                 <div class="col">{{ $t("service_name") }} *</div>
                 <div class="col">
-                    <q-input v-model.trim="formData.name" :error="v$.name.$error"
-                             :error-message="page.getFieldErrorsMsg(v$.name)"></q-input>
+                    <q-input
+                        v-model.trim="formData.name"
+                        :error="v$.name.$error"
+                        :error-message="page.getFieldErrorsMsg(v$.name)"
+                    ></q-input>
                 </div>
             </div>
             <div class="col-12 row q-ma-md">
@@ -19,8 +22,13 @@
                 </div>
             </div>
             <div class="row flex-center no-wrap q-my-md">
-                <q-btn :label="$t('btn_save')" icon="mdi-content-save-outline" type="submit" :loading="pageState.saving"
-                       class="bg-color-positive">
+                <q-btn
+                    :label="$t('btn_save')"
+                    icon="mdi-content-save-outline"
+                    type="submit"
+                    :loading="pageState.saving"
+                    class="bg-color-positive"
+                >
                     <template v-slot:loading>
                         <q-spinner-oval />
                     </template>
@@ -46,7 +54,7 @@ const formInputs = {
     name: "",
     description: "",
     imageFile: {},
-    imageUrl: ""
+    imageUrl: "",
 };
 const app = useApp();
 const formData = reactive({ ...formInputs });
@@ -68,14 +76,18 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) }
+    name: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 
 const page = useAddEditPage({
     apiPath: serverApis.services,
     storeModule: storeModules.services,
-    formInputs, formData, v$, onFormSubmitted, beforeSubmit
+    formInputs,
+    formData,
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
 
