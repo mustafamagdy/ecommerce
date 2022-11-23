@@ -16,8 +16,8 @@
                         <q-input
                             filled
                             v-model.trim="formData.boxName"
-                            :error="v$.name.$error"
-                            :error-message="page.getFieldErrorsMsg(v$.name)"
+                            :error="v$.boxName.$error"
+                            :error-message="page.getFieldErrorsMsg(v$.boxName)"
                             :label="$t('box name')"
                         ></q-input>
 
@@ -85,12 +85,12 @@ const onFormSubmitted = (data) => {
         let record = { id: data, ...formData };
         page.addRecordToList(record);
     } else if (page.showEdit.value) {
-        page.updateRecordInList(formData);
+        page.updateRecordInList({ ...formData });
     }
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    boxName: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 

@@ -74,12 +74,13 @@ const onFormSubmitted = (data) => {
         let record = { id: data, ...formData };
         page.addRecordToList(record);
     } else if (page.showEdit.value) {
-        page.updateRecordInList(formData);
+        page.updateRecordInList({ ...formData });
     }
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    firstName: { required: required, maxLength: maxLength(75) },
+    lastName: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 

@@ -5,24 +5,24 @@
                 <div class="text-h5">{{ $t(" Add new role") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form @submit="onSubmit" @reset="onReset" class="text-right">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="text-right">
                         <div class="row flex flex-center">
                             <q-input
                                 class="q-ma-sm flex full-width"
                                 filled
-                                v-model="formData.roleName"
+                                v-model.trim="formData.roleTitle"
                                 :label="$t('role-Name')"
-                                lazy-rules
-                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+                                :error="v$.roleTitle.$error"
+                                :error-message="page.getFieldErrorsMsg(v$.roleTitle)"
                             />
                         </div>
 
                         <div class="row flex-center no-wrap q-my-md">
                             <q-btn
-                                :label="$t('save')"
+                                :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"
                                 type="submit"
-                                :loading="saving"
+                                :loading="pageState.saving"
                                 class="bg-color-positive"
                             >
                                 <template v-slot:loading>
@@ -48,56 +48,45 @@ import ImagePicker from "src/components/image-picker";
 import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
 
-const options = reactive({
-    apiPath: serverApis.roles,
-    storeModule: storeModules.roles,
-    formInputs: {
-        id: "",
-        roleName: "",
-    },
-});
+const formInputs = {
+    id: "",
+    roleTitle: "",
+};
 const app = useApp();
-const formData = reactive({ ...options.formInputs });
+const formData = reactive({ ...formInputs });
 
 function beforeSubmit() {
-    delete formData.imageUrl;
-    formData.imageFile.name = uid();
-    if (showAdd.value) delete formData.id;
+    if (page.showAdd.value) delete formData.id;
     return true;
 }
 
 const onFormSubmitted = (data) => {
-    if (showAdd.value) {
+    if (page.showAdd.value) {
         let record = { id: data, ...formData };
-        addRecordToList(record);
-    } else if (showEdit.value) {
-        updateRecordInList(formData);
+        page.addRecordToList(record);
+    } else if (page.showEdit.value) {
+        page.updateRecordInList({ ...formData });
     }
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    roleTitle: { required: required, maxLength: maxLength(75) },
 };
-const v$ = useVuelidate(rules, formData); // form validation
+const v$ = useVuelidate(rules, formData);
 
-const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
-
-const { saving } = toRefs(page.state);
-const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
-
-useMeta(() => {
-    return {
-        title: $t("addNewSampletable"),
-    };
+const page = useAddEditPage({
+    apiPath: serverApis.roles,
+    storeModule: storeModules.roles,
+    formInputs,
+    formData,
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
 });
+const pageState = reactive({ ...page.state });
 
 onMounted(() => {
     page.load();
-});
-
-defineExpose({
-    page,
 });
 </script>
 <style></style>
