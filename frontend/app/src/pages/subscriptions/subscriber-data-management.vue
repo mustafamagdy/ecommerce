@@ -181,8 +181,8 @@ const v$ = useVuelidate(rules, formData); // form validation
 const page = useAddEditPage(options, formData, v$, onFormSubmitted, beforeSubmit);
 
 const { saving } = toRefs(page.state);
-const { showAdd, showEdit } = page.computedProps;
-const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
+// const { showAdd, showEdit } = page.computedProps;
+// const { submitForm, getFieldErrorsMsg, addRecordToList, updateRecordInList } = page.methods;
 
 const branchOptions = ["branch1", "branch2"];
 </script>

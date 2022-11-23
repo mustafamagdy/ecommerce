@@ -27,7 +27,7 @@
                                             icon="mdi-playlist-edit"
                                             padding="xs"
                                             class="bg-color-info"
-                                            @click="page.showEdit = { show: true, editId: record.id }"
+                                            @click="page.showEdit = { show: true, id: record.id }"
                                         />
                                         <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
                                             <q-menu auto-close>
@@ -72,14 +72,15 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <employeeAddJob /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddEditRole /> </q-dialog>
     </div>
 </template>
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import employeeAddJob from "./users-add-role.vue";
+import usersAddEditRole from "./users-add-edit-role.vue";
+
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.roles,

@@ -16,8 +16,12 @@
     },
     {
       "id": "889d22283",
-      "name": "service 4",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
+      "name": "service 44",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "description": "",
+      "imageFile": {
+        "name": "08b52563-d72c-416a-a4d8-6a8eb55549e1"
+      }
     },
     {
       "id": "11889d22283",
@@ -72,78 +76,110 @@
       "id": "44166dd2-5066-4b7d-9f09-2c5a7d761e40"
     },
     {
-      "name": "a",
-      "description": "b",
+      "name": "nn",
+      "description": "",
       "imageFile": {
-        "name": "59f0e68f-e4f7-4af4-897a-832e36e5fd13"
+        "name": "7a81f5e0-d7c8-410e-99f6-62f70014891e"
       },
-      "id": "4d7e6ae7-eaac-4f30-a376-9bd91db9f3d8"
-    },
-    {
-      "name": "new sss",
-      "description": "no des",
-      "imageFile": {
-        "name": "def2df94-116f-4cb6-b749-834f69250988"
-      },
-      "id": "434af099-9031-4eda-bccc-354e0e3594a6"
+      "id": "8079bff3-9d0e-4f63-842c-42854e4a3512"
     }
   ],
   "financialBoxes": [
     {
-      "id": 1,
+      "id": "1",
       "type": "box",
-      "boxName": "Brand",
+      "boxName": "Brand-0",
       "managerName": "Andrew Hayes",
-      "typeOfBox": "box"
+      "typeOfBox": "box",
+      "isprimary": "",
+      "branch": ""
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "bank account",
-      "boxName": "Fiat",
+      "boxName": "Fiat-11",
       "managerName": "Krista Kunze",
-      "typeOfBox": "bank_account"
+      "typeOfBox": "bank_account",
+      "isprimary": "",
+      "branch": "branch2"
     },
     {
-      "id": 3,
+      "id": "3",
       "type": "box",
       "boxName": "Van",
       "managerName": "Beth Gerlach",
       "typeOfBox": "box"
     },
     {
-      "id": 4,
+      "id": "4",
       "type": "bank account",
       "boxName": "invoice",
       "managerName": "Patrick Schinner",
       "typeOfBox": "bank_account"
     },
     {
-      "id": 5,
+      "id": "5",
       "type": "bank account",
       "boxName": "ack",
       "managerName": "Jimmie Quigley",
       "typeOfBox": "bank_account"
     },
     {
-      "id": 6,
+      "id": "6",
       "type": "box",
       "boxName": "Handcrafted",
       "managerName": "Evelyn Smitham",
       "typeOfBox": "box"
     },
     {
-      "id": 11,
+      "id": "11",
       "type": "bank account",
       "boxName": "Lead",
       "managerName": "Roberto Bogisich",
       "typeOfBox": "bank_account"
     },
     {
-      "id": 7,
+      "id": "7",
       "type": "box",
       "boxName": "wilted",
       "managerName": "Jeffery Ullrich DDS",
       "typeOfBox": "box"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "newwww",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch2",
+      "primary": true,
+      "id": "849856d9-06d6-49fb-8068-57526be1b543"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "neww",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "primary": true,
+      "id": "b65aa349-111e-4b00-8828-48e2d4de1dc1"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "lflej",
+      "isprimary": "",
+      "managerName": "manager2",
+      "branch": "branch1",
+      "primary": true,
+      "id": "01089826-95ec-483f-ab7f-233b15a658cd"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "new box",
+      "isprimary": "",
+      "managerName": "manager2",
+      "branch": "branch1",
+      "primary": true,
+      "id": "e9708661-0021-404b-803c-7856562055cb"
     }
   ],
   "customers": [
@@ -166,13 +202,13 @@
       "email": "abc@example.com",
       "isActive": true,
       "emailConfirmed": true,
-      "phoneNumber": "0555555555",
+      "phoneNumber": "055",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
       "id": "3",
       "userName": "Ahmed",
-      "firstName": "Abd-Rhman",
+      "firstName": "Abd-Allah",
       "lastName": "Ali",
       "email": "abc@example.com",
       "isActive": true,
@@ -256,6 +292,36 @@
       "emailConfirmed": true,
       "phoneNumber": "0555555555",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "userName": "",
+      "firstName": "Nujud",
+      "lastName": "AlQahtani",
+      "email": "nujood@outlook.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0556667777",
+      "id": "3e24e62e-3a65-4697-acd8-828246402536"
+    },
+    {
+      "userName": "",
+      "firstName": "Omnya",
+      "lastName": "Al-Otaibi",
+      "email": "Omniya@gmail.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0550505005",
+      "id": "1d07ff35-ffe0-4c7c-bba0-d89dc5a810d3"
+    },
+    {
+      "userName": "",
+      "firstName": "Abd-Allah",
+      "lastName": "ajjja",
+      "email": "abdallah@outlook.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0556667777",
+      "id": "edbd59d7-1960-4555-8c57-892bf7a73e67"
     }
   ],
   "bills": [
@@ -318,28 +384,28 @@
   ],
   "branches": [
     {
-      "id": "1",
-      "name": "south-branch",
+      "id": "de86ece7-c63a-46e9-95e5-fa99bb9319d3",
+      "name": "south-0",
       "description": "Located in the south of countries"
     },
     {
-      "id": "2",
-      "name": "south-branch",
+      "id": "6155e8a4-3a51-4005-b367-3b6b6dd1d2bf",
+      "name": "edited-1",
       "description": "Located in the south of countries"
     },
     {
-      "id": "3",
-      "name": "south-branch",
+      "id": "e9592db3-88d6-4e82-8e02-f85c7d5878c1",
+      "name": "edimn-3",
       "description": "Located in the south of countries"
     },
     {
-      "id": "4",
-      "name": "south-branch",
+      "id": "f47e9a10-04f0-4d96-aadd-e0b0e777c8c5",
+      "name": "south",
       "description": "Located in the south of countries"
     },
     {
-      "id": "5",
-      "name": "south-branch",
+      "id": "31cec6fa-63a0-4f4c-9631-dde846267add",
+      "name": "south--AAA",
       "description": "Located in the south of countries"
     },
     {
@@ -353,13 +419,13 @@
       "description": "Located in the south of countries"
     },
     {
-      "id": "8",
-      "name": "south-branch",
+      "id": "be15ca5c-c889-4305-9cae-533a422aba03",
+      "name": "jdj",
       "description": "Located in the south of countries"
     },
     {
-      "id": "9",
-      "name": "south-branch",
+      "id": "6ad1c2a6-d4af-4d98-8318-3d25a5e0306e",
+      "name": "sou",
       "description": "Located in the south of countries"
     },
     {
@@ -368,24 +434,19 @@
       "description": "Located in the south of countries"
     },
     {
-      "id": "12",
-      "name": "south-branch",
-      "description": "Located in the south of countries"
-    },
-    {
-      "name": "aaa",
+      "name": "bbb",
       "description": "aaa",
-      "id": "9e4da41f-d3c1-49c7-82a1-402cf0790ae2"
+      "id": "192b5aae-3230-4ad8-933d-4119c921a1c9"
     },
     {
-      "name": "aaa",
-      "description": "aaa",
-      "id": "8caff92e-14fd-4d94-8b50-3d98c560aef0"
+      "name": "new branch",
+      "description": "",
+      "id": "5f0fb799-4c01-4e59-98d7-bf563050b877"
     },
     {
-      "name": "asdf",
-      "description": "asdf",
-      "id": "e351452e-5893-42ef-8ed3-12fe86fe8aec"
+      "name": "n",
+      "description": "",
+      "id": "a36dc11a-47ae-4ce4-b759-11394e6f4695"
     }
   ],
   "subscriptions": [
@@ -572,17 +633,24 @@
       "statement": "no-statement",
       "debtor": "false",
       "creditor": "true"
+    },
+    {
+      "amount": "76376",
+      "fromBox": "box1",
+      "toBox": "box1",
+      "notices": "ll",
+      "id": "df02a42f-ae89-4aca-83c1-420971186974"
     }
   ],
   "roles": [
     {
       "id": "1",
-      "roleTitle": "manager",
+      "roleTitle": "sales manager",
       "isActive": "true"
     },
     {
       "id": "2",
-      "roleTitle": "employee",
+      "roleTitle": "employee22",
       "isActive": "false"
     },
     {
@@ -599,12 +667,20 @@
       "id": "5",
       "roleTitle": "employee",
       "isActive": "true"
+    },
+    {
+      "roleTitle": "new role edited",
+      "id": "287395f1-8f06-4783-8744-947807d3462f"
+    },
+    {
+      "roleTitle": "neww",
+      "id": "8f384bb7-fc28-49a5-900f-6d2ae5e42cff"
     }
   ],
   "users": [
     {
       "id": "1",
-      "name": "Ali Ahmed",
+      "name": "Ahmed Khairy",
       "username": "fakeUserName",
       "Password": "267637",
       "email": "axb@gmail.com",
@@ -641,6 +717,16 @@
       "Tel": "256246527",
       "isActive": "true",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "Nujud AlQahtani",
+      "username": "khkdh",
+      "Password": "nlkhkl3",
+      "email": "nujood@outlook.com",
+      "Tel": "0556667777",
+      "isActive": "",
+      "imageUrl": "",
+      "id": "9daa02ba-d537-4514-badf-100a46868d4f"
     }
   ]
 }
