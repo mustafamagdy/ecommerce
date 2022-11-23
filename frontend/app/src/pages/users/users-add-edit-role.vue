@@ -65,8 +65,7 @@ const onFormSubmitted = (data) => {
         let record = { id: data, ...formData };
         page.addRecordToList(record);
     } else if (page.showEdit.value) {
-        let record = { ...formData };
-        page.updateRecordInList(record);
+        page.updateRecordInList({ ...formData });
     }
 };
 
