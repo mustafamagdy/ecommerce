@@ -88,14 +88,16 @@
     {
       "id": "1",
       "type": "box",
-      "boxName": "Brand",
+      "boxName": "Brand-0",
       "managerName": "Andrew Hayes",
-      "typeOfBox": "box"
+      "typeOfBox": "box",
+      "isprimary": "",
+      "branch": ""
     },
     {
       "id": "2",
       "type": "bank account",
-      "boxName": "Fiat",
+      "boxName": "Fiat-11",
       "managerName": "Krista Kunze",
       "typeOfBox": "bank_account",
       "isprimary": "",
@@ -393,7 +395,7 @@
     },
     {
       "id": "e9592db3-88d6-4e82-8e02-f85c7d5878c1",
-      "name": "edimn",
+      "name": "edimn-3",
       "description": "Located in the south of countries"
     },
     {
@@ -440,6 +442,11 @@
       "name": "new branch",
       "description": "",
       "id": "5f0fb799-4c01-4e59-98d7-bf563050b877"
+    },
+    {
+      "name": "n",
+      "description": "",
+      "id": "a36dc11a-47ae-4ce4-b759-11394e6f4695"
     }
   ],
   "subscriptions": [
