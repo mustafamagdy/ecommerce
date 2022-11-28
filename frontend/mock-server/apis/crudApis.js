@@ -36,8 +36,8 @@ export const crudApis = (app, api) => {
   });
   app.put(`/api/v1/${api}/:id`, cors(), async (req, res) => {
     try {
-      const id = updateRecord(req.params.id, req.body, api);
-      res.send(id);
+      await updateRecord(req.params.id, req.body, api);
+      res.send(req.params.id);
     } catch (err) {
       res.status(500).send(err);
     }
