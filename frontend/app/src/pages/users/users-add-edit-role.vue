@@ -2,7 +2,7 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
             <div class="q-ma-sm text-center">
-                <div class="text-h5">{{ $t(" Add new role") }}</div>
+                <div class="text-h5">{{ props.showAdd ? $t("Add new role") : $t("Edit role") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form ref="observer" @submit.prevent="page.submitForm()" class="text-right">
@@ -84,6 +84,7 @@ const page = useAddEditPage({
     beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
+const props = defineProps(["showAdd"]);
 
 onMounted(() => {
     page.load();

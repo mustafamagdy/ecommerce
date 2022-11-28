@@ -1,6 +1,6 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
-        <div class="text-h6 q-mb-md">{{ $t("addNewSampletable") }}</div>
+        <div class="text-h5 q-pa-sm">{{ props.showAdd ? $t("Add new Service") : $t("Edit Service") }}</div>
         <q-form ref="observer" @submit.prevent="page.submitForm()">
             <!-- <div>
                 <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
@@ -90,6 +90,7 @@ const page = useAddEditPage({
     beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
+const props = defineProps(["showAdd"]);
 
 onMounted(() => {
     page.load();

@@ -1,5 +1,5 @@
 <template>
-    <div class="col-grow row items-stretch justify-around">
+    <div class="col-grow row items-stretch justify-around no-wrap">
         <div class="column q-pa-sm">
             <usersRuleList />
         </div>

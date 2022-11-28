@@ -2,7 +2,9 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="row">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t("Add Transaction") }}</div>
+                <div class="text-h5 q-pa-md">
+                    {{ props.showAdd ? $t("Add new Transaction") : $t("Edit Transaction") }}
+                </div>
 
                 <div class="q-pa-md" style="min-width: 400px">
                     <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
@@ -85,6 +87,7 @@ const page = useAddEditPage({
     beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
+const props = defineProps(["showAdd"]);
 
 onMounted(() => {
     page.load();

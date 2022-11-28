@@ -2,7 +2,7 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="row">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t("Add new Box") }}</div>
+                <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Box") : $t("Edit Box") }}</div>
 
                 <div class="q-pa-md" style="min-width: 400px">
                     <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
@@ -93,6 +93,7 @@ const rules = {
     boxName: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
+const props = defineProps(["showAdd"]);
 
 const page = useAddEditPage({
     apiPath: serverApis.financialBoxes,

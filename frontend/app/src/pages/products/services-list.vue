@@ -155,7 +155,7 @@
             />
         </div>
         <q-dialog v-model="page.showAddOrEdit" persistent :service="clickedService">
-            <ServicesAddEdit />
+            <ServicesAddEdit :showAdd="page.showAdd" />
         </q-dialog>
     </div>
 </template>

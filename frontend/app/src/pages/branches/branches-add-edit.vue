@@ -1,20 +1,19 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
-        <div class="text-h5 q-pa-md">{{ $t(" Add new Branch") }}</div>
-
+        <div class="text-h5 q-pa-sm">{{ props.showAdd ? $t("Add new Branch") : $t("Edit Branch") }}</div>
         <div class="column q-pa-sm" style="min-width: 400px">
             <q-form ref="observer" @submit.prevent="page.submitForm()">
-                <div class="row q-ma-md">
+                <div class="row q-ma-sm">
                     <div class="col">
                         <q-input filled v-model.trim="formData.name" :label="$t('branch_name')"></q-input>
                     </div>
                 </div>
-                <div class="row q-ma-md">
+                <div class="row q-ma-sm">
                     <div class="col">
                         <q-input v-model.trim="formData.description" type="textarea"></q-input>
                     </div>
                 </div>
-                <div class="row flex-center no-wrap q-my-md">
+                <div class="row flex-center no-wrap q-my-sm">
                     <q-btn
                         :label="$t('btn_save')"
                         icon="mdi-content-save-outline"
@@ -68,7 +67,8 @@ const rules = {
     name: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
-
+const props = defineProps(["showAdd"]);
+console.log(props.showAdd);
 const page = useAddEditPage({
     apiPath: serverApis.branches,
     storeModule: storeModules.branches,
@@ -79,7 +79,6 @@ const page = useAddEditPage({
     beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
-
 onMounted(() => {
     page.load();
 });

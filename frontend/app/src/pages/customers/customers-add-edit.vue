@@ -2,7 +2,7 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="column">
             <div class="q-ma-sm text-center">
-                <div class="text-h5 q-pa-md">{{ $t(" Add new Customer") }}</div>
+                <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Customer") : $t("Edit Customer") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
                     <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
@@ -77,6 +77,7 @@ const onFormSubmitted = (data) => {
         page.updateRecordInList({ ...formData });
     }
 };
+const props = defineProps(["showAdd"]);
 
 const rules = {
     firstName: { required: required, maxLength: maxLength(75) },
