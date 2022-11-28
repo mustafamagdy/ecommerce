@@ -116,7 +116,7 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <customersAddEdit /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <customersAddEdit :showAdd="page.showAdd" /> </q-dialog>
     </div>
 </template>
 <script setup>

@@ -101,7 +101,7 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <branchesAddEdit /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <branchesAddEdit :showAdd="page.showAdd" /> </q-dialog>
     </div>
 </template>
 <script setup>
@@ -116,6 +116,7 @@ const page = reactive(
         pageSize: 10,
     })
 );
+
 onMounted(() => {
     page.load();
 });

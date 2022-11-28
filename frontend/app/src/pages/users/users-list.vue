@@ -1,22 +1,20 @@
 <template>
     <div class="column justify-around q-ma-sm">
         <div class="column">
-            <div class="column">
-                <div class="row justify-between items-center">
-                    <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
-                    <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
-                    <div class="row">
-                        <q-btn icon="mdi-magnify" class="bg-color-dark" />
-                        <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="page.showAdd = true" />
-                    </div>
+            <div class="row justify-between items-center">
+                <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
+                <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
+                <div class="row">
+                    <q-btn icon="mdi-magnify" class="bg-color-dark" />
+                    <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="page.showAdd = true" />
                 </div>
             </div>
         </div>
         <q-separator class="q-mt-sm" inset />
 
-        <q-scroll-area class="col-grow panel" visible>
-            <div class="row q-pa-md items-start justify-around q-gutter-md">
-                <div class="q-ma-sm" v-for="record in page.records" :key="record.id" style="min-width: 200px">
+        <q-scroll-area class="col-grow panel q-mr-sm" visible>
+            <div class="row items-start justify-around q-gutter-md">
+                <div v-for="record in page.records" :key="record.id" style="min-width: 200px">
                     <q-card class="my-card items-start row text-center" clickable>
                         <q-card-section class="column" horizontal>
                             <q-item>
@@ -66,7 +64,7 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddEditUser /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddEditUser :showAdd="page.showAdd" /> </q-dialog>
     </div>
 </template>
 <script setup>

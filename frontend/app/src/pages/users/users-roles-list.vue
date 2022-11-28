@@ -2,7 +2,7 @@
     <div class="column justify-around col-grow">
         <div class="column">
             <div class="column">
-                <div class="row justify-between items-center">
+                <div class="row justify-around items-center">
                     <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
                     <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
                     <div class="row">
@@ -12,10 +12,10 @@
                 </div>
             </div>
         </div>
-        <q-separator class="q-mt-sm" inset />
+        <q-separator class="q-mt-sm" />
 
         <q-scroll-area class="col-grow panel" visible>
-            <div class="row items-start justify-around q-gutter-md">
+            <div class="row items-start justify-around">
                 <div class="q-ma-sm" v-for="record in page.records" :key="record.id" style="max-width: 200px">
                     <q-card class="my-card items-start row text-center" clickable>
                         <q-card-section class="column" horizontal>
@@ -72,7 +72,7 @@
                 @update:model-value="page.load"
             />
         </div>
-        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddEditRole /> </q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" persistent> <usersAddEditRole :showAdd="page.showAdd" /> </q-dialog>
     </div>
 </template>
 <script setup>

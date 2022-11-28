@@ -194,7 +194,7 @@
                 </div>
             </div>
         </div>
-        <q-dialog v-model="operationsPage.showAddOrEdit"> <financialBoxesAddEditTransaction /></q-dialog>
+        <q-dialog v-model="operationsPage.showAddOrEdit"> <financialBoxesAddEditTransaction :showAdd="operationsPage.showAdd" /></q-dialog>
     </div>
 </template>
 
@@ -213,13 +213,7 @@ const operationsPage = reactive(
         pageSize: 6,
     })
 );
-// const boxesPage = reactive(
-//     useCRUDList({
-//         apiPath: serverApis.financialBoxes,
-//         storeModule: storeModules.financialBoxes,
-//         pageSize: 6,
-//     })
-// );
+
 const types = ref("type");
 const rowsNum = ref("0");
 
@@ -228,6 +222,5 @@ const rowsOptions = [" 1", " 2", " 3", " 4", " 5"];
 
 onMounted(() => {
     operationsPage.load();
-    // boxesPage.load();
 });
 </script>

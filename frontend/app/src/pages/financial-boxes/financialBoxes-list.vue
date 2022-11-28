@@ -1,13 +1,3 @@
-<!-- <template>
-    <div class="row col-grow items-stretch justify-start">
-        <view-boxes class="col-grow panel" />
-    </div>
-</template>
-
-<script setup>
-import ViewBoxesList from "./ViewBoxes.vue";
-</script> -->
-
 <template>
     <div class="column q-gutter-md">
         <div class="row justify-around items-center">
@@ -117,7 +107,7 @@ import ViewBoxesList from "./ViewBoxes.vue";
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="page.showAddOrEdit" :showAdd="page.showAdd"> <financialBoxesAddEdit /></q-dialog>
+        <q-dialog v-model="page.showAddOrEdit" :showAdd="page.showAdd"> <financialBoxesAddEdit :showAdd="page.showAdd" /></q-dialog>
     </div>
 </template>
 
