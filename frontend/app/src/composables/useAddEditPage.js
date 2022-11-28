@@ -64,7 +64,6 @@ export function useAddEditPage({
         }
         state.saving = true;
         let url = apiPath;
-        let data = { url, payload: formData };
         try {
             let response;
             if (showAdd.value) {

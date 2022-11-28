@@ -59,7 +59,6 @@ export const addRecord = async (data, tableName) => {
     data.id = faker.datatype.uuid();
     db.data[tableName].push(data);
     await db.write();
-    console.log(data);
     return data.id;
   } catch (err) {
     throw err;

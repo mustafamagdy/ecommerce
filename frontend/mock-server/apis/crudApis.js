@@ -28,7 +28,7 @@ export const crudApis = (app, api) => {
   });
   app.post(`/api/v1/${api}`, cors(), async (req, res) => {
     try {
-      const id = addRecord(req.body, api);
+      const id = await addRecord(req.body, api);
       res.send(id);
     } catch (err) {
       res.status(500).send(err);

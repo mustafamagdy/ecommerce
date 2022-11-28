@@ -8,7 +8,7 @@ export const imageFileMiddlewares = (app, api, imageUrlProp, imageFileProp) => {
       const imgFile = req.body[imageFileProp];
       if (imgFile) {
         const data = imgFile.data.replace(/^data:image\/png;base64,/, "");
-        const imgName = "files" + faker.datatype.uuid();
+        const imgName = "files/" + faker.datatype.uuid();
         fs.writeFile(imgName, data, () => {
           req.body[imageUrlProp] = imgName;
           delete req.body[imageFileProp];
