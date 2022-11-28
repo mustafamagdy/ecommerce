@@ -1,5 +1,6 @@
 const baseURL = process.env.API_PATH;
 export const serverApis = {
+    filesBaseURL: `${baseURL}/`,
     services: `${baseURL}/services`,
     financialBoxes: `${baseURL}/financialBoxes`,
     customers: `${baseURL}/customers`,
@@ -9,5 +10,5 @@ export const serverApis = {
     financialBoxesTransactions: `${baseURL}/financialBoxesTransactions`,
     subscriptionAccountStatement: `${baseURL}/subscriptionAccountStatement`,
     roles: `${baseURL}/roles`,
-    users: `${baseURL}/users`,
+    users: `${baseURL}/users`
 };

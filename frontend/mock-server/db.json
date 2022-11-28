@@ -1,29 +1,6 @@
 {
   "services": [
     {
-      "id": "85299d83",
-      "name": "33333333",
-      "imageUrl": "https://loremflickr.com/300/300/abstract",
-      "description": "3333333",
-      "imageFile": {
-        "name": "1d45f36f-5ac3-4179-ab21-d52d221c2fcf"
-      }
-    },
-    {
-      "id": "889d83",
-      "name": "service 3",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
-    },
-    {
-      "id": "889d22283",
-      "name": "service 44",
-      "imageUrl": "https://loremflickr.com/300/300/abstract",
-      "description": "",
-      "imageFile": {
-        "name": "08b52563-d72c-416a-a4d8-6a8eb55549e1"
-      }
-    },
-    {
       "id": "11889d22283",
       "name": "service 5",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
@@ -59,29 +36,10 @@
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
-      "name": "aaa",
-      "description": "aaa",
-      "imageUrl": "https://loremflickr.com/300/300/abstract",
-      "imageFile": {
-        "name": "9af3c1fc-5055-49ae-abbb-38230893acbf"
-      },
-      "id": "95f34201-5b73-4b5a-82d3-eceb72b47aed"
-    },
-    {
-      "name": "new service",
-      "description": "added from NewSample",
-      "imageFile": {
-        "name": "cfbd811f-3ada-4e4c-9775-b87975db1352"
-      },
-      "id": "44166dd2-5066-4b7d-9f09-2c5a7d761e40"
-    },
-    {
-      "name": "nn",
+      "name": "4444",
       "description": "",
-      "imageFile": {
-        "name": "7a81f5e0-d7c8-410e-99f6-62f70014891e"
-      },
-      "id": "8079bff3-9d0e-4f63-842c-42854e4a3512"
+      "imageUrl": "files/40eee273-3055-49e5-9468-e06a209995ee",
+      "id": "32bfb5df-0ad0-4cb5-8fc3-54838a0642bd"
     },
     {
       "name": "nee",
@@ -188,6 +146,39 @@
       "branch": "branch1",
       "primary": true,
       "id": "e9708661-0021-404b-803c-7856562055cb"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "aaaa",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "primary": true,
+      "id": "55ad0ca6-84ff-429e-9360-e832028d5c18"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "qqq",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "100cc3c6-6276-4824-988e-716d080a856c"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "ققق",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "5cb2eb89-4032-4fca-b561-b0e9ea83d119"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "يسب",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "d1f473e6-348e-43d2-9a22-99e4342d3382"
     }
   ],
   "customers": [
