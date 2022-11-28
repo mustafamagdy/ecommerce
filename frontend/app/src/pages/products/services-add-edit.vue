@@ -2,9 +2,9 @@
     <q-card class="page-section q-py-sm q-px-md">
         <div class="text-h5 q-pa-sm">{{ props.showAdd ? $t("Add new Service") : $t("Edit Service") }}</div>
         <q-form ref="observer" @submit.prevent="page.submitForm()">
-            <!-- <div>
+            <div>
                 <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
-            </div> -->
+            </div>
             <div class="row q-ma-md">
                 <div class="col">{{ $t("service_name") }} *</div>
                 <div class="col">
@@ -54,7 +54,7 @@ const formInputs = {
     name: "",
     description: "",
     imageFile: {},
-    imageUrl: "",
+    imageUrl: ""
 };
 const app = useApp();
 const formData = reactive({ ...formInputs });
@@ -76,7 +76,7 @@ const onFormSubmitted = (data) => {
 };
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) },
+    name: { required: required, maxLength: maxLength(75) }
 };
 const v$ = useVuelidate(rules, formData);
 
@@ -87,7 +87,7 @@ const page = useAddEditPage({
     formData,
     v$,
     onFormSubmitted,
-    beforeSubmit,
+    beforeSubmit
 });
 const pageState = reactive({ ...page.state });
 const props = defineProps(["showAdd"]);
