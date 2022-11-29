@@ -4,7 +4,7 @@
             <services-list class="col-grow panel" />
         </div>
         <div class="col-12 col-sm-6 column q-pa-sm">
-            <service-catalog-list class="col-grow panel" :service="clickedService" />
+            <service-catalog-list class="col-grow panel" :clickedServiceId="clickedServiceId" />
         </div>
     </div>
 </template>
@@ -13,7 +13,21 @@
 import ServicesList from "./services-list.vue";
 import ServiceCatalogList from "./serviceCatalog-list";
 import { useList } from "src/composables/list.js";
+import { useStore } from "vuex";
+import { computed, ref, watch } from "vue";
+const store = useStore();
 
 const page = useList({ storeModule: "services" });
-const { clickedRecord: clickedService } = page.computedProps;
+
+console.log(store.getters[`services/clickedRecordId`]);
+let clickedServiceId = ref("0");
+clickedServiceId = computed({
+    get() {
+        return store.getters[`services/clickedRecordId`];
+    },
+});
+// watch(clickedServiceId, (currentValue, oldValue) => {
+//     console.log(currentValue);
+// });
+// clickedServiceId = computed(() => store.getters["services/clickedRecordId"]);
 </script>

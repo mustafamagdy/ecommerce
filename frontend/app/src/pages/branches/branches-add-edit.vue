@@ -1,19 +1,21 @@
 <template>
-    <q-card class="page-section q-py-sm q-px-md">
-        <div class="text-h5 q-pa-sm">{{ props.showAdd ? $t("Add new Branch") : $t("Edit Branch") }}</div>
-        <div class="column q-pa-sm" style="min-width: 400px">
+    <q-card class="q-pa-sm">
+        <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Branch") : $t("Edit Branch") }}</div>
+        <div class="column" style="min-width: 400px">
             <q-form ref="observer" @submit.prevent="page.submitForm()">
                 <div class="row q-ma-sm">
                     <div class="col">
-                        <q-input filled v-model.trim="formData.name" :label="$t('branch_name')"></q-input>
+                        <span class="label q-mx-sm">{{ $t("Branch_name :") }}</span>
+                        <q-input class="q-ma-sm" v-model.trim="formData.name"></q-input>
                     </div>
                 </div>
                 <div class="row q-ma-sm">
                     <div class="col">
-                        <q-input v-model.trim="formData.description" type="textarea"></q-input>
+                        <span class="label q-mx-sm">{{ $t("Description :") }}</span>
+                        <q-input class="q-ma-sm" v-model.trim="formData.description" type="textarea"></q-input>
                     </div>
                 </div>
-                <div class="row flex-center no-wrap q-my-sm">
+                <div class="row flex-center no-wrap q-mb-md">
                     <q-btn
                         :label="$t('btn_save')"
                         icon="mdi-content-save-outline"

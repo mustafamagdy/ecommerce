@@ -9,7 +9,7 @@ export const crud = {
         showAddRecord: false,
         showEditRecord: false,
         editRecordId: null,
-        clickedRecord: null,
+        clickedRecordId: null,
     }),
     getters: {
         records(state) {
@@ -27,8 +27,8 @@ export const crud = {
         editRecordId(state) {
             return state.editRecordId;
         },
-        clickedRecord(state) {
-            return state.clickedRecord;
+        clickedRecordId(state) {
+            return state.clickedRecordId;
         },
     },
     mutations: {
@@ -102,8 +102,8 @@ export const crud = {
                 state.showEditRecord = false;
             }
         },
-        setClickedRecord(state, value) {
-            state.clickedRecord = value;
+        setClickedRecordId(state, value) {
+            state.clickedRecordId = value;
         },
     },
     actions: {

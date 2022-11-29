@@ -1,56 +1,69 @@
 <template>
-    <q-card class="page-section q-py-sm q-px-md">
+    <q-card>
         <div class="column">
-            <div class="q-ma-sm text-center">
+            <div class="q-ma-sm">
                 <div class="text-h5 q-pa-md">
                     {{ props.showAdd ? $t("Add new User") : $t("Edit User") }}
                 </div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            :label="$t('name')"
-                            v-model.trim="formData.name"
-                            :error="v$.name.$error"
-                            :error-message="page.getFieldErrorsMsg(v$.name)"
-                        ></q-input>
+                    <q-form ref="observer" @submit.prevent="page.submitForm()">
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Name :") }}</span>
+                            <q-input
+                                class="q-ma-sm"
+                                v-model.trim="formData.name"
+                                :error="v$.name.$error"
+                                :error-message="page.getFieldErrorsMsg(v$.name)"
+                            ></q-input>
+                        </div>
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("User-name :") }}</span>
+                            <q-input
+                                class="q-ma-sm"
+                                v-model.trim="formData.username"
+                                :error="v$.username.$error"
+                                :error-message="page.getFieldErrorsMsg(v$.username)"
+                            ></q-input>
+                        </div>
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Password :") }}</span>
+                            <q-input
+                                class="q-ma-sm"
+                                v-model="formData.Password"
+                                lazy-rules
+                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+                            />
+                        </div>
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Phone_number :") }}</span>
+                            <q-input
+                                class="q-ma-sm"
+                                v-model="formData.Tel"
+                                lazy-rules
+                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+                            />
+                        </div>
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Email :") }}</span>
+                            <q-input
+                                class="q-ma-sm"
+                                v-model="formData.email"
+                                lazy-rules
+                                :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+                            />
+                        </div>
 
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            :label="$t('User-name')"
-                            v-model.trim="formData.username"
-                            :error="v$.username.$error"
-                            :error-message="page.getFieldErrorsMsg(v$.username)"
-                        ></q-input>
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            v-model="formData.Password"
-                            :label="$t('password')"
-                            lazy-rules
-                            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                        />
-
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            v-model="formData.Tel"
-                            :label="$t('phoneNumber')"
-                            lazy-rules
-                            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                        />
-                        <q-input
-                            class="q-ma-sm"
-                            filled
-                            v-model="formData.email"
-                            :label="$t('E-mail')"
-                            lazy-rules
-                            :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-                        />
-                        <div class="row flex-center no-wrap q-my-sm">
+                        <q-field readonly class="q-my-sm">
+                            <template v-slot:control>
+                                <div class="self-center full-width no-outline">Or choose recent user</div>
+                            </template>
+                        </q-field>
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Choose_user :") }}</span>
+                            <q-select class="q-ma-sm" v-model="formData.nameame" :options="userOptions" />
+                        </div>
+                        <div class="row flex-center">
                             <q-btn
                                 :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"
@@ -58,19 +71,6 @@
                                 :loading="pageState.saving"
                                 class="bg-color-positive"
                             >
-                                <template v-slot:loading>
-                                    <q-spinner-oval />
-                                </template>
-                            </q-btn>
-                        </div>
-                        <q-field readonly class="q-my-sm">
-                            <template v-slot:control>
-                                <div class="self-center full-width no-outline">Or choose recent user</div>
-                            </template>
-                        </q-field>
-                        <q-select filled v-model="formData.nameame" :options="userOptions" :label="$t('choose user')" />
-                        <div class="row flex-center q-my-sm">
-                            <q-btn :label="$t('Add-user')" icon="add" type="submit" :loading="saving" class="bg-color-positive">
                                 <template v-slot:loading>
                                     <q-spinner-oval />
                                 </template>

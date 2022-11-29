@@ -1,23 +1,22 @@
 <template>
-    <q-card class="page-section q-py-sm q-px-md">
+    <q-card>
         <div class="column">
-            <div class="q-ma-sm text-center">
-                <div class="text-h5">{{ props.showAdd ? $t("Add new role") : $t("Edit role") }}</div>
+            <div class="q-ma-sm">
+                <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new role") : $t("Edit role") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="text-right">
-                        <div class="row flex flex-center">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()">
+                        <div class="col">
+                            <span class="label q-mx-sm">{{ $t("Role_name :") }}</span>
                             <q-input
-                                class="q-ma-sm flex full-width"
-                                filled
+                                class="q-ma-sm"
                                 v-model.trim="formData.roleTitle"
-                                :label="$t('role-Name')"
                                 :error="v$.roleTitle.$error"
                                 :error-message="page.getFieldErrorsMsg(v$.roleTitle)"
                             />
                         </div>
 
-                        <div class="row flex-center no-wrap q-my-md">
+                        <div class="row flex-center no-wrap">
                             <q-btn
                                 :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"

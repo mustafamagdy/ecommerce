@@ -1,14 +1,10 @@
 <template>
     <div class="row col-grow items-stretch justify-start">
-        <div class="col-4 column col-grow panel q-pa-sm">
-            <div class="row no-wrap">
-                <q-btn icon="mdi-magnify" padding="xs" class="bg-color-dark" />
-                <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="boxesPage.showAdd = true" />
-            </div>
-            <q-scroll-area class="col-grow panel" visible> Groups </q-scroll-area>
+        <div class="column q-pa-sm">
+            <servicesList class="col-grow panel" />
         </div>
 
-        <div class="col-8 column q-pa-sm">
+        <div class="column col q-pa-sm">
             <div class="column col-grow panel">
                 <div class="column">
                     <div class="row justify-between items-center no-wrap">
@@ -72,6 +68,7 @@ import { useApp } from "src/composables/app";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, ref, reactive } from "vue";
 import { useCRUDList } from "src/composables/useCRUDList";
+import servicesList from "./services-list.vue";
 const text = ref("");
 const app = useApp();
 const page = reactive(useCRUDList({ apiPath: serverApis.services, storeModule: storeModules.services, pageSize: 8 }));
