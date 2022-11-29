@@ -11,4 +11,5 @@ export const storeModules = {
     subscriptionAccountStatement: "subscriptionAccountStatement",
     roles: "roles",
     users: "users",
+    serviceCatalog: "serviceCatalog",
 };

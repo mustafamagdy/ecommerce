@@ -1,5 +1,5 @@
 <template>
-    <div class="col-grow row items-stretch justify-around no-wrap">
+    <div class="row col-grow items-stretch justify-start no-wrap">
         <div class="column q-pa-sm">
             <usersRuleList />
         </div>
@@ -14,14 +14,16 @@
                 </div>
                 <q-separator vertical inset />
 
-                <div class="column">
-                    <span>{{ $t("Selected-Screen") }} </span>
+                <div class="column justify-around">
+                    <div class="col">
+                        <span>{{ $t("Selected-Screen") }} </span>
 
-                    <div class="q-pa-md">
-                        <q-option-group :options="options" type="checkbox" v-model="screens" />
+                        <div class="q-pa-md">
+                            <q-option-group :options="options" type="checkbox" v-model="screens" />
+                        </div>
                     </div>
-                    <div class="row flex flex-center">
-                        <q-btn icon="done" padding="xs" class="bg-color-primary" />
+                    <div class="row flex flex-center q-pa-md">
+                        <q-btn icon="done" padding="xs" :label="$t('btn_save')" class="bg-color-primary" />
                     </div>
                 </div>
                 <q-separator vertical inset />

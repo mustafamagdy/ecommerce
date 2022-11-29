@@ -1,24 +1,25 @@
 <template>
     <q-card class="page-section q-py-sm q-px-md">
-        <div class="text-h5 q-pa-sm">{{ props.showAdd ? $t("Add new Service") : $t("Edit Service") }}</div>
-        <q-form ref="observer" @submit.prevent="page.submitForm()">
-            <div>
+        <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Service") : $t("Edit Service") }}</div>
+        <q-form class="column q-pa-sm" ref="observer" @submit.prevent="page.submitForm()" style="min-width: 400px">
+            <!-- <div>
                 <ImagePicker v-model:src="formData.imageUrl" v-model:file="formData.imageFile" />
-            </div>
-            <div class="row q-ma-md">
-                <div class="col">{{ $t("service_name") }} *</div>
+            </div> -->
+            <div class="col">
+                <span class="label q-mx-sm">{{ $t("service_name :") }}</span>
                 <div class="col">
                     <q-input
+                        class="q-ma-sm"
                         v-model.trim="formData.name"
                         :error="v$.name.$error"
                         :error-message="page.getFieldErrorsMsg(v$.name)"
                     ></q-input>
                 </div>
             </div>
-            <div class="col-12 row q-ma-md">
-                <div class="col">{{ $t("service_description") }} *</div>
+            <div class="col">
+                <span class="label q-mx-sm">{{ $t("Service_description : ") }}</span>
                 <div class="col">
-                    <q-input v-model.trim="formData.description" type="textarea"></q-input>
+                    <q-input class="q-ma-sm" v-model.trim="formData.description" type="textarea"></q-input>
                 </div>
             </div>
             <div class="row flex-center no-wrap q-my-md">
@@ -54,7 +55,7 @@ const formInputs = {
     name: "",
     description: "",
     imageFile: {},
-    imageUrl: ""
+    imageUrl: "",
 };
 const app = useApp();
 const formData = reactive({ ...formInputs });
@@ -74,9 +75,10 @@ const onFormSubmitted = (data) => {
         page.updateRecordInList({ ...formData });
     }
 };
+const props = defineProps(["showAdd"]);
 
 const rules = {
-    name: { required: required, maxLength: maxLength(75) }
+    name: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
 
@@ -87,10 +89,9 @@ const page = useAddEditPage({
     formData,
     v$,
     onFormSubmitted,
-    beforeSubmit
+    beforeSubmit,
 });
 const pageState = reactive({ ...page.state });
-const props = defineProps(["showAdd"]);
 
 onMounted(() => {
     page.load();

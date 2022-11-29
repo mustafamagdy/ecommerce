@@ -23,7 +23,11 @@
     {
       "id": "822833377",
       "name": "service 9",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "description": "no description",
+      "imageFile": {
+        "name": "1e071e35-0a60-4365-8de6-f4ef5052f5a4"
+      }
     },
     {
       "id": "822833387",
@@ -38,7 +42,7 @@
     {
       "name": "4444",
       "description": "",
-      "imageUrl": "files/40eee273-3055-49e5-9468-e06a209995ee",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
       "id": "32bfb5df-0ad0-4cb5-8fc3-54838a0642bd"
     },
     {
@@ -48,6 +52,118 @@
         "name": "830c9439-6a20-4ffc-866b-c8759a15e7e7"
       },
       "id": "db17843c-4c0b-417a-9d1f-5d6e4a70f057"
+    }
+  ],
+  "serviceCatalog": [
+    {
+      "id": "gjxgjkb",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product1",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "nlkjol",
+      "serviceId": "889d2283",
+      "serviceName": "service2",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product2",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "123",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product3",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "nvnkf",
+      "serviceId": "889d2283",
+      "serviceName": "service2",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product4",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "aaaa",
+      "serviceId": "82283",
+      "serviceName": "service3",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product5",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "lksjj",
+      "serviceId": "82283",
+      "serviceName": "service3",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product6",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "mdkkd",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product7",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "kfkkf",
+      "serviceId": "8228333",
+      "serviceName": "service4",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product8",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "fkfkk",
+      "serviceId": "8228333",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product11",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "lldjj",
+      "serviceId": "822833377",
+      "serviceName": "service5",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product9",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "kjskadcf",
+      "serviceId": "822833377",
+      "serviceName": "service5",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product10",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
     }
   ],
   "financialBoxes": [
@@ -446,6 +562,16 @@
       "name": "n",
       "description": "",
       "id": "a36dc11a-47ae-4ce4-b759-11394e6f4695"
+    },
+    {
+      "name": "qq",
+      "description": "",
+      "id": "47d2b0a5-a6cf-4439-807b-04707884b212"
+    },
+    {
+      "name": "neww",
+      "description": "",
+      "id": "a5011613-c0e7-4908-825a-7eb1495d2a36"
     }
   ],
   "subscriptions": [
@@ -674,6 +800,10 @@
     {
       "roleTitle": "neww",
       "id": "8f384bb7-fc28-49a5-900f-6d2ae5e42cff"
+    },
+    {
+      "roleTitle": "saa",
+      "id": "f1aa719a-d12c-4ce2-92b0-b51f85c33292"
     }
   ],
   "users": [

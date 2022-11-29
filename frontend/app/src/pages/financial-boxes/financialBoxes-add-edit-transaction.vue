@@ -1,21 +1,32 @@
 <template>
-    <q-card class="page-section q-py-sm q-px-md">
+    <q-card>
         <div class="row">
-            <div class="q-ma-sm text-center">
+            <div class="q-ma-sm">
                 <div class="text-h5 q-pa-md">
                     {{ props.showAdd ? $t("Add new Transaction") : $t("Edit Transaction") }}
                 </div>
 
-                <div class="q-pa-md" style="min-width: 400px">
-                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
-                        <q-input filled v-model.trim="formData.amount" :label="$t('amount')"></q-input>
+                <div style="min-width: 400px">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()">
+                        <div class="column">
+                            <span class="label q-mx-sm">{{ $t("Amount :") }}</span>
+                            <q-input class="q-ma-sm" v-model.trim="formData.amount"></q-input>
+                        </div>
+                        <div class="column">
+                            <span class="label q-mx-sm">{{ $t("From_box :") }}</span>
+                            <q-select class="q-ma-sm" v-model="formData.fromBox" :options="boxOptions" />
+                        </div>
+                        <div class="column">
+                            <span class="label q-mx-sm">{{ $t("To_box :") }}</span>
+                            <q-select class="q-ma-sm" v-model="formData.toBox" :options="boxOptions" />
+                        </div>
 
-                        <q-select filled v-model="formData.fromBox" :options="boxOptions" :label="$t('from box')" />
-                        <q-select filled v-model="formData.toBox" :options="boxOptions" :label="$t('to box')" />
+                        <div class="column">
+                            <span class="label q-mx-sm">{{ $t("Notices :") }}</span>
+                            <q-input v-model.trim="formData.notices" class="q-ma-sm" type="textarea" />
+                        </div>
 
-                        <q-input v-model.trim="formData.notices" filled type="textarea" label="notices" />
-
-                        <div class="row flex-center no-wrap q-my-md">
+                        <div class="row flex-center no-wrap">
                             <q-btn
                                 :label="$t('btn_save')"
                                 icon="mdi-content-save-outline"

@@ -1,20 +1,28 @@
 <template>
-    <q-card class="page-section q-py-sm q-px-md">
+    <q-card>
         <div class="column">
-            <div class="q-ma-sm text-center">
+            <div class="q-ma-sm">
                 <div class="text-h5 q-pa-md">{{ props.showAdd ? $t("Add new Customer") : $t("Edit Customer") }}</div>
 
                 <div class="column q-pa-sm" style="min-width: 400px">
-                    <q-form ref="observer" @submit.prevent="page.submitForm()" class="q-gutter-md text-right">
+                    <q-form ref="observer" @submit.prevent="page.submitForm()">
                         <div class="row justify-between no-wrap">
-                            <q-input class="q-ma-sm" filled v-model.trim="formData.firstName" :label="$t('first_name')"></q-input>
-                            <q-input class="q-ma-sm" filled v-model.trim="formData.lastName" :label="$t('last_name')"></q-input>
+                            <div class="col">
+                                <span class="label q-mx-sm">{{ $t("First_name :") }}</span>
+                                <q-input class="q-ma-sm" v-model.trim="formData.firstName"></q-input>
+                            </div>
+                            <div class="col">
+                                <span class="label q-mx-sm">{{ $t("Last_name :") }}</span>
+                                <q-input class="q-ma-sm" v-model.trim="formData.lastName"></q-input>
+                            </div>
                         </div>
                         <div class="column">
-                            <q-input class="q-ma-sm" filled v-model.trim="formData.email" :label="$t('email')"></q-input>
+                            <span class="label q-mx-sm">{{ $t("Email :") }}</span>
+                            <q-input class="q-ma-sm" v-model.trim="formData.email"></q-input>
                         </div>
                         <div class="column">
-                            <q-input class="q-ma-sm" filled v-model.trim="formData.phoneNumber" :label="$t('phone')"></q-input>
+                            <span class="label q-mx-sm">{{ $t("Phone_number :") }}</span>
+                            <q-input class="q-ma-sm" v-model.trim="formData.phoneNumber"></q-input>
                         </div>
 
                         <div class="row flex-center no-wrap q-my-md">
