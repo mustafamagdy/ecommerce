@@ -1,11 +1,15 @@
 <template>
-    <div class="column justify-around">
+    <div class="column justify-around q-ma-sm">
         <div class="row justify-between items-center no-wrap">
             <span>{{ $t("Services") }}</span>
             <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
             <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
             <div class="row">
-                <q-btn icon="mdi-magnify" class="bg-color-dark" />
+                <q-btn icon="mdi-magnify" padding="xs" class="bg-color-dark">
+                    <q-menu persistent style="width: 50%">
+                        <serviceSearch />
+                    </q-menu>
+                </q-btn>
                 <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="page.showAdd = true" />
             </div>
         </div>
@@ -87,10 +91,10 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { onMounted, reactive } from "vue-demi";
-import ServicesAddEdit from "./services-add-edit";
 import { useApp } from "src/composables/app.js";
 import { useStore } from "vuex";
-
+import ServicesAddEdit from "./services-add-edit";
+import serviceSearch from "./service-search.vue";
 const store = useStore();
 const app = useApp();
 const page = reactive(
