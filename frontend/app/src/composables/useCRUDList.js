@@ -73,5 +73,7 @@ export const useCRUDList = ({
         showAddOrEdit,
         load: list.load,
         deleteItem,
+        clickedRecord: list.clickedRecord,
+        advancedFiltersForRecords: list.advancedFiltersForRecords,
     };
 };

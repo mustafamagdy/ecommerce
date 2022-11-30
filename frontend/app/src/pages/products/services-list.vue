@@ -15,7 +15,7 @@
         <q-scroll-area class="col-grow panel" visible>
             <div class="row items-start justify-around">
                 <div v-for="record in page.records" :key="record.id" style="max-width: 200px">
-                    <q-card class="my-card items-start row text-center q-mb-sm" clickable @click="serviceClick(record.id)">
+                    <q-card class="my-card items-start row text-center q-mb-sm" clickable @click="page.clickedRecord = record">
                         <q-card-section class="column" horizontal>
                             <q-item>
                                 <q-item-section avatar>
@@ -99,10 +99,6 @@ const page = reactive(
         storeModule: storeModules.services,
     })
 );
-
-const serviceClick = (clickedServiceId) => {
-    store.commit("services/setClickedRecordId", clickedServiceId);
-};
 
 onMounted(() => {
     page.load();
