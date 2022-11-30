@@ -9,7 +9,8 @@ export const crud = {
         showAddRecord: false,
         showEditRecord: false,
         editRecordId: null,
-        clickedRecordId: null,
+        clickedRecord: {},
+        advancedFiltersForRecords: {},
     }),
     getters: {
         records(state) {
@@ -27,8 +28,11 @@ export const crud = {
         editRecordId(state) {
             return state.editRecordId;
         },
-        clickedRecordId(state) {
-            return state.clickedRecordId;
+        clickedRecord(state) {
+            return state.clickedRecord;
+        },
+        advancedFiltersForRecords(state) {
+            return state.advancedFiltersForRecords;
         },
     },
     mutations: {
@@ -102,8 +106,11 @@ export const crud = {
                 state.showEditRecord = false;
             }
         },
-        setClickedRecordId(state, value) {
-            state.clickedRecordId = value;
+        setClickedRecord(state, value) {
+            state.clickedRecord = value;
+        },
+        setAdvancedFiltersForRecords(state, value) {
+            state.advancedFiltersForRecords = value;
         },
     },
     actions: {

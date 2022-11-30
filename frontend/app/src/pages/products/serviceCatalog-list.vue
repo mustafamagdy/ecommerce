@@ -1,7 +1,7 @@
 <template>
     <div class="column justify-around q-ma-sm">
         <div class="row justify-between items-center">
-            <span>{{ $t("Services_catalogues") }}</span>
+            <span>{{ props.service.name }}</span>
             <span>{{ $t("count") }} : {{ page.totalRecords }}</span>
             <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
             <div class="row">
@@ -85,11 +85,19 @@
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
-import { onMounted, reactive, computed } from "vue-demi";
+import { onMounted, reactive, watch } from "vue-demi";
 import ProductAddEdit from "./product-add-edit.vue";
 import { useApp } from "src/composables/app.js";
 import { useStore } from "vuex";
 const store = useStore();
+const props = defineProps(["service"]);
+watch(
+    () => props.service,
+    (newService) => {
+        page.advancedFiltersForRecords = { field: "serviceId", operator: "equal", value: newService.id };
+        page.load();
+    }
+);
 
 const app = useApp();
 const page = reactive(
@@ -98,11 +106,4 @@ const page = reactive(
         storeModule: storeModules.serviceCatalog,
     })
 );
-// const filteredCards = (records) => {
-//     records.filter((el) => el.id == props.clickedServiceId);
-// };
-const props = defineProps(["clickedServiceId"]);
-onMounted(() => {
-    page.load();
-});
 </script>

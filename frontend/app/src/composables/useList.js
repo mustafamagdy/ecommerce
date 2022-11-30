@@ -9,8 +9,12 @@ export const useList = ({
     apiPath = "",
     storeModule = "",
     listName = "records",
+    recordName = "record",
     pageSize = 10,
 }) => {
+    const upperRecordName =
+        recordName.charAt(0).toUpperCase() + recordName.slice(1);
+    const upperListName = listName.charAt(0).toUpperCase() + listName.slice(1);
     const app = useApp();
     const store = useStore();
     const loading = ref(false);
@@ -28,10 +32,35 @@ export const useList = ({
             store.commit(`${storeModule}/set${upperListName}`, value);
         },
     });
+    let clickedRecord = computed({
+        get() {
+            return store.getters[`${storeModule}/clicked${upperRecordName}`];
+        },
+        set(value) {
+            store.commit(`${storeModule}/setClicked${upperRecordName}`, value);
+        },
+    });
+    let advancedFiltersForRecords = computed({
+        get() {
+            return store.getters[
+                `${storeModule}/advancedFiltersFor${upperListName}`
+            ];
+        },
+        set(value) {
+            store.commit(
+                `${storeModule}/setAdvancedFiltersFor${upperListName}`,
+                value
+            );
+        },
+    });
 
     async function load() {
         loading.value = true;
-        let criteria = { pageNumber: currentPage.value, pageSize: pageSize };
+        let criteria = {
+            pageNumber: currentPage.value,
+            pageSize: pageSize,
+            advancedFiltersForRecords: advancedFiltersForRecords.value,
+        };
         try {
             let data = await search(apiPath + "/search", criteria);
             records.value = data.data;
@@ -54,5 +83,7 @@ export const useList = ({
         records,
         totals,
         load,
+        clickedRecord,
+        advancedFiltersForRecords,
     };
 };
