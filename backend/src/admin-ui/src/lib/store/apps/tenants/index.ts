@@ -1,30 +1,25 @@
 import {createSlice} from '@reduxjs/toolkit'
 import {fetchData} from "./apis";
 import {InitialState} from "src/types/apps/generics";
-import {UserType} from "src/types/apps/userTypes";
+import {TenantType} from "src/types/apps/tenantTypes";
 
-const demo_roles = ['admin', 'supervisor', 'user', 'support'];
-const demo_status = ['active', 'pending', 'inactive'];
-
-
-const demoData = new Array(100)
+const demoData = new Array(10)
   .fill(0)
   .map((_, i) => ({
     id: (i + 1).toString(),
-    firstName: 'full',
-    lastName: 'name',
-    email: `email${i}@root.com`,
-    active: Math.random() > .50,
-    role: demo_roles[Math.floor(Math.random() * demo_roles.length)],
-    userName: `username${i}`,
-    emailConfirmed: Math.random() > .50,
-    phoneNumber: '',
-    imagePath: '',
-    status: demo_status[Math.floor(Math.random() * demo_status.length)],
-    fullName: `Full name ${i}`,
+    name: `Tenant $i}`,
+    adminEmail: `admin${i}@email.com`,
+    phoneNumber: `1234`,
+    vatNo: `1234`,
+    email: `email@tenant${i}.com`,
+    address: `address`,
+    adminName: `admin for tenant`,
+    adminPhoneNumber: `1234`,
+    techSupportUserId: `id`,
+    techSupportName: `support name`,
   }));
 
-const initialState: InitialState<UserType> = {
+const initialState: InitialState<TenantType> = {
   data: demoData,
   total: 1,
   params: {},
@@ -33,7 +28,7 @@ const initialState: InitialState<UserType> = {
 
 export const appUsersSlice = createSlice(
   {
-    name: 'users',
+    name: 'tenants',
     initialState,
     reducers: {},
     extraReducers: builder => {

@@ -5,9 +5,8 @@ export interface Redux {
   dispatch: Dispatch<any>
 }
 
-export interface InitialState<T> {
-  data: T[],
+export interface InitialState<TData, TParams> {
+  data: TData[],
   total: number,
-  params: any,
-  allData: any[]
+  params: TParams
 }

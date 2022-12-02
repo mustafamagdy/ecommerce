@@ -12,12 +12,13 @@ export interface UserType {
   lastName: string
   email: string
   active: boolean
-  role: string
+  roles: string[]
   userName: string
   emailConfirmed: boolean
   phoneNumber: string
-  imagePath: string
+  imagePath?: string
   status: string | 'active' | 'pending' | 'inactive'
   fullName: string;
+  avatarColor?: "primary" | "secondary" | "error" | "warning" | "info" | "success" | undefined
 }
 
