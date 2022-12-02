@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, ReactNode, MouseEvent } from 'react'
+import {useState, ReactNode, MouseEvent} from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -13,15 +13,15 @@ import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import IconButton from '@mui/material/IconButton'
-import Box, { BoxProps } from '@mui/material/Box'
+import Box, {BoxProps} from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled, useTheme } from '@mui/material/styles'
+import {styled, useTheme} from '@mui/material/styles'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
-import Typography, { TypographyProps } from '@mui/material/Typography'
-import MuiFormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel'
+import Typography, {TypographyProps} from '@mui/material/Typography'
+import MuiFormControlLabel, {FormControlLabelProps} from '@mui/material/FormControlLabel'
 
 // ** Icons Imports
 import Google from 'mdi-material-ui/Google'
@@ -33,13 +33,13 @@ import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
 // ** Third Party Imports
 import * as yup from 'yup'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import {useForm, Controller} from 'react-hook-form'
+import {yupResolver} from '@hookform/resolvers/yup'
 
 // ** Hooks
-import { useAuth } from 'src/hooks/useAuth'
+import {useAuth} from 'src/lib/hooks/useAuth'
 import useBgColor from 'src/@core/hooks/useBgColor'
-import { useSettings } from 'src/@core/hooks/useSettings'
+import {useSettings} from 'src/@core/hooks/useSettings'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
@@ -52,7 +52,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 
 // ** Styled Components
-const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+const LoginIllustrationWrapper = styled(Box)<BoxProps>(({theme}) => ({
   padding: theme.spacing(20),
   paddingRight: '0 !important',
   [theme.breakpoints.down('lg')]: {
@@ -60,7 +60,7 @@ const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   }
 }))
 
-const LoginIllustration = styled('img')(({ theme }) => ({
+const LoginIllustration = styled('img')(({theme}) => ({
   maxWidth: '48rem',
   [theme.breakpoints.down('xl')]: {
     maxWidth: '38rem'
@@ -70,7 +70,7 @@ const LoginIllustration = styled('img')(({ theme }) => ({
   }
 }))
 
-const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+const RightWrapper = styled(Box)<BoxProps>(({theme}) => ({
   width: '100%',
   [theme.breakpoints.up('md')]: {
     maxWidth: 400
@@ -80,21 +80,21 @@ const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   }
 }))
 
-const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+const BoxWrapper = styled(Box)<BoxProps>(({theme}) => ({
   width: '100%',
   [theme.breakpoints.down('md')]: {
     maxWidth: 400
   }
 }))
 
-const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
+const TypographyStyled = styled(Typography)<TypographyProps>(({theme}) => ({
   fontWeight: 600,
   letterSpacing: '0.18px',
   marginBottom: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: { marginTop: theme.spacing(8) }
+  [theme.breakpoints.down('md')]: {marginTop: theme.spacing(8)}
 }))
 
-const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(({ theme }) => ({
+const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(({theme}) => ({
   '& .MuiFormControlLabel-label': {
     fontSize: '0.875rem',
     color: theme.palette.text.secondary
@@ -107,7 +107,7 @@ const schema = yup.object().shape({
 })
 
 const defaultValues = {
-  password: 'admin',
+  password: '123Pa$$word!',
   email: 'admin@root.com'
 }
 
@@ -123,17 +123,17 @@ const LoginPage = () => {
   const auth = useAuth()
   const theme = useTheme()
   const bgClasses = useBgColor()
-  const { settings } = useSettings()
+  const {settings} = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
 
   // ** Vars
-  const { skin } = settings
+  const {skin} = settings
 
   const {
     control,
     setError,
     handleSubmit,
-    formState: { errors }
+    formState: {errors}
   } = useForm({
     defaultValues,
     mode: 'onBlur',
@@ -141,8 +141,8 @@ const LoginPage = () => {
   })
 
   const onSubmit = (data: FormData) => {
-    const { email, password } = data
-    auth.login({ email, password }, () => {
+    const {email, password} = data
+    auth.login({email, password}, () => {
       setError('email', {
         type: 'manual',
         message: 'Email or Password is invalid'
@@ -155,17 +155,17 @@ const LoginPage = () => {
   return (
     <Box className='content-right'>
       {!hidden ? (
-        <Box sx={{ flex: 1, display: 'flex', position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{flex: 1, display: 'flex', position: 'relative', alignItems: 'center', justifyContent: 'center'}}>
           <LoginIllustrationWrapper>
             <LoginIllustration
               alt='login-illustration'
               src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
             />
           </LoginIllustrationWrapper>
-          <FooterIllustrationsV2 />
+          <FooterIllustrationsV2/>
         </Box>
       ) : null}
-      <RightWrapper sx={skin === 'bordered' && !hidden ? { borderLeft: `1px solid ${theme.palette.divider}` } : {}}>
+      <RightWrapper sx={skin === 'bordered' && !hidden ? {borderLeft: `1px solid ${theme.palette.divider}`} : {}}>
         <Box
           sx={{
             p: 7,
@@ -188,29 +188,29 @@ const LoginPage = () => {
               }}
             >
               <Logo/>
-              <Typography variant='h6' sx={{ ml: 2, lineHeight: 1, fontWeight: 700, fontSize: '1.5rem !important' }}>
+              <Typography variant='h6' sx={{ml: 2, lineHeight: 1, fontWeight: 700, fontSize: '1.5rem !important'}}>
                 {themeConfig.templateName}
               </Typography>
             </Box>
-            <Box sx={{ mb: 6 }}>
+            <Box sx={{mb: 6}}>
               <TypographyStyled variant='h5'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</TypographyStyled>
               <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
             </Box>
-            <Alert icon={false} sx={{ py: 3, mb: 6, ...bgClasses.primaryLight, '& .MuiAlert-message': { p: 0 } }}>
-              <Typography variant='caption' sx={{ mb: 2, display: 'block', color: 'primary.main' }}>
+            <Alert icon={false} sx={{py: 3, mb: 6, ...bgClasses.primaryLight, '& .MuiAlert-message': {p: 0}}}>
+              <Typography variant='caption' sx={{mb: 2, display: 'block', color: 'primary.main'}}>
                 Admin: <strong>admin@root.com</strong> / Pass: <strong>admin</strong>
               </Typography>
-              <Typography variant='caption' sx={{ display: 'block', color: 'primary.main' }}>
+              <Typography variant='caption' sx={{display: 'block', color: 'primary.main'}}>
                 Client: <strong>client@root.com</strong> / Pass: <strong>client</strong>
               </Typography>
             </Alert>
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
-              <FormControl fullWidth sx={{ mb: 4 }}>
+              <FormControl fullWidth sx={{mb: 4}}>
                 <Controller
                   name='email'
                   control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
+                  rules={{required: true}}
+                  render={({field: {value, onChange, onBlur}}) => (
                     <TextField
                       autoFocus
                       label='Email'
@@ -222,7 +222,7 @@ const LoginPage = () => {
                     />
                   )}
                 />
-                {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
+                {errors.email && <FormHelperText sx={{color: 'error.main'}}>{errors.email.message}</FormHelperText>}
               </FormControl>
               <FormControl fullWidth>
                 <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
@@ -231,8 +231,8 @@ const LoginPage = () => {
                 <Controller
                   name='password'
                   control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
+                  rules={{required: true}}
+                  render={({field: {value, onChange, onBlur}}) => (
                     <OutlinedInput
                       value={value}
                       onBlur={onBlur}
@@ -248,7 +248,7 @@ const LoginPage = () => {
                             onMouseDown={e => e.preventDefault()}
                             onClick={() => setShowPassword(!showPassword)}
                           >
-                            {showPassword ? <EyeOutline /> : <EyeOffOutline />}
+                            {showPassword ? <EyeOutline/> : <EyeOffOutline/>}
                           </IconButton>
                         </InputAdornment>
                       }
@@ -256,60 +256,60 @@ const LoginPage = () => {
                   )}
                 />
                 {errors.password && (
-                  <FormHelperText sx={{ color: 'error.main' }} id=''>
+                  <FormHelperText sx={{color: 'error.main'}} id=''>
                     {errors.password.message}
                   </FormHelperText>
                 )}
               </FormControl>
               <Box
-                sx={{ mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
+                sx={{mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between'}}
               >
                 <FormControlLabel
                   label='Remember Me'
-                  control={<Checkbox />}
-                  sx={{ '& .MuiFormControlLabel-label': { color: 'text.primary' } }}
+                  control={<Checkbox/>}
+                  sx={{'& .MuiFormControlLabel-label': {color: 'text.primary'}}}
                 />
                 <Link passHref href='/forgot-password'>
-                  <Typography component={MuiLink} variant='body2' sx={{ color: 'primary.main' }}>
+                  <Typography component={MuiLink} variant='body2' sx={{color: 'primary.main'}}>
                     Forgot Password?
                   </Typography>
                 </Link>
               </Box>
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
+              <Button fullWidth size='large' type='submit' variant='contained' sx={{mb: 7}}>
                 Login
               </Button>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography sx={{ mr: 2, color: 'text.secondary' }}>New on our platform?</Typography>
+              <Box sx={{display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center'}}>
+                <Typography sx={{mr: 2, color: 'text.secondary'}}>New on our platform?</Typography>
                 <Typography>
                   <Link passHref href='/register'>
-                    <Typography component={MuiLink} sx={{ color: 'primary.main' }}>
+                    <Typography component={MuiLink} sx={{color: 'primary.main'}}>
                       Create an account
                     </Typography>
                   </Link>
                 </Typography>
               </Box>
-              <Divider sx={{ mt: 5, mb: 7.5, '& .MuiDivider-wrapper': { px: 4 } }}>or</Divider>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Divider sx={{mt: 5, mb: 7.5, '& .MuiDivider-wrapper': {px: 4}}}>or</Divider>
+              <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                 <Link href='/' passHref>
                   <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                    <Facebook sx={{ color: '#497ce2' }} />
+                    <Facebook sx={{color: '#497ce2'}}/>
                   </IconButton>
                 </Link>
                 <Link href='/' passHref>
                   <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                    <Twitter sx={{ color: '#1da1f2' }} />
+                    <Twitter sx={{color: '#1da1f2'}}/>
                   </IconButton>
                 </Link>
                 <Link href='/' passHref>
                   <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
                     <Github
-                      sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
+                      sx={{color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300])}}
                     />
                   </IconButton>
                 </Link>
                 <Link href='/' passHref>
                   <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                    <Google sx={{ color: '#db4437' }} />
+                    <Google sx={{color: '#db4437'}}/>
                   </IconButton>
                 </Link>
               </Box>

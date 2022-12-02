@@ -8,13 +8,13 @@ import { useRouter } from 'next/router'
 import Spinner from 'src/@core/components/spinner'
 
 // ** Hook Imports
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth } from 'src/lib/hooks/useAuth'
 
 /**
  *  Set Home URL based on User Roles
  */
-export const getHomeRoute = (role: string) => {
-  if (role === 'client') return '/acl'
+export const getHomeRoute = (roles: string[]) => {
+  if (roles.includes('client')) return '/acl'
   else return '/home'
 }
 
@@ -28,8 +28,8 @@ const Home = () => {
       return
     }
 
-    if (auth.user && auth.user.role) {
-      const homeRoute = getHomeRoute(auth.user.role)
+    if (auth.user && auth.user.roles) {
+      const homeRoute = getHomeRoute(auth.user.roles)
 
       // Redirect user to Home URL
       router.replace(homeRoute)

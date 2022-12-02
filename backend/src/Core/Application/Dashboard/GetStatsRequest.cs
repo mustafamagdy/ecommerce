@@ -44,7 +44,7 @@ public class GetStatsRequestHandler : IRequestHandler<GetStatsRequest, StatsDto>
       RoleCount = await _roleService.GetCountAsync(cancellationToken).ConfigureAwait(false)
     };
 
-    int selectedYear = _time.UtcNow.Year;
+    int selectedYear = _time.Now .Year;
     double[] ordersCountFigure = new double[13];
     double[] ordersTotalFigure = new double[13];
     for (int month = 1; month <= 12; month++)

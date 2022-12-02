@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState, useEffect, MouseEvent, ReactElement, forwardRef } from 'react'
+import {Fragment, useState, useEffect, MouseEvent, ReactElement, forwardRef} from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Menu from '@mui/material/Menu'
 import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
+import {styled} from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
@@ -19,8 +19,8 @@ import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
-import { DataGrid, GridRowId } from '@mui/x-data-grid'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import {DataGrid, GridRowId} from '@mui/x-data-grid'
+import Select, {SelectChangeEvent} from '@mui/material/Select'
 
 // ** Icons Imports
 import Send from 'mdi-material-ui/Send'
@@ -42,17 +42,16 @@ import format from 'date-fns/format'
 import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteInvoice } from 'src/store/apps/invoice'
+import {useDispatch, useSelector} from 'react-redux'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
+import {RootState, AppDispatch} from 'src/lib/store'
+import {ThemeColor} from 'src/@core/layouts/types'
+import {InvoiceType} from 'src/types/apps/invoiceTypes'
+import {DateType} from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
+import {getInitials} from 'src/@core/utils/get-initials'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -85,12 +84,12 @@ interface CellType {
 }
 
 // ** Styled component for the link in the dataTable
-const StyledLink = styled('a')(({ theme }) => ({
+const StyledLink = styled('a')(({theme}) => ({
   textDecoration: 'none',
   color: theme.palette.primary.main
 }))
 
-const RowOptions = ({ id }: { id: number | string }) => {
+const RowOptions = ({id}: { id: number | string }) => {
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -106,7 +105,7 @@ const RowOptions = ({ id }: { id: number | string }) => {
   return (
     <Fragment>
       <IconButton size='small' onClick={handleRowOptionsClick}>
-        <DotsVertical />
+        <DotsVertical/>
       </IconButton>
       <Menu
         keepMounted
@@ -123,17 +122,17 @@ const RowOptions = ({ id }: { id: number | string }) => {
         }}
       >
         <MenuItem>
-          <Download fontSize='small' sx={{ mr: 2 }} />
+          <Download fontSize='small' sx={{mr: 2}}/>
           Download
         </MenuItem>
         <Link href={`/invoice/edit/${id}`} passHref>
           <MenuItem>
-            <PencilOutline fontSize='small' sx={{ mr: 2 }} />
+            <PencilOutline fontSize='small' sx={{mr: 2}}/>
             Edit
           </MenuItem>
         </Link>
         <MenuItem>
-          <ContentCopy fontSize='small' sx={{ mr: 2 }} />
+          <ContentCopy fontSize='small' sx={{mr: 2}}/>
           Duplicate
         </MenuItem>
       </Menu>
@@ -143,24 +142,24 @@ const RowOptions = ({ id }: { id: number | string }) => {
 
 // ** Vars
 const invoiceStatusObj: InvoiceStatusObj = {
-  Sent: { color: 'secondary', icon: <Send sx={{ fontSize: '1.25rem' }} /> },
-  Paid: { color: 'success', icon: <Check sx={{ fontSize: '1.25rem' }} /> },
-  Draft: { color: 'primary', icon: <ContentSaveOutline sx={{ fontSize: '1.25rem' }} /> },
-  'Partial Payment': { color: 'warning', icon: <ChartPie sx={{ fontSize: '1.25rem' }} /> },
-  'Past Due': { color: 'error', icon: <InformationOutline sx={{ fontSize: '1.25rem' }} /> },
-  Downloaded: { color: 'info', icon: <ArrowDown sx={{ fontSize: '1.25rem' }} /> }
+  Sent: {color: 'secondary', icon: <Send sx={{fontSize: '1.25rem'}}/>},
+  Paid: {color: 'success', icon: <Check sx={{fontSize: '1.25rem'}}/>},
+  Draft: {color: 'primary', icon: <ContentSaveOutline sx={{fontSize: '1.25rem'}}/>},
+  'Partial Payment': {color: 'warning', icon: <ChartPie sx={{fontSize: '1.25rem'}}/>},
+  'Past Due': {color: 'error', icon: <InformationOutline sx={{fontSize: '1.25rem'}}/>},
+  Downloaded: {color: 'info', icon: <ArrowDown sx={{fontSize: '1.25rem'}}/>}
 }
 
 // ** renders client column
 const renderClient = (row: InvoiceType) => {
   if (row.avatar.length) {
-    return <CustomAvatar src={row.avatar} sx={{ mr: 3, width: 34, height: 34 }} />
+    return <CustomAvatar src={row.avatar} sx={{mr: 3, width: 34, height: 34}}/>
   } else {
     return (
       <CustomAvatar
         skin='light'
         color={(row.avatarColor as ThemeColor) || ('primary' as ThemeColor)}
-        sx={{ mr: 3, fontSize: '1rem', width: 34, height: 34 }}
+        sx={{mr: 3, fontSize: '1rem', width: 34, height: 34}}
       >
         {getInitials(row.name || 'John Doe')}
       </CustomAvatar>
@@ -174,7 +173,7 @@ const defaultColumns = [
     field: 'id',
     minWidth: 80,
     headerName: '#',
-    renderCell: ({ row }: CellType) => (
+    renderCell: ({row}: CellType) => (
       <Link href={`/invoice/preview/${row.id}`} passHref>
         <StyledLink>{`#${row.id}`}</StyledLink>
       </Link>
@@ -184,9 +183,9 @@ const defaultColumns = [
     flex: 0.1,
     minWidth: 80,
     field: 'invoiceStatus',
-    renderHeader: () => <TrendingUp fontSize='small' sx={{ color: 'action.active' }} />,
-    renderCell: ({ row }: CellType) => {
-      const { dueDate, balance, invoiceStatus } = row
+    renderHeader: () => <TrendingUp fontSize='small' sx={{color: 'action.active'}}/>,
+    renderCell: ({row}: CellType) => {
+      const {dueDate, balance, invoiceStatus} = row
 
       const color = invoiceStatusObj[invoiceStatus] ? invoiceStatusObj[invoiceStatus].color : 'primary'
       const Icon = invoiceStatusObj[invoiceStatus] ? invoiceStatusObj[invoiceStatus].icon : null
@@ -195,23 +194,23 @@ const defaultColumns = [
         <Tooltip
           title={
             <div>
-              <Typography variant='caption' sx={{ color: 'common.white', fontWeight: 600 }}>
+              <Typography variant='caption' sx={{color: 'common.white', fontWeight: 600}}>
                 {invoiceStatus}
               </Typography>
-              <br />
-              <Typography variant='caption' sx={{ color: 'common.white', fontWeight: 600 }}>
+              <br/>
+              <Typography variant='caption' sx={{color: 'common.white', fontWeight: 600}}>
                 Balance:
               </Typography>{' '}
               {balance}
-              <br />
-              <Typography variant='caption' sx={{ color: 'common.white', fontWeight: 600 }}>
+              <br/>
+              <Typography variant='caption' sx={{color: 'common.white', fontWeight: 600}}>
                 Due Date:
               </Typography>{' '}
               {dueDate}
             </div>
           }
         >
-          <CustomAvatar skin='light' color={color} sx={{ width: 34, height: 34 }}>
+          <CustomAvatar skin='light' color={color} sx={{width: 34, height: 34}}>
             {Icon}
           </CustomAvatar>
         </Tooltip>
@@ -223,17 +222,17 @@ const defaultColumns = [
     field: 'name',
     minWidth: 300,
     headerName: 'Client',
-    renderCell: ({ row }: CellType) => {
-      const { name, companyEmail } = row
+    renderCell: ({row}: CellType) => {
+      const {name, companyEmail} = row
 
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
           {renderClient(row)}
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{display: 'flex', flexDirection: 'column'}}>
             <Typography
               noWrap
               variant='body2'
-              sx={{ color: 'text.primary', fontWeight: 500, lineHeight: '22px', letterSpacing: '.1px' }}
+              sx={{color: 'text.primary', fontWeight: 500, lineHeight: '22px', letterSpacing: '.1px'}}
             >
               {name}
             </Typography>
@@ -250,27 +249,27 @@ const defaultColumns = [
     minWidth: 90,
     field: 'total',
     headerName: 'Total',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{`$${row.total || 0}`}</Typography>
+    renderCell: ({row}: CellType) => <Typography variant='body2'>{`$${row.total || 0}`}</Typography>
   },
   {
     flex: 0.15,
     minWidth: 125,
     field: 'issuedDate',
     headerName: 'Issued Date',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{row.issuedDate}</Typography>
+    renderCell: ({row}: CellType) => <Typography variant='body2'>{row.issuedDate}</Typography>
   },
   {
     flex: 0.1,
     minWidth: 90,
     field: 'balance',
     headerName: 'Balance',
-    renderCell: ({ row }: CellType) => {
+    renderCell: ({row}: CellType) => {
       return row.balance !== 0 ? (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        <Typography variant='body2' sx={{color: 'text.primary'}}>
           {row.balance}
         </Typography>
       ) : (
-        <CustomChip size='small' skin='light' color='success' label='Paid' />
+        <CustomChip size='small' skin='light' color='success' label='Paid'/>
       )
     }
   }
@@ -283,10 +282,10 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 
   const value = `${startDate}${endDate !== null ? endDate : ''}`
   props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
-  const updatedProps = { ...props }
+  const updatedProps = {...props}
   delete updatedProps.setDates
 
-  return <TextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
+  return <TextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value}/>
 })
 /* eslint-enable */
 
@@ -302,16 +301,16 @@ const InvoiceList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.invoice)
+  const store = useSelector((state: RootState) => state.invoices)
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        dates,
-        q: value,
-        status: statusValue
-      })
-    )
+    //dispatch(
+    //  fetchData({
+    //    dates,
+    //    q: value,
+    //    status: statusValue
+    //  })
+    // )
   }, [dispatch, statusValue, value, dates])
 
   const handleFilter = (val: string) => {
@@ -339,23 +338,27 @@ const InvoiceList = () => {
       sortable: false,
       field: 'actions',
       headerName: 'Actions',
-      renderCell: ({ row }: CellType) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      renderCell: ({row}: CellType) => (
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Tooltip title='Delete Invoice'>
-            <IconButton size='small' sx={{ mr: 0.5 }} onClick={() => dispatch(deleteInvoice(row.id))}>
-              <DeleteOutline />
+            <IconButton size='small' sx={{mr: 0.5}} onClick={() =>
+
+              // dispatch(deleteInvoice(row.id))
+              console.log('delete')
+            }>
+              <DeleteOutline/>
             </IconButton>
           </Tooltip>
           <Tooltip title='View'>
             <Box>
               <Link href={`/invoice/preview/${row.id}`} passHref>
-                <IconButton size='small' component='a' sx={{ textDecoration: 'none', mr: 0.5 }}>
-                  <EyeOutline />
+                <IconButton size='small' component='a' sx={{textDecoration: 'none', mr: 0.5}}>
+                  <EyeOutline/>
                 </IconButton>
               </Link>
             </Box>
           </Tooltip>
-          <RowOptions id={row.id} />
+          <RowOptions id={row.id}/>
         </Box>
       )
     }
@@ -365,7 +368,7 @@ const InvoiceList = () => {
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title='Filters' />
+          <CardHeader title='Filters'/>
           <CardContent>
             <Grid container spacing={6}>
               <Grid item xs={12} sm={6}>
@@ -375,7 +378,7 @@ const InvoiceList = () => {
                   <Select
                     fullWidth
                     value={statusValue}
-                    sx={{ mr: 4, mb: 2 }}
+                    sx={{mr: 4, mb: 2}}
                     label='Invoice Status'
                     onChange={handleStatusValue}
                     labelId='invoice-status-select'
@@ -419,7 +422,7 @@ const InvoiceList = () => {
       </Grid>
       <Grid item xs={12}>
         <Card>
-          <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} />
+          <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter}/>
           <DataGrid
             autoHeight
             pagination
@@ -429,7 +432,7 @@ const InvoiceList = () => {
             disableSelectionOnClick
             pageSize={Number(pageSize)}
             rowsPerPageOptions={[10, 25, 50]}
-            sx={{ '& .MuiDataGrid-columnHeaders': { borderRadius: 0 } }}
+            sx={{'& .MuiDataGrid-columnHeaders': {borderRadius: 0}}}
             onSelectionModelChange={rows => setSelectedRows(rows)}
             onPageSizeChange={newPageSize => setPageSize(newPageSize)}
           />

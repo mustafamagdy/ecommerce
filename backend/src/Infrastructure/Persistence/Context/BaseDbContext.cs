@@ -19,7 +19,7 @@ using Microsoft.Extensions.Options;
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
 public abstract class BaseDbContext
-  : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
+  : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
   private readonly ITenantInfo? _currentTenant;
   private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;

@@ -63,7 +63,7 @@ public class DashboardTests : TestFixture
     dashboard.BranchCount.Should().Be(1);
     dashboard.OrderCount.Should().Be(1);
     dashboard.DataEnterBarChart.Should().NotBeNullOrEmpty();
-    var currentMonth = DateTime.Now.Month - 1;
+    var currentMonth = HostFixture.SYSTEM_TIME.Now.Month - 1;
     dashboard.DataEnterBarChart[0].Data[currentMonth].Should().Be(1);
     dashboard.DataEnterBarChart[1].Data[currentMonth].Should().Be((double)order.TotalAmount);
   }

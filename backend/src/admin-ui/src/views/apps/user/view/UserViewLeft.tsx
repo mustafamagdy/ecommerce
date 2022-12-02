@@ -37,13 +37,13 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-import { UsersType } from 'src/types/apps/userTypes'
+import { UserType } from 'src/types/apps/userTypes'
 
 // ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
 
 interface Props {
-  data: UsersType
+  data: UserType
 }
 
 interface ColorsType {
@@ -95,9 +95,9 @@ const UserViewLeft = ({ data }: Props) => {
 
   const renderUserAvatar = () => {
     if (data) {
-      if (data.avatar.length) {
+      if (data.imagePath.length) {
         return (
-          <CustomAvatar alt='User Image' src={data.avatar} variant='rounded' sx={{ width: 120, height: 120, mb: 4 }} />
+          <CustomAvatar alt='User Image' src={data.imagePath} variant='rounded' sx={{ width: 120, height: 120, mb: 4 }} />
         )
       } else {
         return (
@@ -175,7 +175,7 @@ const UserViewLeft = ({ data }: Props) => {
                   <Typography variant='subtitle2' sx={{ mr: 2, color: 'text.primary' }}>
                     Username:
                   </Typography>
-                  <Typography variant='body2'>@{data.username}</Typography>
+                  <Typography variant='body2'>@{data.userName}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2.7 }}>
                   <Typography variant='subtitle2' sx={{ mr: 2, color: 'text.primary' }}>
@@ -212,16 +212,8 @@ const UserViewLeft = ({ data }: Props) => {
                   <Typography variant='body2'>Tax-8894</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2.7 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
-                  <Typography variant='body2'>+1 {data.contact}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2.7 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
                   <Typography variant='body2'>English</Typography>
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Country:</Typography>
-                  <Typography variant='body2'>{data.country}</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -258,7 +250,7 @@ const UserViewLeft = ({ data }: Props) => {
                       <TextField
                         fullWidth
                         label='Username'
-                        defaultValue={data.username}
+                        defaultValue={data.userName}
                         InputProps={{ startAdornment: <InputAdornment position='start'>@</InputAdornment> }}
                       />
                     </Grid>
@@ -282,9 +274,6 @@ const UserViewLeft = ({ data }: Props) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField fullWidth label='TAX ID' defaultValue='Tax-8894' />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Contact' defaultValue={`+1 ${data.contact}`} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
