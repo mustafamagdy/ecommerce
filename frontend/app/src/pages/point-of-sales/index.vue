@@ -47,8 +47,7 @@
                                             <q-img :src="product.imagePath" alt="" />
                                             <span class="text-body1">{{ product.name }}</span>
                                         </div>
-                                        <q-badge class="text-body1 bg-color-info q-my-sm" floating>{{ product.price }}
-                                        </q-badge>
+                                        <q-badge class="text-body1 bg-color-info q-my-sm" floating>{{ product.price }} </q-badge>
                                     </q-btn>
                                 </div>
                             </div>
@@ -68,8 +67,7 @@
                                     <span class="col-2 q-pa-xs">{{ item.qty }}</span>
                                     <span class="col-2 q-pa-xs">{{ item.price }}</span>
                                     <div class="col-2 q-pa-xs">
-                                        <q-btn class="bg-color-negative" icon="mdi-minus-circle-outline"
-                                               @click="removeItem(index)" />
+                                        <q-btn class="bg-color-negative" icon="mdi-minus-circle-outline" @click="removeItem(index)" />
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +92,7 @@
                     <div class="col-8 column">
                         <payment-kit v-model="paymentMethods.records" class="col-grow panel q-mr-sm" />
                     </div>
-                    <div class=" col-4 column panel">
+                    <div class="col-4 column panel">
                         <div class="column col-grow items-center pos-totals text-body1">
                             <span>{{ $t("pos-total-due") }}</span>
                             <span class="pos-totals-item bg-color-info text-h4 text-center">{{ totalPrice }}</span>
@@ -108,15 +106,14 @@
                                 </div>
                                 <q-separator class="self-stretch" />
                                 <span>{{ $t("pos-paid-total") }}</span>
-                                <span class="pos-totals-item bg-color-positive text-h4 text-center">{{ totalPaid
-                                    }}</span>
+                                <span class="pos-totals-item bg-color-positive text-h4 text-center">{{ totalPaid }}</span>
                             </div>
                             <q-separator class="self-stretch" />
                             <span>{{ $t("pos-remain") }}</span>
                             <span
                                 class="pos-totals-item text-h4"
                                 :class="remain < 0 ? 'bg-color-negative' : remain > 0 ? 'bg-color-primary' : ''"
-                            >{{ remain }}</span
+                                >{{ remain }}</span
                             >
                         </div>
                         <div class="row" v-if="step === 2">
@@ -151,7 +148,7 @@ const servicesList = reactive(
         apiPath: serverApis.services,
         storeModule: storeModules.pointOfSales,
         listName: pages.services,
-        pageSize: 0
+        pageSize: 0,
     })
 );
 console.log(servicesList);
@@ -161,45 +158,45 @@ const productsList = {
             id: "8529eab0-df42-48d0-b381-fb34dfc88d38",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc84d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb36dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d6-b381-fb34dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d1-b381-fb34dfc88d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc84d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
+            price: 2.5,
         },
         {
             id: "8529eab0-df42-48d0-b381-fb34dfc89d88",
             name: "اسم الخدمة 341",
             imagePath: "https://loremflickr.com/300/300/abstract",
-            price: 2.5
-        }
-    ]
+            price: 2.5,
+        },
+    ],
 };
 const paymentMethods = reactive({
     records: [
@@ -209,7 +206,7 @@ const paymentMethods = reactive({
             label: "Cash",
             type: "cash",
             icon: "mdi-cash-100",
-            paid: 0
+            paid: 0,
         },
         {
             id: "2",
@@ -217,14 +214,14 @@ const paymentMethods = reactive({
             label: "ATM",
             type: "atm",
             icon: "mdi-credit-card-outline",
-            paid: 0
-        }
-    ]
+            paid: 0,
+        },
+    ],
 });
 const order = reactive({
     isForward: false,
     items: [],
-    payments: []
+    payments: [],
 });
 const step = ref(2);
 
@@ -240,7 +237,7 @@ watch(
         newVal.forEach((p) => {
             payments.push({
                 paymentMethodId: p.id,
-                amount: p.paid
+                amount: p.paid,
             });
         });
         order.payments = payments;
@@ -256,7 +253,7 @@ const addItem = (product) => {
             name: product.name,
             qty: 1,
             unitPrice: product.price,
-            price: product.price
+            price: product.price,
         });
     } else {
         order.items[itemIndex].qty += 1;

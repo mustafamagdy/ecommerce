@@ -857,5 +857,82 @@
       "imageUrl": "",
       "id": "9daa02ba-d537-4514-badf-100a46868d4f"
     }
+  ],
+  "pointOfSalesList": [
+    {
+      "id": "mgm",
+      "name": " Point of sale1",
+      "branch": "branch1",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "lmflm",
+      "name": " Point of sale2",
+      "branch": "branch2",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "mddj",
+      "name": " Point of sale3",
+      "branch": "branch3",
+      "isActive": false,
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "code": "",
+      "defaultCustomer": "",
+      "imageFile": {
+        "name": "96907ff0-0835-44f7-8c76-1f7ab763fa7e"
+      }
+    },
+    {
+      "id": "ndnjj",
+      "name": " Point of sale4",
+      "branch": "branch3",
+      "isActive": false,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "new kjljlej",
+      "branch": "branch1",
+      "isActive": "",
+      "defaultCustomer": "cust2",
+      "imageFile": {
+        "name": "a93dc3c6-687f-412e-8e8b-5c03ef060a0b"
+      },
+      "id": "2db59e7c-735b-48f1-ae17-eead30560e84"
+    }
+  ],
+  "pointOfSalesSessions": [
+    {
+      "id": "mgm",
+      "name": " Point of sale1",
+      "employeeName": "Mohamed",
+      "date": "01/01/2022",
+      "time": "time",
+      "branch": "branch1",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "lmflm",
+      "name": " Point of sale2",
+      "employeeName": "Mohamed",
+      "date": "01/01/2022",
+      "time": "time",
+      "branch": "branch2",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "ndnjj",
+      "name": " Point of sale4",
+      "employeeName": "Mohamed",
+      "date": "01/01/2022",
+      "time": "time",
+      "branch": "branch3",
+      "isActive": false,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    }
   ]
 }

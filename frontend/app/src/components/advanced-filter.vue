@@ -21,7 +21,6 @@
 
 <script setup>
 import { reactive, ref } from "vue";
-
 const valueTypeEnum = Object.freeze({
     text: "text",
     number: "number",

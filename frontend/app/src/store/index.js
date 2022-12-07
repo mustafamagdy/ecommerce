@@ -30,6 +30,8 @@ export default store(function (/* { ssrContext } */) {
             subscriptionAccountStatement: crud,
             roles: crud,
             users: crud,
+            pointOfSalesList: crud,
+            pointOfSalesSessions: crud,
         },
         // enable strict mode (adds overhead!)
         // for dev mode and --debug builds only

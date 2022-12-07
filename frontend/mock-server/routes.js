@@ -19,4 +19,6 @@ export const initRoutes = (app) => {
   crudApis(app, "roles");
   crudApis(app, "users");
   crudApis(app, "serviceCatalog");
+  crudApis(app, "pointOfSalesList");
+  crudApis(app, "pointOfSalesSessions");
 };
