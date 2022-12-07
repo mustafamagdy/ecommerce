@@ -102,6 +102,22 @@ let routes = [
                 props: true,
             },
             {
+                path: "/pointOsalesList",
+                name: "pointOsalesList",
+                component: () =>
+                    import("src/pages/point-of-sales/point-of-sales-list.vue"),
+                props: true,
+            },
+            {
+                path: "/pointOsalesSessions",
+                name: "pointOsalesSessions",
+                component: () =>
+                    import(
+                        "src/pages/point-of-sales/point-of-sales-sessions-list.vue"
+                    ),
+                props: true,
+            },
+            {
                 path: "/users",
                 name: "users",
                 component: () => import("src/pages/users/index"),

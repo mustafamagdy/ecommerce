@@ -12,4 +12,6 @@ export const serverApis = {
     roles: `${baseURL}/roles`,
     users: `${baseURL}/users`,
     serviceCatalog: `${baseURL}/serviceCatalog`,
+    pointOfSalesList: `${baseURL}/pointOfSalesList`,
+    pointOfSalesSessions: `${baseURL}/pointOfSalesSessions`,
 };

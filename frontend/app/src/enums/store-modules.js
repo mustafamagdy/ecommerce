@@ -12,4 +12,6 @@ export const storeModules = {
     roles: "roles",
     users: "users",
     serviceCatalog: "serviceCatalog",
+    pointOfSalesList: "pointOfSalesList",
+    pointOfSalesSessions: "pointOfSalesSessions",
 };
