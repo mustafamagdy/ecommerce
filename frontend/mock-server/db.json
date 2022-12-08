@@ -911,28 +911,44 @@
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch1",
-      "isActive": true,
+      "status": "new",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
       "id": "lmflm",
-      "name": " Point of sale2",
+      "name": "point2",
       "employeeName": "Mohamed",
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch2",
-      "isActive": true,
+      "status": "closed",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
     },
     {
       "id": "ndnjj",
-      "name": " Point of sale4",
+      "name": " Point of sale3",
       "employeeName": "Mohamed",
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch3",
-      "isActive": false,
+      "status": "approved",
       "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "aqaq233",
+      "name": " Point of sale4",
+      "employeeName": "Ahmed",
+      "date": "01/09/2022",
+      "time": "time",
+      "branch": "branch3",
+      "status": "approved",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "point2",
+      "employeeName": "emp2",
+      "status": "new",
+      "id": "b63ffb13-3445-47d2-89e0-96f7cfbcc09e"
     }
   ]
 }
