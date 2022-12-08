@@ -26,8 +26,18 @@
                                 </q-item-section>
                             </q-item>
                             <q-item class="column">
-                                {{ record.isActive ? $t("Active") : $t("Deactive") }}
-                                <q-separator :color="record.isActive ? 'green' : 'red'" inset class="full-width" />
+                                {{ record.status }}
+                                <q-separator
+                                    :color="
+                                        record.status === 'active'
+                                            ? 'green'
+                                            : record.status === 'closed'
+                                            ? 'red'
+                                            : record.status === 'approved'
+                                            ? 'blue'
+                                            : 'orange'
+                                    "
+                                />
                             </q-item>
                         </q-card-section>
                         <q-item-section class="column q-ma-sm items-center">
@@ -47,28 +57,61 @@
                                     icon="mdi-playlist-edit"
                                     padding="xs"
                                     class="bg-color-info"
-                                    @click="page.showEdit = { show: true, id: record.id }"
+                                    @click="(page.showEdit = { show: true, id: record.id }), (status = record.status)"
                                 />
                                 <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
+                                            <q-item clickable v-ripple>
+                                                <q-item-section>
+                                                    <q-icon
+                                                        size="md"
+                                                        :name="
+                                                            record.status === 'new'
+                                                                ? 'play_circle'
+                                                                : record.status === 'active'
+                                                                ? 'cancel'
+                                                                : record.status === 'closed'
+                                                                ? 'check_box'
+                                                                : 'recommend'
+                                                        "
+                                                    ></q-icon>
+                                                </q-item-section>
+                                                <q-item-section v-if="record.status === 'new'" @click="record.status = 'active'">
+                                                    {{ $t("activate") }}
+                                                </q-item-section>
+                                                <q-item-section v-if="record.status === 'active'" @click="record.status = 'closed'">
+                                                    {{ $t("close") }}
+                                                </q-item-section>
+                                                <q-item-section v-if="record.status === 'closed'" @click="record.status = 'approved'"
+                                                    >{{ $t("approve") }}
+                                                </q-item-section>
+                                                <q-item-section v-if="record.status === 'approved'" @click="record.status = 'approved'"
+                                                    >{{ $t("approved") }}
+                                                </q-item-section>
+                                            </q-item>
+                                            <q-item clickable v-ripple @click="goToPointOfSalesPage(record)">
+                                                <q-item-section>
+                                                    <q-icon size="md" name="login" />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    {{ $t("pointOfSales") }}
+                                                </q-item-section>
+                                            </q-item>
+                                            <q-item clickable v-ripple>
+                                                <q-item-section>
+                                                    <q-icon size="md" name="summarize" />
+                                                </q-item-section>
+                                                <q-item-section>
+                                                    {{ $t("reports") }}
+                                                </q-item-section>
+                                            </q-item>
                                             <q-item clickable v-ripple @click="page.deleteItem(record.id)">
                                                 <q-item-section>
                                                     <q-icon size="md" name="mdi-delete-outline" />
                                                 </q-item-section>
                                                 <q-item-section>
                                                     {{ $t("delete") }}
-                                                </q-item-section>
-                                            </q-item>
-                                            <q-item clickable v-ripple>
-                                                <q-item-section>
-                                                    <q-icon
-                                                        size="md"
-                                                        :name="record.isActive ? 'mdi-pause-circle-outline' : 'mdi-play-circle-outline'"
-                                                    ></q-icon>
-                                                </q-item-section>
-                                                <q-item-section>
-                                                    {{ record.isActive ? $t("deactivate") : $t("activate") }}
                                                 </q-item-section>
                                             </q-item>
                                         </q-list>
@@ -90,13 +133,34 @@
                 @update:model-value="page.load"
             />
         </div>
-        <!-- <q-dialog v-model="page.showAddOrEdit" persistent> <pointOfSalesSessionsAddEdit :showAdd="page.showAdd" /> </q-dialog> -->
+        <q-dialog v-if="status === 'new'" v-model="page.showAddOrEdit" persistent>
+            <pointOfSalesSessionsAddEditNew :showAdd="page.showAdd" />
+        </q-dialog>
+        <q-dialog v-if="status === 'active' || status === 'closed' || status === 'approved'" v-model="page.showAddOrEdit" persistent>
+            <pointOfSalesAddEditForActiveOne :showAdd="page.showAdd" :status="status" />
+        </q-dialog>
     </div>
 </template>
 <script setup>
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
-import { onMounted, reactive } from "vue-demi";
+import { Notify } from "quasar";
+import { redirect } from "vue-router";
+import { onMounted, reactive, ref } from "vue-demi";
+import pointOfSalesSessionsAddEditNew from "./point-of-sales-sessions-add-edit-new.vue";
+import pointOfSalesAddEditForActiveOne from "./point-of-sales-sessions-add-edit-for-activeOne.vue";
+
+const goToPointOfSalesPage = (record) => {
+    if (record.status === "new") {
+        Notify.create("Please Activate session first!");
+    } else if (record.status === "closed" || record.status === "approved") {
+        Notify.create("Sorry, your session has been closed or approved");
+    } else {
+        redirect("./index.vue");
+    }
+};
+const status = ref("");
+
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.pointOfSalesSessions,
