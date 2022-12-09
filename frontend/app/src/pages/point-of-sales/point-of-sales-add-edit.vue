@@ -29,15 +29,14 @@
                         </div>
 
                         <q-card-section class="column">
-                            <span class="label q-mx-sm">{{ $t("Payment_ways :") }}</span>
+                            <span class="label q-mx-sm">{{ $t("Payment_options :") }}</span>
                             <div class="column">
                                 <div class="row justify-around">
-                                    <q-btn :label="$t('btn_add')" icon="add" type="submit" class="bg-color-primary">
-                                        <template v-slot:loading>
-                                            <q-spinner-oval />
-                                        </template>
-                                    </q-btn>
-                                    <q-btn :label="$t('btn_add_all')" icon="add" type="submit" class="bg-color-primary">
+                                    <q-btn-dropdown color="primary" :label="$t('btn_add')" icon="add">
+                                        <q-option-group :options="paymentOptions" type="checkbox" v-model="formData.paymentMethods" />
+                                    </q-btn-dropdown>
+
+                                    <q-btn :label="$t('btn_add_all')" icon="playlist_add" type="submit" class="bg-color-primary">
                                         <template v-slot:loading>
                                             <q-spinner-oval />
                                         </template>
@@ -84,8 +83,14 @@ const formInputs = {
     defaultCustomer: "",
     imageFile: {},
     imageUrl: "",
-    paymentMethods: [],
+    paymentMethods: ref(["option1"]),
 };
+
+paymentOptions: [
+    { label: "Option1", value: "Option1" },
+    { label: "Option2", value: "Option2" },
+    { label: "Option3", value: "Option3" },
+];
 const accept = ref(false);
 const addMethod = false;
 const branchOptions = ["branch1", "branch2"];

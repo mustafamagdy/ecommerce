@@ -62,7 +62,7 @@
                                 <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
-                                            <q-item clickable v-ripple>
+                                            <q-item clickable v-ripple @click="changeStatusAndDate(record)">
                                                 <q-item-section>
                                                     <q-icon
                                                         size="md"
@@ -77,17 +77,16 @@
                                                         "
                                                     ></q-icon>
                                                 </q-item-section>
-                                                <q-item-section v-if="record.status === 'new'" @click="record.status = 'active'">
-                                                    {{ $t("activate") }}
-                                                </q-item-section>
-                                                <q-item-section v-if="record.status === 'active'" @click="record.status = 'closed'">
-                                                    {{ $t("close") }}
-                                                </q-item-section>
-                                                <q-item-section v-if="record.status === 'closed'" @click="record.status = 'approved'"
-                                                    >{{ $t("approve") }}
-                                                </q-item-section>
-                                                <q-item-section v-if="record.status === 'approved'" @click="record.status = 'approved'"
-                                                    >{{ $t("approved") }}
+                                                <q-item-section>
+                                                    {{
+                                                        record.status === "new"
+                                                            ? $t("activate")
+                                                            : record.status === "active"
+                                                            ? "close"
+                                                            : record.status === "closed"
+                                                            ? "approve"
+                                                            : "approved"
+                                                    }}
                                                 </q-item-section>
                                             </q-item>
                                             <q-item clickable v-ripple @click="goToPointOfSalesPage(record)">
@@ -137,7 +136,7 @@
             <pointOfSalesSessionsAddEditNew :showAdd="page.showAdd" />
         </q-dialog>
         <q-dialog v-if="status === 'active' || status === 'closed' || status === 'approved'" v-model="page.showAddOrEdit" persistent>
-            <pointOfSalesAddEditForActiveOne :showAdd="page.showAdd" :status="status" />
+            <pointOfSalesAddEditForActiveOne :showAdd="page.showAdd" />
         </q-dialog>
     </div>
 </template>
@@ -159,8 +158,16 @@ const goToPointOfSalesPage = (record) => {
         redirect("./index.vue");
     }
 };
-const status = ref("");
-
+const status = ref("new");
+const changeStatusAndDate = (record) => {
+    if (record.status === "new") {
+        (record.status = "active"), (record.statusModifyingDate.activationDate = new Date());
+    } else if (record.status === "active") {
+        (record.status = "closed"), (record.statusModifyingDate.closingDate = new Date());
+    } else if (record.status === "closed") {
+        (record.status = "approved"), (record.statusModifyingDate.approvingDate = new Date());
+    }
+};
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.pointOfSalesSessions,

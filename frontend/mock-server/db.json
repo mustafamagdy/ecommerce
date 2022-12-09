@@ -907,12 +907,17 @@
     {
       "id": "mgm",
       "name": " Point of sale1",
-      "employeeName": "Mohamed",
+      "employeeName": "emp2",
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch1",
       "status": "new",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "",
+        "closingDate": "",
+        "approvingDate": ""
+      }
     },
     {
       "id": "lmflm",
@@ -921,8 +926,13 @@
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch2",
-      "status": "closed",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
+      "status": "new",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "",
+        "closingDate": "",
+        "approvingDate": ""
+      }
     },
     {
       "id": "ndnjj",
@@ -932,7 +942,12 @@
       "time": "time",
       "branch": "branch3",
       "status": "approved",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "",
+        "closingDate": "",
+        "approvingDate": ""
+      }
     },
     {
       "id": "aqaq233",
@@ -941,14 +956,13 @@
       "date": "01/09/2022",
       "time": "time",
       "branch": "branch3",
-      "status": "approved",
-      "imageUrl": "https://loremflickr.com/300/300/abstract"
-    },
-    {
-      "name": "point2",
-      "employeeName": "emp2",
       "status": "new",
-      "id": "b63ffb13-3445-47d2-89e0-96f7cfbcc09e"
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "",
+        "closingDate": "",
+        "approvingDate": ""
+      }
     }
   ]
 }
