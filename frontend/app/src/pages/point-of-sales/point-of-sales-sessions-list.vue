@@ -9,7 +9,7 @@
                         <serviceSearch />
                     </q-menu>
                 </q-btn>
-                <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="page.showAdd = true" />
+                <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="(page.showAdd = true), (status = 'new')" />
             </div>
         </div>
         <q-separator class="q-mt-sm" inset />
