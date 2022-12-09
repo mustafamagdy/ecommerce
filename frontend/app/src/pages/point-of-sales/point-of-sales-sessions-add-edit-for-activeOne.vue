@@ -16,39 +16,29 @@
                         <div class="column">
                             <div class="row">
                                 <span class="label q-ma-sm">{{ $t("status :") }} </span>
-                                <span class="label q-ma-sm"> {{ props.status }} </span>
+                                <span class="label q-ma-sm"> {{ formData.status }} </span>
                                 <q-btn
-                                    v-if="props.status === 'active'"
-                                    icon="cancel"
-                                    padding="xs"
-                                    class="bg-color-negative"
-                                    @click="formData.status = 'closed'"
-                                >
-                                    {{ $t("close") }}
-                                </q-btn>
-                                <q-btn
-                                    icon="check_box"
+                                    v-model="formData.status"
+                                    :icon="
+                                        formData.status === 'active' ? 'cancel' : formData.status === 'closed' ? 'check_box' : 'recommend'
+                                    "
                                     padding="xs"
                                     class="bg-color-primary"
-                                    v-if="props.status === 'closed'"
-                                    @click="formData.status = 'approved'"
-                                    >{{ $t("approve") }}
-                                </q-btn>
-                                <q-btn
-                                    icon="recommend"
-                                    padding="xs"
-                                    class="bg-color-positive"
-                                    v-if="props.status === 'approved'"
-                                    @click="formData.status = 'approved'"
-                                    >{{ $t("approved") }}
+                                >
+                                    {{ formData.status === "active" ? $t("close") : formData.status === "closed" ? "approve" : "approved" }}
                                 </q-btn>
                             </div>
                         </div>
 
                         <div class="column">
-                            <div class="row">
+                            <div class="column">
                                 <span class="label q-ma-sm">{{ $t("Procedures :") }} </span>
-                                <span class="label q-ma-sm"> {{ props.status }} </span>
+                                activated on :
+                                <span class="label q-ma-sm">
+                                    {{ formData.statusModifyingDate.activationDate }}
+                                </span>
+                                Closed on : <span class="row label q-ma-sm"> {{ formData.statusModifyingDate.closingDate }} </span> Approved
+                                on : <span class="row label q-ma-sm"> {{ formData.statusModifyingDate.approvingDate }} </span>
                             </div>
                         </div>
 
@@ -82,22 +72,18 @@ const formInputs = {
     name: "",
     employeeName: "",
     status: "",
+    statusModifyingDate: {
+        activationDate: "",
+        closingDate: "",
+        approvingDate: "",
+    },
 };
-const accept = ref(false);
 const pointOfSales = ["point1", "point2"];
 const employees = ["emp1", "emp2", "emp3"];
+
 const app = useApp();
 const formData = reactive({ ...formInputs });
-const addPaymentMethod = (index) => {
-    formData.paymentMethods.splice(index + 1);
-};
-const removePaymentMethod = (index) => {
-    formData.paymentMethods.splice(index, 1);
-};
 
-const viewNextAddPaymentMethod = () => {
-    addMethod = true;
-};
 function beforeSubmit() {
     if (page.showAdd.value) delete formData.id;
     return true;
@@ -116,8 +102,13 @@ const rules = {
     name: { required: required, maxLength: maxLength(75) },
 };
 const v$ = useVuelidate(rules, formData);
-const props = defineProps(["showAdd", "status"]);
-
+const props = defineProps(["showAdd"]);
+const addPaymentMethod = (index) => {
+    formData.paymentMethods.splice(index + 1);
+};
+const removePaymentMethod = (index) => {
+    formData.paymentMethods.splice(index, 1);
+};
 const page = useAddEditPage({
     apiPath: serverApis.pointOfSalesSessions,
     storeModule: storeModules.pointOfSalesSessions,
