@@ -32,19 +32,32 @@
                             <span class="label q-mx-sm">{{ $t("Payment_options :") }}</span>
                             <div class="column">
                                 <div class="row justify-around">
-                                    <q-btn-dropdown color="primary" :label="$t('btn_add')" icon="add">
-                                        <q-option-group :options="paymentOptions" type="checkbox" v-model="formData.paymentMethods" />
-                                    </q-btn-dropdown>
-
-                                    <q-btn :label="$t('btn_add_all')" icon="playlist_add" type="submit" class="bg-color-primary">
-                                        <template v-slot:loading>
-                                            <q-spinner-oval />
-                                        </template>
-                                    </q-btn>
+                                    <div class="row q-ma-sm justify-between">
+                                        <q-select
+                                            style="width: 250px"
+                                            v-model="formData.paymentMethods"
+                                            :options="paymentOptions"
+                                            multiple
+                                            emit-value
+                                            map-options
+                                        >
+                                            <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
+                                                <q-item v-bind="itemProps">
+                                                    <q-item-section>
+                                                        <q-item-label v-html="opt.label" />
+                                                    </q-item-section>
+                                                    <q-item-section side>
+                                                        <q-toggle :model-value="selected" @update:model-value="toggleOption(opt)" />
+                                                    </q-item-section>
+                                                </q-item>
+                                            </template>
+                                        </q-select>
+                                        <q-toggle v-model="selectAll" label="select all" />
+                                    </div>
                                 </div>
-                                <div class="row flex flex-center">
-                                    <q-input class="q-ma-sm" v-model="text" />
-                                    <q-btn icon="close" class="text-primary" @click="removePaymentMethod()" />
+                                <div class="row flex flex-center justify-between" v-for="method in formData.paymentMethods" :key="method">
+                                    <span class="q-ma-sm"> {{ method }}</span>
+                                    <q-btn v-if="method" icon="close" class="text-primary" @click="removePaymentMethod()" />
                                 </div>
                             </div>
                         </q-card-section>
@@ -64,7 +77,7 @@
     </q-card>
 </template>
 <script setup>
-import { computed, ref, reactive, toRefs, onMounted } from "vue";
+import { computed, ref, reactive, watch, onMounted } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, maxLength } from "@vuelidate/validators";
 import { uid, useMeta } from "quasar";
@@ -83,20 +96,33 @@ const formInputs = {
     defaultCustomer: "",
     imageFile: {},
     imageUrl: "",
-    paymentMethods: ref(["option1"]),
+    paymentMethods: ref(["Option1"]),
 };
 
-paymentOptions: [
+const paymentOptions = [
     { label: "Option1", value: "Option1" },
     { label: "Option2", value: "Option2" },
     { label: "Option3", value: "Option3" },
 ];
 const accept = ref(false);
 const addMethod = false;
+const selectAll = ref(false);
 const branchOptions = ["branch1", "branch2"];
 const boxOptions = ["box", "bank_account"];
 const defaultCustumerOptions = ["cust1", "cust2"];
 const app = useApp();
+
+watch(
+    () => selectAll.value,
+    (val) => {
+        if (val === true) {
+            formData.paymentMethods = paymentOptions;
+        } else {
+            formData.paymentMethods = [""];
+        }
+    }
+);
+
 const formData = reactive({ ...formInputs });
 const addPaymentMethod = (index) => {
     formData.paymentMethods.splice(index + 1);

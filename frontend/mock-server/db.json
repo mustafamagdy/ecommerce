@@ -937,7 +937,7 @@
     {
       "id": "ndnjj",
       "name": " Point of sale3",
-      "employeeName": "Mohamed",
+      "employeeName": "emp2",
       "date": "01/01/2022",
       "time": "time",
       "branch": "branch3",
@@ -963,6 +963,18 @@
         "closingDate": "",
         "approvingDate": ""
       }
+    },
+    {
+      "name": "point2",
+      "employeeName": "emp2",
+      "status": "new",
+      "id": "9c1fc314-5d29-496d-a629-29b6c04144f0"
+    },
+    {
+      "name": "point1",
+      "employeeName": "emp3",
+      "status": "new",
+      "id": "5734e26f-db4a-410f-b7c1-d411902f3739"
     }
   ]
 }
