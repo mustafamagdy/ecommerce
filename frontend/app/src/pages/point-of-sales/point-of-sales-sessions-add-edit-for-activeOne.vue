@@ -13,6 +13,7 @@
                             <span class="label q-mx-sm">{{ $t("employee :") }}</span>
                             <q-select class="q-ma-sm" v-model="formData.employeeName" :options="employees" />
                         </div>
+                        {{ formData.statusModifyingDate }}
                         <div class="column">
                             <div class="row">
                                 <span class="label q-ma-sm">{{ $t("status :") }} </span>

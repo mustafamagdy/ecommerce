@@ -5,9 +5,9 @@
             <span>{{ $t("pages") }} : {{ page.totalPages }}</span>
             <div class="row">
                 <q-btn icon="mdi-magnify" padding="xs" class="bg-color-dark">
-                    <q-menu persistent style="width: 50%">
+                    <!-- <q-menu persistent style="width: 50%">
                         <serviceSearch />
-                    </q-menu>
+                    </q-menu> -->
                 </q-btn>
                 <q-btn icon="mdi-plus" padding="xs" class="bg-color-primary" @click="(page.showAdd = true), (status = 'new')" />
             </div>
@@ -62,7 +62,7 @@
                                 <q-btn icon="mdi-cog-outline" padding="xs" class="bg-color-dark">
                                     <q-menu auto-close>
                                         <q-list separator dense>
-                                            <q-item clickable v-ripple @click="changeStatusAndDate(record)">
+                                            <q-item clickable v-ripple @click="useStatusChange({ record: record })">
                                                 <q-item-section>
                                                     <q-icon
                                                         size="md"
@@ -144,30 +144,23 @@
 import { useCRUDList } from "src/composables/useCRUDList";
 import { serverApis, storeModules } from "src/enums";
 import { Notify } from "quasar";
-import { redirect } from "vue-router";
+import { useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue-demi";
+import { useStatusChange } from "src/composables/useStatusChange";
 import pointOfSalesSessionsAddEditNew from "./point-of-sales-sessions-add-edit-new.vue";
 import pointOfSalesAddEditForActiveOne from "./point-of-sales-sessions-add-edit-for-activeOne.vue";
-
+const router = useRouter();
 const goToPointOfSalesPage = (record) => {
     if (record.status === "new") {
         Notify.create("Please Activate session first!");
     } else if (record.status === "closed" || record.status === "approved") {
         Notify.create("Sorry, your session has been closed or approved");
     } else {
-        redirect("./index.vue");
+        router.push("/pointOfSales");
     }
 };
 const status = ref("new");
-const changeStatusAndDate = (record) => {
-    if (record.status === "new") {
-        (record.status = "active"), (record.statusModifyingDate.activationDate = new Date());
-    } else if (record.status === "active") {
-        (record.status = "closed"), (record.statusModifyingDate.closingDate = new Date());
-    } else if (record.status === "closed") {
-        (record.status = "approved"), (record.statusModifyingDate.approvingDate = new Date());
-    }
-};
+
 const page = reactive(
     useCRUDList({
         apiPath: serverApis.pointOfSalesSessions,
