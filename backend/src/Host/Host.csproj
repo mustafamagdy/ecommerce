@@ -53,6 +53,9 @@
         <Content Update="Configurations\mail.integration-test.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <Content Update="Configurations\database.Production.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
     <ItemGroup>
         <None Include="Email Templates\*.cshtml">
