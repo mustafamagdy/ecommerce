@@ -6,19 +6,17 @@
                 <div class="q-pa-md" style="min-width: 400px">
                     <q-form ref="observer" @submit.prevent="page.submitForm()">
                         <div class="column">
-                            <span class="label q-mx-sm">{{ $t("point_of_sale:") }}</span>
-                            <q-select class="q-ma-sm" v-model="formData.name" :options="pointOfSales" />
+                            <span class="label q-ma-sm">{{ $t("point_of_sale:") }} {{ formData.name }}</span>
                         </div>
                         <div class="column">
-                            <span class="label q-mx-sm">{{ $t("employee :") }}</span>
-                            <q-select class="q-ma-sm" v-model="formData.employeeName" :options="employees" />
+                            <span class="label q-ma-sm">{{ $t("employee :") }} {{ formData.employeeName }}</span>
                         </div>
-                        {{ formData.statusModifyingDate }}
                         <div class="column">
                             <div class="row">
                                 <span class="label q-ma-sm">{{ $t("status :") }} </span>
                                 <span class="label q-ma-sm"> {{ formData.status }} </span>
                                 <q-btn
+                                    @click="changeStatusAndDate(formData)"
                                     v-model="formData.status"
                                     :icon="
                                         formData.status === 'active' ? 'cancel' : formData.status === 'closed' ? 'check_box' : 'recommend'
@@ -34,12 +32,14 @@
                         <div class="column">
                             <div class="column">
                                 <span class="label q-ma-sm">{{ $t("Procedures :") }} </span>
-                                activated on :
-                                <span class="label q-ma-sm">
-                                    {{ formData.statusModifyingDate.activationDate }}
+
+                                <span class="label q-ma-sm"> activated on : {{ formData.statusModifyingDate.activationDate }} </span>
+                                <span class="row label q-ma-sm" v-if="formData.statusModifyingDate.closingDate != ''">
+                                    Closed on : {{ formData.statusModifyingDate.closingDate }}
                                 </span>
-                                Closed on : <span class="row label q-ma-sm"> {{ formData.statusModifyingDate.closingDate }} </span> Approved
-                                on : <span class="row label q-ma-sm"> {{ formData.statusModifyingDate.approvingDate }} </span>
+                                <span class="row label q-ma-sm" v-if="formData.statusModifyingDate.approvingDate != ''">
+                                    Approved on : {{ formData.statusModifyingDate.approvingDate }}
+                                </span>
                             </div>
                         </div>
 
@@ -58,6 +58,7 @@
     </q-card>
 </template>
 <script setup>
+import { useStatusChange } from "src/composables/useStatusChange";
 import { computed, ref, reactive, toRefs, onMounted } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required, maxLength } from "@vuelidate/validators";
@@ -67,6 +68,7 @@ import { $t } from "src/services/i18n";
 import ImagePicker from "src/components/image-picker";
 import { useAddEditPage } from "src/composables/useAddEditPage.js";
 import { serverApis, storeModules } from "src/enums";
+const { changeStatusAndDate } = useStatusChange();
 
 const formInputs = {
     id: "",
@@ -79,8 +81,6 @@ const formInputs = {
         approvingDate: "",
     },
 };
-const pointOfSales = ["point1", "point2"];
-const employees = ["emp1", "emp2", "emp3"];
 
 const app = useApp();
 const formData = reactive({ ...formInputs });
