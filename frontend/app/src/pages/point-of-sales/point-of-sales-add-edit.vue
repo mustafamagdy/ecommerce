@@ -56,7 +56,7 @@
                                     </div>
                                 </div>
                                 <div class="row flex flex-center justify-between" v-for="method in formData.paymentMethods" :key="method">
-                                    <span class="q-ma-sm"> {{ method }}</span>
+                                    <span class="q-ma-sm"> {{ method.label }}</span>
                                     <q-btn v-if="method" icon="close" class="text-primary" @click="removePaymentMethod()" />
                                 </div>
                             </div>

@@ -45,6 +45,11 @@ const formInputs = {
     name: "",
     employeeName: "",
     status: "new",
+    statusModifyingDate: {
+        activationDate: "",
+        closingDate: "",
+        approvingDate: "",
+    },
 };
 const accept = ref(false);
 const pointOfSales = ["point1", "point2"];
