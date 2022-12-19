@@ -1,8 +1,8 @@
 {
   "DatabaseSettings": {
     "DBProvider": "postgresql",
-    "ConnectionString": "Server=ecommerce-dev.c0lcqshyvn17.us-east-2.rds.amazonaws.com;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
-    "ConnectionStringTemplate": "Server=ecommerce-dev.c0lcqshyvn17.us-east-2.rds.amazonaws.com;Port=5432;Database={0};Uid=postgres;Pwd=DeV12345",
+    "ConnectionString": "Server=vmi1129859.contaboserver.net;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
+    "ConnectionStringTemplate": "Server=vmi1129859.contaboserver.net;Port=5432;Database={0};Uid=postgres;Pwd=DeV12345",
     "SequenceTableName": "Sequences",
     "LogSensitiveInfo": false
   }
