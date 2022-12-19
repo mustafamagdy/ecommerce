@@ -23,8 +23,7 @@ RUN dotnet publish "Host.csproj" -c Release -o /app/publish
 
 FROM base AS final
 RUN apt-get update
-RUN apt-get install -y libfreetype6
-RUN apt-get install -y libfontconfig1
+RUN apt-get install freetype-devel glib2-devel cairo-devel
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "FSH.WebApi.Host.dll"]
