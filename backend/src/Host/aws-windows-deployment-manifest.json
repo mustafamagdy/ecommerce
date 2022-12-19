@@ -1,0 +1,16 @@
+{
+  "manifestVersion": 1,
+  "deployments": {
+
+    "aspNetCoreWeb": [
+      {
+        "name": "FSH.WebApi.Host",
+        "parameters": {
+          "appBundle": ".",
+          "iisPath": "/",
+          "iisWebSite": "Default Web Site"
+        }
+      }
+    ]
+  }
+}
