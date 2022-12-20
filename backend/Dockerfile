@@ -24,7 +24,9 @@ RUN dotnet publish "Host.csproj" -c Release -o /app/publish
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 RUN apt-get update
-RUN apt-get install freetype-devel glib2-devel cairo-devel
+RUN apt-get install -y libfreetype6
+RUN apt-get install -y libfontconfig1
+RUN apt-get install -y vim
 WORKDIR /app
 
 COPY --from=build /app/publish .
