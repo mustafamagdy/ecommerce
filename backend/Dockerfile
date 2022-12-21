@@ -4,6 +4,10 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+COPY ["Directory.Build.props", "/"]
+COPY ["Directory.Build.targets", "/"]
+COPY ["dotnet.ruleset", "/"]
+COPY ["stylecop.json", "/"]
 WORKDIR /src
 COPY ["src/Host/Host.csproj", "Host/"]
 COPY ["src/Core/Application/Application.csproj", "Core/Application/"]
