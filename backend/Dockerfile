@@ -13,7 +13,7 @@ COPY ["src/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["src/Migrators/Migrators.MySQL/Migrators.MySQL.csproj", "Migrators.MySQL/"]
 COPY ["src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj", "Migrators.PostgreSQL/"]
 COPY ["src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj", "Migrators.MSSQL/"]
-RUN dotnet restore "src/Host/Host.csproj"
+RUN dotnet restore "Host/Host.csproj"
 COPY . .
 WORKDIR "/src/Host"
 RUN dotnet build "Host.csproj" -c Release -o /app/build
