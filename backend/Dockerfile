@@ -16,7 +16,7 @@ COPY ["src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj", "Migrators/Migrato
 RUN dotnet restore "Host/Host.csproj"
 COPY . .
 WORKDIR "/src/Host"
-RUN dotnet build "Host.csproj" -c Release -o /app/build
+#RUN dotnet build "Host.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "Host.csproj" -c Release -o /app/publish
