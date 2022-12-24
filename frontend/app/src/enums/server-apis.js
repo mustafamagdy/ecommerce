@@ -14,4 +14,5 @@ export const serverApis = {
     serviceCatalog: `${baseURL}/serviceCatalog`,
     pointOfSalesList: `${baseURL}/pointOfSalesList`,
     pointOfSalesSessions: `${baseURL}/pointOfSalesSessions`,
+    draftOrders: `${baseURL}/draftOrders`,
 };

@@ -21,4 +21,5 @@ export const initRoutes = (app) => {
   crudApis(app, "serviceCatalog");
   crudApis(app, "pointOfSalesList");
   crudApis(app, "pointOfSalesSessions");
+  crudApis(app, "draftOrders");
 };

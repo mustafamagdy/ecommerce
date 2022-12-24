@@ -32,6 +32,7 @@ export default store(function (/* { ssrContext } */) {
             users: crud,
             pointOfSalesList: crud,
             pointOfSalesSessions: crud,
+            draftOrders: crud,
         },
         // enable strict mode (adds overhead!)
         // for dev mode and --debug builds only
