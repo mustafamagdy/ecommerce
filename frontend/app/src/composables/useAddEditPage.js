@@ -7,16 +7,16 @@ import { useShowAddEdit } from "src/composables/useShowAddEdit";
 import { fetchRecord, saveRecord, updateRecord } from "src/services/crud-apis";
 
 export function useAddEditPage({
-                                   apiPath = "",
-                                   storeModule = "",
-                                   listName = "records",
-                                   recordName = "record",
-                                   formInputs = {},
-                                   formData = {},
-                                   v$,
-                                   onFormSubmitted,
-                                   beforeSubmit
-                               }) {
+    apiPath = "",
+    storeModule = "",
+    listName = "records",
+    recordName = "record",
+    formInputs = {},
+    formData = {},
+    v$,
+    onFormSubmitted,
+    beforeSubmit,
+}) {
     const upperRecordName =
         recordName.charAt(0).toUpperCase() + recordName.slice(1);
     const app = useApp();
@@ -25,7 +25,7 @@ export function useAddEditPage({
         id: null,
         submitted: false,
         saving: false,
-        loading: false
+        loading: false,
     });
     let currentRecord = computed({
         get() {
@@ -33,7 +33,7 @@ export function useAddEditPage({
         },
         set(value) {
             store.commit(`${storeModule}/setCurrent${upperRecordName}`, value);
-        }
+        },
     });
     const addRecordToList = (record) =>
         store.commit(`${storeModule}/add${upperRecordName}`, record);
@@ -70,7 +70,10 @@ export function useAddEditPage({
                 response = await saveRecord(apiPath, formData);
                 app.flashMsg($t("msg_after_add"));
             } else if (showEdit.value) {
-                response = await updateRecord(apiPath + `/${editId.value}`, formData);
+                response = await updateRecord(
+                    apiPath + `/${editId.value}`,
+                    formData
+                );
                 app.flashMsg($t("msg_after_update"));
             } else {
                 throw new Error($t("msg_default_error"));
@@ -128,6 +131,6 @@ export function useAddEditPage({
         addRecordToList,
         updateRecordInList,
         load,
-        submitForm
+        submitForm,
     };
 }

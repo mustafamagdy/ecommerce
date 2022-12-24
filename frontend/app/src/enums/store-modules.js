@@ -14,4 +14,5 @@ export const storeModules = {
     serviceCatalog: "serviceCatalog",
     pointOfSalesList: "pointOfSalesList",
     pointOfSalesSessions: "pointOfSalesSessions",
+    draftOrders: "draftOrders",
 };

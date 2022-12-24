@@ -6,22 +6,24 @@ axios.defaults.baseURL = process.env.API_PATH;
 //axios.defaults.headers.post['Content-Type']  = 'application/x-www-form-urlencoded';
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
-
 // If token exists set header
 let token = StorageService.getToken();
 if (token) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
-axios.interceptors.request.use(req => {
+axios.interceptors.request.use((req) => {
     console.log("Starting Request", req);
     return req;
 });
-axios.interceptors.response.use(res => {
-    console.log("response", res);
-    return res;
-}, err => {
-    app.showPageRequestError(err);
-});
+axios.interceptors.response.use(
+    (res) => {
+        console.log("response", res);
+        return res;
+    },
+    (err) => {
+        app.showPageRequestError(err);
+    }
+);
 export const ApiService = {
     removeHeader() {
         axios.defaults.headers.common = {};
@@ -34,7 +36,7 @@ export const ApiService = {
         return axios({
             url: apiPath,
             method: "GET",
-            responseType: "blob" // important
+            responseType: "blob", // important
         });
     },
     post(apiPath, data) {
@@ -65,5 +67,5 @@ export const ApiService = {
     },
     axios() {
         return axios;
-    }
+    },
 };
