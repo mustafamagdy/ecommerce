@@ -26,10 +26,10 @@ import Close from 'mdi-material-ui/Close'
 import {useDispatch} from 'react-redux'
 
 // ** Actions Imports
-import {addUser} from 'src/store/apps/user/apis'
+import {addUser} from 'src/lib/store/apps/users/apis'
 
 // ** Types Imports
-import {AppDispatch} from 'src/store'
+import {AppDispatch} from 'src/lib/store'
 
 interface SidebarAddUserType {
   open: boolean

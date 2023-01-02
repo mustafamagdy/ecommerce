@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Bogus;
 using FluentAssertions;
+using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
@@ -248,9 +249,13 @@ public abstract class TestFixture : IAsyncLifetime
 
     var headers = new Dictionary<string, string>();
     var adminHeaders = await LoginAsRootAdmin(headers, CancellationToken.None);
-    _ = await GetAsync("/api/users", adminHeaders);
+    _ = await PostAsJsonAsync("/api/users/search", new PaginationFilter
+    {
+      PageNumber = 1,
+      PageSize = 1000,
+    }, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-    _rootTenantUsers = await _.Content.ReadFromJsonAsync<List<UserDetailsDto>>();
+    _rootTenantUsers = (await _.Content.ReadFromJsonAsync<PaginationResponse<UserDetailsDto>>()).Data;
     _rootTenantUsers.Should().NotBeNullOrEmpty();
   }
 

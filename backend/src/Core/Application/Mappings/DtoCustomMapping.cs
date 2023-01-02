@@ -1,6 +1,8 @@
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.CashRegisters;
 using FSH.WebApi.Application.Operation.Orders;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
 using Mapster;
@@ -51,6 +53,10 @@ public class DtoCustomMapping
       .NewConfig()
       .Map(dest => dest.PaymentMethodName, src => src.PaymentMethod.Name)
       .Map(dest => dest.PaymentId, src => src.Id);
+
+    TypeAdapterConfig<ApplicationUser, UserDetailsDto>
+      .NewConfig()
+      .Map(dest => dest.Roles, src => src.UserRoles.Select(a => a.Role.Name.ToLower()));
 
     TypeAdapterConfig<Order, BasicOrderDto>
       .NewConfig()
