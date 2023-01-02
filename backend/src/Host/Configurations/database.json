@@ -1,8 +1,8 @@
 {
   "DatabaseSettings": {
     "DBProvider": "postgresql",
-    "ConnectionString": "Server=127.0.0.1;Port=5433;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
-    "ConnectionStringTemplate": "Server=127.0.0.1;Port=5433;Database={0};Uid=postgres;Pwd=DeV12345",
+    "ConnectionString": "Server=185.198.27.42;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
+    "ConnectionStringTemplate": "Server=185.198.27.42;Port=5432;Database={0};Uid=postgres;Pwd=DeV12345",
     "SequenceTableName": "Sequences",
     "LogSensitiveInfo": false
   }
