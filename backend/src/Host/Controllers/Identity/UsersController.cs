@@ -9,12 +9,12 @@ public sealed class UsersController : VersionNeutralApiController
 
   public UsersController(IUserService userService) => _userService = userService;
 
-  [HttpGet]
+  [HttpPost("search")]
   [MustHavePermission(FSHAction.View, FSHResource.Users)]
   [OpenApiOperation("Get list of all users.", "")]
-  public Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+  public Task<PaginationResponse<UserDetailsDto>> GetListAsync(PaginationFilter filter, CancellationToken cancellationToken)
   {
-    return _userService.GetListAsync(cancellationToken);
+    return _userService.GetListAsync(filter,cancellationToken);
   }
 
   [HttpGet("basic")]

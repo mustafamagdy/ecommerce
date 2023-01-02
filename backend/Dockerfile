@@ -12,7 +12,7 @@ COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Core/Shared/Shared.csproj", "src/Core/Shared/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 COPY ["src/Migrators/Migrators.MySQL/Migrators.MySQL.csproj", "src/Migrators/Migrators.MySQL/"]
-
+COPY ["src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj", "src/Migrators/Migrators.PostgreSQL/"]
 RUN dotnet restore "src/Host/Host.csproj" --disable-parallel
 #RUN dotnet tool install --tool-path . dotnet-reportgenerator-globaltool --ignore-failed-sources
 
@@ -23,6 +23,10 @@ RUN dotnet publish "Host.csproj" -c Release -o /app/publish
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
+RUN apt-get update
+RUN apt-get install -y libfreetype6
+RUN apt-get install -y libfontconfig1
+RUN apt-get install -y vim
 WORKDIR /app
 
 COPY --from=build /app/publish .
@@ -31,9 +35,8 @@ COPY --from=build /app/publish .
 # For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
-
-ENV ASPNETCORE_URLS=https://+:5050;http://+:5060
-EXPOSE 5050
-EXPOSE 5060
+#ENV ASPNETCORE_URLS=https://+:5050;http://+:5060
+EXPOSE 80
+EXPOSE 443
 
 ENTRYPOINT ["dotnet", "FSH.WebApi.Host.dll"]

@@ -33,11 +33,11 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData } from 'src/store/apps/user'
+import { fetchData } from 'src/lib/store/apps/users/apis'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
-import { UsersType } from 'src/types/apps/userTypes'
+import { RootState, AppDispatch } from 'src/lib/store'
+import { UserType } from 'src/types/apps/userTypes'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
@@ -52,7 +52,7 @@ interface UserStatusType {
 }
 
 interface CellType {
-  row: UsersType
+  row: UserType
 }
 
 // ** Vars
@@ -82,11 +82,11 @@ const AvatarWithoutImageLink = styled(Link)(({ theme }) => ({
 }))
 
 // ** renders client column
-const renderClient = (row: UsersType) => {
-  if (row.avatar.length) {
+const renderClient = (row: UserType) => {
+  if (row.imagePath.length) {
     return (
       <AvatarWithImageLink href={`/apps/user/view/${row.id}`}>
-        <CustomAvatar src={row.avatar} sx={{ mr: 3, width: 34, height: 34 }} />
+        <CustomAvatar src={row.imagePath} sx={{ mr: 3, width: 34, height: 34 }} />
       </AvatarWithImageLink>
     )
   } else {
@@ -107,7 +107,7 @@ const columns = [
     field: 'fullName',
     headerName: 'User',
     renderCell: ({ row }: CellType) => {
-      const { id, fullName, username } = row
+      const { id, fullName, userName } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -125,7 +125,7 @@ const columns = [
             </Link>
             <Link href={`/apps/user/view/${id}`} passHref>
               <Typography noWrap component='a' variant='caption' sx={{ textDecoration: 'none' }}>
-                @{username}
+                @{userName}
               </Typography>
             </Link>
           </Box>
@@ -159,19 +159,6 @@ const columns = [
             {row.role}
           </Typography>
         </Box>
-      )
-    }
-  },
-  {
-    flex: 0.15,
-    minWidth: 120,
-    headerName: 'Plan',
-    field: 'currentPlan',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap variant='subtitle1' sx={{ textTransform: 'capitalize' }}>
-          {row.currentPlan}
-        </Typography>
       )
     }
   },
@@ -210,13 +197,12 @@ const columns = [
 
 const UserList = () => {
   // ** State
-  const [plan, setPlan] = useState<string>('')
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.user)
+  const store = useSelector((state: RootState) => state.users)
 
   useEffect(() => {
     dispatch(
@@ -224,24 +210,19 @@ const UserList = () => {
         role: '',
         q: value,
         status: '',
-        currentPlan: plan
       })
     )
-  }, [dispatch, plan, value])
+  }, [dispatch, value])
 
   const handleFilter = useCallback((val: string) => {
     setValue(val)
-  }, [])
-
-  const handlePlanChange = useCallback((e: SelectChangeEvent) => {
-    setPlan(e.target.value)
   }, [])
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <TableHeader plan={plan} value={value} handleFilter={handleFilter} handlePlanChange={handlePlanChange} />
+          {/*<TableHeader plan={plan} value={value} handleFilter={handleFilter} handlePlanChange={handlePlanChange} />*/}
           <DataGrid
             autoHeight
             rows={store.data}

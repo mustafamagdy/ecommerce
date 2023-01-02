@@ -13,7 +13,7 @@ import axios from 'axios'
 
 // ** Types
 import { InvoiceType } from 'src/types/apps/invoiceTypes'
-import { UserLayoutType, UsersType } from 'src/types/apps/userTypes'
+import { UserLayoutType, UserType } from 'src/types/apps/userTypes'
 
 // ** Demo Components Imports
 import UserViewLeft from 'src/views/apps/user/view/UserViewLeft'
@@ -26,7 +26,7 @@ type Props = UserLayoutType & {
 const UserView = ({ id, invoiceData }: Props) => {
   // ** State
   const [error, setError] = useState<boolean>(false)
-  const [data, setData] = useState<null | UsersType>(null)
+  const [data, setData] = useState<null | UserType>(null)
 
   useEffect(() => {
     axios

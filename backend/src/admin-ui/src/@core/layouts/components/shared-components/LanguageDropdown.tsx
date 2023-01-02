@@ -52,7 +52,6 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
 
 
   const handleLangItemClick = (lang: AllowedLanguages) => {
-    debugger;
     i18n.changeLanguage(lang)
     handleLangDropdownClose()
   }
