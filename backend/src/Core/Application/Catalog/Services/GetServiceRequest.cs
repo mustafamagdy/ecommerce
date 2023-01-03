@@ -7,7 +7,7 @@ public class GetServiceRequest : IRequest<ServiceDto>
   public GetServiceRequest(Guid id) => Id = id;
 }
 
-public class ServiceByIdSpec : Specification<ServiceCatalog, ServiceDto>, ISingleResultSpecification
+public class ServiceByIdSpec : Specification<Service, ServiceDto>, ISingleResultSpecification
 {
   public ServiceByIdSpec(Guid id) =>
     Query.Where(p => p.Id == id);
@@ -15,14 +15,14 @@ public class ServiceByIdSpec : Specification<ServiceCatalog, ServiceDto>, ISingl
 
 public class GetServiceRequestHandler : IRequestHandler<GetServiceRequest, ServiceDto>
 {
-  private readonly IRepository<ServiceCatalog> _repository;
+  private readonly IRepository<Service> _repository;
   private readonly IStringLocalizer _t;
 
-  public GetServiceRequestHandler(IRepository<ServiceCatalog> repository, IStringLocalizer<GetServiceRequestHandler>
+  public GetServiceRequestHandler(IRepository<Service> repository, IStringLocalizer<GetServiceRequestHandler>
     localizer) =>
     (_repository, _t) = (repository, localizer);
 
-  public async Task<ServiceDto> Handle(GetServiceRequest request, CancellationToken cancellationToken) =>
-    await _repository.FirstOrDefaultAsync(new ServiceByIdSpec(request.Id), cancellationToken)
-    ?? throw new NotFoundException(_t["Service {0} Not Found.", request.Id]);
+  public async Task<ServiceDto> Handle(GetServiceRequest request, CancellationToken cancellationToken)=>
+       await _repository.FirstOrDefaultAsync(new ServiceByIdSpec(request.Id), cancellationToken)
+          ?? throw new NotFoundException(_t["Service {0} Not Found.", request.Id]);
 }
