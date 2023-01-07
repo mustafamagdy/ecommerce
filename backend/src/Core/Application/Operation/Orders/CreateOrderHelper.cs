@@ -12,6 +12,7 @@ namespace FSH.WebApi.Application.Operation.Orders;
 public interface ICreateOrderHelper : ITransientService
 {
   Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken);
+  Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken);
   Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken);
 }
 
@@ -59,6 +60,8 @@ public class CreateOrderHelper : ICreateOrderHelper
 
   public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, Guid cashPaymentMethodId, CancellationToken cancellationToken)
     => CreateOrder(items, customer, new List<OrderPaymentAmount> { new() { PaymentMethodId = cashPaymentMethodId, Amount = 0 } }, cashOrder: true, cancellationToken);
+  public Task<Order> CreateCashOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
+    => CreateOrder(items, customer, payments, cashOrder: true, cancellationToken);
 
   public Task<Order> CreateOrder(IEnumerable<OrderItemRequest> items, Customer customer, List<OrderPaymentAmount> payments, CancellationToken cancellationToken)
     => CreateOrder(items, customer, payments, cashOrder: false, cancellationToken);

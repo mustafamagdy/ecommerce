@@ -6,3 +6,9 @@ public class GetDefaultCashPaymentMethodSpec : Specification<PaymentMethod>, ISi
 {
   public GetDefaultCashPaymentMethodSpec() => Query.Where(a => a.CashDefault);
 }
+
+public class GetPaymentMethodSpec : Specification<PaymentMethod>, ISingleResultSpecification
+{
+
+  public GetPaymentMethodSpec(Guid paymentMethodId) => Query.Where(a => a.Id==paymentMethodId);
+}
