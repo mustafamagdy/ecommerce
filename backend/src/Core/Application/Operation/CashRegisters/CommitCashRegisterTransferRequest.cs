@@ -37,7 +37,7 @@ public class CommitCashRegisterTransferHandler : IRequestHandler<CommitCashRegis
     var pendingOut = await _repository.GetByIdAsync(tr.PendingTransferId!, cancellationToken)
                      ?? throw new NotFoundException($"Pending transfer operation {tr.PendingTransferId} not found");
 
-    if (pendingOut == null || pendingOut.OperationType != PaymentOperationType.PendingOut)
+    if (pendingOut.OperationType != PaymentOperationType.PendingOut)
     {
       throw new InvalidOperationException(_t["Invalid transfer operation"]);
     }
