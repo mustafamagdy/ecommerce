@@ -13,6 +13,9 @@ public class DtoCustomMapping
 {
   public static void Configure()
   {
+      var config = TypeAdapterConfig.GlobalSettings;
+      config.Default.IgnoreNullValues(true);
+      config.Scan(typeof(DtoCustomMapping).Assembly);
     TypeAdapterConfig<Order, OrderDto>
       .NewConfig()
       .Map(dest => dest.OrderDate, src => src.OrderDate.ToString("dd/MM/yyyy"))
