@@ -9,7 +9,7 @@ public class CreateServiceCatalogFromProductAndServiceRequest : IRequest<Guid>
 {
   public decimal Price { get; set; }
   public ServicePriority Priority { get; set; }
-  public string ServiceName { get; set; }
+  public Guid ServiceId{ get; set; }
   public CreateProductRequest Product { get; set; }
 }
 
@@ -35,12 +35,12 @@ public class CreateServiceCatalogFromProductAndServiceRequestValidator : CustomV
     //   return !exist;
     // }).WithMessage(t["Product with same name already exist"]);
 
-    RuleFor(a => a.ServiceName).NotEmpty().MustAsync(async (name, cancellationToken) =>
+    RuleFor(a => a.ServiceId).NotEmpty().MustAsync(async (id, cancellationToken) =>
     {
       var exist = await serviceRepo.AnyAsync(new SingleResultSpecification<Service>()
-        .Query.Where(a => a.Name.ToLower() == name)
+        .Query.Where(a => a.Id== id)
         .Specification, cancellationToken);
-      return !exist;
+      return exist;
     }).WithMessage(t["Service with same name already exist"]);
   }
 }
@@ -74,12 +74,12 @@ public class CreateServiceCatalogFromProductAndServiceRequestHandler : IRequestH
     var product = new Product(request.Product.Name, request.Product.Name, request.Price, brand.Id, productImagePath);
     product.AddDomainEvent(EntityCreatedEvent.WithEntity(product));
     await _prodRepo.AddAsync(product, cancellationToken);
+    //
+    // var service = new Service(request.ServiceName, "", null);
+    // service.AddDomainEvent(EntityCreatedEvent.WithEntity(service));
+    // await _serviceRepo.AddAsync(service, cancellationToken);
 
-    var service = new Service(request.ServiceName, "", null);
-    service.AddDomainEvent(EntityCreatedEvent.WithEntity(service));
-    await _serviceRepo.AddAsync(service, cancellationToken);
-
-    var catalogItem = new ServiceCatalog(service.Id, product.Id, request.Price, request.Priority);
+    var catalogItem = new ServiceCatalog(request.ServiceId, product.Id, request.Price, request.Priority);
     catalogItem.AddDomainEvent(EntityCreatedEvent.WithEntity(catalogItem));
     await _repository.AddAsync(catalogItem, cancellationToken);
 
