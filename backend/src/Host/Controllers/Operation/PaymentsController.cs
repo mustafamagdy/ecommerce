@@ -5,7 +5,7 @@ namespace FSH.WebApi.Host.Controllers.Operation;
 public sealed class PaymentsController : VersionedApiController
 {
     [HttpPost("search")]
-    [MustHavePermission(FSHAction.View, FSHResource.Payments)]
+    // [MustHavePermission(FSHAction.View, FSHResource.Orders)]
     [OpenApiOperation("Generate orders summary report for requested filters.", "")]
     public async Task<PaginationResponse<PaymentMethodDto>> GetPaymentMethods(
         SearchPaymentMethodsRequest request,
