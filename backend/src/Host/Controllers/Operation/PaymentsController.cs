@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Operation.Payments;
 
 namespace FSH.WebApi.Host.Controllers.Operation;
 
-public sealed class PaymentsController : VersionedApiController
+public sealed class PaymentMethodsController : VersionedApiController
 {
     [HttpPost("search")]
     // [MustHavePermission(FSHAction.View, FSHResource.Orders)]
