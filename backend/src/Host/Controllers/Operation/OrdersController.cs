@@ -1,6 +1,5 @@
 ﻿using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Operation.Orders;
-using FSH.WebApi.Application.Operation.Payments;
 using FSH.WebApi.Infrastructure.Finance;
 using FSH.WebApi.Shared.Multitenancy;
 
@@ -94,14 +93,6 @@ public sealed class OrdersController : VersionedApiController
     var orderPdf = await Mediator.Send(request, cancellationToken);
     var reportName = $"orders_summary_{time.Now.ToShortDateString()}";
     return File(orderPdf, "application/octet-stream", $"{reportName}.pdf");
-  }
-
-  [HttpGet("payment-methods")]
-  [MustHavePermission(FSHAction.View, FSHResource.Orders)]
-  [OpenApiOperation("Generate orders summary report for requested filters.", "")]
-  public async Task<List<PaymentMethodDto>> GetPaymentMethods( CancellationToken cancellationToken)
-  {
-   return await Mediator.Send(new GetPaymentMethodsRequest(), cancellationToken);
   }
 
   // [HttpPut("{id:guid}")]
