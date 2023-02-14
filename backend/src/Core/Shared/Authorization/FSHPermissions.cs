@@ -46,6 +46,7 @@ public static class FSHResource
   public const string ServiceCatalog = nameof(ServiceCatalog);
   public const string Services = nameof(Services);
   public const string Orders = nameof(Orders);
+  public const string Payments = nameof(Payments);
   public const string Customers = nameof(Customers);
   public const string Branches = nameof(Branches);
   public const string CashRegisters = nameof(CashRegisters);
@@ -158,6 +159,9 @@ public static class FSHPermissions
     new("Create Order", FSHAction.Create, FSHResource.Customers, Roles: PredefinedRoles.Supervisors.And(PredefinedRoles.Admins)),
     new("Update Customer", FSHAction.Update, FSHResource.Customers, Roles: PredefinedRoles.Supervisors.And(PredefinedRoles.Admins)),
     new("Delete Customer", FSHAction.Delete, FSHResource.Customers, Roles: PredefinedRoles.Supervisors.And(PredefinedRoles.Admins)),
+
+    // Payments
+    new("Search Payments", FSHAction.Search, FSHResource.Payments, Roles: PredefinedRoles.All),
   };
 
   public static IReadOnlyCollection<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
