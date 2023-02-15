@@ -31,15 +31,3 @@ public class GetPaymentMethodsHandler : IRequestHandler<SearchPaymentMethodsRequ
         return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
     }
 }
-
-public class PaymentMethodDto:IDto
-{
-    public Guid Id { get; }
-    public string Name { get; }
-
-    public PaymentMethodDto(Guid Id, string name)
-    {
-        this.Id = Id;
-        Name = name;
-    }
-}
