@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Catalog.Products;
+using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Infrastructure.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
@@ -13,6 +14,15 @@ public sealed class ProductsController : VersionedApiController
   {
     return Mediator.Send(request);
   }
+
+  [HttpPost("not-in-service")]
+  [MustHavePermission(FSHAction.Search, FSHResource.Products)]
+  [OpenApiOperation("Get products not assigned to service by service-id.", "")]
+  public Task<PaginationResponse<ProductDto>> SearchAsync(GetProductsNotInServiceIdRequest request)
+  {
+    return Mediator.Send(request);
+  }
+
 
   [HttpGet("{id:guid}")]
   [MustHavePermission(FSHAction.View, FSHResource.Products)]

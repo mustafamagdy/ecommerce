@@ -2,12 +2,14 @@ namespace FSH.WebApi.Domain.Catalog;
 
 public sealed class Product : AuditableEntity, IAggregateRoot, IHasImage
 {
-  public string Name { get; private set; }
+    private List<ServiceCatalog> _serviceCatalogs=new();
+    public string Name { get; private set; }
   public string? Description { get; private set; }
   public decimal Rate { get; private set; }
   public string? ImagePath { get; private set; }
   public Guid BrandId { get; private set; }
   public Brand Brand { get; private set; } = default!;
+  public IReadOnlyCollection<ServiceCatalog> ServiceCatalogs => _serviceCatalogs.AsReadOnly();
 
   public Product(string name, string? description, decimal rate, Guid brandId, string? imagePath)
   {

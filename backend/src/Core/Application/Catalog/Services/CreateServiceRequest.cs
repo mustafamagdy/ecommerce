@@ -7,7 +7,7 @@ public class CreateServiceRequest : IRequest<Guid>
 {
   public string Name { get; set; } = default!;
   public string? Description { get; set; }
-  public FileUploadRequest? ImageFile { get; set; }
+  public FileUploadRequest? Image { get; set; }
 }
 
 public class CreateServiceRequestValidator : CustomValidator<CreateServiceRequest>
@@ -35,7 +35,7 @@ public class CreateServiceRequestHandler : IRequestHandler<CreateServiceRequest,
 
   public async Task<Guid> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
   {
-    var imageUrl = await _fileStorage.UploadAsync<Service>(request.ImageFile, FileType.Image, cancellationToken);
+    var imageUrl = await _fileStorage.UploadAsync<Service>(request.Image, FileType.Image, cancellationToken);
     var service = new Service(request.Name, request.Description, imageUrl);
 
     service.AddDomainEvent(EntityCreatedEvent.WithEntity(service));
