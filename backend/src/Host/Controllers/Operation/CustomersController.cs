@@ -25,11 +25,11 @@ public sealed class CustomersController : VersionedApiController
 
   [HttpDelete("{id:guid}")]
   [MustHavePermission(FSHAction.Search, FSHResource.Customers)]
-  [OpenApiOperation("Get customer by id.", "")]
+  [OpenApiOperation("Delete customer by id.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
-  public Task<BasicCustomerDto> DeleteCustomerIdAsync(Guid id, CancellationToken cancellationToken)
+  public Task<Guid> DeleteCustomerIdAsync(Guid id, CancellationToken cancellationToken)
   {
-    return Mediator.Send(new GetCustomerByIdRequest(id), cancellationToken);
+    return Mediator.Send(new DeleteCustomerByIdRequest(id), cancellationToken);
   }
 
   [HttpPost]
