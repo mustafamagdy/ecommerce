@@ -13,11 +13,21 @@ public sealed class CustomersController : VersionedApiController
   {
     return Mediator.Send(request, cancellationToken);
   }
+
   [HttpGet("{id:guid}")]
   [MustHavePermission(FSHAction.Search, FSHResource.Customers)]
   [OpenApiOperation("Get customer by id.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
   public Task<BasicCustomerDto> GetCustomerByIdAsync(Guid id, CancellationToken cancellationToken)
+  {
+    return Mediator.Send(new GetCustomerByIdRequest(id), cancellationToken);
+  }
+
+  [HttpDelete("{id:guid}")]
+  [MustHavePermission(FSHAction.Search, FSHResource.Customers)]
+  [OpenApiOperation("Get customer by id.", "")]
+  [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
+  public Task<BasicCustomerDto> DeleteCustomerIdAsync(Guid id, CancellationToken cancellationToken)
   {
     return Mediator.Send(new GetCustomerByIdRequest(id), cancellationToken);
   }
