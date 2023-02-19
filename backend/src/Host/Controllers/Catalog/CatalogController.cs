@@ -15,6 +15,14 @@ public sealed class CatalogController : VersionedApiController
     return Mediator.Send(request);
   }
 
+  [HttpGet("{id:guid}")]
+  [MustHavePermission(FSHAction.Search, FSHResource.ServiceCatalog)]
+  [OpenApiOperation("Search service catalog using available filters.", "")]
+  public Task<ServiceCatalogDto> GetByIdAsync(Guid id)
+  {
+    return Mediator.Send(new GetServiceCatalogByIdRequest(id));
+  }
+
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.ServiceCatalog)]
   [OpenApiOperation("Create a new service catalog.", "")]
