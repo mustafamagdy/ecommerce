@@ -24,6 +24,7 @@ RUN dotnet publish "Host.csproj" -c Release -o /app/publish
 FROM base AS final
 RUN apt-get update
 RUN apt-get install freetype-devel glib2-devel cairo-devel
+RUN apt-get install -y fontconfig libfontconfig fonts-crosextra-carlito fonts-crosextra-caladea && fc-cache -f -v
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "FSH.WebApi.Host.dll"]
