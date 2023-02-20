@@ -27,7 +27,6 @@ RUN apt-get update
 RUN apt-get install -y libfreetype6
 RUN apt-get install -y libfontconfig1
 RUN apt-get install -y nano
-RUN apt-get install freetype-devel glib2-devel cairo-devel
 RUN apt-get install -y fontconfig libfontconfig fonts-crosextra-carlito fonts-crosextra-caladea && fc-cache -f -v
 
 
