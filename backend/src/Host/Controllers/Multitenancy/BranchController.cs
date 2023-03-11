@@ -16,7 +16,7 @@ public sealed class BranchController : VersionedApiController
   [HttpPut]
   [MustHavePermission(FSHAction.Update, FSHResource.Branches)]
   [OpenApiOperation("Update a branch for the current tenant.", "")]
-  public Task UpdateBranchAsync(UpdateBranchRequest request)
+  public Task<BranchDto> UpdateBranchAsync(UpdateBranchRequest request)
   {
     return Mediator.Send(request);
   }
@@ -32,7 +32,7 @@ public sealed class BranchController : VersionedApiController
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Branches)]
   [OpenApiOperation("Search for a branch.", "")]
-  public Task<List<BranchDto>> GetListAsync(SearchBranchRequest request)
+  public Task<PaginationResponse<BranchDto>> GetListAsync(SearchBranchRequest request)
   {
     return Mediator.Send(request);
   }
