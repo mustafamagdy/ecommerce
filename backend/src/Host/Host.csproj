@@ -3,11 +3,12 @@
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>FSH.WebApi.Host</RootNamespace>
         <AssemblyName>FSH.WebApi.Host</AssemblyName>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="10.4.0" />
         <PackageReference Include="Hangfire.Console.Extensions.Serilog" Version="1.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -29,6 +30,9 @@
         <Content Update="Configurations\*.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <Content Include=".platform\hooks\prebuild\1-commands.sh">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
         <None Update="Files\full-stack-hero-logo.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -41,6 +45,324 @@
         <None Update="Files\logos\tenant_logo.png">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <Content Update="Configurations\database.integration-test.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="Configurations\identity.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="Configurations\identity.integration-test.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="Configurations\mail.integration-test.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="Configurations\database.Production.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <None Remove="bundle\zh-Hant\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\zh-Hans\Microsoft.CodeAnalysis.resources.dll" />
+        <Content Remove="bundle\web.config" />
+        <None Remove="bundle\tr\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Windows.Extensions.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Drawing.Common.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Diagnostics.PerformanceCounter.dll" />
+        <None Remove="bundle\runtimes\win\lib\net6.0\System.Diagnostics.EventLog.Messages.dll" />
+        <None Remove="bundle\runtimes\win-x86\native\sni.dll" />
+        <None Remove="bundle\runtimes\win-x86\native\libSkiaSharp.dll" />
+        <None Remove="bundle\runtimes\win-x86\native\libHarfBuzzSharp.dll" />
+        <None Remove="bundle\runtimes\win-x86\native\e_sqlite3.dll" />
+        <None Remove="bundle\runtimes\win-x64\native\sni.dll" />
+        <None Remove="bundle\runtimes\win-x64\native\libSkiaSharp.dll" />
+        <None Remove="bundle\runtimes\win-x64\native\libHarfBuzzSharp.dll" />
+        <None Remove="bundle\runtimes\win-x64\native\e_sqlite3.dll" />
+        <None Remove="bundle\runtimes\win-arm64\native\sni.dll" />
+        <None Remove="bundle\runtimes\win-arm64\native\libSkiaSharp.dll" />
+        <None Remove="bundle\runtimes\win-arm64\native\libHarfBuzzSharp.dll" />
+        <None Remove="bundle\runtimes\win-arm64\native\e_sqlite3.dll" />
+        <None Remove="bundle\runtimes\win-arm\native\e_sqlite3.dll" />
+        <None Remove="bundle\runtimes\osx\native\libSkiaSharp.dylib" />
+        <None Remove="bundle\runtimes\linux-x64\native\libe_sqlite3.so" />
+        <None Remove="bundle\runtimes\linux-musl-x64\native\libe_sqlite3.so" />
+        <None Remove="bundle\runtimes\linux-arm64\native\libe_sqlite3.so" />
+        <None Remove="bundle\runtimes\linux-arm\native\libe_sqlite3.so" />
+        <None Remove="bundle\ru\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\pt-BR\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+        <None Remove="bundle\pl\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\ko\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\ja\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\it\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\fr\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\fr\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+        <None Remove="bundle\es\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\es\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+        <None Remove="bundle\de\Microsoft.CodeAnalysis.resources.dll" />
+        <None Remove="bundle\de\Microsoft.CodeAnalysis.CSharp.resources.dll" />
+        <None Remove="bundle\cs\Microsoft.CodeAnalysis.resources.dll" />
+        <Content Remove="bundle\aws-windows-deployment-manifest.json" />
+        <Content Remove="bundle\appsettings.json" />
+        <None Remove="bundle\ZymLabs.NSwag.FluentValidation.dll" />
+        <None Remove="bundle\ZymLabs.NSwag.FluentValidation.AspNetCore.dll" />
+        <None Remove="bundle\YamlDotNet.dll" />
+        <None Remove="bundle\TimeZoneConverter.dll" />
+        <None Remove="bundle\System.Windows.Extensions.dll" />
+        <None Remove="bundle\System.Text.Json.dll" />
+        <None Remove="bundle\System.Security.Permissions.dll" />
+        <None Remove="bundle\System.Security.Cryptography.Xml.dll" />
+        <None Remove="bundle\System.Security.Cryptography.ProtectedData.dll" />
+        <None Remove="bundle\System.Security.Cryptography.Pkcs.dll" />
+        <None Remove="bundle\System.Runtime.Caching.dll" />
+        <None Remove="bundle\System.Net.WebSockets.WebSocketProtocol.dll" />
+        <None Remove="bundle\System.Linq.Dynamic.Core.dll" />
+        <None Remove="bundle\System.Linq.Async.dll" />
+        <None Remove="bundle\System.IdentityModel.Tokens.Jwt.dll" />
+        <None Remove="bundle\System.IO.Packaging.dll" />
+        <None Remove="bundle\System.Drawing.Common.dll" />
+        <None Remove="bundle\System.DirectoryServices.dll" />
+        <None Remove="bundle\System.DirectoryServices.Protocols.dll" />
+        <None Remove="bundle\System.Diagnostics.PerformanceCounter.dll" />
+        <None Remove="bundle\System.Data.SqlClient.dll" />
+        <None Remove="bundle\System.Configuration.ConfigurationManager.dll" />
+        <None Remove="bundle\Storage.Net.dll" />
+        <None Remove="bundle\StackExchange.Redis.dll" />
+        <None Remove="bundle\SkiaSharp.dll" />
+        <None Remove="bundle\SkiaSharp.QrCode.dll" />
+        <None Remove="bundle\SkiaSharp.HarfBuzz.dll" />
+        <None Remove="bundle\Serilog.dll" />
+        <None Remove="bundle\Serilog.Sinks.Seq.dll" />
+        <None Remove="bundle\Serilog.Sinks.PeriodicBatching.dll" />
+        <None Remove="bundle\Serilog.Sinks.MSSqlServer.dll" />
+        <None Remove="bundle\Serilog.Sinks.File.dll" />
+        <None Remove="bundle\Serilog.Sinks.Elasticsearch.dll" />
+        <None Remove="bundle\Serilog.Sinks.Debug.dll" />
+        <None Remove="bundle\Serilog.Sinks.Console.dll" />
+        <None Remove="bundle\Serilog.Sinks.Async.dll" />
+        <None Remove="bundle\Serilog.Settings.Configuration.dll" />
+        <None Remove="bundle\Serilog.Formatting.Elasticsearch.dll" />
+        <None Remove="bundle\Serilog.Formatting.Compact.dll" />
+        <None Remove="bundle\Serilog.Extensions.Logging.dll" />
+        <None Remove="bundle\Serilog.Extensions.Hosting.dll" />
+        <None Remove="bundle\Serilog.Expressions.dll" />
+        <None Remove="bundle\Serilog.Enrichers.Thread.dll" />
+        <None Remove="bundle\Serilog.Enrichers.Process.dll" />
+        <None Remove="bundle\Serilog.Enrichers.Environment.dll" />
+        <None Remove="bundle\Serilog.AspNetCore.dll" />
+        <Content Remove="bundle\Seeders\subscriptions.json" />
+        <Content Remove="bundle\Seeders\subscription-packages.json" />
+        <Content Remove="bundle\Seeders\services.json" />
+        <Content Remove="bundle\Seeders\services-catalog.json" />
+        <Content Remove="bundle\Seeders\products.json" />
+        <Content Remove="bundle\Seeders\printables.json" />
+        <Content Remove="bundle\Seeders\payment-methods.json" />
+        <Content Remove="bundle\Seeders\customers.json" />
+        <Content Remove="bundle\Seeders\brands.json" />
+        <None Remove="bundle\Scrutor.dll" />
+        <None Remove="bundle\SQLitePCLRaw.provider.e_sqlite3.dll" />
+        <None Remove="bundle\SQLitePCLRaw.core.dll" />
+        <None Remove="bundle\SQLitePCLRaw.batteries_v2.dll" />
+        <None Remove="bundle\Rebus.dll" />
+        <None Remove="bundle\Rebus.ServiceProvider.dll" />
+        <None Remove="bundle\Rebus.Microsoft.Extensions.Logging.dll" />
+        <None Remove="bundle\RazorEngineCore.dll" />
+        <None Remove="bundle\QuestPDF.dll" />
+        <None Remove="bundle\Pomelo.EntityFrameworkCore.MySql.dll" />
+        <None Remove="bundle\Polly.dll" />
+        <None Remove="bundle\Pipelines.Sockets.Unofficial.dll" />
+        <None Remove="bundle\Parlot.dll" />
+        <None Remove="bundle\OrchardCore.Localization.Core.dll" />
+        <None Remove="bundle\OrchardCore.Localization.Abstractions.dll" />
+        <None Remove="bundle\Oracle.ManagedDataAccess.dll" />
+        <None Remove="bundle\Oracle.EntityFrameworkCore.dll" />
+        <None Remove="bundle\Open.Linq.AsyncExtensions.dll" />
+        <None Remove="bundle\ObjectsComparer.dll" />
+        <None Remove="bundle\Npgsql.dll" />
+        <None Remove="bundle\Npgsql.EntityFrameworkCore.PostgreSQL.dll" />
+        <None Remove="bundle\NodaTime.dll" />
+        <None Remove="bundle\NodaTime.Serialization.JsonNet.dll" />
+        <None Remove="bundle\Newtonsoft.Json.dll" />
+        <None Remove="bundle\NewId.dll" />
+        <None Remove="bundle\NetTopologySuite.dll" />
+        <None Remove="bundle\NetTopologySuite.IO.SqlServerBytes.dll" />
+        <None Remove="bundle\NetBox.dll" />
+        <None Remove="bundle\Namotion.Reflection.dll" />
+        <None Remove="bundle\NSwag.Generation.dll" />
+        <None Remove="bundle\NSwag.Generation.AspNetCore.dll" />
+        <None Remove="bundle\NSwag.Core.dll" />
+        <None Remove="bundle\NSwag.Core.Yaml.dll" />
+        <None Remove="bundle\NSwag.AspNetCore.dll" />
+        <None Remove="bundle\NSwag.Annotations.dll" />
+        <None Remove="bundle\NJsonSchema.dll" />
+        <None Remove="bundle\NJsonSchema.Yaml.dll" />
+        <None Remove="bundle\NCrontab.dll" />
+        <None Remove="bundle\MySqlConnector.dll" />
+        <None Remove="bundle\MimeKit.dll" />
+        <None Remove="bundle\Migrators.PostgreSQL.xml" />
+        <None Remove="bundle\Migrators.PostgreSQL.dll" />
+        <None Remove="bundle\Migrators.MySQL.xml" />
+        <None Remove="bundle\Migrators.MySQL.dll" />
+        <None Remove="bundle\Migrators.MSSQL.xml" />
+        <None Remove="bundle\Migrators.MSSQL.dll" />
+        <None Remove="bundle\Microsoft.Win32.SystemEvents.dll" />
+        <None Remove="bundle\Microsoft.SqlServer.Types.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Validators.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Tokens.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Protocols.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.LoggingExtensions.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Logging.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.JsonWebTokens.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
+        <None Remove="bundle\Microsoft.IdentityModel.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.Identity.Web.dll" />
+        <None Remove="bundle\Microsoft.Identity.Web.TokenCache.dll" />
+        <None Remove="bundle\Microsoft.Identity.Web.Certificateless.dll" />
+        <None Remove="bundle\Microsoft.Identity.Web.Certificate.dll" />
+        <None Remove="bundle\Microsoft.Identity.Client.dll" />
+        <None Remove="bundle\Microsoft.Identity.Client.Extensions.Msal.dll" />
+        <None Remove="bundle\Microsoft.IO.RecyclableMemoryStream.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Logging.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Localization.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Localization.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Identity.Stores.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Identity.Core.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Diagnostics.HealthChecks.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.Extensions.DependencyModel.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Caching.StackExchangeRedis.dll" />
+        <None Remove="bundle\Microsoft.Extensions.Caching.Memory.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.Sqlite.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.SqlServer.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.SqlServer.Design.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.Relational.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.Relational.Design.dll" />
+        <None Remove="bundle\Microsoft.EntityFrameworkCore.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.Data.Sqlite.dll" />
+        <None Remove="bundle\Microsoft.Data.SqlClient.dll" />
+        <None Remove="bundle\Microsoft.CodeAnalysis.dll" />
+        <None Remove="bundle\Microsoft.CodeAnalysis.CSharp.dll" />
+        <None Remove="bundle\Microsoft.Bcl.AsyncInterfaces.dll" />
+        <None Remove="bundle\Microsoft.Azure.Services.AppAuthentication.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.SignalR.StackExchangeRedis.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Razor.Language.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Mvc.Versioning.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Metadata.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.DataProtection.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.DataProtection.Abstractions.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Cryptography.Internal.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Components.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Components.Authorization.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Authorization.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" />
+        <None Remove="bundle\Microsoft.AspNetCore.Authentication.JwtBearer.dll" />
+        <None Remove="bundle\MessagePack.dll" />
+        <None Remove="bundle\MessagePack.Annotations.dll" />
+        <None Remove="bundle\MediatR.dll" />
+        <None Remove="bundle\MediatR.Extensions.Microsoft.DependencyInjection.dll" />
+        <None Remove="bundle\MediatR.Contracts.dll" />
+        <None Remove="bundle\Mapster.dll" />
+        <None Remove="bundle\Mapster.Core.dll" />
+        <None Remove="bundle\MailKit.dll" />
+        <None Remove="bundle\LinqKit.Core.dll" />
+        <None Remove="bundle\LazyCache.dll" />
+        <None Remove="bundle\LazyCache.AspNetCore.dll" />
+        <None Remove="bundle\Jint.dll" />
+        <None Remove="bundle\Humanizer.dll" />
+        <None Remove="bundle\HarfBuzzSharp.dll" />
+        <None Remove="bundle\HangfireBasicAuthenticationFilter.dll" />
+        <None Remove="bundle\Hangfire.SqlServer.dll" />
+        <None Remove="bundle\Hangfire.SQLite.dll" />
+        <None Remove="bundle\Hangfire.PostgreSql.dll" />
+        <None Remove="bundle\Hangfire.MySql.dll" />
+        <None Remove="bundle\Hangfire.Core.dll" />
+        <None Remove="bundle\Hangfire.Console.dll" />
+        <None Remove="bundle\Hangfire.Console.Extensions.dll" />
+        <None Remove="bundle\Hangfire.Console.Extensions.Serilog.dll" />
+        <None Remove="bundle\Hangfire.AspNetCore.dll" />
+        <None Remove="bundle\Fluid.dll" />
+        <None Remove="bundle\FluentValidation.dll" />
+        <None Remove="bundle\FluentValidation.DependencyInjectionExtensions.dll" />
+        <None Remove="bundle\FluentValidation.AspNetCore.dll" />
+        <None Remove="bundle\Finbuckle.MultiTenant.dll" />
+        <None Remove="bundle\Finbuckle.MultiTenant.EntityFrameworkCore.dll" />
+        <None Remove="bundle\Finbuckle.MultiTenant.AspNetCore.dll" />
+        <None Remove="bundle\Files\full-stack-hero-logo.png" />
+        <None Remove="bundle\FSH.WebApi.Shared.xml" />
+        <None Remove="bundle\FSH.WebApi.Shared.dll" />
+        <None Remove="bundle\FSH.WebApi.Infrastructure.xml" />
+        <None Remove="bundle\FSH.WebApi.Infrastructure.dll" />
+        <None Remove="bundle\FSH.WebApi.Host.xml" />
+        <Content Remove="bundle\FSH.WebApi.Host.runtimeconfig.json" />
+        <None Remove="bundle\FSH.WebApi.Host.dll" />
+        <Content Remove="bundle\FSH.WebApi.Host.deps.json" />
+        <None Remove="bundle\FSH.WebApi.Host" />
+        <None Remove="bundle\FSH.WebApi.Domain.xml" />
+        <None Remove="bundle\FSH.WebApi.Domain.dll" />
+        <None Remove="bundle\FSH.WebApi.Application.xml" />
+        <None Remove="bundle\FSH.WebApi.Application.dll" />
+        <None Remove="bundle\ExcelNumberFormat.dll" />
+        <None Remove="bundle\Esprima.dll" />
+        <None Remove="bundle\EntityFrameworkCore.SqlServer.HierarchyId.dll" />
+        <None Remove="bundle\EntityFrameworkCore.SqlServer.HierarchyId.Abstractions.dll" />
+        <Content Remove="bundle\Email Templates\subscription-renewed.cshtml" />
+        <Content Remove="bundle\Email Templates\pay-for-subscription.cshtml" />
+        <Content Remove="bundle\Email Templates\email-subscription.cshtml" />
+        <None Remove="bundle\Elsa.dll" />
+        <None Remove="bundle\Elsa.Scripting.Liquid.dll" />
+        <None Remove="bundle\Elsa.Scripting.JavaScript.dll" />
+        <None Remove="bundle\Elsa.Persistence.EntityFramework.SqlServer.dll" />
+        <None Remove="bundle\Elsa.Persistence.EntityFramework.PostgreSql.dll" />
+        <None Remove="bundle\Elsa.Persistence.EntityFramework.MySql.dll" />
+        <None Remove="bundle\Elsa.Persistence.EntityFramework.Core.dll" />
+        <None Remove="bundle\Elsa.Core.dll" />
+        <None Remove="bundle\Elsa.Activities.Temporal.Hangfire.dll" />
+        <None Remove="bundle\Elsa.Activities.Temporal.Common.dll" />
+        <None Remove="bundle\Elsa.Activities.Console.dll" />
+        <None Remove="bundle\Elsa.Abstractions.dll" />
+        <None Remove="bundle\Elasticsearch.Net.dll" />
+        <None Remove="bundle\EFCore.BulkExtensions.dll" />
+        <None Remove="bundle\DocumentFormat.OpenXml.dll" />
+        <None Remove="bundle\DistributedLock.FileSystem.dll" />
+        <None Remove="bundle\DistributedLock.Core.dll" />
+        <None Remove="bundle\Dapper.dll" />
+        <Content Remove="bundle\Configurations\workflow.json" />
+        <Content Remove="bundle\Configurations\workflow.integration-test.json" />
+        <Content Remove="bundle\Configurations\signalr.json" />
+        <Content Remove="bundle\Configurations\securityheaders.json" />
+        <Content Remove="bundle\Configurations\security.json" />
+        <Content Remove="bundle\Configurations\openapi.json" />
+        <Content Remove="bundle\Configurations\middleware.json" />
+        <Content Remove="bundle\Configurations\mail.json" />
+        <Content Remove="bundle\Configurations\mail.integration-test.json" />
+        <Content Remove="bundle\Configurations\logger.json" />
+        <Content Remove="bundle\Configurations\localization.json" />
+        <Content Remove="bundle\Configurations\identity.json" />
+        <Content Remove="bundle\Configurations\identity.integration-test.json" />
+        <Content Remove="bundle\Configurations\hangfire.json" />
+        <Content Remove="bundle\Configurations\database.json" />
+        <Content Remove="bundle\Configurations\database.integration-test.json" />
+        <Content Remove="bundle\Configurations\database.Production.json" />
+        <Content Remove="bundle\Configurations\cors.json" />
+        <None Remove="bundle\ClosedXML.dll" />
+        <None Remove="bundle\BouncyCastle.Crypto.dll" />
+        <None Remove="bundle\Azure.Security.KeyVault.Secrets.dll" />
+        <None Remove="bundle\Azure.Security.KeyVault.Certificates.dll" />
+        <None Remove="bundle\Azure.Identity.dll" />
+        <None Remove="bundle\Azure.Core.dll" />
+        <None Remove="bundle\AutoMapper.dll" />
+        <None Remove="bundle\AutoMapper.Extensions.Microsoft.DependencyInjection.dll" />
+        <None Remove="bundle\Ardalis.Specification.dll" />
+        <None Remove="bundle\Ardalis.Specification.EntityFrameworkCore.dll" />
+        <None Remove="bundle\Ardalis.SmartEnum.dll" />
+        <None Remove="bundle\Ardalis.SmartEnum.JsonNet.dll" />
+        <None Remove="bundle\Ardalis.SmartEnum.EFCore.dll" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Email Templates\*.cshtml">

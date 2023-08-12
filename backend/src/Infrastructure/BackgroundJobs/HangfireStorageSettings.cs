@@ -1,7 +1,7 @@
 namespace FSH.WebApi.Infrastructure.BackgroundJobs;
 
-public class HangfireStorageSettings
+public sealed class HangfireStorageSettings
 {
-    public string? StorageProvider { get; set; }
-    public string? ConnectionString { get; set; }
+  public string? StorageProvider { get; set; }
+  public string? ConnectionString { get; set; }
 }

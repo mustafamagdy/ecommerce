@@ -1,0 +1,9 @@
+{
+  "MailSettings": {
+    "DisplayName": "Integration Test",
+    "From": "info@integration-test.com",
+    "Host": "localhost",
+    "UserName": "info@integration-test.com",
+    "UseTLS": false
+  }
+}

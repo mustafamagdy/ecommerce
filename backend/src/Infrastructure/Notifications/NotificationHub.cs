@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace FSH.WebApi.Infrastructure.Notifications;
 
 [Authorize]
-public class NotificationHub : Hub, ITransientService
+public sealed class NotificationHub : Hub, ITransientService
 {
   private readonly ITenantInfo? _currentTenant;
   private readonly ILogger<NotificationHub> _logger;

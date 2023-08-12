@@ -1,20 +1,29 @@
 using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Shared.Multitenancy;
 
-public class SubscriptionType : SmartEnum<SubscriptionType, string>
+[JsonConverter(typeof(SmartEnumNameConverter<SubscriptionFeatureType, string>))]
+public sealed class SubscriptionFeatureType : SmartEnum<SubscriptionFeatureType, string>
 {
-  public const string StandardValue = "std";
-  public static readonly SubscriptionType Standard = new(nameof(Standard), StandardValue);
+  public static readonly SubscriptionFeatureType NoOfUsers = new(nameof(NoOfUsers), "no_of_users");
+  public static readonly SubscriptionFeatureType OrdersPerMonth = new(nameof(OrdersPerMonth), "orders_per_month");
+
+  public SubscriptionFeatureType(string name, string value)
+    : base(name, value)
+  {
+  }
+}
+
+[JsonConverter(typeof(SmartEnumNameConverter<SubscriptionType, string>))]
+public sealed class SubscriptionType : SmartEnum<SubscriptionType, string>
+{
+  public static readonly SubscriptionType Standard = new(nameof(Standard), "std");
   public static readonly SubscriptionType Demo = new(nameof(Demo), "demo");
   public static readonly SubscriptionType Train = new(nameof(Train), "train");
 
-  public SubscriptionType()
-    : base(null, null)
-  {
-  }
-
-  private SubscriptionType(string name, string value)
+  public SubscriptionType(string name, string value)
     : base(name, value)
   {
   }

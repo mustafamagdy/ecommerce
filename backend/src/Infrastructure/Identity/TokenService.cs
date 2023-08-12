@@ -2,9 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Ardalis.Specification;
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Identity.Tokens;
-using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
@@ -17,28 +21,33 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal class TokenService : ITokenService
+internal sealed class TokenService : ITokenService
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly IStringLocalizer _t;
+  private readonly IdentitySettings _identitySettings;
   private readonly SecuritySettings _securitySettings;
   private readonly JwtSettings _jwtSettings;
   private readonly FSHTenantInfo? _currentTenant;
-  private readonly ITenantService _tenantService;
+  private readonly ISystemTime _systemTime;
+  private readonly IReadNonAggregateRepository<FSHTenantInfo> _repo;
 
   public TokenService(
     UserManager<ApplicationUser> userManager,
     IOptions<JwtSettings> jwtSettings,
+    IOptions<IdentitySettings> identitySettings,
     IStringLocalizer<TokenService> localizer,
     FSHTenantInfo? currentTenant,
     IOptions<SecuritySettings> securitySettings,
-    ITenantService tenantService)
+    ISystemTime systemTime, IReadNonAggregateRepository<FSHTenantInfo> repo)
   {
     _userManager = userManager;
     _t = localizer;
+    _identitySettings = identitySettings.Value;
     _jwtSettings = jwtSettings.Value;
     _currentTenant = currentTenant;
-    _tenantService = tenantService;
+    _systemTime = systemTime;
+    _repo = repo;
     _securitySettings = securitySettings.Value;
   }
 
@@ -51,12 +60,12 @@ internal class TokenService : ITokenService
       throw new UnauthorizedException(_t["Authentication Failed."]);
     }
 
-    if (!user.IsActive)
+    if (!user.Active)
     {
       throw new UnauthorizedException(_t["User Not Active. Please contact the administrator."]);
     }
 
-    if (_securitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
+    if (_identitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
     {
       throw new UnauthorizedException(_t["E-Mail not confirmed."]);
     }
@@ -75,12 +84,23 @@ internal class TokenService : ITokenService
       }
     }
 
-    return await GenerateTokensAndUpdateUser(user, ipAddress);
+    return await GenerateTokensAndUpdateUser(user, ipAddress, request.BranchId);
   }
 
   private Task<bool> HasAValidSubscription(string tenantId)
   {
-    return _tenantService.HasAValidProdSubscription(tenantId);
+    var today = _systemTime.Now;
+
+    var spec = new SingleResultSpecification<FSHTenantInfo>()
+      .Query
+      .Include(a => a.ProdSubscription)
+      .ThenInclude(a => a.History)
+      .Where(a => a.Id == tenantId
+                  && a.Active
+                  && a.ProdSubscription != null
+                  && a.ProdSubscription.ExpiryDate >= today);
+
+    return _repo.AnyAsync(spec.Specification);
   }
 
   public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
@@ -101,22 +121,26 @@ internal class TokenService : ITokenService
     return await GenerateTokensAndUpdateUser(user, ipAddress);
   }
 
-  private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress)
+  public async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, Guid? branchId = null)
   {
-    string token = GenerateJwt(user, ipAddress);
+    string token = GenerateJwt(user, ipAddress, branchId);
 
     user.RefreshToken = GenerateRefreshToken();
     user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
+    if (branchId != null)
+    {
+      user.LastUsedBranchId = branchId;
+    }
 
     await _userManager.UpdateAsync(user);
 
     return new TokenResponse(token, user.RefreshToken, user.RefreshTokenExpiryTime);
   }
 
-  private string GenerateJwt(ApplicationUser user, string ipAddress) =>
-    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
+  private string GenerateJwt(ApplicationUser user, string ipAddress, Guid? branchId) =>
+    GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress, branchId));
 
-  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+  private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress, Guid? branchId)
   {
     var claims = new List<Claim>
     {
@@ -127,7 +151,8 @@ internal class TokenService : ITokenService
       new(ClaimTypes.Surname, user.LastName ?? string.Empty),
       new(FSHClaims.IpAddress, ipAddress),
       new(FSHClaims.Tenant, _currentTenant!.Id),
-      new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
+      new(FSHClaims.Branch, (string.IsNullOrEmpty(user.LastUsedBranchId.ToString()) ? branchId?.ToString() : user.LastUsedBranchId.ToString()) ?? string.Empty),
+      new(FSHClaims.ImageUrl, user.ImagePath ?? string.Empty),
       new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
     };
 

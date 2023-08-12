@@ -41,6 +41,6 @@ public class AutoCompleteCustomerRequestHandler : IRequestHandler<AutoCompleteCu
   public async Task<BasicCustomerDto> Handle(AutoCompleteCustomerRequest request, CancellationToken cancellationToken)
   {
     var spec = new AutoCompleteCustomerSpec(request);
-    return await _repository.GetBySpecAsync((ISpecification<Customer, BasicCustomerDto>)spec, cancellationToken);
+    return await _repository.FirstOrDefaultAsync((ISpecification<Customer, BasicCustomerDto>)spec, cancellationToken);
   }
 }

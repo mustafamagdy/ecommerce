@@ -1,3 +1,6 @@
+using FSH.WebApi.Domain.Common.Events;
+using FSH.WebApi.Shared.Persistence;
+
 namespace FSH.WebApi.Application.Catalog.Brands;
 
 public class CreateBrandRequest : IRequest<Guid>
@@ -13,28 +16,35 @@ public sealed class BrandByNameSpec : Specification<Brand>, ISingleResultSpecifi
 
 public class CreateBrandRequestValidator : CustomValidator<CreateBrandRequest>
 {
-  public CreateBrandRequestValidator(
-    IReadRepository<Brand> repository,
-    IStringLocalizer<CreateBrandRequestValidator> T) =>
-    RuleFor(p => p.Name)
-      .NotEmpty()
-      .MaximumLength(75)
-      .MustAsync(async (name, ct) => await repository.GetBySpecAsync(new BrandByNameSpec(name), ct) is null)
-      .WithMessage((_, name) => T["Brand {0} already Exists.", name]);
+  public CreateBrandRequestValidator(IReadRepository<Brand> repository, IStringLocalizer<CreateBrandRequestValidator> T)
+    =>
+      RuleFor(p => p.Name)
+        .NotEmpty()
+        .MaximumLength(75)
+        .MustAsync(async (name, ct) => await repository.FirstOrDefaultAsync(new BrandByNameSpec(name), ct) is null)
+        .WithMessage((_, name) => T["Brand {0} already Exists.", name]);
 }
 
 public class CreateBrandRequestHandler : IRequestHandler<CreateBrandRequest, Guid>
 {
-  // Add Domain Events automatically by using IRepositoryWithEvents
   private readonly IRepositoryWithEvents<Brand> _repository;
+  private readonly IApplicationUnitOfWork _uow;
 
-  public CreateBrandRequestHandler(IRepositoryWithEvents<Brand> repository) => _repository = repository;
+  public CreateBrandRequestHandler(IRepositoryWithEvents<Brand> repository, IApplicationUnitOfWork uow)
+  {
+    _repository = repository;
+    _uow = uow;
+  }
 
   public async Task<Guid> Handle(CreateBrandRequest request, CancellationToken cancellationToken)
   {
     var brand = new Brand(request.Name, request.Description);
 
+    brand.AddDomainEvent(EntityCreatedEvent.WithEntity(brand));
+
     await _repository.AddAsync(brand, cancellationToken);
+
+    await _uow.CommitAsync(cancellationToken);
 
     return brand.Id;
   }

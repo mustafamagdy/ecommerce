@@ -10,20 +10,22 @@ namespace FSH.WebApi.Application.Operation.Orders;
 public class CreateOrderRequest : BaseOrderRequest, IRequest<OrderDto>
 {
   public Guid CustomerId { get; set; }
-  public List<OrderPaymentAmount> Payments { get; set; }
+  public List<OrderPaymentAmount> Payments { get; set; } = new();
 }
 
 public class CreateOrderRequestValidator : CreateOrderRequestBaseValidator<CreateOrderRequest>
 {
-  public CreateOrderRequestValidator(IStringLocalizer<IBaseRequest> t)
-    : base(t)
+  public CreateOrderRequestValidator(IReadRepository<ServiceCatalog> serviceCatalogRepo, IStringLocalizer<IBaseRequest> t)
+    : base(t, serviceCatalogRepo)
   {
     RuleFor(p => p.CustomerId)
       .NotEmpty();
 
-    RuleFor(a => a.Payments)
-      .NotEmpty()
-      .ForEach(a => a.SetValidator(new OrderPaymentAmountValidator()));
+    When(a => a.Payments.Count > 0, () =>
+    {
+      RuleFor(a => a.Payments)
+        .ForEach(a => a.SetValidator(new OrderPaymentAmountValidator()));
+    });
   }
 }
 

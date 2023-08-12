@@ -1,9 +1,13 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Persistence;
+using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -20,22 +24,33 @@ internal static class Startup
   internal static IServiceCollection AddMultitenancy(this IServiceCollection services, IConfiguration config)
   {
     return services
-      .AddDbContext<TenantDbContext>((p, m) =>
+      .AddDbContext<TenantDbContext>((sp, dbOptions) =>
       {
-        var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
+        var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql, StringComparison.CurrentCultureIgnoreCase))
+        {
+          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ?? throw new NotSupportedException("Fix database datetime kind for postgres not registered"));
+        }
+
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+        dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
+      .AddTenantUnitOfWork()
       .AddMultiTenant<FSHTenantInfo>()
-      .WithClaimStrategy(FSHClaims.Tenant)
-      .WithHostStrategy(MultitenancyConstants.TenantIdName)
+      .WithHostStrategy()
       .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
-      .WithQueryStringStrategy(MultitenancyConstants.TenantIdName)
+      .WithClaimStrategy(FSHClaims.Tenant)
       .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
+      .AddScoped<ISubscriptionTypeResolver, SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
-      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
-      .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
+      .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
   }
+
+  private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)
+    => services
+      .AddScoped<ITenantUnitOfWork, TenantUnitOfWork>()
+      .AddScoped<TenantUnitOfWork>();
 
   internal static IApplicationBuilder UseMultiTenancy(this IApplicationBuilder app) =>
     app.UseMultiTenant();

@@ -3,25 +3,34 @@ using FSH.WebApi.Domain.Structure;
 
 namespace FSH.WebApi.Domain.Operation;
 
-public class CashRegister : BaseEntity, IAggregateRoot
+public sealed class CashRegister : AuditableEntity, IAggregateRoot
 {
-  public CashRegister()
+  private CashRegister()
   {
   }
 
-  public CashRegister(Guid branchId, string name, string color)
+  public CashRegister(Guid managerId, Guid branchId, string name, string color)
   {
+    ManagerId = managerId;
     BranchId = branchId;
     Name = name;
     Color = color;
   }
 
-  public Guid BranchId { get; set; }
-  public virtual Branch Branch { get; set; }
+  private List<ActivePaymentOperation> _activeOperations = new();
+  private readonly List<ArchivedPaymentOperation> _archivedOperations = new();
+
   public string Name { get; set; }
   public string Color { get; set; }
   public bool Opened { get; private set; }
   public decimal Balance { get; private set; }
+
+  public Guid ManagerId { get; set; }
+  public Guid BranchId { get; set; }
+  public Branch Branch { get; private set; }
+
+  public IReadOnlyCollection<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
+  public IReadOnlyCollection<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
 
   public void Open()
   {
@@ -37,57 +46,51 @@ public class CashRegister : BaseEntity, IAggregateRoot
   private void MoveAllOperationsToArchive()
   {
     var committedOperations = _activeOperations
-      .Where(a => a.Type != PaymentOperationType.PendingIn
-                  || a.Type != PaymentOperationType.PendingOut)
+      .Where(a => a.OperationType != PaymentOperationType.PendingIn
+                  || a.OperationType != PaymentOperationType.PendingOut)
       .ToList();
 
-    _archivedOperations.AddRange(committedOperations.Cast<ArchivedPaymentOperation>());
+    _archivedOperations.AddRange(committedOperations.Select(ArchivedPaymentOperation.From));
 
     _activeOperations = _activeOperations.Except(committedOperations).ToList();
   }
 
-  private List<ActivePaymentOperation> _activeOperations = new();
-  private List<ArchivedPaymentOperation> _archivedOperations = new();
-
-  public IReadOnlyList<ActivePaymentOperation> ActiveOperations => _activeOperations.AsReadOnly();
-  public IReadOnlyList<ArchivedPaymentOperation> ArchivedOperations => _archivedOperations.AsReadOnly();
-
-  public void AddOperation(PaymentOperation operation)
+  public void AddOperation(ActivePaymentOperation operation)
   {
     if (!Opened)
     {
       throw new InvalidOperationException("Cash register is not opened");
     }
 
-    _activeOperations.Add((ActivePaymentOperation)operation);
+    _activeOperations.Add(operation);
 
     UpdateBalance(operation);
   }
 
   public void AcceptPendingIn(PaymentOperation operation)
   {
-    if (operation.Type != PaymentOperationType.PendingIn)
+    if (operation.OperationType != PaymentOperationType.PendingIn)
     {
-      throw new InvalidOperationException($"Operation {operation.Type} is not valid for accept pending in operation");
+      throw new InvalidOperationException($"Operation {operation.OperationType} is not valid for accept pending in operation");
     }
 
-    operation.Type = PaymentOperationType.In;
+    operation.OperationType = PaymentOperationType.In;
     UpdateBalance(operation);
   }
 
   public void CommitPendingOut(PaymentOperation operation)
   {
-    if (operation.Type != PaymentOperationType.PendingOut)
+    if (operation.OperationType != PaymentOperationType.PendingOut)
     {
-      throw new InvalidOperationException($"Operation {operation.Type} is not valid for committing pending out operation");
+      throw new InvalidOperationException($"Operation {operation.OperationType} is not valid for committing pending out operation");
     }
 
-    operation.Type = PaymentOperationType.Out;
+    operation.OperationType = PaymentOperationType.Out;
   }
 
   private void UpdateBalance(PaymentOperation operation)
   {
-    switch (operation.Type.Name)
+    switch (operation.OperationType.Name)
     {
       case nameof(PaymentOperationType.In):
         Balance += operation.Amount;
@@ -100,62 +103,78 @@ public class CashRegister : BaseEntity, IAggregateRoot
   }
 }
 
-public abstract class PaymentOperation : BaseEntity, IAggregateRoot
+public abstract class PaymentOperation : AuditableEntity, IAggregateRoot
 {
   public DateTime DateTime { get; set; }
   public decimal Amount { get; set; }
-  public PaymentOperationType Type { get; set; }
+  public PaymentOperationType OperationType { get; set; }
 
   public Guid CashRegisterId { get; set; }
-  public virtual CashRegister CashRegister { get; set; }
+  public CashRegister CashRegister { get; set; }
   public Guid PaymentMethodId { get; set; }
-  public virtual PaymentMethod PaymentMethod { get; set; }
+  public PaymentMethod PaymentMethod { get; set; }
 
   public Guid? PendingTransferId { get; set; }
 }
 
-public class ActivePaymentOperation : PaymentOperation
+public sealed class ActivePaymentOperation : PaymentOperation
 {
-  public static (ActivePaymentOperation source, ActivePaymentOperation dest) CreateTransfer(Guid sourceCashRegisterId,
-    Guid destinationCashRegisterId, decimal amount, DateTime opDate)
+  private ActivePaymentOperation()
+  {
+  }
+
+  public ActivePaymentOperation(CashRegister cashRegister, Guid paymentMethodId, decimal amount,
+    DateTime date, PaymentOperationType operationType)
+  {
+    Amount = amount;
+    OperationType = operationType;
+    DateTime = date;
+    PaymentMethodId = paymentMethodId;
+    CashRegister = cashRegister;
+    CashRegisterId = cashRegister.Id;
+  }
+
+  public static (ActivePaymentOperation Source, ActivePaymentOperation Destination) CreateTransfer(Guid sourceCashRegisterId,
+    Guid destinationCashRegisterId, decimal amount, DateTime opDate, Guid transferPaymentMethodId)
   {
     var src = new ActivePaymentOperation
     {
       Id = Guid.NewGuid(),
       Amount = amount,
-      Type = PaymentOperationType.PendingOut,
+      OperationType = PaymentOperationType.PendingOut,
       DateTime = opDate,
-      CashRegisterId = sourceCashRegisterId
+      CashRegisterId = sourceCashRegisterId,
+      PaymentMethodId = transferPaymentMethodId
     };
 
     var dest = new ActivePaymentOperation
     {
       Id = Guid.NewGuid(),
       Amount = amount,
-      Type = PaymentOperationType.PendingIn,
+      OperationType = PaymentOperationType.PendingIn,
       DateTime = opDate,
       CashRegisterId = destinationCashRegisterId,
-      PendingTransferId = src.Id
+      PendingTransferId = src.Id,
+      PaymentMethodId = transferPaymentMethodId
     };
 
     return (src, dest);
   }
+}
 
-  public static implicit operator ArchivedPaymentOperation(ActivePaymentOperation op)
+public sealed class ArchivedPaymentOperation : PaymentOperation
+{
+  public static ArchivedPaymentOperation From(ActivePaymentOperation activeOp)
   {
     return new ArchivedPaymentOperation
     {
-      Amount = op.Amount,
-      Id = op.Id,
-      CashRegisterId = op.CashRegisterId,
-      PaymentMethodId = op.PaymentMethodId,
-      Type = op.Type,
+      Amount = activeOp.Amount,
+      CashRegisterId = activeOp.CashRegisterId,
+      OperationType = activeOp.OperationType,
+      PaymentMethodId = activeOp.PaymentMethodId,
+      PendingTransferId = activeOp.PendingTransferId,
     };
   }
-}
-
-public class ArchivedPaymentOperation : PaymentOperation
-{
 }
 
 public sealed class PaymentOperationType : SmartEnum<PaymentOperationType, string>
@@ -164,11 +183,6 @@ public sealed class PaymentOperationType : SmartEnum<PaymentOperationType, strin
   public static readonly PaymentOperationType PendingIn = new(nameof(PendingIn), "pending-in");
   public static readonly PaymentOperationType Out = new(nameof(Out), "out");
   public static readonly PaymentOperationType PendingOut = new(nameof(PendingOut), "pending-out");
-
-  public PaymentOperationType()
-    : base(null, null)
-  {
-  }
 
   private PaymentOperationType(string name, string value)
     : base(name, value)

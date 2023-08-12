@@ -5,12 +5,12 @@ using FSH.WebApi.Shared.Multitenancy;
 
 namespace FSH.WebApi.Host.Controllers.Catalog;
 
-public class ServicesController : VersionedApiController
+public sealed class ServicesController : VersionedApiController
 {
   [HttpPost("search")]
   [MustHavePermission(FSHAction.Search, FSHResource.Services)]
   [OpenApiOperation("Search brands using available filters.", "")]
-  public Task<PaginationResponse<ServiceDto>> SearchAsync(SearchServiceRequest request)
+  public Task<PaginationResponse<ServiceDto>> SearchAsync(SearchServicesRequest request)
   {
     return Mediator.Send(request);
   }

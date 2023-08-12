@@ -2,7 +2,7 @@ using FSH.WebApi.Application.Identity.Roles;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
-public class RolesController : VersionNeutralApiController
+public sealed class RolesController : VersionNeutralApiController
 {
   private readonly IRoleService _roleService;
 
@@ -48,7 +48,7 @@ public class RolesController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Roles)]
   [OpenApiOperation("Create or update a role.", "")]
-  public Task<string> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
+  public Task<RoleDto> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
   {
     return _roleService.CreateOrUpdateAsync(request);
   }
@@ -59,5 +59,13 @@ public class RolesController : VersionNeutralApiController
   public Task<string> DeleteRole(string id)
   {
     return _roleService.DeleteRole(id);
+  }
+
+  [HttpGet("abilities")]
+  [AllowAnonymous]
+  [OpenApiOperation("Get roles with abilities.", "")]
+  public Task<List<RoleDto>> GetRolesWithItsAbilities(CancellationToken cancellationToken)
+  {
+    return _roleService.GetRolesAndAbilities(cancellationToken);
   }
 }

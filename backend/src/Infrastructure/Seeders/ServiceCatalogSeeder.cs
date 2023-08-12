@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class ServiceCatalogSeeder : ICustomSeeder
+public sealed class ServiceCatalogSeeder : ICustomSeeder
 {
   private readonly ISerializerService _serializerService;
   private readonly ApplicationDbContext _db;
@@ -29,13 +29,12 @@ public class ServiceCatalogSeeder : ICustomSeeder
     {
       _logger.LogInformation("Started to Seed ServiceCatalogs");
 
-      // Here you can use your own logic to populate the database.
-      // As an example, I am using a JSON file to populate the database.
       string serviceCategoryData = await File.ReadAllTextAsync(path + "/Seeders/services-catalog.json", cancellationToken);
       var serviceCategories = _serializerService.Deserialize<List<ServiceCatalog>>(serviceCategoryData);
 
       foreach (var serviceCategory in serviceCategories)
       {
+        serviceCategory.Id = Guid.NewGuid();
         await _db.ServiceCatalogs.AddAsync(serviceCategory, cancellationToken);
       }
 

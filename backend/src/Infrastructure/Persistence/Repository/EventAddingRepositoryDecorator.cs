@@ -12,7 +12,7 @@ namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 /// EntityCreated, EntityUpdated or EntityDeleted event
 /// before delegating to the decorated repository.
 /// </summary>
-public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
+public sealed class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   where T : class, IAggregateRoot
 {
   private readonly IRepository<T> _decorated;
@@ -21,7 +21,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityCreatedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityCreatedEvent.WithEntity(entity));
     return _decorated.AddAsync(entity, cancellationToken);
   }
 
@@ -29,7 +29,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityCreatedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityCreatedEvent.WithEntity(entity));
     }
 
     return _decorated.AddRangeAsync(entities, cancellationToken);
@@ -37,7 +37,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityUpdatedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityUpdatedEvent.WithEntity(entity));
     return _decorated.UpdateAsync(entity, cancellationToken);
   }
 
@@ -45,7 +45,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityUpdatedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityUpdatedEvent.WithEntity(entity));
     }
 
     return _decorated.UpdateRangeAsync(entities, cancellationToken);
@@ -53,7 +53,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
   {
-    entity.DomainEvents.Add(EntityDeletedEvent.WithEntity(entity));
+    entity.AddDomainEvent(EntityDeletedEvent.WithEntity(entity));
     return _decorated.DeleteAsync(entity, cancellationToken);
   }
 
@@ -61,7 +61,7 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
   {
     foreach (var entity in entities)
     {
-      entity.DomainEvents.Add(EntityDeletedEvent.WithEntity(entity));
+      entity.AddDomainEvent(EntityDeletedEvent.WithEntity(entity));
     }
 
     return _decorated.DeleteRangeAsync(entities, cancellationToken);
@@ -76,10 +76,10 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
     _decorated.GetByIdAsync(id, cancellationToken);
 
   public Task<T?> GetBySpecAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
-    => _decorated.GetBySpecAsync(specification, cancellationToken);
+    => _decorated.FirstOrDefaultAsync(specification, cancellationToken);
 
   public Task<TResult?> GetBySpecAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default) =>
-    _decorated.GetBySpecAsync(specification, cancellationToken);
+    _decorated.FirstOrDefaultAsync(specification, cancellationToken);
 
   public Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
     => _decorated.FirstOrDefaultAsync(specification, cancellationToken);
