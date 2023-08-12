@@ -1,9 +1,11 @@
 {
   "DatabaseSettings": {
-    "DBProvider": "mysql",
-    "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-05;User Id=root;Password=DeV12345",
-    "ConnectionStringTemplate": "Data Source=127.0.0.1;Initial Catalog={0};User Id=root;Password=DeV12345",
+    "DBProvider": "postgresql",
+//    "ConnectionString": "Server=185.198.27.42;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
+//    "ConnectionString": "Server=vmi1129859.contaboserver.net;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
+    "ConnectionString": "Server=127.0.0.1;Port=5439;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
+    "ConnectionStringTemplate": "Server=185.198.27.42;Port=5432;Database={0};Uid=postgres;Pwd=DeV12345",
     "SequenceTableName": "Sequences",
-    "LogSensitiveInfo" : false
+    "LogSensitiveInfo": false
   }
 }

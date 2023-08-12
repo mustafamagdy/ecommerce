@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Seeders;
 
-public class BrandGeneratorJob : IBrandGeneratorJob
+public sealed class BrandGeneratorJob : IBrandGeneratorJob
 {
   private readonly ILogger<BrandGeneratorJob> _logger;
   private readonly ISender _mediator;

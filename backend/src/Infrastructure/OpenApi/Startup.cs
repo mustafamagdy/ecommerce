@@ -91,12 +91,12 @@ internal static class Startup
       document.SchemaProcessors.Add(fluentValidationSchemaProcessor);
     });
 
-    services.AddScoped(provider =>
+    services.AddScoped(sp =>
     {
-      var validationRules = provider.GetService<IEnumerable<FluentValidationRule>>();
-      var loggerFactory = provider.GetService<ILoggerFactory>();
+      var validationRules = sp.GetService<IEnumerable<FluentValidationRule>>();
+      var loggerFactory = sp.GetService<ILoggerFactory>();
 
-      return new FluentValidationSchemaProcessor(provider, validationRules, loggerFactory);
+      return new FluentValidationSchemaProcessor(sp, validationRules, loggerFactory);
     });
 
     return services;
@@ -124,6 +124,10 @@ internal static class Startup
           };
           options.OAuth2Client.Scopes.Add(config["SecuritySettings:Swagger:ApiScope"]);
         }
+      });
+      app.UseReDoc(conf =>
+      {
+        conf.Path = "/docs";
       });
     }
 

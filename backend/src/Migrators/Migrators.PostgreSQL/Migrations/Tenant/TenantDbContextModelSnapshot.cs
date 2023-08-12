@@ -17,31 +17,48 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "6.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FSH.WebApi.Infrastructure.Multitenancy.FSHTenantInfo", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
                     b.Property<string>("AdminEmail")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("AdminName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AdminPhoneNumber")
+                        .HasColumnType("text");
+
                     b.Property<string>("ConnectionString")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DemoConnectionString")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("DemoSubscriptionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
                         .HasColumnType("text");
 
                     b.Property<string>("Identifier")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Issuer")
                         .HasColumnType("text");
@@ -50,15 +67,350 @@ namespace Migrators.PostgreSQL.Migrations.Tenant
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("ValidUpto")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ProdSubscriptionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TechSupportUserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TrainConnectionString")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("TrainSubscriptionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("VatNo")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DemoSubscriptionId")
+                        .IsUnique();
 
                     b.HasIndex("Identifier")
                         .IsUnique();
 
+                    b.HasIndex("ProdSubscriptionId")
+                        .IsUnique();
+
+                    b.HasIndex("TrainSubscriptionId")
+                        .IsUnique();
+
                     b.ToTable("Tenants", "MultiTenancy");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionFeature", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Feature")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("SubscriptionFeatures");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TenantSubscriptionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.HasIndex("TenantSubscriptionId");
+
+                    b.ToTable("SubscriptionHistories");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Default")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
+
+                    b.Property<int>("ValidForDays")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPackage");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantProdSubscriptionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("TenantProdSubscriptionId");
+
+                    b.ToTable("SubscriptionPayments");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CurrentPackageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("tenant_subscription_type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentPackageId");
+
+                    b.ToTable("TenantSubscription");
+
+                    b.HasDiscriminator<string>("tenant_subscription_type").HasValue("TenantSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentMethod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CashDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RootPaymentMethods");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
+
+                    b.HasDiscriminator().HasValue("Demo");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
+
+                    b.HasDiscriminator().HasValue("Standard");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.MultiTenancy.TenantSubscription");
+
+                    b.HasDiscriminator().HasValue("Train");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", "DemoSubscription")
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "DemoSubscriptionId");
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "ProdSubscription")
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "ProdSubscriptionId");
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", "TrainSubscription")
+                        .WithOne("Tenant")
+                        .HasForeignKey("FSH.WebApi.Domain.MultiTenancy.FSHTenantInfo", "TrainSubscriptionId");
+
+                    b.Navigation("DemoSubscription");
+
+                    b.Navigation("ProdSubscription");
+
+                    b.Navigation("TrainSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionFeature", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "Package")
+                        .WithMany("Features")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionHistory", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", "TenantSubscription")
+                        .WithMany("History")
+                        .HasForeignKey("TenantSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+
+                    b.Navigation("TenantSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPayment", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", "TenantProdSubscription")
+                        .WithMany("Payments")
+                        .HasForeignKey("TenantProdSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("TenantProdSubscription");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", "CurrentPackage")
+                        .WithMany()
+                        .HasForeignKey("CurrentPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CurrentPackage");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.SubscriptionPackage", b =>
+                {
+                    b.Navigation("Features");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantSubscription", b =>
+                {
+                    b.Navigation("History");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantDemoSubscription", b =>
+                {
+                    b.Navigation("Tenant")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantProdSubscription", b =>
+                {
+                    b.Navigation("Payments");
+
+                    b.Navigation("Tenant")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.MultiTenancy.TenantTrainSubscription", b =>
+                {
+                    b.Navigation("Tenant")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

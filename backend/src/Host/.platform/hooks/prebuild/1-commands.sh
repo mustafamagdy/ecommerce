@@ -1,0 +1,1 @@
+sudo yum install freetype-devel glib2-devel cairo-devel

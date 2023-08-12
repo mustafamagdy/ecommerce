@@ -13,3 +13,13 @@ public class EntitiesByPaginationFilterSpec<T> : EntitiesByBaseFilterSpec<T>
         : base(filter) =>
         Query.PaginateBy(filter);
 }
+public class EntitiesByPaginationSpec<T> : Specification<T>
+{
+    public EntitiesByPaginationSpec(PaginationFilter filter) =>
+        Query.PaginateBy(filter);
+}
+public class EntitiesByPaginationSpec<T,TResult> : Specification<T, TResult>
+{
+    public EntitiesByPaginationSpec(PaginationFilter filter) =>
+        Query.PaginateBy(filter);
+}

@@ -1,37 +1,37 @@
 using System.Data;
 using System.Diagnostics;
 using Finbuckle.MultiTenant;
-using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Multitenancy.Services;
+using FSH.WebApi.Domain.Auditing;
 using FSH.WebApi.Domain.Common.Contracts;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Auditing;
-using FSH.WebApi.Infrastructure.Identity;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Shared.Extensions;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Context;
 
-public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string,
-  IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim,
-  IdentityUserToken<string>>
+public abstract class BaseDbContext
+  : MultiTenantIdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
-  private readonly ITenantInfo _currentTenant;
-  private readonly ISubscriptionInfo _currentSubscriptionType;
-  private TenantDbContext _tenantDb;
-  protected readonly ICurrentUser _currentUser;
+  private readonly ITenantInfo? _currentTenant;
+  private readonly ISubscriptionTypeResolver _subscriptionTypeResolver;
+  private readonly ICurrentUser _currentUser;
   private readonly ISerializerService _serializer;
   private readonly ITenantConnectionStringBuilder _csBuilder;
   private readonly DatabaseSettings _dbSettings;
-  private readonly IEventPublisher _events;
+  private readonly ITenantConnectionStringResolver _tenantConnectionStringResolver;
 
-  protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions options, ICurrentUser currentUser,
+  protected BaseDbContext(ITenantInfo currentTenant, DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser,
     ISerializerService serializer, ITenantConnectionStringBuilder csBuilder, IOptions<DatabaseSettings> dbSettings,
-    IEventPublisher events, ISubscriptionInfo currentSubscriptionType, TenantDbContext tenantDb)
+    ISubscriptionTypeResolver subscriptionTypeResolver, ITenantConnectionStringResolver tenantConnectionStringResolver)
     : base(currentTenant, options)
   {
     _currentTenant = currentTenant;
@@ -39,9 +39,8 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     _serializer = serializer;
     _csBuilder = csBuilder;
     _dbSettings = dbSettings.Value;
-    _events = events;
-    _currentSubscriptionType = currentSubscriptionType;
-    _tenantDb = tenantDb;
+    _subscriptionTypeResolver = subscriptionTypeResolver;
+    _tenantConnectionStringResolver = tenantConnectionStringResolver;
   }
 
   // Used by Dapper
@@ -63,41 +62,39 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
   {
     if (_dbSettings.LogSensitiveInfo)
     {
+      optionsBuilder.EnableDetailedErrors();
       optionsBuilder.EnableSensitiveDataLogging();
       optionsBuilder.LogTo(m => Debug.WriteLine(m), LogLevel.Information);
       optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+      optionsBuilder.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
     }
 
-    string connectionString = string.Empty;
-    if (_currentTenant != null && _currentSubscriptionType != null)
+    TenantMismatchMode = TenantMismatchMode.Overwrite;
+    TenantNotSetMode = TenantNotSetMode.Overwrite;
+
+    if (_currentTenant != null)
     {
-      var subscriptionType = _currentSubscriptionType.SubscriptionType;
-      var tenantId = _currentTenant.Id;
-      var tenant = _tenantDb.TenantInfo.Find(tenantId);
-      connectionString = subscriptionType.Name switch
+      var subscriptionType = _subscriptionTypeResolver.Resolve();
+      string connectionString = _currentTenant!.Id != MultitenancyConstants.RootTenant.Id
+        ? _tenantConnectionStringResolver.Resolve(_currentTenant!.Id, subscriptionType)
+        : _currentTenant!.ConnectionString.IfNullOrEmpty(_dbSettings.ConnectionString);
+
+      if (string.IsNullOrWhiteSpace(connectionString))
       {
-        nameof(SubscriptionType.Standard) => tenant.ConnectionString,
-        nameof(SubscriptionType.Demo) => tenant.DemoConnectionString,
-        nameof(SubscriptionType.Train) => tenant.TrainConnectionString,
-        _ => ""
-      };
-    }
+        throw new InvalidOperationException($"Unable to create db context for tenant {_currentTenant.Id} for subscription {subscriptionType}");
+      }
 
-    if (!string.IsNullOrWhiteSpace(connectionString))
-    {
-      optionsBuilder.UseDatabase(_dbSettings.DBProvider, TenantInfo?.ConnectionString!);
+      optionsBuilder.UseDatabase(_dbSettings.DBProvider, connectionString);
     }
   }
 
-  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
   {
     var auditEntries = HandleAuditingBeforeSaveChanges(_currentUser.GetUserId());
 
     int result = await base.SaveChangesAsync(cancellationToken);
 
     await HandleAuditingAfterSaveChangesAsync(auditEntries, cancellationToken);
-
-    await SendDomainEventsAsync();
 
     return result;
   }
@@ -200,8 +197,7 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     return trailEntries.Where(e => e.HasTemporaryProperties).ToList();
   }
 
-  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries,
-    CancellationToken cancellationToken = new())
+  private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries, CancellationToken cancellationToken = new())
   {
     if (trailEntries == null || trailEntries.Count == 0)
     {
@@ -226,23 +222,5 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<ApplicationUs
     }
 
     return SaveChangesAsync(cancellationToken);
-  }
-
-  private async Task SendDomainEventsAsync()
-  {
-    var entitiesWithEvents = ChangeTracker.Entries<IEntity>()
-      .Select(e => e.Entity)
-      .Where(e => e.DomainEvents.Count > 0)
-      .ToArray();
-
-    foreach (var entity in entitiesWithEvents)
-    {
-      var domainEvents = entity.DomainEvents.ToArray();
-      entity.DomainEvents.Clear();
-      foreach (var domainEvent in domainEvents)
-      {
-        await _events.PublishAsync(domainEvent);
-      }
-    }
   }
 }

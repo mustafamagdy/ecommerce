@@ -7,7 +7,8 @@ public interface IRoleService : ITransientService
   Task<bool> ExistsAsync(string roleName, string? excludeId);
   Task<RoleDto> GetByIdAsync(string id);
   Task<RoleDto> GetByIdWithPermissionsAsync(string roleId, CancellationToken cancellationToken);
-  Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request);
+  Task<RoleDto> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request);
   Task<string> UpdatePermissionsAsync(UpdateRolePermissionsRequest request, CancellationToken cancellationToken);
   Task<string> DeleteRole(string id);
+  Task<List<RoleDto>> GetRolesAndAbilities(CancellationToken cancellationToken);
 }

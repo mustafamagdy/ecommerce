@@ -1,60 +1,76 @@
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using FSH.WebApi.Domain.MultiTenancy;
-using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Domain.Structure;
-using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Shared.Multitenancy;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public abstract class SubscriptionConfig<T> : IEntityTypeConfiguration<T>
-  where T : Subscription
+public sealed class SubscriptionFeatureConfig : BaseEntityConfiguration<SubscriptionFeature, DefaultIdType>
 {
-  public virtual void Configure(EntityTypeBuilder<T> builder)
+  public override void Configure(EntityTypeBuilder<SubscriptionFeature> builder)
   {
-    builder
-      .Property(b => b.Price)
-      .HasPrecision(7, 3);
+    base.Configure(builder);
 
-    builder
-      .Property(b => b.SubscriptionType)
+    builder.Property(a => a.Feature)
       .HasConversion(
-        p => p.Value,
-        p => SubscriptionType.FromValue(p)
-      );
+        p => p.Name,
+        p => SubscriptionFeatureType.FromValue(p));
   }
 }
 
-public class StandardSubscriptionConfig : SubscriptionConfig<StandardSubscription>
+public sealed class SubscriptionPackageConfig : BaseEntityConfiguration<SubscriptionPackage, DefaultIdType>
 {
-}
-
-public class DemoSubscriptionConfig : SubscriptionConfig<DemoSubscription>
-{
-}
-
-public class TrainSubscriptionConfig : SubscriptionConfig<TrainSubscription>
-{
-}
-
-public class SubscriptionHistoryConfig : IEntityTypeConfiguration<SubscriptionHistory>
-{
-  public void Configure(EntityTypeBuilder<SubscriptionHistory> builder)
+  public override void Configure(EntityTypeBuilder<SubscriptionPackage> builder)
   {
+    base.Configure(builder);
+
+    builder
+      .Property(b => b.Price)
+      .HasPrecision(7, 3);
+
+    builder.HasMany(a => a.Features).WithOne(a => a.Package).HasForeignKey(a => a.PackageId);
+  }
+}
+
+public sealed class TenantSubscriptionConfig : BaseEntityConfiguration<TenantSubscription, DefaultIdType>
+{
+  public override void Configure(EntityTypeBuilder<TenantSubscription> builder)
+  {
+    base.Configure(builder);
+    builder.HasMany(a => a.History).WithOne(a => a.TenantSubscription).HasForeignKey(a => a.TenantSubscriptionId);
+
+    builder
+      .HasDiscriminator<string>("tenant_subscription_type")
+      .HasValue<TenantProdSubscription>(SubscriptionType.Standard.Name)
+      .HasValue<TenantDemoSubscription>(SubscriptionType.Demo.Name)
+      .HasValue<TenantTrainSubscription>(SubscriptionType.Train.Name);
+  }
+}
+
+public sealed class SubscriptionHistoryConfig : BaseAuditableEntityConfiguration<SubscriptionHistory>
+{
+  public override void Configure(EntityTypeBuilder<SubscriptionHistory> builder)
+  {
+    base.Configure(builder);
+
     builder
       .Property(b => b.Price)
       .HasPrecision(7, 3);
   }
 }
 
-public class SubscriptionPaymentConfig : IEntityTypeConfiguration<SubscriptionPayment>
+public sealed class SubscriptionPaymentConfig : BaseAuditableEntityConfiguration<SubscriptionPayment>
 {
-  public void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
+  public override void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
   {
+    base.Configure(builder);
+
     builder
       .Property(b => b.Amount)
       .HasPrecision(7, 3);
+
+    builder
+      .HasOne(a => a.TenantProdSubscription)
+      .WithMany(a => a.Payments)
+      .HasForeignKey(a => a.TenantProdSubscriptionId);
   }
 }

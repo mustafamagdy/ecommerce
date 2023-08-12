@@ -7,6 +7,13 @@ public class GetProductRequest : IRequest<ProductDetailsDto>
     public GetProductRequest(Guid id) => Id = id;
 }
 
+public class ProductByIdWithBrandSpec : Specification<Product, ProductDetailsDto>, ISingleResultSpecification
+{
+  public ProductByIdWithBrandSpec(Guid id) =>
+    Query
+      .Where(p => p.Id == id)
+      .Include(p => p.Brand);
+}
 public class GetProductRequestHandler : IRequestHandler<GetProductRequest, ProductDetailsDto>
 {
     private readonly IRepository<Product> _repository;
@@ -16,7 +23,7 @@ public class GetProductRequestHandler : IRequestHandler<GetProductRequest, Produ
         (_repository, _t) = (repository, localizer);
 
     public async Task<ProductDetailsDto> Handle(GetProductRequest request, CancellationToken cancellationToken) =>
-        await _repository.GetBySpecAsync(
-            (ISpecification<Product, ProductDetailsDto>)new ProductByIdWithBrandSpec(request.Id), cancellationToken)
+        await _repository.FirstOrDefaultAsync(
+            new ProductByIdWithBrandSpec(request.Id), cancellationToken)
         ?? throw new NotFoundException(_t["Product {0} Not Found.", request.Id]);
 }

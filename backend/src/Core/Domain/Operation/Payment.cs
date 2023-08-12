@@ -1,9 +1,13 @@
 namespace FSH.WebApi.Domain.Operation;
 
-public class OrderPayment : Payment
+public sealed class OrderPayment : Payment
 {
+  private OrderPayment()
+  {
+  }
+
   public Guid OrderId { get; private set; }
-  public virtual Order Order { get; set; }
+  public Order Order { get; set; }
 
   public OrderPayment(Guid orderId, Guid paymentMethodId, decimal amount)
     : base(amount, paymentMethodId)
@@ -14,7 +18,7 @@ public class OrderPayment : Payment
 
 public abstract class Payment : AuditableEntity, IAggregateRoot
 {
-  public Payment()
+  protected Payment()
   {
   }
 
@@ -26,5 +30,5 @@ public abstract class Payment : AuditableEntity, IAggregateRoot
 
   public decimal Amount { get; protected set; }
   public Guid PaymentMethodId { get; protected set; }
-  public virtual PaymentMethod PaymentMethod { get; set; } = default!;
+  public PaymentMethod PaymentMethod { get; set; }
 }

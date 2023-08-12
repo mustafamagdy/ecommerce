@@ -6,17 +6,13 @@ using Newtonsoft.Json.Serialization;
 
 namespace FSH.WebApi.Infrastructure.Common.Services;
 
-public class NewtonSoftService : ISerializerService
+public sealed class NewtonsoftService : ISerializerService
 {
   public T Deserialize<T>(string text)
-  {
-    return JsonConvert.DeserializeObject<T>(text);
-  }
+    => JsonConvert.DeserializeObject<T>(text);
 
   public T Deserialize<T>(string text, JsonConverter converter)
-  {
-    return JsonConvert.DeserializeObject<T>(text, converter);
-  }
+    => JsonConvert.DeserializeObject<T>(text, converter);
 
   public string Serialize<T>(T obj)
   {
@@ -27,7 +23,6 @@ public class NewtonSoftService : ISerializerService
       Converters = new List<JsonConverter>
       {
         new StringEnumConverter() { CamelCaseText = true },
-        new SubscriptionConverterWithSubscriptionType()
       }
     });
   }

@@ -9,22 +9,25 @@ namespace FSH.WebApi.Application.Operation.Orders;
 
 public class CreateOrderWithNewCustomerRequest : BaseOrderRequest, IRequest<OrderDto>
 {
-  public CreateSimpleCustomerRequest Customer { get; set; } = default!;
-  public List<OrderPaymentAmount> Payments { get; set; }
+  public CreateSimpleCustomerRequest Customer { get; set; }
+  public List<OrderPaymentAmount> Payments { get; set; } = new();
 }
 
 public class
   CreateOrderWithNewCustomerRequestValidator : CreateOrderRequestBaseValidator<CreateOrderWithNewCustomerRequest>
 {
-  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Order> repository,
-    IReadRepository<Customer> customerRepo, IStringLocalizer<IBaseRequest> t)
-    : base(t)
+  public CreateOrderWithNewCustomerRequestValidator(IReadRepository<Customer> customerRepo,
+    IReadRepository<ServiceCatalog> serviceCatalogRepo,
+    IStringLocalizer<IBaseRequest> t)
+    : base(t, serviceCatalogRepo)
   {
     RuleFor(a => a.Customer).SetValidator(new CreateSimpleCustomerRequestValidator(customerRepo, t));
 
-    RuleFor(a => a.Payments)
-      .NotEmpty()
-      .ForEach(a => a.SetValidator(new OrderPaymentAmountValidator()));
+    When(a => a.Payments.Count > 0, () =>
+    {
+      RuleFor(a => a.Payments)
+        .ForEach(a => a.SetValidator(new OrderPaymentAmountValidator()));
+    });
   }
 }
 

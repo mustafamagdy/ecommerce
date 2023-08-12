@@ -2,10 +2,13 @@
 
 public interface IEntity
 {
-    List<DomainEvent> DomainEvents { get; }
+  IReadOnlyCollection<DomainEvent> DomainEvents { get; }
+
+  void AddDomainEvent(DomainEvent @event);
+  void ClearDomainEvents();
 }
 
-public interface IEntity<TId> : IEntity
+public interface IEntity<out TId> : IEntity
 {
-    TId Id { get; }
+  TId Id { get; }
 }

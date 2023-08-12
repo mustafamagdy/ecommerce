@@ -1,15 +1,15 @@
 ﻿namespace FSH.WebApi.Shared.Notifications;
 
-public class BasicNotification : INotificationMessage
+public sealed class BasicNotification : INotificationMessage
 {
-    public enum LabelType
-    {
-        Information,
-        Success,
-        Warning,
-        Error
-    }
+  public enum LabelType
+  {
+    Information,
+    Success,
+    Warning,
+    Error
+  }
 
-    public string? Message { get; set; }
-    public LabelType Label { get; set; }
+  public string? Message { get; set; }
+  public LabelType Label { get; set; }
 }

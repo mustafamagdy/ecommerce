@@ -3,18 +3,26 @@ using FSH.WebApi.Application.Identity.Users.Password;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
-public class UsersController : VersionNeutralApiController
+public sealed class UsersController : VersionNeutralApiController
 {
   private readonly IUserService _userService;
 
   public UsersController(IUserService userService) => _userService = userService;
 
-  [HttpGet]
+  [HttpPost("search")]
   [MustHavePermission(FSHAction.View, FSHResource.Users)]
   [OpenApiOperation("Get list of all users.", "")]
-  public Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+  public Task<PaginationResponse<UserDetailsDto>> GetListAsync(PaginationFilter filter, CancellationToken cancellationToken)
   {
-    return _userService.GetListAsync(cancellationToken);
+    return _userService.GetListAsync(filter,cancellationToken);
+  }
+
+  [HttpGet("basic")]
+  [MustHavePermission(FSHAction.View, FSHResource.Users)]
+  [OpenApiOperation("Get basic list of all users.", "")]
+  public Task<List<BasicUserDataDto>> GetBasicListAsync(CancellationToken cancellationToken)
+  {
+    return _userService.GetListBasicDataAsync(cancellationToken);
   }
 
   [HttpGet("{id}")]
@@ -45,7 +53,7 @@ public class UsersController : VersionNeutralApiController
   [HttpPost]
   [MustHavePermission(FSHAction.Create, FSHResource.Users)]
   [OpenApiOperation("Creates a new user.", "")]
-  public Task<string> CreateAsync(CreateUserRequest request)
+  public Task<UserDetailsDto> CreateAsync(CreateUserRequest request)
   {
     // TODO: check if registering anonymous users is actually allowed (should probably be an appsetting)
     // and return UnAuthorized when it isn't
@@ -53,12 +61,20 @@ public class UsersController : VersionNeutralApiController
     return _userService.CreateAsync(request, GetOriginFromRequest());
   }
 
+  [HttpPost("{id}/reset-password")]
+  [OpenApiOperation("Reset a user's password.", "")]
+  [MustHavePermission(FSHAction.ResetPassword, FSHResource.Users)]
+  public Task<string> ResetPasswordForUserAsync(string id, UserResetPasswordRequest request)
+  {
+    return _userService.ResetUserPasswordAsync(request);
+  }
+
   [HttpPost("self-register")]
   [TenantIdHeader]
   [AllowAnonymous]
   [OpenApiOperation("Anonymous user creates a user.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
-  public Task<string> SelfRegisterAsync(CreateUserRequest request)
+  public Task<UserDetailsDto> SelfRegisterAsync(CreateUserRequest request)
   {
     // TODO: check if registering anonymous users is actually allowed (should probably be an appsetting)
     // and return UnAuthorized when it isn't
@@ -112,7 +128,8 @@ public class UsersController : VersionNeutralApiController
   }
 
   [HttpPost("reset-password")]
-  [OpenApiOperation("Reset a user's password.", "")]
+  [AllowAnonymous]
+  [OpenApiOperation("Reset a user's password using reset password token.", "")]
   [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
   public Task<string> ResetPasswordAsync(ResetPasswordRequest request)
   {

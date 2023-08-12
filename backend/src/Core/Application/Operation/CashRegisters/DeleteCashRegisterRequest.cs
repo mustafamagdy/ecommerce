@@ -1,9 +1,15 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
 public class DeleteCashRegisterRequest : IRequest
 {
+  public DeleteCashRegisterRequest(Guid id)
+  {
+    Id = id;
+  }
+
   public Guid Id { get; set; }
 }
 
@@ -27,15 +33,17 @@ public class DeleteCashRegisterRequestHandler : IRequestHandler<DeleteCashRegist
   private readonly IStringLocalizer<DeleteCashRegisterRequestHandler> _t;
   private readonly IReadRepository<ActivePaymentOperation> _activeOpsRepo;
   private readonly IReadRepository<ArchivedPaymentOperation> _archiveOpsRepo;
+  private readonly IApplicationUnitOfWork _uow;
 
   public DeleteCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository,
     IStringLocalizer<DeleteCashRegisterRequestHandler> localizer, IReadRepository<ActivePaymentOperation> activeOpsRepo,
-    IReadRepository<ArchivedPaymentOperation> archiveOpsRepo)
+    IReadRepository<ArchivedPaymentOperation> archiveOpsRepo, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _t = localizer;
     _activeOpsRepo = activeOpsRepo;
     _archiveOpsRepo = archiveOpsRepo;
+    _uow = uow;
   }
 
   public async Task<Unit> Handle(DeleteCashRegisterRequest request, CancellationToken cancellationToken)
@@ -54,6 +62,8 @@ public class DeleteCashRegisterRequestHandler : IRequestHandler<DeleteCashRegist
     }
 
     await _repository.DeleteAsync(cr, cancellationToken);
+    await _uow.CommitAsync(cancellationToken);
+
     return Unit.Value;
   }
 }
