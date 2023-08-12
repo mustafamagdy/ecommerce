@@ -78,7 +78,6 @@ public class HostFixture : IAsyncLifetime
 
     _factory = new TestWebApplicationFactory(_hostPort);
 
-
     _smtpServer = SimpleSmtpServer.Start(_mailPort);
     _smtpServer.MessageReceived += SmtpServerOnMessageReceived;
   }

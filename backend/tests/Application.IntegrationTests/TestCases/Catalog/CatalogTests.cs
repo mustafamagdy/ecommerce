@@ -42,8 +42,8 @@ public class CatalogTests : TestFixture
     {
       Price = 100,
       Priority = ServicePriority.Normal,
-      // ProductName = "new product",
-      // ServiceName = "new service"
+      ProductName = "new product",
+      ServiceName = "new service"
     };
     _ = await PostAsJsonAsync("/api/v1/catalog/with-product-and-service", newCatalogItem, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -56,8 +56,8 @@ public class CatalogTests : TestFixture
     catalogItems.Data.Should().NotBeNullOrEmpty();
     var newItemCount = catalogItems.TotalCount;
     newItemCount.Should().Be(itemCount + 1);
-    // catalogItems.Data.Should().Contain(a => a.ProductName == newCatalogItem.Product.Name);
-    // catalogItems.Data.Should().Contain(a => a.ServiceName == newCatalogItem.ServiceName);
+    catalogItems.Data.Should().Contain(a => a.ProductName == newCatalogItem.ProductName);
+    catalogItems.Data.Should().Contain(a => a.ServiceName == newCatalogItem.ServiceName);
   }
 
   [Fact]

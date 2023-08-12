@@ -1,11 +1,6 @@
-using System.Diagnostics;
-using FSH.WebApi.Application.Catalog.ServiceCatalogs;
-using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Operation.Customers;
 using FSH.WebApi.Application.Operation.Payments;
-using FSH.WebApi.Application.Settings.Vat;
 using FSH.WebApi.Domain.Operation;
-using FSH.WebApi.Shared.Multitenancy;
 using Mapster;
 
 namespace FSH.WebApi.Application.Operation.Orders;
@@ -54,16 +49,21 @@ public class CreateCashOrderRequestHandler : IRequestHandler<CreateCashOrderRequ
             throw new NotFoundException(_t["Cash customer not found"]);
         }
 
-        foreach (var payment in request.Payments)
+        var cashPaymentMethod =
+            await _paymentMethodRepo.FirstOrDefaultAsync(new GetDefaultCashPaymentMethodSpec(), cancellationToken);
+        if (cashPaymentMethod is null)
         {
-            var paymentMethod = await _paymentMethodRepo.GetByIdAsync(payment.PaymentMethodId, cancellationToken);
-            if (paymentMethod is null)
-            {
-                throw new NotFoundException(_t["Payment method {0} not found", payment.PaymentMethodId]);
-            }
+            throw new NotFoundException(_t["Cash payment method not configured"]);
         }
 
-        var order = await _orderHelper.CreateCashOrder(request.Items, defaultCustomer, request.Payments,
+        var order = await _orderHelper.CreateCashOrder(request.Items, defaultCustomer, new List<OrderPaymentAmount>()
+            {
+                new()
+                {
+                    Amount = 0,
+                    PaymentMethodId = cashPaymentMethod.Id
+                }
+            },
             cancellationToken);
 
         return order.Adapt<OrderDto>();
