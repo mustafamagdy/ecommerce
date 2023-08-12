@@ -61,23 +61,23 @@ public abstract class TestFixture : IAsyncLifetime
       _client.DefaultRequestHeaders.Add(key, val);
     }
 
-    var message = new HttpRequestMessage
-    {
-      Method = method,
-      RequestUri = new Uri(requestUri),
-    };
-
-    if (value != null)
-    {
-      message.Content = JsonContent.Create(value);
-    }
-
     if (tenant != null)
     {
       var baseAddress = _client.BaseAddress;
       var urlBuilder = new UriBuilder(baseAddress);
       urlBuilder.Host = tenant + "." + urlBuilder.Host;
       _client.BaseAddress = urlBuilder.Uri;
+    }
+
+    var message = new HttpRequestMessage
+    {
+        Method = method,
+        RequestUri = new Uri(requestUri, UriKind.Relative),
+    };
+
+    if (value != null)
+    {
+        message.Content = JsonContent.Create(value);
     }
 
     return _client.SendAsync(message, cancellationToken);
