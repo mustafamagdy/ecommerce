@@ -20,7 +20,7 @@ public class HostFixture : IAsyncLifetime
   private readonly int _dbPort = GetFreeTcpPort();
   private readonly int _hostPort = GetFreeTcpPort();
   private readonly int _mailPort = GetFreeTcpPort();
-  private TestcontainersContainer _dbContainer = null!;
+  private IContainer _dbContainer = null!;
   private WebApplicationFactory<Program> _factory = null!;
   private readonly IMessageSink _sink;
   private string _cnStringTemplate = "";
@@ -95,7 +95,7 @@ public class HostFixture : IAsyncLifetime
 
   internal string MainTenantConnectionString => string.Format(_cnStringTemplate, _dbPort, _rootTenantDbName);
 
-  private TestcontainersContainer BuildContainer()
+  private IContainer BuildContainer()
   {
     var internalPort = DbProvider switch
     {
@@ -104,7 +104,7 @@ public class HostFixture : IAsyncLifetime
       _ => throw new ArgumentOutOfRangeException()
     };
 
-    ITestcontainersBuilder<TestcontainersContainer> builder = new TestcontainersBuilder<TestcontainersContainer>();
+    var builder = new ContainerBuilder();
     builder = DbProvider switch
     {
       "postgresql" => builder.WithImage("postgres:alpine")
