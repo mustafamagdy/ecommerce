@@ -3,8 +3,8 @@
     "Provider": "Jwt",
     "RequireActiveTenantSubscription": false,
     "JwtSettings": {
-      "key": "PNVVBO55MUYQ8BO33SGAJCQF8U",
-      "overrideTokenKey": "TAYRRUN65Z00YU7GADJJ0E55D5",
+      "key": "sCayvjQL43mSydKJhm3m5vfpPrIVTw3AatmKBjSgYNt59EbRV6",
+      "overrideTokenKey": "86Zqqbi49mgslHJ3QxWUVu9SgpOHSgSceb2eOY7LqJTndx6w40",
       "tokenExpirationInMinutes": 60,
       "refreshTokenExpirationInDays": 7,
       "overrideTokenExpirationInMinutes": 3

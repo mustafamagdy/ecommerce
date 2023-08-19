@@ -1,12 +1,11 @@
 using System.Data.SqlClient;
-using System.Runtime.InteropServices;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Infrastructure.Common;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Npgsql;
-using Oracle.ManagedDataAccess.Client;
 
 namespace FSH.WebApi.Infrastructure.Persistence.ConnectionString;
 
@@ -36,27 +35,27 @@ public sealed class ConnectionStringSecurer : IConnectionStringSecurer
       DbProviderKeys.SqlServer => MakeSecureSqlConnectionString(connectionString),
       DbProviderKeys.MySql => MakeSecureMySqlConnectionString(connectionString),
       DbProviderKeys.SqLite => MakeSecureSqLiteConnectionString(connectionString),
-      DbProviderKeys.Oracle => MakeSecureOracleConnectionString(connectionString),
+      // DbProviderKeys.Oracle => MakeSecureOracleConnectionString(connectionString),
       _ => connectionString
     };
   }
 
-  private string MakeSecureOracleConnectionString(string connectionString)
-  {
-    var builder = new OracleConnectionStringBuilder(connectionString);
-
-    if (!string.IsNullOrEmpty(builder.Password))
-    {
-      builder.Password = HiddenValueDefault;
-    }
-
-    if (!string.IsNullOrEmpty(builder.UserID))
-    {
-      builder.UserID = HiddenValueDefault;
-    }
-
-    return builder.ToString();
-  }
+  // private string MakeSecureOracleConnectionString(string connectionString)
+  // {
+  //   var builder = new OracleConnectionStringBuilder(connectionString);
+  //
+  //   if (!string.IsNullOrEmpty(builder.Password))
+  //   {
+  //     builder.Password = HiddenValueDefault;
+  //   }
+  //
+  //   if (!string.IsNullOrEmpty(builder.UserID))
+  //   {
+  //     builder.UserID = HiddenValueDefault;
+  //   }
+  //
+  //   return builder.ToString();
+  // }
 
   private string MakeSecureMySqlConnectionString(string connectionString)
   {

@@ -25,7 +25,6 @@ try
 
   builder.Services
     .AddApplicationControllers()
-    .AddApplicationFluentValidation()
     .AddApplicationJsonOptions();
 
   builder.Services.AddInfrastructure(builder.Configuration);

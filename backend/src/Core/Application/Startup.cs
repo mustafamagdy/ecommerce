@@ -14,6 +14,9 @@ public static class Startup
     var assembly = Assembly.GetExecutingAssembly();
     return services
       .AddValidatorsFromAssembly(assembly)
-      .AddMediatR(assembly);
+      .AddMediatR(m =>
+      {
+        m.RegisterServicesFromAssembly(assembly);
+      });
   }
 }

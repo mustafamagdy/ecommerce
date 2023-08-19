@@ -19,21 +19,20 @@ internal static class Startup
     return services;
   }
 
-  internal static IServiceCollection AddServices(this IServiceCollection services, Type interfaceType, ServiceLifetime lifetime)
+  internal static IServiceCollection AddServices(this IServiceCollection services, Type interfaceType,
+    ServiceLifetime lifetime)
   {
     var interfaceTypes =
       AppDomain.CurrentDomain.GetAssemblies()
-        .Where(a => !a.FullName.Contains("Microsoft.EntityFrameworkCore"))
+        .Where(a => a.FullName != null && !a.FullName.Contains("Microsoft.EntityFrameworkCore"))
         .SelectMany(s => s.GetTypes())
-        .Where(t => interfaceType.IsAssignableFrom(t)
-                    && t.IsClass && !t.IsAbstract)
+        .Where(t => interfaceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
         .Select(t => new
         {
           Service = t.GetInterfaces().FirstOrDefault(),
           Implementation = t
         })
-        .Where(t => t.Service is not null
-                    && interfaceType.IsAssignableFrom(t.Service));
+        .Where(t => t.Service is not null && interfaceType.IsAssignableFrom(t.Service));
 
     foreach (var type in interfaceTypes)
     {
@@ -43,7 +42,8 @@ internal static class Startup
     return services;
   }
 
-  internal static IServiceCollection AddService(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime) =>
+  private static IServiceCollection AddService(this IServiceCollection services, Type serviceType,
+    Type implementationType, ServiceLifetime lifetime) =>
     lifetime switch
     {
       ServiceLifetime.Transient => services.AddTransient(serviceType, implementationType),
