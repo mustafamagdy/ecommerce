@@ -7,10 +7,10 @@
     <ItemGroup>
         <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
         <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.9" />
-        <PackageReference Include="NewId" Version="4.0.0-develop.44+sha.e1e1364" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Update="Roslynator.Analyzers" Version="4.1.1">
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.10" />
+        <PackageReference Include="NewId" Version="4.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Update="Roslynator.Analyzers" Version="4.4.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -40,7 +40,7 @@ public class PayForSubscriptionRequestHandler : IRequestHandler<PayForSubscripti
     _tenantRepo = tenantRepo;
   }
 
-  public async Task<Unit> Handle(PayForSubscriptionRequest request, CancellationToken cancellationToken)
+  public async Task Handle(PayForSubscriptionRequest request, CancellationToken cancellationToken)
   {
     PaymentMethod pm;
     if (request.PaymentMethodId == null)
@@ -62,6 +62,5 @@ public class PayForSubscriptionRequestHandler : IRequestHandler<PayForSubscripti
 
     await _uow.CommitAsync(cancellationToken);
 
-    return Unit.Value;
   }
 }

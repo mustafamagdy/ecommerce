@@ -32,7 +32,7 @@ public class UpdateCashRegisterRequestHandler : IRequestHandler<UpdateCashRegist
     _uow = uow;
   }
 
-  public async Task<Unit> Handle(UpdateCashRegisterRequest request, CancellationToken cancellationToken)
+  public async Task Handle(UpdateCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var cr = await _repository.GetByIdAsync(request.Id, cancellationToken);
     if (cr == null)
@@ -42,7 +42,5 @@ public class UpdateCashRegisterRequestHandler : IRequestHandler<UpdateCashRegist
 
     await _repository.UpdateAsync(cr, cancellationToken);
     await _uow.CommitAsync(cancellationToken);
-
-    return Unit.Value;
   }
 }

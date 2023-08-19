@@ -1,10 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentValidation.AspNetCore;
 using FSH.WebApi.Infrastructure.Finance;
 using FSH.WebApi.Infrastructure.Multitenancy;
+using FSH.WebApi.Infrastructure.Validation;
 using Microsoft.Extensions.DependencyInjection;
-using ZymLabs.NSwag.FluentValidation.AspNetCore;
 
 namespace FSH.WebApi.Infrastructure.Registrations;
 
@@ -14,16 +13,9 @@ public static class ServiceExtensions
   {
     return services.AddControllers(opt =>
     {
+      opt.Filters.Add<ApiValidationFilter>();
       opt.Filters.Add<HasValidSubscriptionTypeFilter>();
       opt.Filters.Add<RequireOpenCashRegisterFilter>();
-    });
-  }
-
-  public static IMvcBuilder AddApplicationFluentValidation(this IMvcBuilder builder)
-  {
-    return builder.AddFluentValidation(conf =>
-    {
-      conf.ValidatorFactoryType = typeof(HttpContextServiceProviderValidatorFactory);
     });
   }
 
