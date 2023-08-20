@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Infrastructure.Auth;
@@ -15,10 +14,7 @@ using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Notifications;
 using FSH.WebApi.Infrastructure.OpenApi;
 using FSH.WebApi.Infrastructure.Persistence;
-using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.SecurityHeaders;
-using FSH.WebApi.Infrastructure.Workflows;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -35,6 +31,7 @@ public static class Startup
   public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
   {
     MapsterSettings.Configure();
+
     return services
       .AddApiVersioning()
       .AddAuth(config)
@@ -45,14 +42,14 @@ public static class Startup
       .AddHealthCheck()
       .AddPOLocalization(config)
       .AddMailing(config)
-      .AddMediatR(Assembly.GetExecutingAssembly())
+      .AddMediatR()
       .AddMultitenancy(config)
       .AddNotifications(config)
       .AddOpenApiDocumentation(config)
       .AddPersistence(config)
       .AddRequestLogging(config)
       .AddRouting(options => options.LowercaseUrls = true)
-      .AddWorkflow(config)
+      // .AddWorkflow(config)
       .AddServices()
       .AddHostedServices();
   }
