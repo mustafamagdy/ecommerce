@@ -1,6 +1,6 @@
 using System.Reflection;
 using FSH.WebApi.Application.Mappings;
-using FSH.WebApi.Application.Settings;
+using FSH.WebApi.Application.MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Application;
@@ -13,10 +13,12 @@ public static class Startup
 
     var assembly = Assembly.GetExecutingAssembly();
     return services
-      .AddValidatorsFromAssembly(assembly)
+      .AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>))
+      .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
       .AddMediatR(m =>
       {
         m.RegisterServicesFromAssembly(assembly);
+        m.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
       });
   }
 }

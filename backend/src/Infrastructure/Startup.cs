@@ -15,7 +15,6 @@ using FSH.WebApi.Infrastructure.Notifications;
 using FSH.WebApi.Infrastructure.OpenApi;
 using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.SecurityHeaders;
-using FSH.WebApi.Infrastructure.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -32,7 +31,7 @@ public static class Startup
   public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
   {
     MapsterSettings.Configure();
-    
+
     return services
       .AddApiVersioning()
       .AddAuth(config)
@@ -51,7 +50,6 @@ public static class Startup
       .AddRequestLogging(config)
       .AddRouting(options => options.LowercaseUrls = true)
       // .AddWorkflow(config)
-      .AddApplicationFluentValidation()
       .AddServices()
       .AddHostedServices();
   }
