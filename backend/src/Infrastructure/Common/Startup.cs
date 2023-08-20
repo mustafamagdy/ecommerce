@@ -15,7 +15,7 @@ internal static class Startup
 
   internal static IServiceCollection AddHostedServices(this IServiceCollection services)
   {
-    services.AddHostedService<DemoService>();
+    // services.AddHostedService<DemoService>();
     return services;
   }
 

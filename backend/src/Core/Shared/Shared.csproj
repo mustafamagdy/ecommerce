@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
     <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="2.1.0" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="6.11.1" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="6.9.1" />
     <PackageReference Update="Roslynator.Analyzers" Version="4.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
