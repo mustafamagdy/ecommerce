@@ -98,9 +98,9 @@ internal static class Startup
           e.MigrationsAssembly("Migrators.MySQL")
             .SchemaBehavior(MySqlSchemaBehavior.Ignore));
 
-      case DbProviderKeys.Oracle:
-        return builder.UseOracle(connectionString, e =>
-          e.MigrationsAssembly("Migrators.Oracle"));
+      // case DbProviderKeys.Oracle:
+      //   return builder.UseOracle(connectionString, e =>
+      //     e.MigrationsAssembly("Migrators.Oracle"));
 
       case DbProviderKeys.SqLite:
         return builder.UseSqlite(connectionString, e =>

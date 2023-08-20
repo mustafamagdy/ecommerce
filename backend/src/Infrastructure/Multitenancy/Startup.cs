@@ -27,20 +27,24 @@ internal static class Startup
       .AddDbContext<TenantDbContext>((sp, dbOptions) =>
       {
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql, StringComparison.CurrentCultureIgnoreCase))
+        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql,
+              StringComparison.CurrentCultureIgnoreCase))
         {
-          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ?? throw new NotSupportedException("Fix database datetime kind for postgres not registered"));
+          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ??
+                                    throw new NotSupportedException(
+                                      "Fix database datetime kind for postgres not registered"));
         }
 
-        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ??
+                                  throw new NotSupportedException("Domain dispatcher not registered"));
         dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
       .AddTenantUnitOfWork()
       .AddMultiTenant<FSHTenantInfo>()
-      .WithHostStrategy()
-      .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
-      .WithClaimStrategy(FSHClaims.Tenant)
-      .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
+        .WithHostStrategy()
+        .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
+        .WithClaimStrategy(FSHClaims.Tenant)
+        .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
       .AddScoped<ISubscriptionTypeResolver, SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
@@ -55,7 +59,8 @@ internal static class Startup
   internal static IApplicationBuilder UseMultiTenancy(this IApplicationBuilder app) =>
     app.UseMultiTenant();
 
-  private static FinbuckleMultiTenantBuilder<FSHTenantInfo> WithQueryStringStrategy(this FinbuckleMultiTenantBuilder<FSHTenantInfo> builder, string queryStringKey) =>
+  private static FinbuckleMultiTenantBuilder<FSHTenantInfo> WithQueryStringStrategy(
+    this FinbuckleMultiTenantBuilder<FSHTenantInfo> builder, string queryStringKey) =>
     builder.WithDelegateStrategy(context =>
     {
       if (context is not HttpContext httpContext)
