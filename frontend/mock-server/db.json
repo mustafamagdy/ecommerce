@@ -1,0 +1,1024 @@
+{
+  "services": [
+    {
+      "id": "11889d22283",
+      "name": "service 5",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "889d2283",
+      "name": "service 6",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "82283",
+      "name": "service 7",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8228333",
+      "name": "service 8",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "description": "",
+      "imageFile": {
+        "name": "87646406-9856-4e7f-9da8-66f942e84d7e"
+      }
+    },
+    {
+      "id": "822833377",
+      "name": "service 9",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "description": "no description",
+      "imageFile": {
+        "name": "1e071e35-0a60-4365-8de6-f4ef5052f5a4"
+      }
+    },
+    {
+      "id": "822833387",
+      "name": "service 10",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8223387",
+      "name": "service 11",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "4444",
+      "description": "",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "id": "32bfb5df-0ad0-4cb5-8fc3-54838a0642bd"
+    },
+    {
+      "name": "nee",
+      "description": "",
+      "imageFile": {
+        "name": "830c9439-6a20-4ffc-866b-c8759a15e7e7"
+      },
+      "id": "db17843c-4c0b-417a-9d1f-5d6e4a70f057"
+    }
+  ],
+  "serviceCatalog": [
+    {
+      "id": "gjxgjkb",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product1",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "nlkjol",
+      "serviceId": "889d2283",
+      "serviceName": "service2",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product2",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "123",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product3",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "nvnkf",
+      "serviceId": "889d2283",
+      "serviceName": "service2",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product4",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "aaaa",
+      "serviceId": "82283",
+      "serviceName": "service3",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product5",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "lksjj",
+      "serviceId": "82283",
+      "serviceName": "service3",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product6",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "mdkkd",
+      "serviceId": "11889d22283",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product7",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "kfkkf",
+      "serviceId": "8228333",
+      "serviceName": "service4",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product8",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "fkfkk",
+      "serviceId": "8228333",
+      "serviceName": "service1",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product11",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "lldjj",
+      "serviceId": "822833377",
+      "serviceName": "service5",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product9",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    },
+    {
+      "id": "kjskadcf",
+      "serviceId": "822833377",
+      "serviceName": "service5",
+      "serviceImageUrl": "https://loremflickr.com/300/300/abstract",
+      "productName": "Product10",
+      "productImageUrl": "https://loremflickr.com/300/300/abstract",
+      "price": 189,
+      "priority": "normal"
+    }
+  ],
+  "financialBoxes": [
+    {
+      "id": "1",
+      "type": "box",
+      "boxName": "Brand-0",
+      "managerName": "Andrew Hayes",
+      "typeOfBox": "box",
+      "isprimary": "",
+      "branch": ""
+    },
+    {
+      "id": "2",
+      "type": "bank account",
+      "boxName": "Fiat-11",
+      "managerName": "Krista Kunze",
+      "typeOfBox": "bank_account",
+      "isprimary": "",
+      "branch": "branch2"
+    },
+    {
+      "id": "3",
+      "type": "box",
+      "boxName": "Van",
+      "managerName": "Beth Gerlach",
+      "typeOfBox": "box"
+    },
+    {
+      "id": "4",
+      "type": "bank account",
+      "boxName": "invoice",
+      "managerName": "Patrick Schinner",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": "5",
+      "type": "bank account",
+      "boxName": "ack",
+      "managerName": "Jimmie Quigley",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": "6",
+      "type": "box",
+      "boxName": "Handcrafted",
+      "managerName": "Evelyn Smitham",
+      "typeOfBox": "box"
+    },
+    {
+      "id": "11",
+      "type": "bank account",
+      "boxName": "Lead",
+      "managerName": "Roberto Bogisich",
+      "typeOfBox": "bank_account"
+    },
+    {
+      "id": "7",
+      "type": "box",
+      "boxName": "wilted",
+      "managerName": "Jeffery Ullrich DDS",
+      "typeOfBox": "box"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "newwww",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch2",
+      "primary": true,
+      "id": "849856d9-06d6-49fb-8068-57526be1b543"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "neww",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "primary": true,
+      "id": "b65aa349-111e-4b00-8828-48e2d4de1dc1"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "lflej",
+      "isprimary": "",
+      "managerName": "manager2",
+      "branch": "branch1",
+      "primary": true,
+      "id": "01089826-95ec-483f-ab7f-233b15a658cd"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "new box",
+      "isprimary": "",
+      "managerName": "manager2",
+      "branch": "branch1",
+      "primary": true,
+      "id": "e9708661-0021-404b-803c-7856562055cb"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "aaaa",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "primary": true,
+      "id": "55ad0ca6-84ff-429e-9360-e832028d5c18"
+    },
+    {
+      "typeOfBox": "bank_account",
+      "boxName": "qqq",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "100cc3c6-6276-4824-988e-716d080a856c"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "ققق",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "5cb2eb89-4032-4fca-b561-b0e9ea83d119"
+    },
+    {
+      "typeOfBox": "box",
+      "boxName": "يسب",
+      "isprimary": "",
+      "managerName": "manager1",
+      "branch": "branch1",
+      "id": "d1f473e6-348e-43d2-9a22-99e4342d3382"
+    }
+  ],
+  "customers": [
+    {
+      "id": "1",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "2",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "055",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "3",
+      "userName": "Ahmed",
+      "firstName": "Abd-Allah",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "4",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "5",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Al",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "6",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "7",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "8",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "9",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "10",
+      "userName": "Ahmed",
+      "firstName": "Abd-Rhman",
+      "lastName": "Ali",
+      "email": "abc@example.com",
+      "isActive": true,
+      "emailConfirmed": true,
+      "phoneNumber": "0555555555",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "userName": "",
+      "firstName": "Nujud",
+      "lastName": "AlQahtani",
+      "email": "nujood@outlook.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0556667777",
+      "id": "3e24e62e-3a65-4697-acd8-828246402536"
+    },
+    {
+      "userName": "",
+      "firstName": "Omnya",
+      "lastName": "Al-Otaibi",
+      "email": "Omniya@gmail.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0550505005",
+      "id": "1d07ff35-ffe0-4c7c-bba0-d89dc5a810d3"
+    },
+    {
+      "userName": "",
+      "firstName": "Abd-Allah",
+      "lastName": "ajjja",
+      "email": "abdallah@outlook.com",
+      "isActive": "",
+      "emailConfirmed": "",
+      "phoneNumber": "0556667777",
+      "id": "edbd59d7-1960-4555-8c57-892bf7a73e67"
+    }
+  ],
+  "bills": [
+    {
+      "id": "1",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "2",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "3",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "4",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "5",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "6",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "7",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    },
+    {
+      "id": "8",
+      "date": "1/11/2022",
+      "total": "5000",
+      "paid": "2000",
+      "rest": "3000"
+    }
+  ],
+  "branches": [
+    {
+      "id": "de86ece7-c63a-46e9-95e5-fa99bb9319d3",
+      "name": "555",
+      "description": "555"
+    },
+    {
+      "id": "6155e8a4-3a51-4005-b367-3b6b6dd1d2bf",
+      "name": "edited-1",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "e9592db3-88d6-4e82-8e02-f85c7d5878c1",
+      "name": "edimn-3",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "f47e9a10-04f0-4d96-aadd-e0b0e777c8c5",
+      "name": "south",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "31cec6fa-63a0-4f4c-9631-dde846267add",
+      "name": "south--AAA",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "6",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "7",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "be15ca5c-c889-4305-9cae-533a422aba03",
+      "name": "jdj",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "6ad1c2a6-d4af-4d98-8318-3d25a5e0306e",
+      "name": "sou",
+      "description": "Located in the south of countries"
+    },
+    {
+      "id": "11",
+      "name": "south-branch",
+      "description": "Located in the south of countries"
+    },
+    {
+      "name": "bbb",
+      "description": "aaa",
+      "id": "192b5aae-3230-4ad8-933d-4119c921a1c9"
+    },
+    {
+      "name": "new branch",
+      "description": "",
+      "id": "5f0fb799-4c01-4e59-98d7-bf563050b877"
+    },
+    {
+      "name": "n",
+      "description": "",
+      "id": "a36dc11a-47ae-4ce4-b759-11394e6f4695"
+    },
+    {
+      "name": "qq",
+      "description": "",
+      "id": "47d2b0a5-a6cf-4439-807b-04707884b212"
+    },
+    {
+      "name": "neww",
+      "description": "",
+      "id": "a5011613-c0e7-4908-825a-7eb1495d2a36"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "1",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": true,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "4",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": false,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "5",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": true,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "6",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": false,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "7",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": true,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "8",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": false,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "9",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": true,
+      "recentPackage": "package",
+      "balance": "2000"
+    },
+    {
+      "id": "10",
+      "name": "Subscriper name",
+      "Tel": "0555555555",
+      "email": "abc@examplc.com",
+      "subscriptionDate": "1/4/2022",
+      "isActive": false,
+      "recentPackage": "package",
+      "balance": "2000"
+    }
+  ],
+  "subscriptionAccountStatement": [
+    {
+      "billNum": "1",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "2",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "3",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    },
+    {
+      "billNum": "4",
+      "billDate": "1/1/1111",
+      "subscriptionPeriod": "3",
+      "package": "package1",
+      "amount": "30003",
+      "paid": "1500",
+      "rest": "287287"
+    }
+  ],
+  "financialBoxesTransactions": [
+    {
+      "id": "1",
+      "oprertionType": "Type3",
+      "date": "5/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "false"
+    },
+    {
+      "id": "2",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "true",
+      "creditor": "false"
+    },
+    {
+      "id": "3",
+      "oprertionType": "Type2",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false;",
+      "creditor": "false"
+    },
+    {
+      "id": "4",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "true"
+    },
+    {
+      "id": "5",
+      "oprertionType": "Type3",
+      "date": "5/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "false"
+    },
+    {
+      "id": "6",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "true",
+      "creditor": "false"
+    },
+    {
+      "id": "7",
+      "oprertionType": "Type2",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false;",
+      "creditor": "false"
+    },
+    {
+      "id": "8",
+      "oprertionType": "Type1",
+      "date": "1/1/2010",
+      "statement": "no-statement",
+      "debtor": "false",
+      "creditor": "true"
+    },
+    {
+      "amount": "76376",
+      "fromBox": "box1",
+      "toBox": "box1",
+      "notices": "ll",
+      "id": "df02a42f-ae89-4aca-83c1-420971186974"
+    }
+  ],
+  "roles": [
+    {
+      "id": "1",
+      "roleTitle": "sales manager",
+      "isActive": "true"
+    },
+    {
+      "id": "2",
+      "roleTitle": "employee22",
+      "isActive": "false"
+    },
+    {
+      "id": "3",
+      "roleTitle": "employee",
+      "isActive": "true"
+    },
+    {
+      "id": "4",
+      "roleTitle": "employee",
+      "isActive": "false"
+    },
+    {
+      "id": "5",
+      "roleTitle": "employee",
+      "isActive": "true"
+    },
+    {
+      "roleTitle": "new role edited",
+      "id": "287395f1-8f06-4783-8744-947807d3462f"
+    },
+    {
+      "roleTitle": "neww",
+      "id": "8f384bb7-fc28-49a5-900f-6d2ae5e42cff"
+    },
+    {
+      "roleTitle": "saa",
+      "id": "f1aa719a-d12c-4ce2-92b0-b51f85c33292"
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Ahmed Khairy",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "2",
+      "name": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "3",
+      "name": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "4",
+      "name": "Ali Ahmed",
+      "username": "fakeUserName",
+      "Password": "267637",
+      "email": "axb@gmail.com",
+      "Tel": "256246527",
+      "isActive": "true",
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "Nujud AlQahtani",
+      "username": "khkdh",
+      "Password": "nlkhkl3",
+      "email": "nujood@outlook.com",
+      "Tel": "0556667777",
+      "isActive": "",
+      "imageUrl": "",
+      "id": "9daa02ba-d537-4514-badf-100a46868d4f"
+    }
+  ],
+  "pointOfSalesList": [
+    {
+      "id": "mgm",
+      "name": " Point of sale1",
+      "branch": "branch1",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "lmflm",
+      "name": " Point of sale2",
+      "branch": "branch2",
+      "isActive": true,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "id": "mddj",
+      "name": " Point of sale3",
+      "branch": "branch3",
+      "isActive": false,
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "code": "",
+      "defaultCustomer": "",
+      "imageFile": {
+        "name": "96907ff0-0835-44f7-8c76-1f7ab763fa7e"
+      }
+    },
+    {
+      "id": "ndnjj",
+      "name": " Point of sale4",
+      "branch": "branch3",
+      "isActive": false,
+      "imageUrl": "https://loremflickr.com/300/300/abstract"
+    },
+    {
+      "name": "new kjljlej",
+      "branch": "branch1",
+      "isActive": "",
+      "defaultCustomer": "cust2",
+      "imageFile": {
+        "name": "a93dc3c6-687f-412e-8e8b-5c03ef060a0b"
+      },
+      "id": "2db59e7c-735b-48f1-ae17-eead30560e84"
+    }
+  ],
+  "pointOfSalesSessions": [
+    {
+      "id": "mgm",
+      "name": " Point of sale1",
+      "employeeName": "emp2",
+      "date": "01/01/2022",
+      "time": "time",
+      "branch": "branch1",
+      "status": "approved",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "2022-12-16T14:18:55.383Z",
+        "closingDate": "2022-12-16T14:19:00.367Z",
+        "approvingDate": "2022-12-16T14:19:01.673Z"
+      }
+    },
+    {
+      "id": "ndnjj",
+      "name": " Point of sale3",
+      "employeeName": "emp2",
+      "date": "01/01/2022",
+      "time": "time",
+      "branch": "branch3",
+      "status": "approved",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "",
+        "closingDate": "",
+        "approvingDate": ""
+      }
+    },
+    {
+      "id": "aqaq233",
+      "name": " Point of sale4",
+      "employeeName": "Ahmed",
+      "date": "01/09/2022",
+      "time": "time",
+      "branch": "branch3",
+      "status": "approved",
+      "imageUrl": "https://loremflickr.com/300/300/abstract",
+      "statusModifyingDate": {
+        "activationDate": "2022-12-16T14:04:55.145Z",
+        "closingDate": "2022-12-16T14:22:10.716Z",
+        "approvingDate": "2022-12-16T14:22:11.471Z"
+      }
+    },
+    {
+      "name": "point2",
+      "employeeName": "emp2",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "2022-12-16T14:26:09.019Z",
+        "closingDate": "2022-12-16T14:26:12.003Z",
+        "approvingDate": "2022-12-16T14:26:18.189Z"
+      },
+      "id": "13d48e9e-3d23-4fba-9631-bbee8136f115"
+    },
+    {
+      "name": "point1",
+      "employeeName": "emp2",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "16-12-2022 17:31",
+        "closingDate": "16-12-2022 17:31",
+        "approvingDate": "16-12-2022 17:31"
+      },
+      "id": "6d20f691-0ceb-4ec1-b616-be96f281e029"
+    },
+    {
+      "name": "point2",
+      "employeeName": "emp1",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "16-12-2022 18:54",
+        "closingDate": "16-12-2022 18:54",
+        "approvingDate": "16-12-2022 18:54"
+      },
+      "id": "73404c38-4b9d-499b-832f-450e8ddc5ec9"
+    },
+    {
+      "name": "point1",
+      "employeeName": "emp2",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "16-12-2022 18:54",
+        "closingDate": "16-12-2022 18:54",
+        "approvingDate": "16-12-2022 18:54"
+      },
+      "id": "98b7f4fb-1e52-4aaf-aeb9-f24ddf270317"
+    },
+    {
+      "name": "point1",
+      "employeeName": "emp2",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "21-12-2022 20:48",
+        "closingDate": "21-12-2022 20:49",
+        "approvingDate": "21-12-2022 20:49"
+      },
+      "id": "869bd929-9261-4890-b854-6134f3d1fc2a"
+    },
+    {
+      "name": "point1",
+      "employeeName": "emp2",
+      "status": "approved",
+      "statusModifyingDate": {
+        "activationDate": "22-12-2022 12:4",
+        "closingDate": "22-12-2022 12:4",
+        "approvingDate": "22-12-2022 12:4"
+      },
+      "id": "e98bfdb5-cc38-4739-95cf-a91b6e1c1aac"
+    }
+  ],
+  "draftOrders": []
+}

@@ -1,0 +1,18 @@
+export const storeModules = {
+    services: "services",
+    products: "products",
+    pointOfSales: "pointOfSales",
+    financialBoxes: "financialBoxes",
+    customers: "customers",
+    bills: "bills",
+    branches: "branches",
+    subscriptions: "subscriptions",
+    financialBoxesTransactions: "financialBoxesTransactions",
+    subscriptionAccountStatement: "subscriptionAccountStatement",
+    roles: "roles",
+    users: "users",
+    serviceCatalog: "serviceCatalog",
+    pointOfSalesList: "pointOfSalesList",
+    pointOfSalesSessions: "pointOfSalesSessions",
+    draftOrders: "draftOrders",
+};
