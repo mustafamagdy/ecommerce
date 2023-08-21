@@ -372,5 +372,6 @@
     <ItemGroup>
       <Folder Include="Files\fonts" />
       <Folder Include="Files\logos" />
+      <Folder Include="Logs\" />
     </ItemGroup>
 </Project>
