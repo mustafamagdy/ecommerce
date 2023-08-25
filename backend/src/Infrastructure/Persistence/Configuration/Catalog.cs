@@ -19,6 +19,21 @@ public sealed class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
   }
 }
 
+public sealed class CategoryConfig : BaseAuditableTenantEntityConfiguration<Category>
+{
+  public override void Configure(EntityTypeBuilder<Category> builder)
+  {
+    base.Configure(builder);
+
+    builder
+      .Property(b => b.Name)
+      .HasMaxLength(256);
+
+    builder
+      .Property(b => b.Description);
+  }
+}
+
 public sealed class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
 {
   public override void Configure(EntityTypeBuilder<Product> builder)
@@ -45,20 +60,10 @@ public sealed class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguratio
   {
     base.Configure(builder);
 
-    builder.Property(a => a.Priority)
-      .HasConversion(
-        p => p.Name,
-        p => ServicePriority.FromValue(p));
-
     builder
       .Property(b => b.Price)
       .IsRequired()
       .HasPrecision(7, 3);
-
-    builder
-      .Property(a => a.Priority)
-      .HasConversion<string>()
-      .HasDefaultValue(ServicePriority.Normal);
   }
 }
 

@@ -8,10 +8,10 @@ public record DeleteCustomerByIdRequest(Guid Id) : IRequest<Guid>;
 public class DeleteCustomerByIdRequestHandler : IRequestHandler<DeleteCustomerByIdRequest, Guid>
 {
     private readonly IRepository<Customer> _repository;
-    private readonly IUnitOfWork _uow;
+    private readonly IApplicationUnitOfWork _uow;
     private readonly IStringLocalizer _t;
 
-    public DeleteCustomerByIdRequestHandler(IRepository<Customer> repository, IUnitOfWork uow,
+    public DeleteCustomerByIdRequestHandler(IRepository<Customer> repository, IApplicationUnitOfWork uow,
         IStringLocalizer<DeleteCustomerByIdRequestHandler> t)
     {
         _repository = repository;

@@ -27,6 +27,7 @@ public sealed class ApplicationDbContext : BaseDbContext
   }
 
   public DbSet<Branch> Branches => Set<Branch>();
+  public DbSet<Category> Categories => Set<Category>();
   public DbSet<Product> Products => Set<Product>();
   public DbSet<Brand> Brands => Set<Brand>();
   public DbSet<ServiceCatalog> ServiceCatalogs => Set<ServiceCatalog>();
