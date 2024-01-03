@@ -12,16 +12,17 @@ class CategoriesRepositoryImpl extends CategoriesRepository {
     String? query,
   ) async {
     final data = {
-      'lang': LocalStorage.instance.getActiveLocale(),
-      'perPage': 100,
-      'type': 'main',
-      "has_products": 1,
+      'name':'',
+      // 'lang': LocalStorage.instance.getActiveLocale(),
+      // 'perPage': 100,
+      // 'type': 'main',
+      // "has_products": 1,
       "p_shop_id" : LocalStorage.instance.getUser()?.shop?.id ?? 0
     };
     try {
       final client = inject<HttpService>().client(requireAuth: true);
       final response = await client.get(
-        '/api/v1/dashboard/seller/categories/paginate',
+        '/api/v1/categories',
         queryParameters: data,
       );
       return ApiResult.success(
