@@ -11,6 +11,7 @@ class AppConstants {
   static const String keySelectedCurrency = 'keySelectedCurrency';
   static const String keyBags = 'keyBags';
   static const String keyUser = 'keyUser';
+  static const String keyTenant = 'keyTenant';
   static const String pinCode = 'pinCode';
   static const String demoSellerLogin = 'sellers@githubit.com';
   static const String demoSellerPassword = 'seller';

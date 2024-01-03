@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:admin_desktop/src/models/data/tenant_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/models.dart';
@@ -163,6 +164,18 @@ class LocalStorage {
       return null;
     }
     return UserData.fromJson(map);
+  }
+
+  TenantData? getTenant() {
+    final savedString = _preferences?.getString(AppConstants.keyTenant);
+    if (savedString == null) {
+      return null;
+    }
+    final map = jsonDecode(savedString);
+    if (map == null) {
+      return null;
+    }
+    return TenantData.fromJson(map);
   }
 
   void deleteUser() => _preferences?.remove(AppConstants.keyUser);
