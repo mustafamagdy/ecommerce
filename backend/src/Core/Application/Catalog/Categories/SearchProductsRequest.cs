@@ -2,9 +2,6 @@ namespace FSH.WebApi.Application.Catalog.Categories;
 
 public class SearchCategoriesRequest : PaginationFilter, IRequest<PaginationResponse<CategoryDto>>
 {
-  public Guid? BrandId { get; set; }
-  public decimal? MinimumRate { get; set; }
-  public decimal? MaximumRate { get; set; }
 }
 
 public class SearchCategoriesRequestHandler : IRequestHandler<SearchCategoriesRequest, PaginationResponse<CategoryDto>>
