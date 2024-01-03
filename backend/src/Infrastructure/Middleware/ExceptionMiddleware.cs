@@ -89,7 +89,7 @@ internal sealed class ExceptionMiddleware : IMiddleware
           errorResult.StatusCode = (int)e.StatusCode;
           if (e.ErrorMessages is not null)
           {
-            errorResult.Messages = e.ErrorMessages;
+            errorResult.Messages = e.ErrorMessages.ToList();
           }
 
           break;
