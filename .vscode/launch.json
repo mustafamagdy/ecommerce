@@ -5,6 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": ".NET Core Docker Attach",
+            "type": "docker",
+            "request": "attach",
+            "platform": "netCore",
+            "dockerOptions": {
+                "containerNamePattern": "api", // The name of your Docker container
+                "dockerCompose": {
+                    "dockerComposeFile": "${workspaceFolder}/docker-compose.yml", // The path to your Docker Compose file
+                    "projectName": "api", // The name of your Docker Compose project
+                    "serviceName": "api", // The name of the service in your Docker Compose file
+                }
+            },
+            "sourceFileMap": {
+                "/src": "${workspaceFolder}" // Map the source files in your Docker container to those in your workspace
+            }
+        },
+        {
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "name": "nodemon",

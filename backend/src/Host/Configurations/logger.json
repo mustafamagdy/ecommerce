@@ -32,27 +32,27 @@
     "WriteTo": [
       {
         "Args": {
+          "serverUrl": "http://your-seq-server-url",
+          "apiKey": "your-api-key",
+          "restrictedToMinimumLevel": "Information"
+        },
+        "Name": "Seq"
+      },
+      {
+        "Args": {
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+          "restrictedToMinimumLevel": "Information"
+        },
+        "Name": "Console"
+      },
+      {
+        "Args": {
           "path": "Logs/logs_.txt",
-//          "path": "Logs/logs_.json",
-//          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
           "rollingInterval": "Day",
           "restrictedToMinimumLevel": "Information",
           "retainedFileCountLimit": 365
         },
         "Name": "File"
-      },
-      {
-        "Name": "Hangfire"
-      },
-      {
-        "Name": "Elasticsearch",
-        "Args": {
-          "nodeUris": "http://localhost:9200;",
-          "indexFormat": "Backend-logs-{0:yyyy.MM}",
-          "numberOfShards": 2,
-          "numberOfReplicas": 1,
-          "restrictedToMinimumLevel": "Debug"
-        }
       }
     ]
   }
