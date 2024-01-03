@@ -1,35 +1,59 @@
-networks:
-  application-tests:
-
 services:
-  #  api:
-  #    build:
-  #      context: .
-  #      dockerfile: Dockerfile
-  #    container_name: api
-  #    environment:
-  #      - "DatabaseSettings__ConnectionString=Server=db;Database=root-db;User=root;Password=DeV12345;MultipleActiveResultSets=true"
-  #      - "DatabaseSettings__DBProvider=mysql"
-  #      - "HangfireSettings__Storage__ConnectionString=Server=db;Database=root-db;User=root;Password=DeV12345;MultipleActiveResultSets=true;Allow User Variables=true"
-  #      - "HangfireSettings__Storage__StorageProvider=mysql"
-  #      - "ASPNETCORE_Kestrel__Certificates__Default__Password=DeV12345"
-  #      - "ASPNETCORE_Kestrel__Certificates__Default__Path=/https/DN.Host.pfx"
-  #    volumes:
-  #      - ~/.aspnet/https:/https:ro
-  #    ports:
-  #      - "5050:5050"
-  #      - "5060:5060"
-  #    depends_on:
-  #      - db
-  #    restart: on-failure
-  mysql-db:
-    networks:
-      - application-tests
-    ports:
-      - "3306:3306"
-    image: "amd64/mysql:8.0-oracle"
-    container_name: mysql-db
-    restart: always
+  postgres-db:
+    image: "postgres:13"
+    container_name: postgres-db
+
     environment:
-      MYSQL_ROOT_PASSWORD: "DeV12345"
-      MYSQL_PASSWORD: "DeV12345"
+      POSTGRES_USER: "psqluser"
+      POSTGRES_PASSWORD: "Dev12345"
+      POSTGRES_DB: "root_tenant_db"
+    ports:
+      - "5432:5432"
+    restart: always
+
+  seq-log:
+    image: datalust/seq:latest
+    container_name: seq-log
+
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "5341:5341"
+      - "5342:80"
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+
+    environment:
+      - "DatabaseSettings__ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=Dev12345"
+      - "DatabaseSettings__ConnectionStringTemplate=postgres-db;Port=5432;Database={0};Uid=psqluser;Pwd=Dev12345"
+      - "DatabaseSettings__DBProvider=postgresql"
+      - "HangfireSettings__Storage__ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=Dev12345"
+      - "HangfireSettings__Storage__StorageProvider=postgresql"
+      - "SERILOG__WRITE_TO__0__SEQ__NAME=Seq"
+      - "SERILOG__WRITE_TO__0__SEQ__ARGS_SERVERURL=http://seq-log:5341"
+      - "SERILOG__WRITE_TO__1__CONSOLE__NAME=Console"
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-db
+      - seq-log
+    restart: on-failure
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "Dev12345"
+      PGADMIN_SETUP_HOST: "postgres-db"
+    ports:
+      - "8089:80"
+    depends_on:
+      - postgres-db
+    restart: always
