@@ -53,8 +53,8 @@ public class HostFixture : IAsyncLifetime
     await _dbContainer.StartAsync();
 
     _rootTenantDbName = $"main_{Guid.NewGuid()}";
-    var connectionString = string.Format(_cnStringTemplate, _dbPort, _rootTenantDbName);
-    var tenantDbConnectionStringTemplate = DbProvider switch
+    string connectionString = string.Format(_cnStringTemplate, _dbPort, _rootTenantDbName);
+    string tenantDbConnectionStringTemplate = DbProvider switch
     {
       "postgresql" => $"Server=127.0.0.1;Port={_dbPort};Database={{0}};Uid=postgres;Pwd=DeV12345",
       "mysql" => $"Data Source=127.0.0.1;Port={_dbPort};Initial Catalog={{0}};User Id=root;Password=DeV12345;SSL Mode=None;AllowPublicKeyRetrieval=true;Allow User Variables=true;",

@@ -18,7 +18,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Shared")
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -107,6 +107,49 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasKey("Id");
 
                     b.ToTable("Brands", "Shared");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories", "Shared");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -219,6 +262,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -241,12 +287,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasPrecision(7, 3)
                         .HasColumnType("numeric(7,3)");
 
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("normal");
-
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
@@ -259,6 +299,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ProductId");
 
@@ -814,7 +856,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasDiscriminator<string>("payment_type").HasValue("PaymentOperation");
 
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                    b
+                        .UseTphMappingStrategy()
+                        .HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
@@ -864,7 +908,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasDiscriminator<string>("template_type").HasValue("PrintableDocument");
 
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                    b
+                        .UseTphMappingStrategy()
+                        .HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.DocumentSection", b =>
@@ -910,7 +956,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasDiscriminator<string>("section_type").HasValue("DocumentSection");
 
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                    b
+                        .UseTphMappingStrategy()
+                        .HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
@@ -1078,6 +1126,20 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasDiscriminator().HasValue("OrdersSummary");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Receipt");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
+                {
+                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
+
+                    b.HasDiscriminator().HasValue("Wide");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.Sections.BarcodeSection", b =>
                 {
                     b.HasBaseType("FSH.WebApi.Domain.Printing.Sections.DocumentSection");
@@ -1128,20 +1190,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasDiscriminator().HasValue("TwoPartTitle");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.SimpleReceiptInvoice", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
-
-                    b.HasDiscriminator().HasValue("Receipt");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Printing.WideReceiptInvoice", b =>
-                {
-                    b.HasBaseType("FSH.WebApi.Domain.Printing.PrintableDocument");
-
-                    b.HasDiscriminator().HasValue("Wide");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Product", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Catalog.Brand", "Brand")
@@ -1155,8 +1203,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Catalog.ServiceCatalog", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Catalog.Category", "Category")
+                        .WithMany("CategoryCatalogs")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.Catalog.Product", "Product")
-                        .WithMany()
+                        .WithMany("ServiceCatalogs")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1166,6 +1220,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Product");
 
@@ -1329,6 +1385,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
 
                     b.Navigation("CashRegister");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Category", b =>
+                {
+                    b.Navigation("CategoryCatalogs");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Catalog.Product", b =>
+                {
+                    b.Navigation("ServiceCatalogs");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Identity.ApplicationRole", b =>

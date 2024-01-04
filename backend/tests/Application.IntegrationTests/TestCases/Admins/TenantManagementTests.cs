@@ -32,16 +32,16 @@ public class TenantManagementTests : TestFixture
   public async Task can_create_new_tenant_and_login_using_hostname()
   {
     // Still not working => test-tenant.domain.com
-    // var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
-    //
-    // var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
-    // _.StatusCode.Should().Be(HttpStatusCode.OK);
-    // var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
-    // tenantResponse.Should().NotBeNull();
-    // tenantResponse.Id.Should().Be(tenantId);
-    //
-    // _ = await TryLoginWithoutTenantHeaderAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
-    // _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantId = PrepareNewTenant(out string adminEmail, out var tenant, false);
+
+    var _ = await RootAdmin_PostAsJsonAsync("/api/tenants", tenant);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var tenantResponse = await _.Content.ReadFromJsonAsync<BasicTenantInfoDto>();
+    tenantResponse.Should().NotBeNull();
+    tenantResponse.Id.Should().Be(tenantId);
+
+    _ = await TryLoginWithoutTenantHeaderAs(adminEmail, MultitenancyConstants.DefaultPassword, tenantId);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]

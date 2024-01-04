@@ -5,7 +5,7 @@
     <scripts>
       <script value="dev" />
     </scripts>
-    <node-interpreter value="project" />
+    <node-interpreter value="$USER_HOME$/AppData/Roaming/nvm/v18.17.1/node" />
     <envs />
     <method v="2" />
   </configuration>
