@@ -5,6 +5,14 @@ namespace FSH.WebApi.Host.Controllers.DemoPermissions;
 [AllowAnonymous]
 public sealed class DemoController : VersionedApiController
 {
+  [HttpGet("test-log")]
+  [OpenApiOperation("Test Logging", "")]
+  public Task TestLog([FromServices] ILogger<DemoController> logger)
+  {
+    logger.LogInformation("Test log");
+    return Task.CompletedTask;
+  }
+
   // [HttpGet("test-workflow1")]
   // public async Task Test01([FromServices] IBuildsAndStartsWorkflow builder)
   // {
@@ -18,10 +26,11 @@ public sealed class DemoController : VersionedApiController
   // }
 
   [HttpGet("{id:guid}")]
-  [MustHavePermission(FSHAction.View, FSHResource.Brands)]
+  // [MustHavePermission(FSHAction.View, FSHResource.Brands)]
   [OpenApiOperation("Get brand details.", "")]
   public Task<BrandDto> GetAsync(Guid id)
   {
+    //logger.LogInformation("Test log");
     return Mediator.Send(new GetBrandRequest(id));
   }
 

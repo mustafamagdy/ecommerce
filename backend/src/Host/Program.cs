@@ -7,6 +7,7 @@ using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Registrations;
 using QuestPDF.Drawing;
 using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 [assembly: ApiConventionType(typeof(FSHApiConventions))]
 
@@ -19,8 +20,7 @@ try
   builder.Host.AddConfigurations();
   builder.Host.UseSerilog((_, config) =>
   {
-    config.WriteTo.Console()
-      .ReadFrom.Configuration(builder.Configuration);
+    config.ReadFrom.Configuration(builder.Configuration);
   });
 
   builder.Services
