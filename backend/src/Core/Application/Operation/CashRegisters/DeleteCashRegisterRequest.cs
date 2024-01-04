@@ -46,7 +46,7 @@ public class DeleteCashRegisterRequestHandler : IRequestHandler<DeleteCashRegist
     _uow = uow;
   }
 
-  public async Task<Unit> Handle(DeleteCashRegisterRequest request, CancellationToken cancellationToken)
+  public async Task Handle(DeleteCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var cr = await _repository.GetByIdAsync(request.Id, cancellationToken);
     if (cr == null)
@@ -63,7 +63,5 @@ public class DeleteCashRegisterRequestHandler : IRequestHandler<DeleteCashRegist
 
     await _repository.DeleteAsync(cr, cancellationToken);
     await _uow.CommitAsync(cancellationToken);
-
-    return Unit.Value;
   }
 }

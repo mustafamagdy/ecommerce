@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,4 +37,9 @@ internal static class Startup
 
   private static MiddlewareSettings GetMiddlewareSettings(IConfiguration config) =>
     config.GetSection(nameof(MiddlewareSettings)).Get<MiddlewareSettings>();
+
+  internal static IServiceCollection AddMediatR(this IServiceCollection services)
+  {
+    return services.AddMediatR(m => { m.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()); });
+  }
 }

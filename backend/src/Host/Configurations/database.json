@@ -3,8 +3,8 @@
     "DBProvider": "postgresql",
 //    "ConnectionString": "Server=185.198.27.42;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
 //    "ConnectionString": "Server=vmi1129859.contaboserver.net;Port=5432;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
-    "ConnectionString": "Server=127.0.0.1;Port=5439;Database=root_tenant_db_01;Uid=postgres;Pwd=DeV12345",
-    "ConnectionStringTemplate": "Server=185.198.27.42;Port=5432;Database={0};Uid=postgres;Pwd=DeV12345",
+    "ConnectionString": "Server=127.0.0.1;Port=5403;Database=root_tenant_db_01;Uid=psqluser;Pwd=DeV12345",
+    "ConnectionStringTemplate": "Server=185.198.27.42;Port=5403;Database={0};Uid=psqluser;Pwd=DeV12345",
     "SequenceTableName": "Sequences",
     "LogSensitiveInfo": false
   }

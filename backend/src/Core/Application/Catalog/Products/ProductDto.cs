@@ -13,7 +13,7 @@ public class ProductDto :IRegister, IDto
   public string BrandName { get; set; } = default!;
   public void Register(TypeAdapterConfig config)
   {
-      config.NewConfig<Product, ProductDto>()
-          .Map(dis => dis.ImagePath, src => src.ImagePath!);
+    config.NewConfig<Product, ProductDto>()
+      .Map(dis => dis.ImagePath, src => src.ImagePath!);
   }
 }

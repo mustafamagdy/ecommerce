@@ -7,7 +7,7 @@ public class UpdateServiceCatalogRequest : IRequest<Guid>
 {
   public Guid Id { get; set; }
   public decimal Price { get; set; }
-  public ServicePriority Priority { get; set; }
+  public Guid CategoryId { get; set; }
   public Guid? ServiceId { get; set; }
   public Guid? ProductId { get; set; }
 }
@@ -19,7 +19,9 @@ public class UpdateServiceCatalogRequestHandler : IRequestHandler<UpdateServiceC
   private readonly IFileStorageService _file;
   private readonly IApplicationUnitOfWork _uwo;
 
-  public UpdateServiceCatalogRequestHandler(IRepository<ServiceCatalog> repository, IStringLocalizer<UpdateServiceCatalogRequestHandler> localizer, IFileStorageService file, IApplicationUnitOfWork uwo)
+  public UpdateServiceCatalogRequestHandler(IRepository<ServiceCatalog> repository,
+    IStringLocalizer<UpdateServiceCatalogRequestHandler> localizer, IFileStorageService file,
+    IApplicationUnitOfWork uwo)
   {
     _repository = repository;
     _file = file;
@@ -33,7 +35,7 @@ public class UpdateServiceCatalogRequestHandler : IRequestHandler<UpdateServiceC
 
     _ = serviceCatalog ?? throw new NotFoundException(_t["ServiceCatalog {0} Not Found.", request.Id]);
 
-    var updatedServiceCatalog = serviceCatalog.Update(request.ProductId, request.ServiceId, request.Price, request.Priority);
+    var updatedServiceCatalog = serviceCatalog.Update(request.ProductId, request.ServiceId, request.CategoryId, request.Price);
 
     serviceCatalog.AddDomainEvent(EntityUpdatedEvent.WithEntity(serviceCatalog));
 

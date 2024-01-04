@@ -1,7 +1,9 @@
 using System.Net;
+using FluentValidation;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Shared.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Serilog;
 using Serilog.Context;
@@ -29,6 +31,21 @@ internal sealed class ExceptionMiddleware : IMiddleware
     try
     {
       await next(context);
+    }
+    catch (ValidationException validationException)
+    {
+      var response = context.Response;
+      if (!response.HasStarted)
+      {
+        response.ContentType = "application/json";
+        response.StatusCode = (int)HttpStatusCode.BadRequest;
+        var failures = validationException.Errors;
+        await response.WriteAsync(_jsonSerializer.Serialize(failures));
+      }
+      else
+      {
+        Log.Warning("Can't write error response. Response has already started.");
+      }
     }
     catch (Exception exception)
     {
@@ -72,7 +89,7 @@ internal sealed class ExceptionMiddleware : IMiddleware
           errorResult.StatusCode = (int)e.StatusCode;
           if (e.ErrorMessages is not null)
           {
-            errorResult.Messages = e.ErrorMessages;
+            errorResult.Messages = e.ErrorMessages.ToList();
           }
 
           break;
@@ -86,7 +103,8 @@ internal sealed class ExceptionMiddleware : IMiddleware
           break;
       }
 
-      Log.Error($"{errorResult.Exception} Request failed with Status Code {context.Response.StatusCode} and Error Id {errorId}.");
+      Log.Error(
+        $"{errorResult.Exception} Request failed with Status Code {context.Response.StatusCode} and Error Id {errorId}.");
       var response = context.Response;
       if (!response.HasStarted)
       {
