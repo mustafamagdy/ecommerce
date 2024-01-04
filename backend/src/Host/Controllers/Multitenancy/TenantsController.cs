@@ -83,9 +83,9 @@ public sealed class TenantsController : VersionNeutralApiController
   [HttpPost("pay")]
   [MustHavePermission(FSHAction.Update, FSHResource.Subscriptions)]
   [OpenApiOperation("Pay for tenant subscription", "")]
-  public Task<Unit> RenewSubscription(PayForSubscriptionRequest request)
+  public Task RenewSubscription(PayForSubscriptionRequest request)
   {
-    return Mediator.Send(request);
+    return Mediator.Send(request, CancellationToken.None);
   }
 
   [HttpGet("{id}/info")]

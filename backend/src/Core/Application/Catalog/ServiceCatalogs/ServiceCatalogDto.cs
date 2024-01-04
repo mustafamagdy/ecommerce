@@ -9,9 +9,10 @@ public class ServiceCatalogDto :IRegister, IDto
   public string? ServiceImageUrl { get; set; }
   public Guid ProductId { get; set; } = default!;
   public string ProductName { get; set; } = default!;
+  public Guid? CategoryId { get; set; } = default!;
+  public string CategoryName { get; set; } = default!;
   public string? ProductImageUrl { get; set; }
   public decimal Price { get; set; }
-  public string Priority { get; set; }
   public void Register(TypeAdapterConfig config)
   {
       config.NewConfig<ServiceCatalog, ServiceCatalogDto>()

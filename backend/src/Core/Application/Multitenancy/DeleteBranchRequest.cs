@@ -36,7 +36,7 @@ public class DeleteBranchRequestHandler : IRequestHandler<DeleteBranchRequest>
     _t = localizer;
   }
 
-  public async Task<Unit> Handle(DeleteBranchRequest request, CancellationToken cancellationToken)
+  public async Task Handle(DeleteBranchRequest request, CancellationToken cancellationToken)
   {
     var branch = await _repository.GetByIdAsync(request.Id, cancellationToken)
                  ?? throw new NotFoundException(_t["Branch {0} not found", request.Id]);
@@ -49,6 +49,5 @@ public class DeleteBranchRequestHandler : IRequestHandler<DeleteBranchRequest>
 
     await _repository.DeleteAsync(branch, cancellationToken);
     await _uow.CommitAsync(cancellationToken);
-    return Unit.Value;
   }
 }

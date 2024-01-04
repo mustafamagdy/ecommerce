@@ -1,3 +1,3 @@
-public  interface ApiMarker
+public interface ApiMarker
 {
 }
