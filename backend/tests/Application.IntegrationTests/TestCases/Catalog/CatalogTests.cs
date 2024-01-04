@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Application.IntegrationTests.Infra;
 using FluentAssertions;
 using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Application.Catalog.Categories;
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Catalog.ServiceCatalogs;
 using FSH.WebApi.Application.Catalog.Services;
@@ -41,7 +42,7 @@ public class CatalogTests : TestFixture
     var newCatalogItem = new CreateServiceCatalogFromProductAndServiceRequest
     {
       Price = 100,
-      Priority = ServicePriority.Normal,
+      CategoryName = "food",
       ProductName = "new product",
       ServiceName = "new service"
     };
@@ -73,9 +74,15 @@ public class CatalogTests : TestFixture
     var itemCount = catalogItems.TotalCount;
     itemCount.Should().BeGreaterThan(0);
 
+    _ = await PostAsJsonAsync("/api/v1/categories/search", new SearchCategoriesRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var categories = await _.Content.ReadFromJsonAsync<PaginationResponse<CategoryDto>>();
+    categories.Should().NotBeNull();
+    categories.Data.Should().NotBeEmpty();
+    var category = categories.Data.First();
+
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
     var products = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     products.Should().NotBeNull();
     products.Data.Should().NotBeEmpty();
@@ -91,7 +98,7 @@ public class CatalogTests : TestFixture
     var newCatalogItem = new CreateServiceCatalogRequest()
     {
       Price = 100,
-      Priority = ServicePriority.Normal,
+      CategoryId = category.Id,
       ServiceId = service.Id,
       ProductId = product.Id
     };
@@ -135,9 +142,15 @@ public class CatalogTests : TestFixture
     var itemCount = catalogItems.TotalCount;
     itemCount.Should().BeGreaterThan(0);
 
+    _ = await PostAsJsonAsync("/api/v1/categories/search", new SearchCategoriesRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var categories = await _.Content.ReadFromJsonAsync<PaginationResponse<CategoryDto>>();
+    categories.Should().NotBeNull();
+    categories.Data.Should().NotBeEmpty();
+    var category = categories.Data.First();
+
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
     var products = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     products.Should().NotBeNull();
     products.Data.Should().NotBeEmpty();
@@ -153,7 +166,7 @@ public class CatalogTests : TestFixture
     var newCatalogItem = new CreateServiceCatalogRequest()
     {
       Price = 100,
-      Priority = ServicePriority.Normal,
+      CategoryId = category.Id,
       ServiceId = service.Id,
       ProductId = product.Id
     };
@@ -165,7 +178,6 @@ public class CatalogTests : TestFixture
     {
       Id = itemId,
       Price = 120,
-      Priority = ServicePriority.Urgent,
     };
     _ = await PutAsJsonAsync($"/api/v1/catalog/{itemId}", updateCatalogItem, adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -178,7 +190,6 @@ public class CatalogTests : TestFixture
     catalogItems.Data.Should().NotBeNullOrEmpty();
     var updatedItem = catalogItems.Data.FirstOrDefault(a => a.Id == itemId);
     updatedItem.Price.Should().Be(updatedItem.Price);
-    updatedItem.Priority.Should().Be(updatedItem.Priority);
   }
 
   [Fact]
@@ -194,9 +205,15 @@ public class CatalogTests : TestFixture
     var itemCount = catalogItems.TotalCount;
     itemCount.Should().BeGreaterThan(0);
 
+    _ = await PostAsJsonAsync("/api/v1/categories/search", new SearchCategoriesRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var categories = await _.Content.ReadFromJsonAsync<PaginationResponse<CategoryDto>>();
+    categories.Should().NotBeNull();
+    categories.Data.Should().NotBeEmpty();
+    var category = categories.Data.First();
+
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
     var products = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     products.Should().NotBeNull();
     products.Data.Should().NotBeEmpty();
@@ -212,7 +229,7 @@ public class CatalogTests : TestFixture
     var newCatalogItem = new CreateServiceCatalogRequest()
     {
       Price = 100,
-      Priority = ServicePriority.Normal,
+      CategoryId = category.Id,
       ServiceId = service.Id,
       ProductId = product.Id
     };
@@ -237,9 +254,15 @@ public class CatalogTests : TestFixture
     var itemCount = catalogItems.TotalCount;
     itemCount.Should().BeGreaterThan(0);
 
+    _ = await PostAsJsonAsync("/api/v1/categories/search", new SearchCategoriesRequest(), adminHeaders);
+    _.StatusCode.Should().Be(HttpStatusCode.OK);
+    var categories = await _.Content.ReadFromJsonAsync<PaginationResponse<CategoryDto>>();
+    categories.Should().NotBeNull();
+    categories.Data.Should().NotBeEmpty();
+    var category = categories.Data.First();
+
     _ = await PostAsJsonAsync("/api/v1/products/search", new SearchProductsRequest(), adminHeaders);
     _.StatusCode.Should().Be(HttpStatusCode.OK);
-
     var products = await _.Content.ReadFromJsonAsync<PaginationResponse<ProductDto>>();
     products.Should().NotBeNull();
     products.Data.Should().NotBeEmpty();
@@ -255,7 +278,7 @@ public class CatalogTests : TestFixture
     var newCatalogItem = new CreateServiceCatalogRequest()
     {
       Price = 100,
-      Priority = ServicePriority.Normal,
+      CategoryId = category.Id,
       ServiceId = service.Id,
       ProductId = product.Id
     };

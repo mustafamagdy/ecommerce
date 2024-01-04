@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Npgsql;
 using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace FSH.WebApi.Infrastructure.Persistence.ConnectionString;
 

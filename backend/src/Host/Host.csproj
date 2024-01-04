@@ -6,15 +6,15 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="10.4.0" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
         <PackageReference Include="Hangfire.Console.Extensions.Serilog" Version="1.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-        <PackageReference Update="Roslynator.Analyzers" Version="4.1.1">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+        <PackageReference Update="Roslynator.Analyzers" Version="4.4.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -264,9 +264,9 @@
         <None Remove="bundle\Microsoft.AspNetCore.Authentication.JwtBearer.dll" />
         <None Remove="bundle\MessagePack.dll" />
         <None Remove="bundle\MessagePack.Annotations.dll" />
-        <None Remove="bundle\MediatR.dll" />
-        <None Remove="bundle\MediatR.Extensions.Microsoft.DependencyInjection.dll" />
-        <None Remove="bundle\MediatR.Contracts.dll" />
+<!--        <None Remove="bundle\MediatR.dll" />-->
+<!--        <None Remove="bundle\MediatR.Extensions.Microsoft.DependencyInjection.dll" />-->
+<!--        <None Remove="bundle\MediatR.Contracts.dll" />-->
         <None Remove="bundle\Mapster.dll" />
         <None Remove="bundle\Mapster.Core.dll" />
         <None Remove="bundle\MailKit.dll" />
@@ -372,5 +372,6 @@
     <ItemGroup>
       <Folder Include="Files\fonts" />
       <Folder Include="Files\logos" />
+      <Folder Include="Logs\" />
     </ItemGroup>
 </Project>
