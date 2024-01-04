@@ -1,12 +1,13 @@
+version: '3.8'
+
 services:
   postgres-db:
     image: "postgres:13"
     container_name: postgres-db
-
     environment:
-      POSTGRES_USER: "psqluser"
-      POSTGRES_PASSWORD: "Dev12345"
-      POSTGRES_DB: "root_tenant_db"
+      - POSTGRES_USER=psqluser
+      - POSTGRES_PASSWORD=DeV12345
+      - POSTGRES_DB=root_tenant_db
     ports:
       - "5432:5432"
     restart: always
@@ -14,7 +15,6 @@ services:
   seq-log:
     image: datalust/seq:latest
     container_name: seq-log
-
     environment:
       ACCEPT_EULA: "Y"
     ports:
@@ -27,16 +27,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: api
-
     environment:
-      - "DatabaseSettings__ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=Dev12345"
-      - "DatabaseSettings__ConnectionStringTemplate=postgres-db;Port=5432;Database={0};Uid=psqluser;Pwd=Dev12345"
-      - "DatabaseSettings__DBProvider=postgresql"
-      - "HangfireSettings__Storage__ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=Dev12345"
-      - "HangfireSettings__Storage__StorageProvider=postgresql"
-      - "SERILOG__WRITE_TO__0__SEQ__NAME=Seq"
-      - "SERILOG__WRITE_TO__0__SEQ__ARGS_SERVERURL=http://seq-log:5341"
-      - "SERILOG__WRITE_TO__1__CONSOLE__NAME=Console"
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DatabaseSettings:DBProvider=postgresql
+      - DatabaseSettings:ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=DeV12345
+      - DatabaseSettings:ConnectionStringTemplate=postgres-db;Port=5432;Database={0};Uid=psqluser;Pwd=DeV12345
+      - HangfireSettings:Storage:StorageProvider=postgresql
+      - HangfireSettings:Storage:ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=DeV12345
+      - Serilog:WriteTo:0:Name=Seq
+      - Serilog:WriteTo:0:Args:serverUrl=http://seq-log:5341
     ports:
       - "5050:80"
     depends_on:
@@ -47,11 +46,10 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
-
     environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
-      PGADMIN_DEFAULT_PASSWORD: "Dev12345"
-      PGADMIN_SETUP_HOST: "postgres-db"
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=DeV12345
+      - PGADMIN_SETUP_HOST=postgres-db
     ports:
       - "8089:80"
     depends_on:
