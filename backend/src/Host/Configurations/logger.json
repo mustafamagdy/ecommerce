@@ -1,14 +1,10 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Hangfire": "Warning",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
-    }
-  },
   "Serilog": {
-    "Using": [],
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File",
+      "Serilog.Sinks.Seq"
+    ],
     "Enrich": [
       "FromLogContext",
       "WithMachineName",
@@ -32,8 +28,7 @@
     "WriteTo": [
       {
         "Args": {
-          "serverUrl": "http://your-seq-server-url",
-          "apiKey": "your-api-key",
+          "serverUrl": "http://localhost:5439",
           "restrictedToMinimumLevel": "Information"
         },
         "Name": "Seq"
