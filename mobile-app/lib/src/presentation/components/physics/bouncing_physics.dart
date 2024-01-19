@@ -23,17 +23,17 @@ class CustomBouncingScrollPhysics extends ScrollPhysics {
     if (!position.outOfRange) return offset;
 
     final double overscrollPastStart =
-    math.max(position.minScrollExtent - position.pixels, 0.0);
+        math.max(position.minScrollExtent - position.pixels, 0.0);
     final double overscrollPastEnd =
-    math.max(position.pixels - position.maxScrollExtent, 0.0);
+        math.max(position.pixels - position.maxScrollExtent, 0.0);
     final double overscrollPast =
-    math.max(overscrollPastStart, overscrollPastEnd);
+        math.max(overscrollPastStart, overscrollPastEnd);
     final bool easing = (overscrollPastStart > 0.0 && offset < 0.0) ||
         (overscrollPastEnd > 0.0 && offset > 0.0);
 
     final double friction = easing
         ? frictionFactor(
-        (overscrollPast - offset.abs()) / position.viewportDimension)
+            (overscrollPast - offset.abs()) / position.viewportDimension)
         : frictionFactor(overscrollPast / position.viewportDimension);
     final double direction = offset.sign;
 
@@ -59,7 +59,7 @@ class CustomBouncingScrollPhysics extends ScrollPhysics {
   @override
   Simulation? createBallisticSimulation(
       ScrollMetrics position, double velocity) {
-    final Tolerance tolerance = this.tolerance;
+    final Tolerance tolerance = toleranceFor(position);
     if (velocity.abs() >= tolerance.velocity || position.outOfRange) {
       return CustomBouncingScrollSimulation(
         spring: spring,

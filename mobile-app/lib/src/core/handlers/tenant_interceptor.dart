@@ -14,9 +14,7 @@ class TenantInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final TenantData tenant = LocalStorage.instance.getTenant()!;
-    if (tenant != null) {
-      options.headers.addAll({'tenant': tenant.id});
-    }
+    options.headers.addAll({'tenant': tenant.id});
     handler.next(options);
   }
 }
