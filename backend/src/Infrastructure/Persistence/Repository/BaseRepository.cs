@@ -7,9 +7,23 @@ using Microsoft.EntityFrameworkCore;
 namespace FSH.WebApi.Infrastructure.Persistence.Repository
 {
   /// <inheritdoc/>
-  public abstract class RepositoryBase<T> : IRepositoryBase<T>
+  public abstract class RepositoryBase<T> : IRepositoryBase<T>, IReadRepositoryBase<T>
     where T : class
   {
+
+    /// <inheritdoc/>
+    public virtual async Task DeleteRangeAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+    {
+      var entities = await ApplySpecification(specification).ToListAsync(cancellationToken);
+      _uow.Set<T>().RemoveRange(entities);
+    }
+
+    /// <inheritdoc/>
+    public virtual IAsyncEnumerable<T> AsAsyncEnumerable(ISpecification<T> specification)
+    {
+      return ApplySpecification(specification).AsAsyncEnumerable();
+    }
+
     private readonly ISpecificationEvaluator _specificationEvaluator;
     private readonly IUnitOfWork _uow;
 

@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Ardalis.SmartEnum.JsonNet;
+using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Serialization;
 using FSH.WebApi.Infrastructure.Finance;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,7 @@ public static class ServiceExtensions
       opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
       opt.JsonSerializerOptions.Converters.Clear();
       opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+      opt.JsonSerializerOptions.Converters.Add(new SmartEnumJsonConverter<OrderStatus, string>());
     });
   }
 }
