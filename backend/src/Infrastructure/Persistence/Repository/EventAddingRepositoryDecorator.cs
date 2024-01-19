@@ -19,6 +19,16 @@ public sealed class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
 
   public EventAddingRepositoryDecorator(IRepository<T> decorated) => _decorated = decorated;
 
+  public Task DeleteRangeAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+  {
+    return _decorated.DeleteRangeAsync(specification, cancellationToken);
+  }
+
+  public IAsyncEnumerable<T> AsAsyncEnumerable(ISpecification<T> specification)
+  {
+    return _decorated.AsAsyncEnumerable(specification);
+  }
+
   public Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
   {
     entity.AddDomainEvent(EntityCreatedEvent.WithEntity(entity));

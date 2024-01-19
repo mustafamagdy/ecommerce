@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
+
 namespace FSH.WebApi.Infrastructure.BackgroundJobs;
 
 internal static class Startup
@@ -48,7 +49,7 @@ internal static class Startup
         .UseDatabase(storageProvider, connectionString, config)
         .UseFilter(new FSHJobFilter(provider))
         .UseFilter(new LogJobFilter())
-        .UseConsole());
+        .UseColouredConsoleLogProvider());
 
     return services;
   }
