@@ -1,6 +1,6 @@
-// import 'address_data.dart';
-// import 'shop_data.dart';
-// import 'currency_data.dart';
+import 'address_data.dart';
+import 'shop_data.dart';
+import 'currency_data.dart';
 
 class TenantData {
   TenantData({

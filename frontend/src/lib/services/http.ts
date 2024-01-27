@@ -1,9 +1,9 @@
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders} from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import authConfig from 'src/configs/auth'
 import storage from './storage'
-import {isAnonymous} from './endpoints'
+import { isAnonymous } from './endpoints'
 
-const BASE_URL = (process.env.BASE_URL ?? "https://localhost:5001").replace(/\/+$/, "")
+const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/+$/, "")
 
 class HttpService {
 
@@ -30,7 +30,8 @@ class HttpService {
 
   private defaultHeaders = (config: AxiosRequestConfig) => {
     if (config.headers)
-      config.headers ['tenant'] = 'root';
+      config.headers['tenant'] = 'root';
+
     return config;
   }
 
@@ -41,7 +42,8 @@ class HttpService {
       return config;
 
     if (config.headers)
-      config.headers ['Authorization'] = `Bearer ${storage.getItem(authConfig.storageTokenKeyName)!}`;
+      config.headers['Authorization'] = `Bearer ${storage.getItem(authConfig.storageTokenKeyName)!}`;
+
     return config;
 
   }
@@ -54,6 +56,7 @@ class HttpService {
       }
     } catch (e) {
       this.handleErrors(e);
+
       return Promise.reject(e);
     }
   }
@@ -66,6 +69,7 @@ class HttpService {
       }
     } catch (e) {
       this.handleErrors(e);
+
       return Promise.reject(e);
     }
   }
@@ -78,6 +82,7 @@ class HttpService {
       }
     } catch (e) {
       this.handleErrors(e);
+
       return Promise.reject(e);
     }
   }
