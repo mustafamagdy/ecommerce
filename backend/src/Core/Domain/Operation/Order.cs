@@ -1,7 +1,10 @@
 using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Domain.Operation;
 
+[JsonConverter(typeof(SmartEnumNameConverter<OrderStatus, string>))]
 public sealed class OrderStatus : SmartEnum<OrderStatus, string>
 {
   public static readonly OrderStatus Normal = new(nameof(Normal), "normal");

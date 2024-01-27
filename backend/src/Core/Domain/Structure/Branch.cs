@@ -19,7 +19,7 @@ public sealed class Branch : AuditableEntity, IAggregateRoot
     Description = description;
   }
 
-  public bool Active { get; private set; }
+  public bool Active { get; private set; } = true;
   public string Name { get; private set; }
   public string? Description { get; private set; }
 

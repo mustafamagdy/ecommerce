@@ -2,97 +2,97 @@
   {
     "ServiceId": "ca43337c-c9bc-4c18-98e1-3bf8694f9fb7",
     "ProductId": "ed974720-389d-41df-b4af-e3fb12306211",
-    "Price": 4.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 4.000
   },
   {
     "ServiceId": "538f5ce7-9bd4-4309-8e62-6e566b01fdfe",
     "ProductId": "ed974720-389d-41df-b4af-e3fb12306211",
-    "Price": 4.000,
-    "Priority": "Urgent"
+    "CategoryId": "778A22EC-BCB3-4B0A-87A8-447C995C992B",
+    "Price": 4.000
   },
   {
     "ServiceId": "d72ee823-f4e6-43c4-84b5-0e27f8c290f2",
     "ProductId": "ed974720-389d-41df-b4af-e3fb12306211",
-    "Price": 3.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 3.000
   },
   {
     "ServiceId": "5a1488ed-8e5c-40f9-ab48-6b73ecc1d6a0",
     "ProductId": "ed974720-389d-41df-b4af-e3fb12306211",
-    "Price": 5.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 5.000
   },
   {
     "ServiceId": "ca43337c-c9bc-4c18-98e1-3bf8694f9fb7",
     "ProductId": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
-    "Price": 4.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 4.000
   },
   {
     "ServiceId": "538f5ce7-9bd4-4309-8e62-6e566b01fdfe",
     "ProductId": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
-    "Price": 4.000,
-    "Priority": "Urgent"
+    "CategoryId": "778A22EC-BCB3-4B0A-87A8-447C995C992B",
+    "Price": 4.000
   },
   {
     "ServiceId": "d72ee823-f4e6-43c4-84b5-0e27f8c290f2",
     "ProductId": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
-    "Price": 3.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 3.000
   },
   {
     "ServiceId": "5a1488ed-8e5c-40f9-ab48-6b73ecc1d6a0",
     "ProductId": "c362a7c6-fce1-4a82-8fc3-973282d730e4",
-    "Price": 5.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 5.000
   },
   {
     "ServiceId": "ca43337c-c9bc-4c18-98e1-3bf8694f9fb7",
     "ProductId": "f528c67c-a23a-43db-afd8-58e23085236b",
-    "Price": 4.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 4.000
   },
   {
     "ServiceId": "538f5ce7-9bd4-4309-8e62-6e566b01fdfe",
     "ProductId": "f528c67c-a23a-43db-afd8-58e23085236b",
-    "Price": 4.000,
-    "Priority": "Urgent"
+    "CategoryId": "778A22EC-BCB3-4B0A-87A8-447C995C992B",
+    "Price": 4.000
   },
   {
     "ServiceId": "d72ee823-f4e6-43c4-84b5-0e27f8c290f2",
     "ProductId": "f528c67c-a23a-43db-afd8-58e23085236b",
-    "Price": 3.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 3.000
   },
   {
     "ServiceId": "5a1488ed-8e5c-40f9-ab48-6b73ecc1d6a0",
     "ProductId": "f528c67c-a23a-43db-afd8-58e23085236b",
-    "Price": 5.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 5.000
   },
   {
     "ServiceId": "ca43337c-c9bc-4c18-98e1-3bf8694f9fb7",
     "ProductId": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
-    "Price": 4.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 4.000
   },
   {
     "ServiceId": "538f5ce7-9bd4-4309-8e62-6e566b01fdfe",
     "ProductId": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
-    "Price": 4.000,
-    "Priority": "Urgent"
+    "CategoryId": "778A22EC-BCB3-4B0A-87A8-447C995C992B",
+    "Price": 4.000
   },
   {
     "ServiceId": "d72ee823-f4e6-43c4-84b5-0e27f8c290f2",
     "ProductId": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
-    "Price": 3.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 3.000
   },
   {
     "ServiceId": "5a1488ed-8e5c-40f9-ab48-6b73ecc1d6a0",
     "ProductId": "6433c426-d95f-48a2-9cec-4e62bb6060d4",
-    "Price": 5.000,
-    "Priority": "Normal"
+    "CategoryId": "55580106-D9B8-4103-B485-1A32AFA31A46",
+    "Price": 5.000
   }
 ]

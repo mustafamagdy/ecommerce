@@ -8,6 +8,7 @@ public class SearchOrdersRequest : PaginationFilter, IRequest<PaginationResponse
   public Guid? CustomerId { get; set; }
   public string? CustomerName { get; set; }
   public string? CustomerPhoneNumber { get; set; }
+  public OrderStatus? Status { get; set; }
 }
 
 public class OrdersBySearchRequestSpec : EntitiesByPaginationFilterSpec<Order, OrderDto>
@@ -20,6 +21,7 @@ public class OrdersBySearchRequestSpec : EntitiesByPaginationFilterSpec<Order, O
       .Where(a => request.CustomerId == null || a.CustomerId == request.CustomerId)
       .Where(a => request.CustomerPhoneNumber == null || a.Customer.PhoneNumber == request.CustomerPhoneNumber)
       .Where(a => request.CustomerName == null || a.Customer.Name == request.CustomerName)
+      .Where(a => request.Status == null || a.Status == request.Status)
       .OrderBy(c => c.OrderNumber, !request.HasOrderBy());
 }
 
