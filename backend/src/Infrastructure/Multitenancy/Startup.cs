@@ -1,4 +1,5 @@
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Stores;
 using FSH.WebApi.Application.Multitenancy;
 using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.MultiTenancy;
@@ -44,11 +45,19 @@ internal static class Startup
         .WithHostStrategy()
         .WithHeaderStrategy(MultitenancyConstants.TenantIdName)
         .WithClaimStrategy(FSHClaims.Tenant)
-        .WithEFCoreStore<TenantDbContext, FSHTenantInfo>()
+        .WithCustomEFCoreStore<TenantDbContext, FSHTenantInfo>()
       .Services
       .AddScoped<ISubscriptionTypeResolver, SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>();
+  }
+
+  private static FinbuckleMultiTenantBuilder<TTenantInfo> WithCustomEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+    where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
+  {
+    builder.Services.AddDbContext<TEFCoreStoreDbContext>();
+    return builder.WithStore<EFCoreCustomStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
   }
 
   private static IServiceCollection AddTenantUnitOfWork(this IServiceCollection services)
