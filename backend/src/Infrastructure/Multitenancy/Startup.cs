@@ -30,12 +30,19 @@ internal static class Startup
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
         if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql,
               StringComparison.CurrentCultureIgnoreCase))
+        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql,
+              StringComparison.CurrentCultureIgnoreCase))
         {
+          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ??
+                                    throw new NotSupportedException(
+                                      "Fix database datetime kind for postgres not registered"));
           dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ??
                                     throw new NotSupportedException(
                                       "Fix database datetime kind for postgres not registered"));
         }
 
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ??
+                                  throw new NotSupportedException("Domain dispatcher not registered"));
         dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ??
                                   throw new NotSupportedException("Domain dispatcher not registered"));
         dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);

@@ -267,6 +267,9 @@
 <!--        <None Remove="bundle\MediatR.dll" />-->
 <!--        <None Remove="bundle\MediatR.Extensions.Microsoft.DependencyInjection.dll" />-->
 <!--        <None Remove="bundle\MediatR.Contracts.dll" />-->
+<!--        <None Remove="bundle\MediatR.dll" />-->
+<!--        <None Remove="bundle\MediatR.Extensions.Microsoft.DependencyInjection.dll" />-->
+<!--        <None Remove="bundle\MediatR.Contracts.dll" />-->
         <None Remove="bundle\Mapster.dll" />
         <None Remove="bundle\Mapster.Core.dll" />
         <None Remove="bundle\MailKit.dll" />
@@ -372,6 +375,5 @@
     <ItemGroup>
       <Folder Include="Files\fonts" />
       <Folder Include="Files\logos" />
-      <Folder Include="Logs\" />
     </ItemGroup>
 </Project>
