@@ -41,6 +41,7 @@ public static class FSHResource
   public const string UserRoles = nameof(UserRoles);
   public const string Roles = nameof(Roles);
   public const string RoleClaims = nameof(RoleClaims);
+  public const string Categories = nameof(Categories);
   public const string Products = nameof(Products);
   public const string Brands = nameof(Brands);
   public const string ServiceCatalog = nameof(ServiceCatalog);
@@ -89,6 +90,13 @@ public static class FSHPermissions
     new("Update Products", FSHAction.Update, FSHResource.Products, Roles: PredefinedRoles.Supervisors),
     new("Delete Products", FSHAction.Delete, FSHResource.Products, Roles: PredefinedRoles.Supervisors),
     new("Export Products", FSHAction.Export, FSHResource.Products, Roles: PredefinedRoles.Supervisors),
+
+    // Categories
+    new("View Categories", FSHAction.View, FSHResource.Categories, Roles: PredefinedRoles.All),
+    new("Search Categories", FSHAction.Search, FSHResource.Categories, Roles: PredefinedRoles.All),
+    new("Create Categories", FSHAction.Create, FSHResource.Categories, Roles: PredefinedRoles.Supervisors),
+    new("Update Categories", FSHAction.Update, FSHResource.Categories, Roles: PredefinedRoles.Supervisors),
+    new("Delete Categories", FSHAction.Delete, FSHResource.Categories, Roles: PredefinedRoles.Supervisors),
 
     // brands
     new("View Brands", FSHAction.View, FSHResource.Brands, Roles: PredefinedRoles.All),

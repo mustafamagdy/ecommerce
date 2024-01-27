@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <NoWarn>RCS1021;IDE0161;RCS1205</NoWarn>
     </PropertyGroup>
     <ItemGroup>
@@ -11,7 +11,7 @@
       <Folder Include="Migrations\Tenant" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Update="Roslynator.Analyzers" Version="4.4.0">
+      <PackageReference Update="Roslynator.Analyzers" Version="4.9.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

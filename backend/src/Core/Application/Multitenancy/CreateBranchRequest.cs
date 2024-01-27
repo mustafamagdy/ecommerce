@@ -27,7 +27,6 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, G
   public async Task<Guid> Handle(CreateBranchRequest request, CancellationToken cancellationToken)
   {
     var branch = new Branch(_currentTenant.Id, request.Name, request.Description);
-
     branch.AddDomainEvent(EntityCreatedEvent.WithEntity(branch));
 
     await _repository.AddAsync(branch, cancellationToken);
