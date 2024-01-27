@@ -59,7 +59,7 @@ class CustomBouncingScrollPhysics extends ScrollPhysics {
   @override
   Simulation? createBallisticSimulation(
       ScrollMetrics position, double velocity) {
-    final Tolerance tolerance = toleranceFor(position);
+    final Tolerance tolerance = this.tolerance;
     if (velocity.abs() >= tolerance.velocity || position.outOfRange) {
       return CustomBouncingScrollSimulation(
         spring: spring,
