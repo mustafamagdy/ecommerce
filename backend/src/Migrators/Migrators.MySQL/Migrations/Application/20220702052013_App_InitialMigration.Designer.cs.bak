@@ -11,11 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Migrators.MySQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
     [Migration("20220702052013_App_InitialMigration")]
-========
-    [Migration("20220826115500_App_InitialMigration")]
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
     partial class App_InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,11 +19,7 @@ namespace Migrators.MySQL.Migrations.Application
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Shared")
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
                 .HasAnnotation("ProductVersion", "6.0.5")
-========
-                .HasAnnotation("ProductVersion", "6.0.6")
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("FSH.WebApi.Domain.Auditing.Trail", b =>
@@ -272,7 +264,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasIndex("ServiceId");
 
                     b.ToTable("ServiceCatalogs", "Shared");
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -390,13 +381,10 @@ namespace Migrators.MySQL.Migrations.Application
                     b.HasIndex("BranchId");
 
                     b.ToTable("CashRegisters", "Shared");
-========
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -672,9 +660,6 @@ namespace Migrators.MySQL.Migrations.Application
                 });
 
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRole", b =>
-========
-            modelBuilder.Entity("FSH.WebApi.Domain.Identity.ApplicationRole", b =>
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -1101,16 +1086,9 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
                     b.HasKey("Id");
 
                     b.ToTable("PaymentMethods", "Shared");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.PaymentOperation", b =>
@@ -1542,7 +1520,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("Service");
                 });
 
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
@@ -1579,15 +1556,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("CashRegister");
 
                     b.Navigation("PaymentMethod");
-========
-            modelBuilder.Entity("FSH.WebApi.Domain.Identity.ApplicationRoleClaim", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Identity.ApplicationRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>
@@ -1632,28 +1600,6 @@ namespace Migrators.MySQL.Migrations.Application
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.OrderPayment", b =>
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.Order", "Order")
-                        .WithMany("OrderPayments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FSH.WebApi.Domain.Operation.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("PaymentMethod");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRoleClaim", b =>
-========
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
                 {
                     b.HasOne("FSH.WebApi.Domain.Operation.Order", "Order")
                         .WithMany("OrderPayments")
@@ -1736,31 +1682,6 @@ namespace Migrators.MySQL.Migrations.Application
                         .IsRequired();
                 });
 
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
-========
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ActivePaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ActiveOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.ArchivedPaymentOperation", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Operation.CashRegister", "CashRegister")
-                        .WithMany("ArchivedOperations")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegister");
-                });
-
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.CashRegister", b =>
                 {
                     b.Navigation("ActiveOperations");
@@ -1768,14 +1689,6 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("ArchivedOperations");
                 });
 
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
-========
-            modelBuilder.Entity("FSH.WebApi.Domain.Operation.Customer", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
             modelBuilder.Entity("FSH.WebApi.Domain.Operation.Order", b =>
                 {
                     b.Navigation("OrderItems");
@@ -1783,14 +1696,11 @@ namespace Migrators.MySQL.Migrations.Application
                     b.Navigation("OrderPayments");
                 });
 
-<<<<<<<< HEAD:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220702052013_App_InitialMigration.Designer.cs
-========
             modelBuilder.Entity("FSH.WebApi.Domain.Printing.PrintableDocument", b =>
                 {
                     b.Navigation("Sections");
                 });
 
->>>>>>>> 1baded17f077b47944c6da3452b47ba29386b81c:backend/src/Migrators/Migrators.MySQL/Migrations/Application/20220826115500_App_InitialMigration.Designer.cs
             modelBuilder.Entity("FSH.WebApi.Domain.Structure.Branch", b =>
                 {
                     b.Navigation("CashRegisters");

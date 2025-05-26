@@ -83,7 +83,7 @@ public class ExportOrderInvoiceRequestHandler : IRequestHandler<ExportOrderInvoi
     boundTemplate.BindTemplate(order);
 
     var subscriptionType = _subscriptionTypeResolver.Resolve();
-    var invoice = new InvoiceDocument(subscriptionType, boundTemplate);
+    var invoice = new InvoiceDocument(order, _vatQrCodeGenerator);
     return (order.OrderNumber, _pdfWriter.WriteToStream(invoice));
   }
 }

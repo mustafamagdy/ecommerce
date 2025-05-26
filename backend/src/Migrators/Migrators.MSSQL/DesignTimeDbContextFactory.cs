@@ -7,6 +7,9 @@ using System;
 using System.IO;
 using System.Security.Claims; // Added for Claim and ClaimsPrincipal
 using FSH.WebApi.Application.Common.Interfaces; // Added for ICurrentUser and ISerializerService
+using FSH.WebApi.Application.Multitenancy.Services;
+using Microsoft.Extensions.Options;
+using FSH.WebApi.Shared.Multitenancy; // Added for SubscriptionType
 
 namespace FSH.WebApi.Migrators.MSSQL;
 
@@ -37,7 +40,6 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
             Console.WriteLine($"Warning: ConnectionString not found in appsettings. Using default: {connectionString}");
         }
 
-
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
         // Use SQL Server
@@ -47,6 +49,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
             // Potentially add other SQL Server specific options if needed for migrations
         });
 
+        
 
         // We need to pass null for dependencies that are normally resolved by DI if ApplicationDbContext constructor requires them.
         // ApplicationDbContext's constructor:
@@ -102,16 +105,17 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
         // Or the factory has to mock all those services.
 
         // For this step, I'm providing the options. The tools will attempt to use them.
+        Console.WriteLine($"DesignTimeDbContextFactory: Using environment '{environment}' and connection string for SQL Server.");
+        
         return new ApplicationDbContext(
             null, /* ITenantInfo */
-            null, /* ISubscriptionInfo */
+            new DesignTimeSubscriptionTypeResolver(), /* ISubscriptionTypeResolver */
             optionsBuilder.Options,
             new DesignTimeCurrentUser(), /* ICurrentUser */
             new DesignTimeSerializerService(), /* ISerializerService */
             null, /* ITenantConnectionStringBuilder */
             Microsoft.Extensions.Options.Options.Create(dbSettings ?? new DatabaseSettings()), /* IOptions<DatabaseSettings> */
-            null, /* IEventPublisher */
-            null  /* TenantDbContext */
+            new DesignTimeTenantConnectionStringResolver() /* ITenantConnectionStringResolver */
         );
     }
 
@@ -126,15 +130,27 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
         public IEnumerable<Claim>? GetUserClaims() => null;
         public string? GetTenant() => "root"; // Default or mock tenant
         public void SetUser(ClaimsPrincipal user) { }
-         public void SetUserJob(string userId, string tenant) { }
+        public void SetUserJob(string userId, string tenant) { }
     }
 
     // Minimal mock for ISerializerService
     public class DesignTimeSerializerService : ISerializerService
     {
         public T Deserialize<T>(string text) => default(T);
-        public T Deserialize<T>(string text, Newtonsoft.Json.JsonConverter converter) => default(T); // Added missing method
+        public T Deserialize<T>(string text, Newtonsoft.Json.JsonConverter converter) => default(T);
         public string Serialize<T>(T obj) => string.Empty;
         public string Serialize<T>(T obj, Type type) => string.Empty;
+    }
+    
+    // Minimal mock for ISubscriptionTypeResolver
+    public class DesignTimeSubscriptionTypeResolver : ISubscriptionTypeResolver
+    {
+        public SubscriptionType Resolve() => SubscriptionType.Standard;
+    }
+    
+    // Minimal mock for ITenantConnectionStringResolver
+    public class DesignTimeTenantConnectionStringResolver : ITenantConnectionStringResolver
+    {
+        public string Resolve(string tenantId, SubscriptionType subscriptionType) => string.Empty;
     }
 }

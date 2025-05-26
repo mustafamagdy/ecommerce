@@ -33,10 +33,4 @@ public sealed class OrderItem : BaseEntity, IAggregateRoot
     OrderId = orderId;
     return this;
   }
-
-  public OrderItem SetOrderId(Guid orderId)
-  {
-    OrderId = orderId;
-    return this;
-  }
 }

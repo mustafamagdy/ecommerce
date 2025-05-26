@@ -3,6 +3,7 @@ using Dapper;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Infrastructure.Common.Extensions;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -24,8 +25,10 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
     _currentTenant = currentTenant;
     _env = env;
     _counterRepo = counterRepo;
-    _sequenceTableName = config["DatabaseSettings:SequenceTableName"];
-    _connectionString = string.Format(config["DatabaseSettings:ConnectionStringTemplate"], _counterRepo.DatabaseName);
+    _sequenceTableName = config["DatabaseSettings:SequenceTableName"] ?? "sequence_counters";
+    _connectionString = config["DatabaseSettings:ConnectionStringTemplate"] != null 
+      ? string.Format(config["DatabaseSettings:ConnectionStringTemplate"], _counterRepo.DatabaseName)
+      : null;
   }
 
   private async Task CheckCounterTableExist(string tableName)
@@ -58,6 +61,11 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
     if (_counterTableExist == null)
     {
       await CheckCounterTableExist(_sequenceTableName);
+    }
+
+    if (string.IsNullOrEmpty(_connectionString))
+    {
+      throw new InvalidOperationException("Connection string is not configured properly for sequence generation");
     }
 
     long next = 0;
@@ -100,6 +108,7 @@ public class TenantSequenceGenerator : ITenantSequenceGenerator
     catch (Exception ex)
     {
       trx?.Rollback();
+      throw; // Re-throw the exception to properly handle it upstream
     } finally
     {
       await cnn?.CloseAsync()!;

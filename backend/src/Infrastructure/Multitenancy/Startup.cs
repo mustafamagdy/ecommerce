@@ -57,7 +57,7 @@ internal static class Startup
       .AddScoped<ISubscriptionTypeResolver, SubscriptionTypeResolver>()
       .AddScoped<ITenantService, TenantService>()
       .AddSingleton<ITenantConnectionStringBuilder, TenantConnectionStringBuilder>()
-      .AddSingleton<ISubscriptionInfo, SubscriptionInfo>();
+      .AddScoped<ITenantConnectionStringResolver, TenantConnectionStringResolver>();
   }
 
   private static FinbuckleMultiTenantBuilder<TTenantInfo> WithCustomEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)

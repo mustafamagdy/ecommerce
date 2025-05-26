@@ -2,6 +2,8 @@
 
 using System.Reflection;
 using FSH.WebApi.Application.Common.Pdf;
+using FSH.WebApi.Application.Printing;
+using FSH.WebApi.Shared.Multitenancy;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -15,10 +17,17 @@ namespace FSH.WebApi.Application.Operation.Orders
     public OrderExportDto Model { get; }
     private byte[] _qrCode = null!;
 
-    public InvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator)
+    public InvoiceDocument(OrderExportDto model, IVatQrCodeGenerator qrGenerator) 
+        : base(SubscriptionType.Standard)
     {
       _qrGenerator = qrGenerator;
       Model = model;
+    }
+
+    public InvoiceDocument(SubscriptionType subscriptionType, BoundTemplate boundTemplate) 
+        : base(subscriptionType)
+    {
+      // Handle the case where we're creating from a template
     }
 
     protected override void SetupPage(PageDescriptor page)
@@ -36,38 +45,36 @@ namespace FSH.WebApi.Application.Operation.Orders
       //     col.Item().BorderColor(Colors.Black).Border(1, Unit.Point).AlignCenter().Text("LOGO").FontSize(10);
       //   });
       // });
-      _qrCode = _qrGenerator.GenerateQrCode(Model.Base64QrCode, 100, 100);
+      _qrCode = _qrGenerator?.GenerateQrCode(Model?.Base64QrCode, 100, 100);
       string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-      byte[] logo = File.ReadAllBytes(appPath + "/Files/logos/tenant_logo.png");
+      byte[]? logo = appPath != null ? File.ReadAllBytes(appPath + "/Files/logos/tenant_logo.png") : null;
 
       container.Column(col =>
       {
         col.Item().Height(30)
-          .AlignMiddle().AlignCenter().ShowDebugArea()
+          .AlignMiddle().AlignCenter()
           .Width(100).Image(logo, ImageScaling.Resize);
 
         col
           .Item()
           .Height(38)
-          .ShowDebugArea()
           .Background(Colors.White)
           .AlignCenter()
           .AlignMiddle()
-          .Text($"*{Model.OrderNumber}*")
+          .Text($"*{Model?.OrderNumber}*")
           .LineHeight(1)
           .FontFamily("Libre Barcode 39") // use real font family name
           .FontSize(36);
 
         col
           .Item()
-          .ShowDebugArea()
           .AlignCenter().AlignMiddle()
-          .Text(Model.OrderNumber)
+          .Text(Model?.OrderNumber)
           .FontSize(10);
 
         col.Item().SeparatorLine('=', 70);
-        col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("فاتورة ضريبية مبسطة").FontSize(10);
-        col.Item().AlignMiddle().AlignCenter().ShowDebugArea().Text("Simplified Tax Invoice").FontSize(10);
+        col.Item().AlignMiddle().AlignCenter().Text("فاتورة ضريبية مبسطة").FontSize(10);
+        col.Item().AlignMiddle().AlignCenter().Text("Simplified Tax Invoice").FontSize(10);
       });
 
       // container.Row(row =>
@@ -103,7 +110,7 @@ namespace FSH.WebApi.Application.Operation.Orders
 
         column.Item().Element(ComposeTable);
 
-        var totalPrice = Model.TotalAmount;
+        var totalPrice = Model?.TotalAmount ?? 0;
         column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:N2}").SemiBold();
 
         // if (!string.IsNullOrWhiteSpace(Model.Comments))
@@ -115,7 +122,10 @@ namespace FSH.WebApi.Application.Operation.Orders
     {
       container.Column(col =>
       {
-        col.Item().AlignCenter().Width(70).Height(70).Image(_qrCode, ImageScaling.Resize);
+        if (_qrCode != null)
+        {
+          col.Item().AlignCenter().Width(70).Height(70).Image(_qrCode, ImageScaling.Resize);
+        }
         col.Item().SeparatorLine();
 
         col.Item().AlignCenter().Text(text =>
@@ -149,15 +159,18 @@ namespace FSH.WebApi.Application.Operation.Orders
         });
 
         // string text = "كلام طويل وملوش اخر صدقني انا بقولك انه مش عارف اخره فين ولذلك هقولك كمان شوية";
-        foreach (var item in Model.OrderItems)
+        if (Model?.OrderItems != null)
         {
-          table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text($"{item.Price:F0}");
-          table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(item.Qty);
-          table.Cell().Element(CellStyle).AlignRight().AlignTop().Text(item.ItemName);
+          foreach (var item in Model.OrderItems)
+          {
+            table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text($"{item.Price:F0}");
+            table.Cell().Element(CellStyle).AlignLeft().AlignTop().Text(item.Qty);
+            table.Cell().Element(CellStyle).AlignRight().AlignTop().Text(item.ItemName);
 
-          static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
+            static IContainer CellStyle(IContainer container) => container.PaddingHorizontal(2);
 
-          // .BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
+            // .BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
+          }
         }
       });
     }

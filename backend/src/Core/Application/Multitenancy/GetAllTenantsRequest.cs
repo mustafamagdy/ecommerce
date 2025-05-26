@@ -1,6 +1,14 @@
 ﻿using Dapper;
-using Dapper.FluentColumnMapping;
+using MediatR;
 using FSH.WebApi.Domain.MultiTenancy;
+using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Common.Specification;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class SearchAllTenantsRequest : PaginationFilter, IRequest<PaginationResponse<TenantDto>>
 {
@@ -24,7 +32,7 @@ public class SearchAllTenantsRequestHandler : IRequestHandler<SearchAllTenantsRe
   public async Task<PaginationResponse<TenantDto>> Handle(SearchAllTenantsRequest request,
     CancellationToken cancellationToken)
   {
-    return null;
+    return new PaginationResponse<TenantDto>(new List<TenantDto>(), 0, request.PageNumber, request.PageSize);
 //     string sql = @"
 // -- set @subStartedFrom = null;
 // -- set @subStartedTo = null;
