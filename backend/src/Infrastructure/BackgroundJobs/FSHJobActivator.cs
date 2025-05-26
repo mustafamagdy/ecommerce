@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Infrastructure.BackgroundJobs;
 
-public class FSHJobActivator : JobActivator
+public sealed class FSHJobActivator : JobActivator
 {
   private readonly IServiceScopeFactory _scopeFactory;
 

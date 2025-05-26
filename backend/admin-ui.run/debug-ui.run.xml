@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="debug-ui" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/src/admin-ui/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="dev" />
+    </scripts>
+    <node-interpreter value="$USER_HOME$/AppData/Roaming/nvm/v18.17.1/node" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

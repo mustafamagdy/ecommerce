@@ -1,4 +1,6 @@
-﻿namespace FSH.WebApi.Application.Common.Persistence;
+﻿using System.Linq.Expressions;
+
+namespace FSH.WebApi.Application.Common.Persistence;
 
 // The Repository for the Application Db
 // I(Read)RepositoryBase<T> is from Ardalis.Specification
@@ -9,7 +11,7 @@
 public interface IRepository<T> : IRepositoryBase<T>
   where T : class, IAggregateRoot
 {
-  Task<List<T>> AddRangeAsync(List<T> entities, CancellationToken cancellationToken = default(CancellationToken));
+  Task<List<T>> AddRangeAsync(List<T> entities, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -18,6 +20,7 @@ public interface IRepository<T> : IRepositoryBase<T>
 public interface IReadRepository<T> : IReadRepositoryBase<T>
   where T : class, IAggregateRoot
 {
+  Task<decimal?> SumAsync(ISpecification<T> specification, Expression<Func<T, decimal?>> selector, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -31,15 +34,13 @@ public interface IRepositoryWithEvents<T> : IRepositoryBase<T>
 {
 }
 
-public interface ITenantRepository<TEntity> : IRepositoryBase<TEntity>
+public interface INonAggregateRepository<TEntity> : IRepositoryBase<TEntity>
   where TEntity : class
-
-
 {
   Task<List<TEntity>> AddRangeAsync(List<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
 }
 
-public interface IReadTenantRepository<TEntity> : IReadRepositoryBase<TEntity>
+public interface IReadNonAggregateRepository<TEntity> : IReadRepositoryBase<TEntity>
   where TEntity : class
 {
 }

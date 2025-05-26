@@ -1,5 +1,7 @@
+using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -8,9 +10,11 @@ using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.Persistence.Repository;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Serilog;
@@ -32,12 +36,22 @@ internal static class Startup
       .ValidateDataAnnotations()
       .ValidateOnStart();
 
+    services.AddScoped<DomainEventDispatcher>();
+    services.AddScoped<FixNpgDateTimeKind>();
     return services
-      .AddDbContext<ApplicationDbContext>((sp, m) =>
+      .AddDbContext<ApplicationDbContext>((sp, dbOptions) =>
       {
         var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-        m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
+        if (string.Equals(databaseSettings.DBProvider, DbProviderKeys.Npgsql, StringComparison.CurrentCultureIgnoreCase))
+        {
+          dbOptions.AddInterceptors(sp.GetService<FixNpgDateTimeKind>() ?? throw new NotSupportedException("Fix database datetime kind for postgres not registered"));
+        }
+
+        dbOptions.AddInterceptors(sp.GetService<DomainEventDispatcher>() ?? throw new NotSupportedException("Domain dispatcher not registered"));
+
+        dbOptions.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
       })
+      .AddApplicationUnitOfWork()
       .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
       .AddTransient<ApplicationDbInitializer>()
       .AddTransient<ApplicationDbSeeder>()
@@ -46,8 +60,26 @@ internal static class Startup
       .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
       .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
       .AddRepositories()
-      .AddTransient<ITenantSequenceGenerator, TenantSequenceGenerator>();
+      .AddTransient<ITenantSequenceGenerator>(sp =>
+      {
+        var databaseSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        var currentTenant = sp.GetService<ITenantInfo>();
+        var env = sp.GetService<IHostEnvironment>();
+        var counterRepo = sp.GetService<IDapperEntityRepository>();
+
+        return databaseSettings.DBProvider.ToLower() switch
+        {
+          DbProviderKeys.MySql => new MySqlTenantSequenceGenerator(config, currentTenant, env, counterRepo),
+          DbProviderKeys.Npgsql => new NpgsqlTenantSequenceGenerator(config, currentTenant, env, counterRepo),
+          _ => throw new NotSupportedException($"Provider {databaseSettings.DBProvider} doesn't have a sequence generator")
+        };
+      });
   }
+
+  private static IServiceCollection AddApplicationUnitOfWork(this IServiceCollection services)
+    => services
+      .AddScoped<IApplicationUnitOfWork, ApplicationUnitOfWork>()
+      .AddScoped<ApplicationUnitOfWork>();
 
   internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
   {
@@ -66,9 +98,9 @@ internal static class Startup
           e.MigrationsAssembly("Migrators.MySQL")
             .SchemaBehavior(MySqlSchemaBehavior.Ignore));
 
-      case DbProviderKeys.Oracle:
-        return builder.UseOracle(connectionString, e =>
-          e.MigrationsAssembly("Migrators.Oracle"));
+      // case DbProviderKeys.Oracle:
+      //   return builder.UseOracle(connectionString, e =>
+      //     e.MigrationsAssembly("Migrators.Oracle"));
 
       case DbProviderKeys.SqLite:
         return builder.UseSqlite(connectionString, e =>
@@ -83,8 +115,8 @@ internal static class Startup
   {
     // Add Repositories
     services.AddScoped(typeof(IRepository<>), typeof(ApplicationDbRepository<>));
-    services.AddScoped(typeof(ITenantRepository<>), typeof(TenantDbRepository<>));
-    services.AddScoped(typeof(IReadTenantRepository<>), typeof(TenantDbRepository<>));
+    services.AddScoped(typeof(INonAggregateRepository<>), typeof(NonAggregateDbRepository<>));
+    services.AddScoped(typeof(IReadNonAggregateRepository<>), typeof(NonAggregateDbRepository<>));
 
     var aggregateRootTypes = typeof(IAggregateRoot)
       .Assembly

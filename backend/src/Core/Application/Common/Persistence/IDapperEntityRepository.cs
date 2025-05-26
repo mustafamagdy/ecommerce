@@ -4,8 +4,11 @@ namespace FSH.WebApi.Application.Common.Persistence;
 
 public interface IDapperEntityRepository : ITransientService
 {
-  Task<IReadOnlyList<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
+  Task<IReadOnlyCollection<T>> QueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;
+
+  Task<T?> QueryFirstOrDefaultNoneEntAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
+    where T : class;
 
   Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;

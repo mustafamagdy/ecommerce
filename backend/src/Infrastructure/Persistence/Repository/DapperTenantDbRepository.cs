@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Repository;
 
-public class DapperTenantConnectionAccessor : IDapperTenantConnectionAccessor
+public sealed class DapperTenantConnectionAccessor : IDapperTenantConnectionAccessor
 {
   private readonly DatabaseFacade _db;
 

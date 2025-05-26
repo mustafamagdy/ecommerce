@@ -1,11 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>FSH.WebApi.Shared</RootNamespace>
     <AssemblyName>FSH.WebApi.Shared</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0"/>
-    <PackageReference Include="Finbuckle.MultiTenant" Version="6.7.2"/>
+    <PackageReference Include="Ardalis.SmartEnum" Version="8.0.0" />
+    <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="8.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="6.13.0" />
+    <PackageReference Update="Roslynator.Analyzers" Version="4.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Multitenancy\ISubscriptionPackage.cs" />
+    <Compile Remove="Multitenancy\ITenantSubscription.cs" />
   </ItemGroup>
 </Project>

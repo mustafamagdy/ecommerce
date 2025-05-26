@@ -1,33 +1,57 @@
+version: '3.8'
+
 services:
+  postgres-db:
+    image: "postgres:13"
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=psqluser
+      - POSTGRES_PASSWORD=DeV12345
+      - POSTGRES_DB=root_tenant_db
+    ports:
+      - "5432:5432"
+    restart: always
+
+  seq-log:
+    image: datalust/seq:latest
+    container_name: seq-log
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "5341:5341"
+      - "5342:80"
+    restart: always
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: api
     environment:
-      - "DatabaseSettings__ConnectionString=Server=db;Database=fullStackHeroDb;\
-        User=sa;Password=SuperSecurePassword123!;MultipleActiveResultSets=true"
-      - "DatabaseSettings__DBProvider=mssql"
-      - "HangfireSettings__Storage__ConnectionString=Server=db;Database=fullSta\
-        ckHeroDb;User=sa;Password=SuperSecurePassword123!;MultipleActiveResultS\
-        ets=true"
-      - "HangfireSettings__Storage__StorageProvider=mssql"
-      - "ASPNETCORE_Kestrel__Certificates__Default__Password=SuperSecurePasswor\
-        d123!"
-      - "ASPNETCORE_Kestrel__Certificates__Default__Path=/https/DN.Host.pfx"
-    volumes:
-      - ~/.aspnet/https:/https:ro
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DatabaseSettings:DBProvider=postgresql
+      - DatabaseSettings:ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=DeV12345
+      - DatabaseSettings:ConnectionStringTemplate=postgres-db;Port=5432;Database={0};Uid=psqluser;Pwd=DeV12345
+      - HangfireSettings:Storage:StorageProvider=postgresql
+      - HangfireSettings:Storage:ConnectionString=Server=postgres-db;Database=root_tenant_db;Uid=psqluser;Pwd=DeV12345
+      - Serilog:WriteTo:0:Name=Seq
+      - Serilog:WriteTo:0:Args:serverUrl=http://seq-log:5341
     ports:
-      - "5050:5050"
-      - "5060:5060"
+      - "5050:80"
     depends_on:
-      - db
+      - postgres-db
+      - seq-log
     restart: on-failure
-  db:
-    image: "mcr.microsoft.com/mssql/server"
-    container_name: db
-    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
     environment:
-      MSSQL_SA_PASSWORD: "SuperSecurePassword123!"
-      SA_PASSWORD: "SuperSecurePassword123!"
-      ACCEPT_EULA: "Y"
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=DeV12345
+      - PGADMIN_SETUP_HOST=postgres-db
+    ports:
+      - "8089:80"
+    depends_on:
+      - postgres-db
+    restart: always

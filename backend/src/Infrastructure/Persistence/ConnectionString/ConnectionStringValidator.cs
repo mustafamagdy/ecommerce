@@ -6,10 +6,11 @@ using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Npgsql;
 using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace FSH.WebApi.Infrastructure.Persistence.ConnectionString;
 
-internal class ConnectionStringValidator : IConnectionStringValidator
+internal sealed class ConnectionStringValidator : IConnectionStringValidator
 {
   private readonly DatabaseSettings _dbSettings;
   private readonly ILogger<ConnectionStringValidator> _logger;

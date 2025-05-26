@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FSH.WebApi.Infrastructure.Persistence;
 
-public class DatabaseSettings : IValidatableObject
+public sealed class DatabaseSettings : IValidatableObject
 {
   public DatabaseSettings()
   {

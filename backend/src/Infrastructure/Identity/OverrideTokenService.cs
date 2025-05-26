@@ -6,6 +6,8 @@ using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Multitenancy;
+using FSH.WebApi.Application.Multitenancy.Services;
+using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
@@ -19,9 +21,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal class OverrideTokenService : IOverrideTokenService
+internal sealed class OverrideTokenService : IOverrideTokenService
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly IdentitySettings _identitySettings;
   private readonly IStringLocalizer _t;
   private readonly SecuritySettings _securitySettings;
   private readonly JwtSettings _jwtSettings;
@@ -32,6 +35,7 @@ internal class OverrideTokenService : IOverrideTokenService
   public OverrideTokenService(
     UserManager<ApplicationUser> userManager,
     IOptions<JwtSettings> jwtSettings,
+    IOptions<IdentitySettings> identitySettings,
     IStringLocalizer<OverrideTokenService> localizer,
     FSHTenantInfo? currentTenant,
     IOptions<SecuritySettings> securitySettings,
@@ -39,6 +43,7 @@ internal class OverrideTokenService : IOverrideTokenService
   {
     _userManager = userManager;
     _t = localizer;
+    _identitySettings = identitySettings.Value;
     _jwtSettings = jwtSettings.Value;
     _currentTenant = currentTenant;
     _tenantService = tenantService;
@@ -56,12 +61,12 @@ internal class OverrideTokenService : IOverrideTokenService
       throw new UnauthorizedException(_t["Authentication Failed."]);
     }
 
-    if (!user.IsActive)
+    if (!user.Active)
     {
       throw new UnauthorizedException(_t["User Not Active. Please contact the administrator."]);
     }
 
-    if (_securitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
+    if (_identitySettings.RequireConfirmedAccount && !user.EmailConfirmed)
     {
       throw new UnauthorizedException(_t["E-Mail not confirmed."]);
     }
@@ -108,7 +113,7 @@ internal class OverrideTokenService : IOverrideTokenService
       new(ClaimTypes.Email, user.Email),
       new(FSHClaims.Fullname, $"{user.FirstName} {user.LastName}"),
       new(FSHClaims.Tenant, _currentTenant!.Id),
-      new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
+      new(FSHClaims.ImageUrl, user.ImagePath ?? string.Empty),
       new(FSHClaims.MOT_Permission, mot.Permission),
       new(FSHClaims.MOT_Scope, mot.Scope),
     };

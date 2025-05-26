@@ -2,5 +2,5 @@
 
 internal static class OpenIdConnectClaimTypes
 {
-    public const string Issuer = "iss";
+  public const string Issuer = "iss";
 }

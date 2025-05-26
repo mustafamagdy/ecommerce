@@ -3,15 +3,9 @@ using System.Collections.Generic;
 
 namespace System
 {
-  public static class ArabicFixer
+  public static class ArabicFixture
   {
-    /// <summary>
-    /// Fix the specified string.
-    /// </summary>
-    /// <param name='str'>
-    /// String to be fixed.
-    /// </param>
-    public static string FixArabic(this string str)
+    private static string FixArabic(this string str)
     {
       return FixArabic(str, false, true);
     }
@@ -73,24 +67,27 @@ namespace System
         string[] strSplit = str.Split(stringSeparators, StringSplitOptions.None);
 
         if (strSplit.Length == 0)
-          return ArabicFixerTool.FixLine(str);
-        else if (strSplit.Length == 1)
-          return ArabicFixerTool.FixLine(str);
-        else
         {
-          string outputString = ArabicFixerTool.FixLine(strSplit[0]);
-          int iteration = 1;
-          if (strSplit.Length > 1)
-          {
-            while (iteration < strSplit.Length)
-            {
-              outputString += Environment.NewLine + ArabicFixerTool.FixLine(strSplit[iteration]);
-              iteration++;
-            }
-          }
-
-          return outputString;
+          return ArabicFixerTool.FixLine(str);
         }
+
+        if (strSplit.Length == 1)
+        {
+          return ArabicFixerTool.FixLine(str);
+        }
+
+        string outputString = ArabicFixerTool.FixLine(strSplit[0]);
+        int iteration = 1;
+        if (strSplit.Length > 1)
+        {
+          while (iteration < strSplit.Length)
+          {
+            outputString += Environment.NewLine + ArabicFixerTool.FixLine(strSplit[iteration]);
+            iteration++;
+          }
+        }
+
+        return outputString;
       }
       else
       {
@@ -225,7 +222,7 @@ internal class ArabicMapping
 internal class ArabicTable
 {
   private static List<ArabicMapping> mapList;
-  private static ArabicTable arabicMapper;
+  private static ArabicTable? arabicMapper;
 
   /// <summary>
   /// Setting up the conversion table
@@ -233,7 +230,6 @@ internal class ArabicTable
   private ArabicTable()
   {
     mapList = new List<ArabicMapping>();
-
 
     mapList.Add(new ArabicMapping((int)GeneralArabicLetters.Hamza, (int)IsolatedArabicLetters.Hamza));
     mapList.Add(new ArabicMapping((int)GeneralArabicLetters.Alef, (int)IsolatedArabicLetters.Alef));

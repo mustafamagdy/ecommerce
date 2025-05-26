@@ -1,6 +1,6 @@
 ﻿namespace FSH.WebApi.Infrastructure.Notifications;
 
-public class SignalRSettings
+public sealed class SignalRSettings
 {
   public class Backplane
   {

@@ -20,8 +20,8 @@
       "WorkerCount": 5
     },
     "Storage": {
-      "StorageProvider": "mysql",
-      "ConnectionString": "Data Source=127.0.0.1;Initial Catalog=multi-tenant-05;User Id=root;Password=DeV12345;Allow User Variables=true",
+      "StorageProvider": "",
+      "ConnectionString": "",
       "Options": {
         "CommandBatchMaxTimeout": "00:05:00",
         "QueuePollInterval": "00:00:01",

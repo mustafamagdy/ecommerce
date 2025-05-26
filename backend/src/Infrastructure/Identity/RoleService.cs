@@ -7,39 +7,37 @@ using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using FSH.WebApi.Shared.Multitenancy;
+using FSH.WebApi.Shared.Persistence;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using StackExchange.Redis;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
-internal class RoleService : IRoleService
+internal sealed class RoleService : IRoleService
 {
   private readonly RoleManager<ApplicationRole> _roleManager;
   private readonly UserManager<ApplicationUser> _userManager;
-  private readonly ApplicationDbContext _db;
   private readonly IStringLocalizer _t;
   private readonly ICurrentUser _currentUser;
   private readonly ITenantInfo _currentTenant;
   private readonly IEventPublisher _events;
+  private readonly IApplicationUnitOfWork _uow;
 
   public RoleService(
-    RoleManager<ApplicationRole> roleManager,
-    UserManager<ApplicationUser> userManager,
-    ApplicationDbContext db,
-    IStringLocalizer<RoleService> localizer,
-    ICurrentUser currentUser,
-    ITenantInfo currentTenant,
-    IEventPublisher events)
+    RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager,
+    IStringLocalizer<RoleService> localizer, ICurrentUser currentUser, ITenantInfo currentTenant,
+    IEventPublisher events, IApplicationUnitOfWork uow)
   {
     _roleManager = roleManager;
     _userManager = userManager;
-    _db = db;
     _t = localizer;
     _currentUser = currentUser;
     _currentTenant = currentTenant;
     _events = events;
+    _uow = uow;
   }
 
   public async Task<List<RoleDto>> GetListAsync(CancellationToken cancellationToken) =>
@@ -55,7 +53,7 @@ internal class RoleService : IRoleService
     && existingRole.Id != excludeId;
 
   public async Task<RoleDto> GetByIdAsync(string id) =>
-    await _db.Roles.SingleOrDefaultAsync(x => x.Id == id) is { } role
+    await _uow.Set<ApplicationRole>().SingleOrDefaultAsync(x => x.Id == id) is { } role
       ? role.Adapt<RoleDto>()
       : throw new NotFoundException(_t["Role Not Found"]);
 
@@ -63,15 +61,26 @@ internal class RoleService : IRoleService
   {
     var role = await GetByIdAsync(roleId);
 
-    role.Permissions = await _db.RoleClaims
+    var roleClaims = await _uow.Set<ApplicationRoleClaim>()
       .Where(c => c.RoleId == roleId && c.ClaimType == FSHClaims.Permission)
       .Select(c => c.ClaimValue)
       .ToListAsync(cancellationToken);
 
+    var abilities = roleClaims.Select(a => new
+    {
+      Resource = a.Split(".")[1],
+      Permission = a.Split(".")[2]
+    }).ToArray();
+
+    role.Abilities = abilities
+      .GroupBy(a => a.Resource)
+      .Select(a => new AbilityDto { Actions = a.Select(x => x.Permission).ToArray(), Resource = a.Key })
+      .ToList();
+
     return role;
   }
 
-  public async Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request)
+  public async Task<RoleDto> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request)
   {
     if (string.IsNullOrEmpty(request.Id))
     {
@@ -86,7 +95,7 @@ internal class RoleService : IRoleService
 
       await _events.PublishAsync(new ApplicationRoleCreatedEvent(role.Id, role.Name));
 
-      return string.Format(_t["Role {0} Created."], request.Name);
+      return role.Adapt<RoleDto>();
     }
     else
     {
@@ -112,7 +121,7 @@ internal class RoleService : IRoleService
 
       await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name));
 
-      return string.Format(_t["Role {0} Updated."], role.Name);
+      return role.Adapt<RoleDto>();
     }
   }
 
@@ -128,7 +137,7 @@ internal class RoleService : IRoleService
     if (_currentTenant.Id != MultitenancyConstants.Root.Id)
     {
       // Remove Root Permissions if the Role is not created for Root Tenant.
-      request.Permissions.RemoveAll(u => u.StartsWith("Permissions.Root."));
+      request.Permissions.RemoveAll(u => u.StartsWith("root."));
     }
 
     var currentClaims = await _roleManager.GetClaimsAsync(role);
@@ -148,14 +157,14 @@ internal class RoleService : IRoleService
     {
       if (!string.IsNullOrEmpty(permission))
       {
-        _db.RoleClaims.Add(new ApplicationRoleClaim
+        _uow.Set<ApplicationRoleClaim>().Add(new ApplicationRoleClaim
         {
           RoleId = role.Id,
           ClaimType = FSHClaims.Permission,
           ClaimValue = permission,
           CreatedBy = _currentUser.GetUserId().ToString()
         });
-        await _db.SaveChangesAsync(cancellationToken);
+        await _uow.CommitAsync(cancellationToken);
       }
     }
 
@@ -189,5 +198,30 @@ internal class RoleService : IRoleService
     await _events.PublishAsync(new ApplicationRoleDeletedEvent(role.Id, role.Name));
 
     return string.Format(_t["Role {0} Deleted."], role.Name);
+  }
+
+  public async Task<List<RoleDto>> GetRolesAndAbilities(CancellationToken cancellationToken)
+  {
+    var roles = (await _roleManager.Roles.ToListAsync(cancellationToken)).Adapt<List<RoleDto>>();
+    var permissions = await _uow.Set<ApplicationRoleClaim>().ToListAsync(cancellationToken: cancellationToken);
+
+    foreach (var role in roles)
+    {
+      var roleClaims = permissions
+        .Where(a => a.RoleId == role.Id && a.ClaimType == FSHClaims.Permission)
+        .ToArray();
+      var abilities = roleClaims.Select(a => new
+      {
+        Resource = a.ClaimValue.Split(".")[1],
+        Permission = a.ClaimValue.Split(".")[2]
+      }).ToArray();
+
+      role.Abilities = abilities
+        .GroupBy(a => a.Resource)
+        .Select(a => new AbilityDto { Actions = a.Select(x => x.Permission).ToArray(), Resource = a.Key })
+        .ToList();
+    }
+
+    return roles;
   }
 }

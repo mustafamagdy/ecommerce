@@ -1,11 +1,15 @@
+using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Printing;
+using FSH.WebApi.Infrastructure.OpenApi.PrimitiveTypeMappings;
+using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NJsonSchema.Generation.TypeMappers;
 using NSwag;
 using NSwag.AspNetCore;
-using NSwag.Generation.Processors.Security;
 using ZymLabs.NSwag.FluentValidation;
 
 namespace FSH.WebApi.Infrastructure.OpenApi;
@@ -15,7 +19,7 @@ internal static class Startup
   internal static IServiceCollection AddOpenApiDocumentation(this IServiceCollection services, IConfiguration config)
   {
     var settings = config.GetSection(nameof(SwaggerSettings)).Get<SwaggerSettings>();
-    if (!settings.Enable) return services;
+    if (settings != null && !settings.Enable) return services;
 
     services.AddVersionedApiExplorer(o => o.SubstituteApiVersionInUrl = true);
     services.AddEndpointsApiExplorer();
@@ -23,7 +27,7 @@ internal static class Startup
     {
       document.PostProcess = doc =>
       {
-        doc.Info.Title = settings.Title;
+        doc.Info.Title = settings!.Title;
         doc.Info.Version = settings.Version;
         doc.Info.Description = settings.Description;
         doc.Info.Contact = new()
@@ -39,7 +43,7 @@ internal static class Startup
         };
       };
 
-      if (config["SecuritySettings:Provider"].Equals("AzureAd", StringComparison.OrdinalIgnoreCase))
+      if (config["SecuritySettings:Provider"]!.Equals("AzureAd", StringComparison.OrdinalIgnoreCase))
       {
         document.AddSecurity(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
         {
@@ -54,7 +58,7 @@ internal static class Startup
               TokenUrl = config["SecuritySettings:Swagger:TokenUrl"],
               Scopes = new Dictionary<string, string>
               {
-                { config["SecuritySettings:Swagger:ApiScope"], "access the api" }
+                { config["SecuritySettings:Swagger:ApiScope"]!, "access the api" }
               }
             }
           }
@@ -73,10 +77,7 @@ internal static class Startup
         });
       }
 
-      document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor());
-      document.OperationProcessors.Add(new SwaggerGlobalAuthProcessor());
-
-      document.TypeMappers.Add(new PrimitiveTypeMapper(typeof(TimeSpan), schema =>
+      document.SchemaSettings.TypeMappers.Add(new PrimitiveTypeMapper(typeof(TimeSpan), schema =>
       {
         schema.Type = NJsonSchema.JsonObjectType.String;
         schema.IsNullableRaw = true;
@@ -84,12 +85,23 @@ internal static class Startup
         schema.Example = "02:00:00";
       }));
 
-      document.OperationProcessors.Add(new SwaggerHeaderAttributeProcessor());
-
-      var fluentValidationSchemaProcessor = serviceProvider.CreateScope().ServiceProvider.GetService<FluentValidationSchemaProcessor>();
-      document.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<OrderStatus, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<PaymentOperationType, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<PrintableType, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<SectionAlignment, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<SectionPosition, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<SectionType, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<SubscriptionFeatureType, string>());
+      document.SchemaSettings.TypeMappers.Add(new SmartEnumTypeMapper<SubscriptionType, string>());
     });
-    services.AddScoped<FluentValidationSchemaProcessor>();
+
+    services.AddScoped(sp =>
+    {
+      var validationRules = sp.GetService<IEnumerable<FluentValidationRule>>();
+      var loggerFactory = sp.GetService<ILoggerFactory>();
+
+      return new FluentValidationSchemaProcessor(sp, validationRules, loggerFactory);
+    });
 
     return services;
   }
@@ -99,12 +111,12 @@ internal static class Startup
     if (config.GetValue<bool>("SwaggerSettings:Enable"))
     {
       app.UseOpenApi();
-      app.UseSwaggerUi3(options =>
+      app.UseSwaggerUi(options =>
       {
         options.DefaultModelsExpandDepth = -1;
         options.DocExpansion = "none";
         options.TagsSorter = "alpha";
-        if (config["SecuritySettings:Provider"].Equals("AzureAd", StringComparison.OrdinalIgnoreCase))
+        if (config["SecuritySettings:Provider"]!.Equals("AzureAd", StringComparison.OrdinalIgnoreCase))
         {
           options.OAuth2Client = new OAuth2ClientSettings
           {
@@ -117,6 +129,7 @@ internal static class Startup
           options.OAuth2Client.Scopes.Add(config["SecuritySettings:Swagger:ApiScope"]);
         }
       });
+      app.UseReDoc(conf => { conf.Path = "/docs"; });
     }
 
     return app;

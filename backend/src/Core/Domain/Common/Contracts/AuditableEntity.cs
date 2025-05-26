@@ -1,7 +1,10 @@
+using MassTransit;
+
 namespace FSH.WebApi.Domain.Common.Contracts;
 
 public abstract class AuditableEntity : AuditableEntity<DefaultIdType>
 {
+  protected AuditableEntity() => Id = NewId.Next().ToGuid();
 }
 
 public abstract class AuditableEntity<T> : BaseEntity<T>, IAuditableEntity, ISoftDelete

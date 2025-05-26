@@ -1,41 +1,83 @@
+using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using Newtonsoft.Json;
+
 namespace FSH.WebApi.Domain.Operation;
 
-public class Order : AuditableEntity, IAggregateRoot
+[JsonConverter(typeof(SmartEnumNameConverter<OrderStatus, string>))]
+public sealed class OrderStatus : SmartEnum<OrderStatus, string>
 {
-  public string OrderNumber { get; private set; }
-  public Guid CustomerId { get; private set; }
-  public DateTime OrderDate { get; private set; }
-  public string QrCodeBase64 { get; private set; }
-  public virtual Customer Customer { get; private set; } = default!;
-  public virtual HashSet<OrderItem> OrderItems { get; set; }
-  public virtual HashSet<OrderPayment> OrderPayments { get; set; }
+  public static readonly OrderStatus Normal = new(nameof(Normal), "normal");
+  public static readonly OrderStatus Canceled = new(nameof(Canceled), "canceled");
 
-  public decimal TotalAmount => OrderItems?.Sum(a => a.Price * a.Qty) ?? 0;
-  public decimal TotalVat => OrderItems?.Sum(a => a.VatAmount) ?? 0;
-  public decimal NetAmount => OrderItems?.Sum(a => a.ItemTotal) ?? 0;
-  public decimal TotalPaid => OrderPayments?.Sum(a => a.Amount) ?? 0;
-  public bool Paid => TotalPaid >= NetAmount;
-
-  public Order(Guid customerId, string orderNumber, DateTime orderDate)
+  public OrderStatus(string name, string value)
+    : base(name, value)
   {
-    CustomerId = customerId;
+  }
+}
+
+public sealed class Order : AuditableEntity, IAggregateRoot
+{
+  private readonly List<OrderItem> _orderItems = new();
+  private readonly List<OrderPayment> _orderPayments = new();
+
+  private Order()
+  {
+  }
+
+  public Order(Customer customer, string orderNumber, DateTime orderDate)
+  {
     OrderNumber = orderNumber;
     OrderDate = orderDate;
-
-    OrderItems = new();
-    OrderPayments = new();
+    Customer = customer;
   }
 
-  public Order Update(Guid? customerId)
-  {
-    if (customerId is not null && !CustomerId.Equals(customerId.Value)) CustomerId = customerId.Value;
-    return this;
-  }
+  public string OrderNumber { get; private set; }
+  public DateTime OrderDate { get; private set; }
+  public OrderStatus Status { get; set; } = OrderStatus.Normal;
+  public string QrCodeBase64 { get; private set; }
+  public Guid CustomerId { get; private set; }
+  public Customer Customer { get; private set; }
 
-  public Order SetInvoiceQrCode(string? invoiceQrCode)
+  public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
+  public IReadOnlyCollection<OrderPayment> OrderPayments => _orderPayments.AsReadOnly();
+
+  public decimal TotalAmount { get; private set; }
+  public decimal TotalVat { get; private set; }
+  public decimal NetAmount { get; private set; }
+  public decimal TotalPaid { get; private set; }
+  public bool Paid => TotalPaid >= NetAmount;
+
+  public void SetInvoiceQrCode(string? invoiceQrCode)
   {
     if (invoiceQrCode is not null && (string.IsNullOrEmpty(QrCodeBase64) || !QrCodeBase64.Equals(invoiceQrCode)))
       QrCodeBase64 = invoiceQrCode;
-    return this;
+  }
+
+  private void AddItem(OrderItem item)
+  {
+    item.SetOrderId(Id);
+    _orderItems.Add(item);
+    TotalAmount += item.Price * item.Qty;
+    TotalVat += item.VatAmount;
+    NetAmount += item.ItemTotal;
+  }
+
+  public void AddItems(List<OrderItem> items)
+  {
+    items.ForEach(AddItem);
+  }
+
+  public void AddPayment(OrderPayment payment)
+  {
+    Customer.PayDue(payment.Amount);
+    _orderPayments.Add(payment);
+    TotalPaid += payment.Amount;
+  }
+
+  public void Cancel()
+  {
+    Status = OrderStatus.Canceled;
+    Customer.PayDue(-1 * (TotalPaid - NetAmount));
   }
 }

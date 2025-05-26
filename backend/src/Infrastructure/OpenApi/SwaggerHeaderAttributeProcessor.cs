@@ -5,7 +5,7 @@ using NSwag.Generation.Processors.Contexts;
 
 namespace FSH.WebApi.Infrastructure.OpenApi;
 
-public class SwaggerHeaderAttributeProcessor : IOperationProcessor
+public sealed class SwaggerHeaderAttributeProcessor : IOperationProcessor
 {
   public bool Process(OperationProcessorContext context)
   {
@@ -13,8 +13,7 @@ public class SwaggerHeaderAttributeProcessor : IOperationProcessor
 
     var parameters = context.OperationDescription.Operation.Parameters;
 
-    var existingParam = parameters.FirstOrDefault(p =>
-      p.Kind == OpenApiParameterKind.Header && p.Name == attribute.HeaderName);
+    var existingParam = parameters.FirstOrDefault(p => p.Kind == OpenApiParameterKind.Header && p.Name == attribute.HeaderName);
     if (existingParam is not null)
     {
       parameters.Remove(existingParam);

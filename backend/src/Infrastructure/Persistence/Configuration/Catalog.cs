@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 
-public class BrandConfig : IEntityTypeConfiguration<Brand>
+public sealed class BrandConfig : BaseAuditableTenantEntityConfiguration<Brand>
 {
-  public void Configure(EntityTypeBuilder<Brand> builder)
+  public override void Configure(EntityTypeBuilder<Brand> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)
@@ -19,11 +19,26 @@ public class BrandConfig : IEntityTypeConfiguration<Brand>
   }
 }
 
-public class ProductConfig : IEntityTypeConfiguration<Product>
+public sealed class CategoryConfig : BaseAuditableTenantEntityConfiguration<Category>
 {
-  public void Configure(EntityTypeBuilder<Product> builder)
+  public override void Configure(EntityTypeBuilder<Category> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
+
+    builder
+      .Property(b => b.Name)
+      .HasMaxLength(256);
+
+    builder
+      .Property(b => b.Description);
+  }
+}
+
+public sealed class ProductConfig : BaseAuditableTenantEntityConfiguration<Product>
+{
+  public override void Configure(EntityTypeBuilder<Product> builder)
+  {
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)
@@ -39,29 +54,24 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
   }
 }
 
-public class ServiceCatalogConfig : IEntityTypeConfiguration<ServiceCatalog>
+public sealed class ServiceCatalogConfig : BaseAuditableTenantEntityConfiguration<ServiceCatalog>
 {
-  public void Configure(EntityTypeBuilder<ServiceCatalog> builder)
+  public override void Configure(EntityTypeBuilder<ServiceCatalog> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Price)
       .IsRequired()
       .HasPrecision(7, 3);
-
-    builder
-      .Property(a => a.Priority)
-      .HasConversion<string>()
-      .HasDefaultValue(ServicePriority.Normal);
   }
 }
 
-public class ServiceConfig : IEntityTypeConfiguration<Service>
+public sealed class ServiceConfig : BaseAuditableTenantEntityConfiguration<Service>
 {
-  public void Configure(EntityTypeBuilder<Service> builder)
+  public override void Configure(EntityTypeBuilder<Service> builder)
   {
-    builder.IsMultiTenant();
+    base.Configure(builder);
 
     builder
       .Property(b => b.Name)

@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Shared.Persistence;
 
 namespace FSH.WebApi.Application.Operation.CashRegisters;
 
@@ -21,15 +22,17 @@ public class UpdateCashRegisterRequestHandler : IRequestHandler<UpdateCashRegist
 {
   private readonly IRepositoryWithEvents<CashRegister> _repository;
   private readonly IStringLocalizer<UpdateCashRegisterRequestHandler> _t;
+  private readonly IApplicationUnitOfWork _uow;
 
   public UpdateCashRegisterRequestHandler(IRepositoryWithEvents<CashRegister> repository,
-    IStringLocalizer<UpdateCashRegisterRequestHandler> localizer)
+    IStringLocalizer<UpdateCashRegisterRequestHandler> localizer, IApplicationUnitOfWork uow)
   {
     _repository = repository;
     _t = localizer;
+    _uow = uow;
   }
 
-  public async Task<Unit> Handle(UpdateCashRegisterRequest request, CancellationToken cancellationToken)
+  public async Task Handle(UpdateCashRegisterRequest request, CancellationToken cancellationToken)
   {
     var cr = await _repository.GetByIdAsync(request.Id, cancellationToken);
     if (cr == null)
@@ -38,6 +41,6 @@ public class UpdateCashRegisterRequestHandler : IRequestHandler<UpdateCashRegist
     }
 
     await _repository.UpdateAsync(cr, cancellationToken);
-    return Unit.Value;
+    await _uow.CommitAsync(cancellationToken);
   }
 }

@@ -1,16 +1,13 @@
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using FluentValidation.AspNetCore;
 using FSH.WebApi.Application;
 using FSH.WebApi.Host.Configurations;
 using FSH.WebApi.Host.Controllers;
 using FSH.WebApi.Infrastructure;
 using FSH.WebApi.Infrastructure.Common;
-using FSH.WebApi.Infrastructure.Multitenancy;
-using FSH.WebApi.Infrastructure.Seeders;
+using FSH.WebApi.Infrastructure.Registrations;
 using QuestPDF.Drawing;
 using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 [assembly: ApiConventionType(typeof(FSHApiConventions))]
 
@@ -23,18 +20,12 @@ try
   builder.Host.AddConfigurations();
   builder.Host.UseSerilog((_, config) =>
   {
-    config.WriteTo.Console()
-      .ReadFrom.Configuration(builder.Configuration);
+    config.ReadFrom.Configuration(builder.Configuration);
   });
 
-  builder.Services.AddControllers(opt => { opt.Filters.Add<HasValidSubscriptionTypeFilter>(); })
-    .AddFluentValidation()
-    .AddJsonOptions(opt =>
-    {
-      opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-      opt.JsonSerializerOptions.Converters.Clear();
-      opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
-    });
+  builder.Services
+    .AddApplicationControllers()
+    .AddApplicationJsonOptions();
 
   builder.Services.AddInfrastructure(builder.Configuration);
   builder.Services.AddApplication();
@@ -43,12 +34,17 @@ try
 
   await app.Services.InitializeDatabasesAsync();
 
-  string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-  FontManager.RegisterFont(File.OpenRead(appPath + "/Files/fonts/LibreBarcode39-Regular.ttf"));
+  var env = app.Environment.EnvironmentName;
+  if (!env.Contains("test"))
+  {
+    string? appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    FontManager.RegisterFont(File.OpenRead(appPath + "/Files/fonts/LibreBarcode39-Regular.ttf"));
+  }
 
   app.UseInfrastructure(builder.Configuration);
   app.MapEndpoints();
-  app.Run();
+
+  await app.RunAsync();
 }
 catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", StringComparison.Ordinal))
 {
@@ -63,4 +59,5 @@ catch (Exception ex) when (!ex.GetType().Name.Equals("StopTheHostException", Str
 
 public partial class Program
 {
+  // Only anchor for integration tests
 }

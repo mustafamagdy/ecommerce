@@ -1,37 +1,41 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using Ardalis.SmartEnum;
+using Ardalis.SmartEnum.JsonNet;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Domain.Catalog;
 
-public enum ServicePriority
+public sealed class ServiceCatalog : AuditableEntity, IAggregateRoot
 {
-  [EnumMember(Value = "normal")] Normal,
-  [EnumMember(Value = "urgent")] Urgent
-}
-
-public class ServiceCatalog : AuditableEntity, IAggregateRoot
-{
-  public Guid ServiceId { get; set; }
-  public Service Service { get; set; }
-
-  public Guid ProductId { get; set; }
-  public Product Product { get; set; }
-
-  public decimal Price { get; set; }
-  public ServicePriority Priority { get; set; }
-
-  public ServiceCatalog(Guid serviceId, Guid productId, decimal price, ServicePriority priority)
+  public ServiceCatalog(Guid serviceId, Guid productId, Guid? categoryId, decimal price)
   {
     ServiceId = serviceId;
     ProductId = productId;
+    CategoryId = categoryId;
     Price = price;
-    Priority = priority;
   }
 
-  public ServiceCatalog Update(decimal price, ServicePriority priority)
+  public Guid ServiceId { get; private set; }
+  public Service Service { get; private set; }
+
+  public Guid ProductId { get; private set; }
+  public Product Product { get; private set; }
+
+  public Guid? CategoryId { get; private set; }
+  public Category? Category { get; private set; }
+  public decimal Price { get; private set; }
+
+  public ServiceCatalog Update(Guid? productId, Guid? serviceId, Guid? categoryId, decimal? price)
   {
-    Price = price;
-    Priority = priority;
+    if (productId.HasValue && productId.Value != Guid.Empty && !ProductId.Equals(productId.Value))
+      ProductId = productId.Value;
+    if (serviceId.HasValue && serviceId.Value != Guid.Empty && !ServiceId.Equals(serviceId.Value))
+      ServiceId = serviceId.Value;
+    if (categoryId.HasValue && categoryId.Value != Guid.Empty && !CategoryId.Equals(categoryId.Value))
+      CategoryId = categoryId.Value;
+    if (price.HasValue && Price != price) Price = price.Value;
+
     return this;
   }
 }

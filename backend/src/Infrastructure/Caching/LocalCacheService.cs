@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FSH.WebApi.Infrastructure.Caching;
 
-public class LocalCacheService : ICacheService
+public sealed class LocalCacheService : ICacheService
 {
   private readonly ILogger<LocalCacheService> _logger;
   private readonly IAppCache _cache;
