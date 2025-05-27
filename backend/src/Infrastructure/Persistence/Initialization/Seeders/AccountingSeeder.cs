@@ -6,19 +6,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using System.Linq; // Required for .Any()
+using System.Linq;
+using Finbuckle.MultiTenant;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Initialization.Seeders;
 
 public class AccountingSeeder : ICustomSeeder
 {
     private readonly ApplicationDbContext _db;
-    private readonly FSHTenantInfo _currentTenant;
+    private readonly ITenantInfo _currentTenant;
     private readonly ILogger<AccountingSeeder> _logger;
 
     public string Order => "Accounting"; // Defines the order of execution if multiple seeders exist
 
-    public AccountingSeeder(ApplicationDbContext db, FSHTenantInfo currentTenant, ILogger<AccountingSeeder> logger)
+    public AccountingSeeder(ApplicationDbContext db, ITenantInfo currentTenant, ILogger<AccountingSeeder> logger)
     {
         _db = db;
         _currentTenant = currentTenant;
@@ -30,7 +31,7 @@ public class AccountingSeeder : ICustomSeeder
         _logger.LogInformation("Starting Chart of Accounts seeding for TenantId: {TenantId}", _currentTenant.Id);
 
         // Check if accounts already exist for this tenant
-        if (await _db.Accounts.AnyAsync(a => a.TenantId == _currentTenant.Id, cancellationToken))
+        if (await _db.Accounts.AnyAsync(cancellationToken))
         {
             _logger.LogInformation("Chart of Accounts already seeded for TenantId: {TenantId}. Skipping.", _currentTenant.Id);
             return;
@@ -77,5 +78,3 @@ public class AccountingSeeder : ICustomSeeder
         _logger.LogInformation("Chart of Accounts seeded successfully for TenantId: {TenantId}", _currentTenant.Id);
     }
 }
-
-[end of backend/src/Infrastructure/Persistence/Initialization/Seeders/AccountingSeeder.cs]
