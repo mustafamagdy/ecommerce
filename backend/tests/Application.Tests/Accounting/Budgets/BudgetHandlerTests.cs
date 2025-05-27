@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FSH.WebApi.Application.Accounting.Budgets;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Accounting;
@@ -16,6 +17,7 @@ using System.Threading.Tasks;
 using Ardalis.Specification;
 using Mapster;
 using Xunit;
+using FluentValidation;
 
 namespace FSH.WebApi.Application.Tests.Accounting.Budgets;
 
@@ -226,6 +228,7 @@ public class BudgetHandlerTests
 
         var je1 = CreateMockJournalEntry(Guid.NewGuid(), startDate.AddDays(5));
         var je2 = CreateMockJournalEntry(Guid.NewGuid(), startDate.AddDays(10));
+        // Mock transactions for the current budget period (ActualAmount = 200)
         var transactions = new List<Transaction>
         {
             CreateMockTransaction(Guid.NewGuid(), je1, account, TransactionType.Debit, 150m), // Expense: +150
@@ -233,7 +236,7 @@ public class BudgetHandlerTests
         }; // Total Actual Expense = 200m
 
         _transactionRepository.ListAsync(Arg.Any<TransactionsForAccountInPeriodSpec>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(transactions));
+            .Returns(Task.FromResult<List<Transaction>>(transactions));
 
         var handler = new GetBudgetHandler(_budgetRepository, _accountRepository, _transactionRepository, _getLocalizer);
         var request = new GetBudgetRequest(budgetId);
@@ -313,7 +316,7 @@ public class BudgetHandlerTests
         // Mock transactions for budget1 (ActualAmount = 50)
         var jeBudget1 = CreateMockJournalEntry(Guid.NewGuid(), budget1.PeriodStartDate.AddDays(2));
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId1), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), jeBudget1, account1, TransactionType.Debit, 50m) }));
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), jeBudget1, account1, TransactionType.Debit, 50m) }));
 
         var handler = new SearchBudgetsHandler(_budgetRepository, _accountRepository, _transactionRepository, _searchLocalizer);
 
@@ -353,5 +356,24 @@ internal class BudgetsBySearchFilterSpec : Specification<Budget, BudgetDto>
         {
              Query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
         }
+    }
+}
+
+// Added TransactionsForAccountInPeriodSpec to resolve the AccountId error
+internal class TransactionsForAccountInPeriodSpec : Specification<Transaction>
+{
+    public Guid AccountId { get; }
+    public DateTime FromDate { get; }
+    public DateTime ToDate { get; }
+    
+    public TransactionsForAccountInPeriodSpec(Guid accountId, DateTime fromDate, DateTime toDate)
+    {
+        AccountId = accountId;
+        FromDate = fromDate;
+        ToDate = toDate;
+        Query
+            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate >= fromDate && t.JournalEntry.PostedDate < toDate.AddDays(1))
+            .Include(t => t.JournalEntry)
+            .OrderBy(t => t.JournalEntry.PostedDate);
     }
 }

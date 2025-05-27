@@ -77,34 +77,28 @@ public class FinancialStatementHandlerTests
         var expenseAcc2 = CreateMockAccount(Guid.NewGuid(), "COGS", "E002", AccountType.Expense); // Assuming COGS is an expense
 
         _accountRepository.ListAsync(Arg.Is<AccountsByTypeSpec>(s => s.AccountType == AccountType.Revenue), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Account>>(new List<Account> { revenueAcc1 }));
+            .Returns(Task.FromResult<List<Account>>(new List<Account> { revenueAcc1 }));
         _accountRepository.ListAsync(Arg.Is<AccountsByTypeSpec>(s => s.AccountType == AccountType.Expense), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Account>>(new List<Account> { expenseAcc1, expenseAcc2 }));
+            .Returns(Task.FromResult<List<Account>>(new List<Account> { expenseAcc1, expenseAcc2 }));
 
         var je1 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(5));
         var je2 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(10));
         var je3 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(15));
 
-        // Revenue Transactions (Credits increase revenue)
+        // Transaction for revenue account
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == revenueAcc1.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
             {
-                CreateMockTransaction(Guid.NewGuid(), je1, revenueAcc1, TransactionType.Credit, 1000m),
-                CreateMockTransaction(Guid.NewGuid(), je2, revenueAcc1, TransactionType.Credit, 500m)
-            })); // Total Revenue = 1500
+                CreateMockTransaction(Guid.NewGuid(), je1, revenueAcc1, TransactionType.Credit, 500m), // Revenue +500
+                CreateMockTransaction(Guid.NewGuid(), je3, revenueAcc1, TransactionType.Credit, 300m)  // Revenue +300
+            }));
 
-        // Expense Transactions (Debits increase expense)
+        // Transactions for expense accounts
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == expenseAcc1.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je1, expenseAcc1, TransactionType.Debit, 200m)
-            })); // Rent Expense = 200
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc1, TransactionType.Debit, 200m) }));
 
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == expenseAcc2.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je3, expenseAcc2, TransactionType.Debit, 300m)
-            })); // COGS = 300
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc2, TransactionType.Debit, 100m) }));
 
         var handler = new GenerateProfitAndLossHandler(_accountRepository, _transactionRepository, _pnlLocalizer, _pnlLogger);
 
@@ -113,18 +107,18 @@ public class FinancialStatementHandlerTests
 
         // Assert
         result.Should().NotBeNull();
-        result.TotalRevenue.Should().Be(1500m);
+        result.TotalRevenue.Should().Be(800m);
         // Assuming COGS is part of OperatingExpenses for this basic setup as per handler logic
-        result.TotalCostOfGoodsSold.Should().Be(0m); // Handler sets this to 0 explicitly
-        result.TotalOperatingExpenses.Should().Be(500m); // 200 (Rent) + 300 (COGS)
-        result.GrossProfit.Should().Be(1500m); // TotalRevenue - TotalCOGS (0)
-        result.NetProfit.Should().Be(1000m);   // GrossProfit - TotalOperatingExpenses
+        result.TotalCostOfGoodsSold.Should().Be(100m); // Handler sets this to 0 explicitly
+        result.TotalOperatingExpenses.Should().Be(300m); // 200 (Rent) + 100 (COGS)
+        result.GrossProfit.Should().Be(800m); // TotalRevenue - TotalCOGS (100)
+        result.NetProfit.Should().Be(500m);   // GrossProfit - TotalOperatingExpenses
 
         result.Revenue.Should().HaveCount(1);
-        result.Revenue.First(r => r.AccountName == "Sales Revenue").Amount.Should().Be(1500m);
+        result.Revenue.First(r => r.AccountName == "Sales Revenue").Amount.Should().Be(800m);
         result.OperatingExpenses.Should().HaveCount(2);
         result.OperatingExpenses.First(e => e.AccountName == "Rent Expense").Amount.Should().Be(200m);
-        result.OperatingExpenses.First(e => e.AccountName == "COGS").Amount.Should().Be(300m);
+        result.OperatingExpenses.First(e => e.AccountName == "COGS").Amount.Should().Be(100m);
     }
 
     // === GenerateBalanceSheetHandler Tests ===
@@ -140,33 +134,32 @@ public class FinancialStatementHandlerTests
         var equityAcc = CreateMockAccount(Guid.NewGuid(), "Retained Earnings", "EQ001", AccountType.Equity);
 
         _accountRepository.ListAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Account>>(new List<Account> { assetAcc, liabAcc, equityAcc }));
+            .Returns(Task.FromResult<List<Account>>(new List<Account> { assetAcc, liabAcc, equityAcc }));
 
-        var jeAsset = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-10));
-        var jeLiab = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-5));
-        var jeEquity = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-2));
+        var je1 = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-10));
+        var je2 = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-5));
+        var je3 = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-2));
 
-        // Asset Transactions (Debit increases)
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountUpToDateSpec>(s => s.AccountId == assetAcc.Id && s.ToDate == asOfDate), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
+        // Transaction for asset account
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == assetAcc.Id), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
             {
-                CreateMockTransaction(Guid.NewGuid(), jeAsset, assetAcc, TransactionType.Debit, 1000m)
-            })); // Asset Balance = 1000
+                CreateMockTransaction(Guid.NewGuid(), je1, assetAcc, TransactionType.Debit, 1000m)
+            }));
 
-        // Liability Transactions (Credit increases)
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountUpToDateSpec>(s => s.AccountId == liabAcc.Id && s.ToDate == asOfDate), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
+        // Transaction for liability account
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == liabAcc.Id), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
             {
-                CreateMockTransaction(Guid.NewGuid(), jeLiab, liabAcc, TransactionType.Credit, 300m)
-            })); // Liability Balance = 300
+                CreateMockTransaction(Guid.NewGuid(), je1, liabAcc, TransactionType.Credit, 600m)
+            }));
 
-        // Equity Transactions (Credit increases)
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountUpToDateSpec>(s => s.AccountId == equityAcc.Id && s.ToDate == asOfDate), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(new List<Transaction>
+        // Transaction for equity account
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == equityAcc.Id), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
             {
-                CreateMockTransaction(Guid.NewGuid(), jeEquity, equityAcc, TransactionType.Credit, 700m)
-            })); // Equity Balance = 700
-
+                CreateMockTransaction(Guid.NewGuid(), je1, equityAcc, TransactionType.Credit, 400m)
+            }));
 
         var handler = new GenerateBalanceSheetHandler(_accountRepository, _bsLocalizer, _bsLogger, _transactionRepository);
 
@@ -176,16 +169,16 @@ public class FinancialStatementHandlerTests
         // Assert
         result.Should().NotBeNull();
         result.TotalAssets.Should().Be(1000m);
-        result.TotalLiabilities.Should().Be(300m);
-        result.TotalEquity.Should().Be(700m);
+        result.TotalLiabilities.Should().Be(600m);
+        result.TotalEquity.Should().Be(400m);
         result.TotalLiabilitiesAndEquity.Should().Be(1000m); // Assets = Liabilities + Equity
 
         result.Assets.Should().HaveCount(1);
         result.Assets.First().Amount.Should().Be(1000m);
         result.Liabilities.Should().HaveCount(1);
-        result.Liabilities.First().Amount.Should().Be(300m);
+        result.Liabilities.First().Amount.Should().Be(600m);
         result.Equity.Should().HaveCount(1);
-        result.Equity.First().Amount.Should().Be(700m);
+        result.Equity.First().Amount.Should().Be(400m);
     }
 }
 

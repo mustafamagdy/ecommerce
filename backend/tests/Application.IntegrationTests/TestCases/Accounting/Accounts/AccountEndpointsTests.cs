@@ -16,32 +16,36 @@ namespace Application.IntegrationTests.TestCases.Accounting.Accounts;
 
 public class AccountEndpointsTests : TestFixture
 {
+    private Dictionary<string, string> _adminHeaders;
+    private Guid _branchId;
+
     public AccountEndpointsTests(HostFixture host, ITestOutputHelper output)
         : base(host, output)
     {
     }
 
-    private async Task<Guid> CreateAccountViaApi(CreateAccountRequest request, object? authHeaders = null)
+    private async Task<Guid> CreateAccountViaApi(CreateAccountRequest request, Dictionary<string, string>? authHeaders = null)
     {
-        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", request, authHeaders ?? AdminHeaders);
+        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", request, authHeaders ?? _adminHeaders);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         return await response.Content.ReadFromJsonAsync<Guid>();
     }
 
-    private async Task<AccountDto?> GetAccountViaApi(Guid id, object? authHeaders = null)
+    private async Task<AccountDto?> GetAccountAsync(Guid id, Dictionary<string, string>? authHeaders = null)
     {
-        var response = await GetAsync($"/api/v1/accounting/accounts/{id}", authHeaders ?? AdminHeaders);
+        var response = await GetAsync($"/api/v1/accounting/accounts/{id}", authHeaders ?? _adminHeaders);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         return await response.Content.ReadFromJsonAsync<AccountDto>();
     }
 
-
     [Fact]
     public async Task Can_Create_Account_When_Submit_Valid_Data()
     {
         // Arrange
-        var (adminHeaders, branchId) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var createRequest = new CreateAccountRequest
         {
             AccountName = "Test Bank Account",
@@ -52,7 +56,7 @@ public class AccountEndpointsTests : TestFixture
         };
 
         // Act
-        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", createRequest, adminHeaders);
+        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", createRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -60,7 +64,7 @@ public class AccountEndpointsTests : TestFixture
         accountId.Should().NotBeEmpty();
 
         // Optional: Retrieve to verify
-        var createdAccountDto = await GetAccountViaApi(accountId, adminHeaders);
+        var createdAccountDto = await GetAccountAsync(accountId, _adminHeaders);
         createdAccountDto.Should().NotBeNull();
         createdAccountDto!.AccountName.Should().Be(createRequest.AccountName);
         createdAccountDto.AccountNumber.Should().Be(createRequest.AccountNumber);
@@ -74,7 +78,9 @@ public class AccountEndpointsTests : TestFixture
     public async Task Create_Account_Should_Return_BadRequest_When_AccountName_Is_Missing()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var createRequest = new CreateAccountRequest
         {
             AccountName = null!, // Invalid
@@ -84,7 +90,7 @@ public class AccountEndpointsTests : TestFixture
         };
 
         // Act
-        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", createRequest, adminHeaders);
+        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", createRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -95,7 +101,9 @@ public class AccountEndpointsTests : TestFixture
     public async Task Create_Account_Should_Return_Conflict_When_AccountNumber_Already_Exists()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var initialRequest = new CreateAccountRequest
         {
             AccountName = "Initial Account",
@@ -103,7 +111,7 @@ public class AccountEndpointsTests : TestFixture
             AccountType = AccountType.Asset.ToString(),
             InitialBalance = 100
         };
-        await CreateAccountViaApi(initialRequest, adminHeaders); // Create the first account
+        await CreateAccountViaApi(initialRequest, _adminHeaders); // Create the first account
 
         var duplicateRequest = new CreateAccountRequest
         {
@@ -114,7 +122,7 @@ public class AccountEndpointsTests : TestFixture
         };
 
         // Act
-        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", duplicateRequest, adminHeaders);
+        var response = await PostAsJsonAsync("/api/v1/accounting/accounts", duplicateRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -124,7 +132,9 @@ public class AccountEndpointsTests : TestFixture
     public async Task Can_Get_Account_By_Id()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var createRequest = new CreateAccountRequest
         {
             AccountName = "Fetchable Account",
@@ -132,10 +142,10 @@ public class AccountEndpointsTests : TestFixture
             AccountType = AccountType.Expense.ToString(),
             InitialBalance = 0
         };
-        var accountId = await CreateAccountViaApi(createRequest, adminHeaders);
+        var accountId = await CreateAccountViaApi(createRequest, _adminHeaders);
 
         // Act
-        var response = await GetAsync($"/api/v1/accounting/accounts/{accountId}", adminHeaders);
+        var response = await GetAsync($"/api/v1/accounting/accounts/{accountId}", _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -150,11 +160,13 @@ public class AccountEndpointsTests : TestFixture
     public async Task Get_Account_Should_Return_NotFound_For_NonExistent_Id()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await GetAsync($"/api/v1/accounting/accounts/{nonExistentId}", adminHeaders);
+        var response = await GetAsync($"/api/v1/accounting/accounts/{nonExistentId}", _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -164,7 +176,9 @@ public class AccountEndpointsTests : TestFixture
     public async Task Can_Update_Account_When_Submit_Valid_Data()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var createRequest = new CreateAccountRequest
         {
             AccountName = "Original Name",
@@ -172,7 +186,7 @@ public class AccountEndpointsTests : TestFixture
             AccountType = AccountType.Asset.ToString(),
             InitialBalance = 500
         };
-        var accountId = await CreateAccountViaApi(createRequest, adminHeaders);
+        var accountId = await CreateAccountViaApi(createRequest, _adminHeaders);
 
         var updateRequest = new UpdateAccountRequest
         {
@@ -185,14 +199,14 @@ public class AccountEndpointsTests : TestFixture
         };
 
         // Act
-        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, adminHeaders);
+        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var updatedAccountId = await response.Content.ReadFromJsonAsync<Guid>();
         updatedAccountId.Should().Be(accountId);
 
-        var updatedAccountDto = await GetAccountViaApi(accountId, adminHeaders);
+        var updatedAccountDto = await GetAccountAsync(accountId, _adminHeaders);
         updatedAccountDto.Should().NotBeNull();
         updatedAccountDto!.AccountName.Should().Be(updateRequest.AccountName);
         updatedAccountDto.AccountNumber.Should().Be(updateRequest.AccountNumber);
@@ -207,12 +221,14 @@ public class AccountEndpointsTests : TestFixture
     public async Task Update_Account_Should_Return_NotFound_For_NonExistent_Id()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
         var nonExistentId = Guid.NewGuid();
         var updateRequest = new UpdateAccountRequest { Id = nonExistentId, AccountName = "Non Existent Update" };
 
         // Act
-        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{nonExistentId}", updateRequest, adminHeaders);
+        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{nonExistentId}", updateRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -222,16 +238,17 @@ public class AccountEndpointsTests : TestFixture
     public async Task Update_Account_Should_Return_BadRequest_When_Name_Is_Missing_If_Provided_Empty()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
-         var createRequest = new CreateAccountRequest { AccountName = "Test", AccountNumber = "VALID001", AccountType = "Asset" };
-        var accountId = await CreateAccountViaApi(createRequest, adminHeaders);
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
+        var createRequest = new CreateAccountRequest { AccountName = "Test", AccountNumber = "VALID001", AccountType = "Asset" };
+        var accountId = await CreateAccountViaApi(createRequest, _adminHeaders);
 
         // UpdateAccountRequestValidator makes name optional if null, but not if empty string
         var updateRequest = new UpdateAccountRequest { Id = accountId, AccountName = string.Empty };
 
-
         // Act
-        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, adminHeaders);
+        var response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, _adminHeaders);
 
         // Assert
         // The default validator for UpdateAccountRequest in Application layer has:
@@ -253,50 +270,51 @@ public class AccountEndpointsTests : TestFixture
         // This means empty string is fine.
         // Let's test for MaxLength instead.
         updateRequest.AccountName = new string('x', 300); // Exceeds MaxLength
-        response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, adminHeaders);
+        response = await PutAsJsonAsync($"/api/v1/accounting/accounts/{accountId}", updateRequest, _adminHeaders);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
 
     [Fact]
     public async Task Can_Search_Accounts()
     {
         // Arrange
-        var (adminHeaders, _) = await CreateTenantAndLogin();
-        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Cash Account", AccountNumber = "S_CASH001", AccountType = AccountType.Asset.ToString(), InitialBalance = 100 }, adminHeaders);
-        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Revenue Account", AccountNumber = "S_REV001", AccountType = AccountType.Revenue.ToString(), InitialBalance = 200 }, adminHeaders);
-        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Expense Account", AccountNumber = "S_EXP001", AccountType = AccountType.Expense.ToString(), InitialBalance = 0 }, adminHeaders);
+        var result = await CreateTenantAndLogin();
+        _adminHeaders = result.Headers;
+        _branchId = result.BranchId;
+        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Cash Account", AccountNumber = "S_CASH001", AccountType = AccountType.Asset.ToString(), InitialBalance = 100 }, _adminHeaders);
+        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Revenue Account", AccountNumber = "S_REV001", AccountType = AccountType.Revenue.ToString(), InitialBalance = 200 }, _adminHeaders);
+        await CreateAccountViaApi(new CreateAccountRequest { AccountName = "Expense Account", AccountNumber = "S_EXP001", AccountType = AccountType.Expense.ToString(), InitialBalance = 0 }, _adminHeaders);
 
         var searchRequest = new SearchAccountsRequest { PageNumber = 1, PageSize = 10 };
 
         // Act
-        var response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, adminHeaders);
+        var response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, _adminHeaders);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
-        result.Should().NotBeNull();
-        result!.Data.Should().NotBeNull();
-        result.TotalCount.Should().BeGreaterOrEqualTo(3); // Depending on other pre-seeded data
+        var searchResult = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
+        searchResult.Should().NotBeNull();
+        searchResult!.Data.Should().NotBeNull();
+        searchResult.TotalCount.Should().BeGreaterOrEqualTo(3); // Depending on other pre-seeded data
 
         // Test search by Keyword (AccountName)
         searchRequest.Keyword = "Cash";
-        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, adminHeaders);
-        result = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
-        result!.Data.Should().ContainSingle(a => a.AccountName == "Cash Account");
+        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, _adminHeaders);
+        searchResult = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
+        searchResult!.Data.Should().ContainSingle(a => a.AccountName == "Cash Account");
 
         // Test search by Keyword (AccountNumber)
         searchRequest.Keyword = "S_REV001";
-        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, adminHeaders);
-        result = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
-        result!.Data.Should().ContainSingle(a => a.AccountNumber == "S_REV001");
+        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, _adminHeaders);
+        searchResult = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
+        searchResult!.Data.Should().ContainSingle(a => a.AccountNumber == "S_REV001");
 
         // Test search by AccountType
         searchRequest.Keyword = null; // Clear keyword
         searchRequest.AccountType = AccountType.Expense.ToString();
-        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, adminHeaders);
-        result = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
-        result!.Data.Should().ContainSingle(a => a.AccountType == AccountType.Expense.ToString() && a.AccountNumber == "S_EXP001");
-        result.Data.Should().AllSatisfy(a => a.AccountType.Should().Be(AccountType.Expense.ToString()));
+        response = await PostAsJsonAsync("/api/v1/accounting/accounts/search", searchRequest, _adminHeaders);
+        searchResult = await response.Content.ReadFromJsonAsync<PaginationResponse<AccountDto>>();
+        searchResult!.Data.Should().ContainSingle(a => a.AccountType == AccountType.Expense.ToString() && a.AccountNumber == "S_EXP001");
+        searchResult.Data.Should().AllSatisfy(a => a.AccountType.Should().Be(AccountType.Expense.ToString()));
     }
 }

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FSH.WebApi.Application.Accounting.Accounts;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Accounting;
 using FSH.WebApi.Domain.Common.Contracts; // For IAggregateRoot
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Mapster; // Required for Adapt
 using Ardalis.Specification; // Required for ISpecification
+using FluentValidation;
 
 namespace FSH.WebApi.Application.Tests.Accounting.Accounts;
 

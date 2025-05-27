@@ -97,10 +97,10 @@ public class LedgerHandlerTests
         };
 
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId && s.BeforeDate == fromDate), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(openingTransactions));
+            .Returns(Task.FromResult<List<Transaction>>(openingTransactions));
 
         _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId && s.FromDate == fromDate && s.ToDate == toDate), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(periodTransactions));
+            .Returns(Task.FromResult<List<Transaction>>(periodTransactions));
 
         var handler = new GetAccountLedgerHandler(_accountRepository, _transactionRepository, _localizer, _logger);
 
@@ -157,10 +157,10 @@ public class LedgerHandlerTests
 
         var periodTransactions = new List<Transaction>(); // No transactions in period
 
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(openingTransactions));
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(periodTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId && s.BeforeDate == fromDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(openingTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId && s.FromDate == fromDate && s.ToDate == toDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(periodTransactions));
 
         var handler = new GetAccountLedgerHandler(_accountRepository, _transactionRepository, _localizer, _logger);
 
@@ -198,10 +198,10 @@ public class LedgerHandlerTests
             CreateMockTransaction(Guid.NewGuid(), jePeriod, account, TransactionType.Debit, 50m),  // Liability: -50, Running Bal: 150
         };
 
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(openingTransactions));
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<Transaction>>(periodTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId && s.BeforeDate == fromDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(openingTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId && s.FromDate == fromDate && s.ToDate == toDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<List<Transaction>>(periodTransactions));
 
         var handler = new GetAccountLedgerHandler(_accountRepository, _transactionRepository, _localizer, _logger);
 

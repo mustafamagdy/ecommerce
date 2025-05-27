@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FSH.WebApi.Application.Accounting.JournalEntries;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Models;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Accounting;
@@ -16,6 +17,7 @@ using System.Threading.Tasks;
 using Ardalis.Specification;
 using Mapster;
 using Xunit;
+using FluentValidation;
 
 namespace FSH.WebApi.Application.Tests.Accounting.JournalEntries;
 
