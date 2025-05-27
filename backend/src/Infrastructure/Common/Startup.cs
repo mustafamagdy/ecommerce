@@ -2,6 +2,8 @@
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using Microsoft.Extensions.DependencyInjection;
+using FSH.WebApi.Infrastructure.Persistence.Initialization; // Required for ICustomSeeder
+using FSH.WebApi.Infrastructure.Persistence.Initialization.Seeders; // Required for AccountingSeeder
 using Microsoft.Extensions.Hosting;
 
 namespace FSH.WebApi.Infrastructure.Common;
@@ -11,7 +13,8 @@ internal static class Startup
   internal static IServiceCollection AddServices(this IServiceCollection services) =>
     services
       .AddServices(typeof(ITransientService), ServiceLifetime.Transient)
-      .AddServices(typeof(IScopedService), ServiceLifetime.Scoped);
+            .AddServices(typeof(IScopedService), ServiceLifetime.Scoped)
+            .AddTransient<ICustomSeeder, AccountingSeeder>(); // Register AccountingSeeder
 
   internal static IServiceCollection AddHostedServices(this IServiceCollection services)
   {

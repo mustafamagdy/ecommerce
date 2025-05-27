@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Multitenancy.Services;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.MultiTenancy;
 using FSH.WebApi.Domain.Operation;
+using FSH.WebApi.Domain.Accounting;
 using FSH.WebApi.Domain.Printing;
 using FSH.WebApi.Domain.Structure;
 using FSH.WebApi.Infrastructure.Multitenancy;
@@ -38,6 +39,12 @@ public sealed class ApplicationDbContext : BaseDbContext
   public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
   public DbSet<OrderPayment> OrderPayments => Set<OrderPayment>();
   public DbSet<CashRegister> CashRegisters => Set<CashRegister>();
+
+  public DbSet<Account> Accounts => Set<Account>();
+  public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+  public DbSet<Transaction> Transactions => Set<Transaction>();
+  public DbSet<Budget> Budgets => Set<Budget>();
+  public DbSet<FinancialStatement> FinancialStatements => Set<FinancialStatement>();
 
   public DbSet<PaymentOperation> PaymentOperations => Set<PaymentOperation>();
 
