@@ -8,4 +8,5 @@ internal static class SchemaNames
   public static string Identity = nameof(Identity); // "IDENTITY";
   public static string MultiTenancy = nameof(MultiTenancy); // "MULTITENANCY";
   public static string Shared = nameof(Shared); // "SHARED";
+  public static string Accounting = nameof(Accounting); // "ACCOUNTING";
 }
