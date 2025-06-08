@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.Specification;
 using Xunit;
 
 namespace FSH.WebApi.Application.Tests.Accounting.FinancialStatements;
@@ -76,29 +75,24 @@ public class FinancialStatementHandlerTests
         var expenseAcc1 = CreateMockAccount(Guid.NewGuid(), "Rent Expense", "E001", AccountType.Expense);
         var expenseAcc2 = CreateMockAccount(Guid.NewGuid(), "COGS", "E002", AccountType.Expense); // Assuming COGS is an expense
 
-        _accountRepository.ListAsync(Arg.Is<AccountsByTypeSpec>(s => s.AccountType == AccountType.Revenue), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Account>>(new List<Account> { revenueAcc1 }));
-        _accountRepository.ListAsync(Arg.Is<AccountsByTypeSpec>(s => s.AccountType == AccountType.Expense), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Account>>(new List<Account> { expenseAcc1, expenseAcc2 }));
+        _accountRepository.ListAsync(Arg.Any<AccountsByTypeSpec>(), Arg.Any<CancellationToken>())
+            .Returns(
+                Task.FromResult(new List<Account> { revenueAcc1 }),
+                Task.FromResult(new List<Account> { expenseAcc1, expenseAcc2 }));
 
         var je1 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(5));
         var je2 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(10));
         var je3 = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(15));
 
-        // Transaction for revenue account
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == revenueAcc1.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je1, revenueAcc1, TransactionType.Credit, 500m), // Revenue +500
-                CreateMockTransaction(Guid.NewGuid(), je3, revenueAcc1, TransactionType.Credit, 300m)  // Revenue +300
-            }));
-
-        // Transactions for expense accounts
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == expenseAcc1.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc1, TransactionType.Debit, 200m) }));
-
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == expenseAcc2.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc2, TransactionType.Debit, 100m) }));
+        _transactionRepository.ListAsync(Arg.Any<TransactionsForAccountInPeriodSpec>(), Arg.Any<CancellationToken>())
+            .Returns(
+                Task.FromResult(new List<Transaction>
+                {
+                    CreateMockTransaction(Guid.NewGuid(), je1, revenueAcc1, TransactionType.Credit, 500m),
+                    CreateMockTransaction(Guid.NewGuid(), je3, revenueAcc1, TransactionType.Credit, 300m)
+                }),
+                Task.FromResult(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc1, TransactionType.Debit, 200m) }),
+                Task.FromResult(new List<Transaction> { CreateMockTransaction(Guid.NewGuid(), je2, expenseAcc2, TransactionType.Debit, 100m) }));
 
         var handler = new GenerateProfitAndLossHandler(_accountRepository, _transactionRepository, _pnlLocalizer, _pnlLogger);
 
@@ -140,26 +134,20 @@ public class FinancialStatementHandlerTests
         var je2 = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-5));
         var je3 = CreateMockJournalEntry(Guid.NewGuid(), asOfDate.AddDays(-2));
 
-        // Transaction for asset account
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == assetAcc.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je1, assetAcc, TransactionType.Debit, 1000m)
-            }));
-
-        // Transaction for liability account
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == liabAcc.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je1, liabAcc, TransactionType.Credit, 600m)
-            }));
-
-        // Transaction for equity account
-        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == equityAcc.Id), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<List<Transaction>>(new List<Transaction>
-            {
-                CreateMockTransaction(Guid.NewGuid(), je1, equityAcc, TransactionType.Credit, 400m)
-            }));
+        _transactionRepository.ListAsync(Arg.Any<TransactionsForAccountInPeriodSpec>(), Arg.Any<CancellationToken>())
+            .Returns(
+                Task.FromResult(new List<Transaction>
+                {
+                    CreateMockTransaction(Guid.NewGuid(), je1, assetAcc, TransactionType.Debit, 1000m)
+                }),
+                Task.FromResult(new List<Transaction>
+                {
+                    CreateMockTransaction(Guid.NewGuid(), je1, liabAcc, TransactionType.Credit, 600m)
+                }),
+                Task.FromResult(new List<Transaction>
+                {
+                    CreateMockTransaction(Guid.NewGuid(), je1, equityAcc, TransactionType.Credit, 400m)
+                }));
 
         var handler = new GenerateBalanceSheetHandler(_accountRepository, _bsLocalizer, _bsLogger, _transactionRepository);
 
@@ -182,47 +170,3 @@ public class FinancialStatementHandlerTests
     }
 }
 
-// Minimal Spec implementations for testing
-internal class AccountsByTypeSpec : Specification<Account>
-{
-    public AccountType AccountType { get; }
-    public AccountsByTypeSpec(AccountType accountType)
-    {
-        AccountType = accountType;
-        Query.Where(a => a.AccountType == accountType && a.IsActive);
-    }
-}
-
-// Re-using from LedgerHandlerTests or define locally if not shared.
-// For this context, assuming it might be specific or slightly different.
-internal class TransactionsForAccountInPeriodSpec : Specification<Transaction>
-{
-    public Guid AccountId { get; }
-    public DateTime FromDate { get; }
-    public DateTime ToDate { get; }
-    public TransactionsForAccountInPeriodSpec(Guid accountId, DateTime fromDate, DateTime toDate)
-    {
-        AccountId = accountId;
-        FromDate = fromDate;
-        ToDate = toDate;
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate >= fromDate && t.JournalEntry.PostedDate < toDate.AddDays(1))
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
-    }
-}
-
-internal class TransactionsForAccountUpToDateSpec : Specification<Transaction>
-{
-    public Guid AccountId { get; }
-    public DateTime ToDate { get; }
-    public TransactionsForAccountUpToDateSpec(Guid accountId, DateTime toDate)
-    {
-        AccountId = accountId;
-        ToDate = toDate;
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate < toDate.AddDays(1)) // up to and including 'toDate'
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
-    }
-}
