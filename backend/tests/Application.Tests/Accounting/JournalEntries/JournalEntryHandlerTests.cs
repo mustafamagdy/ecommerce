@@ -112,6 +112,33 @@ public class JournalEntryHandlerTests
         await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(request, CancellationToken.None));
     }
 
+    [Fact]
+    public async Task CreateJournalEntryHandler_Should_Throw_ValidationException_When_Account_Is_Not_Active()
+    {
+        // Arrange
+        var inactiveAccountId = Guid.NewGuid();
+        var request = new CreateJournalEntryRequest
+        {
+            EntryDate = DateTime.UtcNow,
+            Description = "JE with inactive account",
+            Transactions = new List<CreateTransactionRequestItem>
+            {
+                new CreateTransactionRequestItem { AccountId = inactiveAccountId, TransactionType = "Debit", Amount = 50 },
+                new CreateTransactionRequestItem { AccountId = Guid.NewGuid(), TransactionType = "Credit", Amount = 50 }
+            }
+        };
+
+        _accountRepository.GetByIdAsync(inactiveAccountId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(new Account("Inactive", "001", AccountType.Asset, 0m, null, false)));
+        _accountRepository.GetByIdAsync(Arg.Is<Guid>(id => id != inactiveAccountId), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(new Account("Active", "002", AccountType.Asset, 0m, null, true)));
+
+        var handler = new CreateJournalEntryHandler(_journalEntryRepository, _accountRepository, _createLocalizer, _createLogger);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(request, CancellationToken.None));
+    }
+
     // === PostJournalEntryHandler Tests ===
     [Fact]
     public async Task PostJournalEntryHandler_Should_Post_JournalEntry_And_Update_Account_Balances()
@@ -194,6 +221,101 @@ public class JournalEntryHandlerTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(request, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task PostJournalEntryHandler_Should_Throw_ValidationException_When_JournalEntry_Has_No_Transactions()
+    {
+        var journalEntryId = Guid.NewGuid();
+        var journalEntry = new JournalEntry(DateTime.UtcNow, "No Tx JE", null);
+        typeof(AuditableEntity).GetProperty(nameof(AuditableEntity.Id))!.SetValue(journalEntry, journalEntryId);
+
+        _journalEntryRepository.FirstOrDefaultAsync(Arg.Any<JournalEntryWithTransactionsSpec>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JournalEntry?>(journalEntry));
+
+        var handler = new PostJournalEntryHandler(_journalEntryRepository, _accountRepository, _postLocalizer, _postLogger);
+        var request = new PostJournalEntryRequest(journalEntryId);
+
+        await Assert.ThrowsAsync<ValidationException>(() => handler.Handle(request, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task PostJournalEntryHandler_Should_Throw_InvalidOperationException_When_Debits_Do_Not_Equal_Credits()
+    {
+        var journalEntryId = Guid.NewGuid();
+        var accountId1 = Guid.NewGuid();
+        var accountId2 = Guid.NewGuid();
+
+        var journalEntry = new JournalEntry(DateTime.UtcNow, "Unbalanced JE", null);
+        typeof(AuditableEntity).GetProperty(nameof(AuditableEntity.Id))!.SetValue(journalEntry, journalEntryId);
+        journalEntry.Transactions = new List<Transaction>
+        {
+            new Transaction(journalEntryId, accountId1, TransactionType.Debit, 100m, "Debit"),
+            new Transaction(journalEntryId, accountId2, TransactionType.Credit, 50m, "Credit")
+        };
+
+        _journalEntryRepository.FirstOrDefaultAsync(Arg.Any<JournalEntryWithTransactionsSpec>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JournalEntry?>(journalEntry));
+        _accountRepository.GetByIdAsync(accountId1, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(new Account("A1", "1", AccountType.Asset, 0m, null, true)));
+        _accountRepository.GetByIdAsync(accountId2, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(new Account("A2", "2", AccountType.Liability, 0m, null, true)));
+
+        var handler = new PostJournalEntryHandler(_journalEntryRepository, _accountRepository, _postLocalizer, _postLogger);
+        var request = new PostJournalEntryRequest(journalEntryId);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(request, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task PostJournalEntryHandler_Should_Throw_NotFoundException_When_Account_Not_Found()
+    {
+        var journalEntryId = Guid.NewGuid();
+        var missingAccountId = Guid.NewGuid();
+
+        var journalEntry = new JournalEntry(DateTime.UtcNow, "JE", null);
+        typeof(AuditableEntity).GetProperty(nameof(AuditableEntity.Id))!.SetValue(journalEntry, journalEntryId);
+        journalEntry.Transactions = new List<Transaction>
+        {
+            new Transaction(journalEntryId, missingAccountId, TransactionType.Debit, 50m, "Debit")
+        };
+
+        _journalEntryRepository.FirstOrDefaultAsync(Arg.Any<JournalEntryWithTransactionsSpec>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JournalEntry?>(journalEntry));
+        _accountRepository.GetByIdAsync(missingAccountId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(null));
+
+        var handler = new PostJournalEntryHandler(_journalEntryRepository, _accountRepository, _postLocalizer, _postLogger);
+        var request = new PostJournalEntryRequest(journalEntryId);
+
+        await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(request, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task PostJournalEntryHandler_Should_Throw_InvalidOperationException_When_AccountType_Unknown()
+    {
+        var journalEntryId = Guid.NewGuid();
+        var accountId = Guid.NewGuid();
+
+        var journalEntry = new JournalEntry(DateTime.UtcNow, "JE", null);
+        typeof(AuditableEntity).GetProperty(nameof(AuditableEntity.Id))!.SetValue(journalEntry, journalEntryId);
+        journalEntry.Transactions = new List<Transaction>
+        {
+            new Transaction(journalEntryId, accountId, TransactionType.Debit, 10m, "Debit")
+        };
+
+        _journalEntryRepository.FirstOrDefaultAsync(Arg.Any<JournalEntryWithTransactionsSpec>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JournalEntry?>(journalEntry));
+
+        var invalidAccount = new Account("Weird", "W001", (AccountType)999, 0m, null);
+        typeof(AuditableEntity).GetProperty(nameof(AuditableEntity.Id))!.SetValue(invalidAccount, accountId);
+        _accountRepository.GetByIdAsync(accountId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Account?>(invalidAccount));
+
+        var handler = new PostJournalEntryHandler(_journalEntryRepository, _accountRepository, _postLocalizer, _postLogger);
+        var request = new PostJournalEntryRequest(journalEntryId);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(request, CancellationToken.None));
     }
 
     // === GetJournalEntryHandler Tests ===
