@@ -216,6 +216,85 @@ public class LedgerHandlerTests
         result.Entries[0].Balance.Should().Be(150m); // 200 - 50
         result.ClosingBalance.Should().Be(150m);
     }
+
+    [Fact]
+    public async Task GetAccountLedgerHandler_Should_Handle_RevenueAccount_Correctly()
+    {
+        var accountId = Guid.NewGuid();
+        var fromDate = new DateTime(2023, 2, 1);
+        var toDate = new DateTime(2023, 2, 28);
+        var request = new GetAccountLedgerRequest(accountId, fromDate, toDate);
+
+        var account = CreateMockAccount(accountId, "Revenue", "REV001", AccountType.Revenue);
+        _accountRepository.GetByIdAsync(accountId, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Account?>(account));
+
+        var jeOpening = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(-1));
+        var openingTransactions = new List<Transaction>
+        {
+            CreateMockTransaction(Guid.NewGuid(), jeOpening, account, TransactionType.Credit, 300m)
+        }; // Opening Balance = 300
+
+        var jePeriod = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(3));
+        var periodTransactions = new List<Transaction>
+        {
+            CreateMockTransaction(Guid.NewGuid(), jePeriod, account, TransactionType.Debit, 100m)
+        };
+
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId && s.BeforeDate == fromDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(openingTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId && s.FromDate == fromDate && s.ToDate == toDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(periodTransactions));
+
+        var handler = new GetAccountLedgerHandler(_accountRepository, _transactionRepository, _localizer, _logger);
+
+        var result = await handler.Handle(request, CancellationToken.None);
+
+        result.OpeningBalance.Should().Be(300m);
+        result.Entries.Should().HaveCount(1);
+        result.Entries[0].DebitAmount.Should().Be(100m);
+        result.Entries[0].CreditAmount.Should().Be(0);
+        result.Entries[0].Balance.Should().Be(200m);
+        result.ClosingBalance.Should().Be(200m);
+    }
+
+    [Fact]
+    public async Task GetAccountLedgerHandler_Should_Handle_EquityAccount_Correctly()
+    {
+        var accountId = Guid.NewGuid();
+        var fromDate = new DateTime(2023, 3, 1);
+        var toDate = new DateTime(2023, 3, 31);
+        var request = new GetAccountLedgerRequest(accountId, fromDate, toDate);
+
+        var account = CreateMockAccount(accountId, "Equity", "EQ001", AccountType.Equity);
+        _accountRepository.GetByIdAsync(accountId, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Account?>(account));
+
+        var jeOpening = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(-1));
+        var openingTransactions = new List<Transaction>
+        {
+            CreateMockTransaction(Guid.NewGuid(), jeOpening, account, TransactionType.Credit, 400m)
+        }; // Opening Balance = 400
+
+        var jePeriod = CreateMockJournalEntry(Guid.NewGuid(), fromDate.AddDays(5));
+        var periodTransactions = new List<Transaction>
+        {
+            CreateMockTransaction(Guid.NewGuid(), jePeriod, account, TransactionType.Debit, 150m)
+        };
+
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountBeforeDateSpec>(s => s.AccountId == accountId && s.BeforeDate == fromDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(openingTransactions));
+        _transactionRepository.ListAsync(Arg.Is<TransactionsForAccountInPeriodSpec>(s => s.AccountId == accountId && s.FromDate == fromDate && s.ToDate == toDate), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(periodTransactions));
+
+        var handler = new GetAccountLedgerHandler(_accountRepository, _transactionRepository, _localizer, _logger);
+        var result = await handler.Handle(request, CancellationToken.None);
+
+        result.OpeningBalance.Should().Be(400m);
+        result.Entries.Should().HaveCount(1);
+        result.Entries[0].DebitAmount.Should().Be(150m);
+        result.Entries[0].CreditAmount.Should().Be(0);
+        result.Entries[0].Balance.Should().Be(250m);
+        result.ClosingBalance.Should().Be(250m);
+    }
 }
 
 // Minimal Spec implementations for testing, assuming the real ones are more complex
