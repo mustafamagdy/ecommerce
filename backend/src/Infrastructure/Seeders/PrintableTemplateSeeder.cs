@@ -37,6 +37,8 @@ public sealed class PrintableDocumentsSeeder : ICustomSeeder
     var simpleReceipts = items.OfType<SimpleReceiptInvoice>().ToArray();
     var wideInvoices = items.OfType<WideReceiptInvoice>().ToArray();
     var ordersSummaryReport = items.OfType<OrdersSummaryReport>().ToArray();
+    var pnlReports = items.OfType<ProfitAndLossReport>().ToArray();
+    var balanceReports = items.OfType<BalanceSheetReport>().ToArray();
 
     var hasSimpleSeeded = await _db.Set<SimpleReceiptInvoice>().AnyAsync(cancellationToken).ConfigureAwait(false);
     if (!hasSimpleSeeded && simpleReceipts.Length > 0)
@@ -54,6 +56,18 @@ public sealed class PrintableDocumentsSeeder : ICustomSeeder
     if (!hasOrderSummaryReport && ordersSummaryReport.Length > 0)
     {
       await SeedTemplates(ordersSummaryReport, cancellationToken);
+    }
+
+    var hasPnlReport = await _db.Set<ProfitAndLossReport>().AnyAsync(cancellationToken).ConfigureAwait(false);
+    if (!hasPnlReport && pnlReports.Length > 0)
+    {
+      await SeedTemplates(pnlReports, cancellationToken);
+    }
+
+    var hasBalanceReport = await _db.Set<BalanceSheetReport>().AnyAsync(cancellationToken).ConfigureAwait(false);
+    if (!hasBalanceReport && balanceReports.Length > 0)
+    {
+      await SeedTemplates(balanceReports, cancellationToken);
     }
 
     await _db.SaveChangesAsync(cancellationToken);
@@ -89,5 +103,25 @@ public sealed class PrintableDocumentsSeeder : ICustomSeeder
       return a;
     }).ToArray();
     await _db.AddRangeAsync(tempates, cancellationToken);
+  }
+
+  private async Task SeedTemplates(ProfitAndLossReport[] templates, CancellationToken cancellationToken)
+  {
+    templates = templates.Select(a =>
+    {
+      a.Id = Guid.NewGuid();
+      return a;
+    }).ToArray();
+    await _db.AddRangeAsync(templates, cancellationToken);
+  }
+
+  private async Task SeedTemplates(BalanceSheetReport[] templates, CancellationToken cancellationToken)
+  {
+    templates = templates.Select(a =>
+    {
+      a.Id = Guid.NewGuid();
+      return a;
+    }).ToArray();
+    await _db.AddRangeAsync(templates, cancellationToken);
   }
 }

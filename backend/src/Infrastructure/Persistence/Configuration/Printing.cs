@@ -23,7 +23,9 @@ public sealed class PrintableTemplateConfig : BaseTenantEntityConfiguration<Prin
       .HasDiscriminator<string>("template_type")
       .HasValue<SimpleReceiptInvoice>(PrintableType.Receipt.Name)
       .HasValue<OrdersSummaryReport>(PrintableType.OrdersSummary.Name)
-      .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name);
+      .HasValue<WideReceiptInvoice>(PrintableType.Wide.Name)
+      .HasValue<ProfitAndLossReport>(PrintableType.ProfitAndLoss.Name)
+      .HasValue<BalanceSheetReport>(PrintableType.BalanceSheet.Name);
 
     // builder.HasMany(a => a.Sections).WithOne(a => a.Document).HasForeignKey(a => a.DocumentId);
     var sections = builder.Navigation(nameof(PrintableDocument.Sections));

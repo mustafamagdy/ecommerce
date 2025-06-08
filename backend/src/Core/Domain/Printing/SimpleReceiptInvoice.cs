@@ -11,3 +11,11 @@ public sealed class OrdersSummaryReport : PrintableDocument
 public sealed class WideReceiptInvoice : PrintableDocument
 {
 }
+
+public sealed class ProfitAndLossReport : PrintableDocument
+{
+}
+
+public sealed class BalanceSheetReport : PrintableDocument
+{
+}
