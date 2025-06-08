@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.Specification;
 using Xunit;
 
 namespace FSH.WebApi.Application.Tests.Accounting.FinancialStatements;
@@ -182,47 +181,3 @@ public class FinancialStatementHandlerTests
     }
 }
 
-// Minimal Spec implementations for testing
-internal class AccountsByTypeSpec : Specification<Account>
-{
-    public AccountType AccountType { get; }
-    public AccountsByTypeSpec(AccountType accountType)
-    {
-        AccountType = accountType;
-        Query.Where(a => a.AccountType == accountType && a.IsActive);
-    }
-}
-
-// Re-using from LedgerHandlerTests or define locally if not shared.
-// For this context, assuming it might be specific or slightly different.
-internal class TransactionsForAccountInPeriodSpec : Specification<Transaction>
-{
-    public Guid AccountId { get; }
-    public DateTime FromDate { get; }
-    public DateTime ToDate { get; }
-    public TransactionsForAccountInPeriodSpec(Guid accountId, DateTime fromDate, DateTime toDate)
-    {
-        AccountId = accountId;
-        FromDate = fromDate;
-        ToDate = toDate;
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate >= fromDate && t.JournalEntry.PostedDate < toDate.AddDays(1))
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
-    }
-}
-
-internal class TransactionsForAccountUpToDateSpec : Specification<Transaction>
-{
-    public Guid AccountId { get; }
-    public DateTime ToDate { get; }
-    public TransactionsForAccountUpToDateSpec(Guid accountId, DateTime toDate)
-    {
-        AccountId = accountId;
-        ToDate = toDate;
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate < toDate.AddDays(1)) // up to and including 'toDate'
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
-    }
-}
