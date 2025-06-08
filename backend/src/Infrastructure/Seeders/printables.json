@@ -123,4 +123,33 @@
       }
     ]
   }
+  ,
+  {
+    "Type": "ProfitAndLoss",
+    "Active": true,
+    "Sections": [
+      {"Type": "Title", "Order": 1, "Alignment": "Center", "Position": "Header", "ShowDebug": false, "BindingProperty": "Profit & Loss Statement"},
+      {"Type": "Title", "Order": 2, "Alignment": "Center", "Position": "Header", "ShowDebug": false, "BindingProperty": "$FromDate - $ToDate"},
+      {"Type": "Table", "Order": 3, "Alignment": "Center", "Position": "Body", "ShowDebug": false, "BindingProperty": "$Revenue[](AccountName,Amount)", "HeaderTitle": "Account%al,Amount%al", "ColumnDefs": "r,c25", "HeaderStyle": "font=8,semi-bold"},
+      {"Type": "TwoPartTitle", "Order": 4, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Total Revenue: ,$TotalRevenue"},
+      {"Type": "Table", "Order": 5, "Alignment": "Center", "Position": "Body", "ShowDebug": false, "BindingProperty": "$OperatingExpenses[](AccountName,Amount)", "HeaderTitle": "Account%al,Amount%al", "ColumnDefs": "r,c25", "HeaderStyle": "font=8,semi-bold"},
+      {"Type": "TwoPartTitle", "Order": 6, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Total Operating Expenses: ,$TotalOperatingExpenses"},
+      {"Type": "TwoPartTitle", "Order": 7, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Net Profit: ,$NetProfit"}
+    ]
+  },
+  {
+    "Type": "BalanceSheet",
+    "Active": true,
+    "Sections": [
+      {"Type": "Title", "Order": 1, "Alignment": "Center", "Position": "Header", "ShowDebug": false, "BindingProperty": "Balance Sheet"},
+      {"Type": "Title", "Order": 2, "Alignment": "Center", "Position": "Header", "ShowDebug": false, "BindingProperty": "As of $AsOfDate"},
+      {"Type": "Table", "Order": 3, "Alignment": "Center", "Position": "Body", "ShowDebug": false, "BindingProperty": "$Assets[](AccountName,Amount)", "HeaderTitle": "Assets%al,Amount%al", "ColumnDefs": "r,c25", "HeaderStyle": "font=8,semi-bold"},
+      {"Type": "TwoPartTitle", "Order": 4, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Total Assets: ,$TotalAssets"},
+      {"Type": "Table", "Order": 5, "Alignment": "Center", "Position": "Body", "ShowDebug": false, "BindingProperty": "$Liabilities[](AccountName,Amount)", "HeaderTitle": "Liabilities%al,Amount%al", "ColumnDefs": "r,c25", "HeaderStyle": "font=8,semi-bold"},
+      {"Type": "TwoPartTitle", "Order": 6, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Total Liabilities: ,$TotalLiabilities"},
+      {"Type": "Table", "Order": 7, "Alignment": "Center", "Position": "Body", "ShowDebug": false, "BindingProperty": "$Equity[](AccountName,Amount)", "HeaderTitle": "Equity%al,Amount%al", "ColumnDefs": "r,c25", "HeaderStyle": "font=8,semi-bold"},
+      {"Type": "TwoPartTitle", "Order": 8, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Total Equity: ,$TotalEquity"},
+      {"Type": "TwoPartTitle", "Order": 9, "Alignment": "Right", "Position": "Body", "ShowDebug": false, "BindingProperty": "Liabilities + Equity: ,$TotalLiabilitiesAndEquity"}
+    ]
+  }
 ]

@@ -33,4 +33,22 @@ public class FinancialStatementsController : VersionedApiController
         var statementDto = await _mediator.Send(request);
         return Ok(statementDto);
     }
+
+    [HttpPost("financial-statements/profit-and-loss/report")]
+    [OpenApiOperation("Generate a Profit and Loss PDF report for a specified period.", "")]
+    public async Task<FileResult> GenerateProfitAndLossReportAsync(GenerateProfitAndLossReportRequest request)
+    {
+        var pdf = await _mediator.Send(request);
+        var fileName = $"profit_loss_{request.FromDate:yyyyMMdd}_{request.ToDate:yyyyMMdd}.pdf";
+        return File(pdf, "application/octet-stream", fileName);
+    }
+
+    [HttpPost("financial-statements/balance-sheet/report")]
+    [OpenApiOperation("Generate a Balance Sheet PDF report as of a specified date.", "")]
+    public async Task<FileResult> GenerateBalanceSheetReportAsync(GenerateBalanceSheetReportRequest request)
+    {
+        var pdf = await _mediator.Send(request);
+        var fileName = $"balance_sheet_{request.AsOfDate:yyyyMMdd}.pdf";
+        return File(pdf, "application/octet-stream", fileName);
+    }
 }

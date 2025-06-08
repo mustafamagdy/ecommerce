@@ -19,6 +19,8 @@ public sealed class PrintableDocumentJsonConverter : JsonConverter
       nameof(PrintableType.Receipt) => typeof(SimpleReceiptInvoice),
       nameof(PrintableType.Wide) => typeof(WideReceiptInvoice),
       nameof(PrintableType.OrdersSummary) => typeof(OrdersSummaryReport),
+      nameof(PrintableType.ProfitAndLoss) => typeof(ProfitAndLossReport),
+      nameof(PrintableType.BalanceSheet) => typeof(BalanceSheetReport),
       _ => throw new ArgumentOutOfRangeException(typeToken)
     };
 
