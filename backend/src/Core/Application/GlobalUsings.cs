@@ -8,6 +8,20 @@ global using FSH.WebApi.Application.Common.Models;
 global using FSH.WebApi.Application.Common.Persistence;
 global using FSH.WebApi.Application.Common.Specification;
 global using FSH.WebApi.Application.Common.Validation;
+global using FSH.WebApi.Application.HR.Employees.Commands;
+global using FSH.WebApi.Application.HR.Employees.Queries;
+global using FSH.WebApi.Application.HR.Leaves.Commands;
+global using FSH.WebApi.Application.HR.Leaves.Queries;
+global using FSH.WebApi.Application.HR.LeaveTypes.Commands;
+global using FSH.WebApi.Application.HR.LeaveTypes.Queries;
+global using FSH.WebApi.Application.HR.Payroll.Commands;
+global using FSH.WebApi.Application.HR.Payroll.Queries;
+global using FSH.WebApi.Application.HR.Recruitment.Applicants.Commands;  // Added
+global using FSH.WebApi.Application.HR.Recruitment.Applicants.Dtos;    // Added
+global using FSH.WebApi.Application.HR.Recruitment.Applicants.Queries;   // Added
+global using FSH.WebApi.Application.HR.Recruitment.JobOpenings.Commands;
+global using FSH.WebApi.Application.HR.Recruitment.JobOpenings.Dtos;
+global using FSH.WebApi.Application.HR.Recruitment.JobOpenings.Queries;
 global using FSH.WebApi.Domain.Catalog;
 global using FSH.WebApi.Domain.Common;
 global using FSH.WebApi.Domain.Common.Contracts;
