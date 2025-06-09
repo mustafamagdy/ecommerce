@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Common.Validation;
+using FSH.WebApi.Domain.HR.Enums; // For LeaveStatusEnum
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 
@@ -12,9 +13,10 @@ public class UpdateLeaveStatusRequestValidator : CustomValidator<UpdateLeaveStat
             .NotEmpty();
 
         RuleFor(p => p.Status)
-            .NotEmpty()
-            .Must(status => status == "Approved" || status == "Rejected")
-                .WithMessage(T["Status must be either 'Approved' or 'Rejected'."]);
+            .NotNull()
+            .IsInEnum() // Validates it's a valid enum value
+            .Must(status => status == LeaveStatusEnum.Approved || status == LeaveStatusEnum.Rejected) // Further restrict to only these two for this specific request
+                .WithMessage(T["Status must be either 'Approved' or 'Rejected' for this operation."]);
 
         RuleFor(p => p.Notes)
             .MaximumLength(500)

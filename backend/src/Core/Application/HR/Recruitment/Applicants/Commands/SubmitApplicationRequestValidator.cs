@@ -51,6 +51,7 @@ public class SubmitApplicationRequestValidator : CustomValidator<SubmitApplicati
         // Validation for FileUploadRequest (Resume)
         // This is basic. More specific validation (file types, size limits)
         // would depend on how FileUploadRequest is structured and business rules.
+        // TODO: File type and size validation should ideally be configurable (e.g., from application settings) rather than hardcoded.
         When(p => p.Resume != null, () =>
         {
             RuleFor(p => p.Resume!.Name)

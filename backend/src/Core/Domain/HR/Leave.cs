@@ -1,3 +1,5 @@
+using FSH.WebApi.Domain.HR.Enums; // Added for LeaveStatusEnum
+
 namespace FSH.WebApi.Domain.HR;
 
 public class Leave : AuditableEntity
@@ -12,5 +14,6 @@ public class Leave : AuditableEntity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string? Reason { get; set; }
-    public string Status { get; set; } = string.Empty; // e.g., Pending, Approved, Rejected
+    public LeaveStatusEnum Status { get; set; } = LeaveStatusEnum.Pending; // Changed to Enum
+    public string? Notes { get; set; } // Added from previous subtask for manager's comments
 }

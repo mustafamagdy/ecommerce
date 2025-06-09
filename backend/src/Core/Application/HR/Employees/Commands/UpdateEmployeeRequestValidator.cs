@@ -78,8 +78,24 @@ public class UpdateEmployeeRequestValidator : CustomValidator<UpdateEmployeeRequ
             .When(p => p.JobTitleId.HasValue);
 
         RuleFor(p => p.ManagerId)
-            .MustAsync(async (id, ct) => id is null || await employeeRepository.GetByIdAsync(id.Value, ct) is not null)
-                .WithMessage((_, id) => T["Manager with ID {0} not found.", id])
-            .When(p => p.ManagerId.HasValue || p.ManagerId == null); // Validate if explicitly set to null or a new Guid
+            .MustAsync(async (managerId, ct) => // Check 1: Proposed manager must exist
+            {
+                if (!managerId.HasValue) return true; // No manager assigned, so no issue
+                return await employeeRepository.GetByIdAsync(managerId.Value, ct) is not null;
+            })
+                .WithMessage((_, id) => T["Proposed manager with ID {0} not found.", id])
+            .NotEqual(p => p.Id)
+                .WithMessage(T["An employee cannot be their own manager."])
+            .MustAsync(async (request, managerId, ct) => // Check 2: Prevent direct circular dependency
+            {
+                if (!managerId.HasValue) return true; // No manager, no circular dependency
+                var proposedManager = await employeeRepository.GetByIdAsync(managerId.Value, ct);
+                // If proposedManager is null, previous rule handles it.
+                // If proposedManager's manager is the current employee being updated, it's a circular dependency.
+                if (proposedManager?.ManagerId == request.Id) return false;
+                return true;
+            })
+                .WithMessage(T["This assignment creates a direct circular manager dependency."])
+            .When(p => p.ManagerId.HasValue); // All these rules apply only if ManagerId is being set
     }
 }

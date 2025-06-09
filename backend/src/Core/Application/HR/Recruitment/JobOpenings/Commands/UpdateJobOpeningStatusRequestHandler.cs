@@ -34,12 +34,18 @@ public class UpdateJobOpeningStatusRequestHandler : IRequestHandler<UpdateJobOpe
             return jobOpening.Id;
         }
 
+        var oldStatus = jobOpening.Status;
         jobOpening.Status = request.Status;
 
         // If closing a job, might set ClosingDate if not already set.
         if (request.Status == JobOpeningStatus.Closed && jobOpening.ClosingDate is null)
         {
             jobOpening.ClosingDate = DateTime.UtcNow;
+        }
+        // If re-opening a job (from Closed or OnHold), clear the ClosingDate so it can be set anew or be open-ended.
+        else if ((oldStatus == JobOpeningStatus.Closed || oldStatus == JobOpeningStatus.OnHold) && request.Status == JobOpeningStatus.Open)
+        {
+            jobOpening.ClosingDate = null;
         }
 
         jobOpening.AddDomainEvent(EntityUpdatedEvent.WithEntity(jobOpening));

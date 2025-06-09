@@ -25,6 +25,7 @@ public class Payslip : AuditableEntity
 
     public DateTime GeneratedDate { get; set; }
     public PayslipStatus Status { get; set; } = PayslipStatus.Draft;
+    public string? CancellationReason { get; set; } // Added for cancellation reason
 
     public List<PayslipComponent> Components { get; set; } = new(); // Snapshot of components
 

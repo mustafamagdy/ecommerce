@@ -1,3 +1,5 @@
+using FSH.WebApi.Domain.HR.Enums; // For LeaveStatusEnum
+
 namespace FSH.WebApi.Application.HR.Leaves;
 
 public class LeaveDto
@@ -13,7 +15,8 @@ public class LeaveDto
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string? Reason { get; set; }
-    public string Status { get; set; } = string.Empty; // e.g., Pending, Approved, Rejected, Cancelled
+    public LeaveStatusEnum Status { get; set; } // Changed to Enum
+    public string StatusDescription => Status.ToString(); // String representation
 
     public string? Notes { get; set; } // Manager's comments
 

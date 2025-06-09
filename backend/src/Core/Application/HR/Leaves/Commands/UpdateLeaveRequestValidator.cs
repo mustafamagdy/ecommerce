@@ -27,11 +27,13 @@ public class UpdateLeaveRequestValidator : CustomValidator<UpdateLeaveRequest>
                 .WithMessage(T["Start date cannot be in the past."])
             .When(p => p.StartDate.HasValue);
 
-        RuleFor(p => p.EndDate)
-            .NotEmpty()
-            .GreaterThanOrEqualTo(p => p.StartDate!.Value) // Assumes StartDate is also being provided or already validated
-                .WithMessage(T["End date must be on or after the start date."])
-            .When(p => p.EndDate.HasValue && p.StartDate.HasValue);
+        When(p => p.EndDate.HasValue, () => {
+            RuleFor(p => p.EndDate!.Value) // Use EndDate.Value because of When condition
+                .NotEmpty().WithMessage(T["End date cannot be empty when provided."])
+                .GreaterThanOrEqualTo(p => p.StartDate!.Value)
+                    .WithMessage(T["End date must be on or after the start date."])
+                .When(p => p.StartDate.HasValue); // This inner When is important if StartDate is optional
+        });
 
         RuleFor(p => p.Reason)
             .MaximumLength(500)

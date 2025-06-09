@@ -2,7 +2,8 @@ using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces; // For ICurrentUser
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.HR;
-using FSH.WebApi.Application.HR.Leaves.Queries; // For OverlappingLeaveSpec
+using FSH.WebApi.Domain.HR.Enums; // For LeaveStatusEnum
+using FSH.WebApi.Application.HR.Leaves.Specifications; // For OverlappingLeaveSpec
 using MediatR;
 using Microsoft.Extensions.Localization;
 
@@ -43,7 +44,7 @@ public class UpdateLeaveRequestHandler : IRequestHandler<UpdateLeaveRequest, Gui
             throw new ForbiddenException(_t["You are not authorized to update this leave request."]);
         }
 
-        if (leave.Status != "Pending")
+        if (leave.Status != LeaveStatusEnum.Pending) // Using Enum
         {
             throw new ConflictException(_t["Only pending leave requests can be updated. This leave is already {0}.", leave.Status]);
         }
