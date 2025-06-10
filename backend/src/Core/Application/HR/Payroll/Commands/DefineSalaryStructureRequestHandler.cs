@@ -34,6 +34,10 @@ public class DefineSalaryStructureRequestHandler : IRequestHandler<DefineSalaryS
         var employee = await _employeeRepo.GetByIdAsync(request.EmployeeId, cancellationToken);
         _ = employee ?? throw new NotFoundException(_t["Employee with ID {0} not found.", request.EmployeeId]);
 
+        // Concurrency check: For defining a new salary structure, the primary concern would be multiple
+        // attempts to create one for the same employee simultaneously. A unique database constraint
+        // on EmployeeId in the SalaryStructures table is the robust way to prevent duplicates.
+        // The check below handles finding an existing structure for update.
         var spec = new SalaryStructureByEmployeeIdSpec(request.EmployeeId);
         var salaryStructure = await _salaryStructureRepo.FirstOrDefaultAsync(spec, cancellationToken);
 

@@ -9,5 +9,6 @@ public class ScheduleInterviewRequest : IRequest<Guid> // Returns Interview.Id
     public Guid InterviewerId { get; set; } // Employee Id
     public DateTime ScheduledTime { get; set; }
     public InterviewType Type { get; set; }
-    public string? Notes { get; set; } // Optional initial notes for the interview (e.g., meeting link, location)
+    public string? Location { get; set; } // New: Physical address or meeting link
+    public string? Notes { get; set; } // Optional internal notes for the interview
 }

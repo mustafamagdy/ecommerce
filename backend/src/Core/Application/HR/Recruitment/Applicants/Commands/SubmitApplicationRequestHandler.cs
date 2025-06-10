@@ -57,9 +57,17 @@ public class SubmitApplicationRequestHandler : IRequestHandler<SubmitApplication
             // Ensure FileUploadRequest is correctly populated (Name, Extension, Data) by the caller (e.g., controller)
             if (string.IsNullOrEmpty(request.Resume.Name) || string.IsNullOrEmpty(request.Resume.Extension) || request.Resume.Data == null)
             {
-                throw new ValidationException(_t["Resume file information is incomplete."]);
+                // This basic validation should ideally be part of FluentValidation for the request DTO.
+                throw new ValidationException(_t["Resume file information is incomplete. Name, Extension, and Data are required."]);
             }
+
+            // TODO: Implement more robust error handling for file upload (e.g., catch specific exceptions from IFileStorageService).
+            // TODO: Consider transactional consistency: What if Applicant record creation succeeds but file upload fails?
+            //       (e.g., could use a two-phase commit, a saga pattern, or mark applicant as 'PendingResumeUpload' and have a cleanup job).
+            // TODO: Implement retry logic for transient file storage errors if applicable for the chosen IFileStorageService.
             resumePath = await _fileStorage.UploadAsync<Applicant>(request.Resume, FileType.Document, cancellationToken);
+            // Consider what happens if UploadAsync throws an exception. The current try-catch in middleware would handle it,
+            // but specific handling might be needed here if, for example, a specific applicant status should be set.
         }
 
         var applicant = new Applicant

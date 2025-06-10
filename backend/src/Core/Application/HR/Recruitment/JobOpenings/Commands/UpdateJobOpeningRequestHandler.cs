@@ -55,9 +55,24 @@ public class UpdateJobOpeningRequestHandler : IRequestHandler<UpdateJobOpeningRe
             jobOpening.DepartmentId = request.DepartmentId.Value;
         }
 
+        var oldStatus = jobOpening.Status;
+        bool statusChangedToOpen = false;
+
         if (request.Status.HasValue)
         {
-            jobOpening.Status = request.Status.Value;
+            if (jobOpening.Status != request.Status.Value)
+            {
+                jobOpening.Status = request.Status.Value;
+                if (request.Status.Value == JobOpeningStatus.Open && oldStatus != JobOpeningStatus.Open)
+                {
+                    statusChangedToOpen = true;
+                }
+                // If status changed to Closed and ClosingDate is not explicitly provided in this request, set it.
+                if (request.Status.Value == JobOpeningStatus.Closed && !request.ClosingDate.HasValue && jobOpening.ClosingDate is null)
+                {
+                    jobOpening.ClosingDate = DateTime.UtcNow;
+                }
+            }
         }
 
         if (request.PostedDate.HasValue)
@@ -65,11 +80,19 @@ public class UpdateJobOpeningRequestHandler : IRequestHandler<UpdateJobOpeningRe
             jobOpening.PostedDate = request.PostedDate.Value;
         }
 
-        // Allow setting ClosingDate to null
-        if (request.ClosingDate.HasValue || (request.ClosingDate is null && jobOpening.ClosingDate is not null))
+        // Revised ClosingDate logic:
+        // If status is being changed to Open AND no new ClosingDate is provided in this request, clear it.
+        if (statusChangedToOpen && !request.ClosingDate.HasValue)
+        {
+            jobOpening.ClosingDate = null;
+        }
+        // Otherwise, if ClosingDate is provided in the request, use it.
+        // This also handles explicitly setting ClosingDate to null via the request.
+        else if (request.ClosingDate.HasValue || (request.ClosingDate is null && jobOpening.ClosingDate is not null && !statusChangedToOpen) ) // only clear if not becoming open without date
         {
             jobOpening.ClosingDate = request.ClosingDate;
         }
+
 
         jobOpening.AddDomainEvent(EntityUpdatedEvent.WithEntity(jobOpening));
         await _jobOpeningRepo.UpdateAsync(jobOpening, cancellationToken);

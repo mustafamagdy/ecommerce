@@ -2,6 +2,7 @@ using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces; // For ICurrentUser
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.HR;
+using FSH.WebApi.Domain.HR.Enums; // For LeaveStatusEnum
 using MediatR;
 using Microsoft.Extensions.Localization;
 
@@ -39,15 +40,15 @@ public class CancelLeaveRequestHandler : IRequestHandler<CancelLeaveRequest, Gui
         }
 
         // Define cancellable states
-        bool isCancellable = leave.Status == "Pending" ||
-                             (leave.Status == "Approved" && leave.StartDate > DateTime.UtcNow); // Can cancel if approved but not yet started
+        bool isCancellable = leave.Status == LeaveStatusEnum.Pending ||
+                             (leave.Status == LeaveStatusEnum.Approved && leave.StartDate > DateTime.UtcNow); // Can cancel if approved but not yet started
 
         if (!isCancellable)
         {
             throw new ConflictException(_t["This leave request cannot be cancelled. It is already {0} or has started.", leave.Status]);
         }
 
-        leave.Status = "Cancelled";
+        leave.Status = LeaveStatusEnum.Cancelled; // Using Enum
 
         await _leaveRepository.UpdateAsync(leave, cancellationToken);
         await _uow.CommitAsync(cancellationToken);

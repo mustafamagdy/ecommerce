@@ -2,6 +2,7 @@ using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Common.Events;
 using FSH.WebApi.Domain.HR;
+using FSH.WebApi.Application.HR.Payroll.Specifications; // Added for SalaryStructureByEmployeeIdSpec
 using MediatR;
 using Microsoft.Extensions.Localization;
 
@@ -43,7 +44,7 @@ public class GeneratePayslipRequestHandler : IRequestHandler<GeneratePayslipRequ
         _ = employee ?? throw new NotFoundException(_t["Employee with ID {0} not found.", request.EmployeeId]);
 
         // Fetch SalaryStructure
-        var salaryStructureSpec = new SalaryStructureByEmployeeIdSpec(request.EmployeeId); // Reusing spec from DefineSalaryStructure
+        var salaryStructureSpec = new SalaryStructureByEmployeeIdSpec(request.EmployeeId); // Using spec from Specifications folder
         var salaryStructure = await _salaryStructureRepo.FirstOrDefaultAsync(salaryStructureSpec, cancellationToken);
         _ = salaryStructure ?? throw new NotFoundException(_t["Salary structure for employee {0} not found. Please define it first.", request.EmployeeId]);
 
@@ -57,18 +58,37 @@ public class GeneratePayslipRequestHandler : IRequestHandler<GeneratePayslipRequ
         }
 
         // Calculations
-        decimal basicSalaryForPeriod = salaryStructure.BasicSalary; // Assuming BasicSalary is monthly and payslip is monthly.
-                                                                 // Adjust if payslip period can vary (e.g., pro-rata for partial month).
+        // Note: For financial calculations, always use decimal. Consistent rounding rules should be applied
+        // if integrating with external financial systems or for display purposes to avoid minor discrepancies.
+
+        int daysInMonth = DateTime.DaysInMonth(request.PayPeriodStartDate.Year, request.PayPeriodStartDate.Month);
+        // Assuming PayPeriodStartDate and PayPeriodEndDate correctly define the actual days to be paid for.
+        // This could be the full month, or a partial period if employee joined/left mid-month.
+        int daysWorkedInPeriod = (request.PayPeriodEndDate - request.PayPeriodStartDate).Days + 1;
+
+        decimal proRataFactor = 1.0m; // Default to 1 (full month)
+        if (daysWorkedInPeriod < daysInMonth) // Basic pro-rata if period is less than the month's total days
+        {
+            proRataFactor = (decimal)daysWorkedInPeriod / daysInMonth;
+        }
+        // More complex pro-rata might consider actual join/leave dates from employee record if period is full month.
+
+        decimal actualBasicSalaryForPeriod = salaryStructure.BasicSalary * proRataFactor;
+
+        // Earnings & Deductions: Typically, percentage-based components are calculated on the *full* basic salary,
+        // not the pro-rated one, unless specified otherwise by company policy. Fixed amounts are taken as is.
+        // The SalaryComponent.CalculateActualValue method already uses the full BasicSalary from salaryStructure.
         decimal totalEarnings = salaryStructure.CalculateTotalEarnings();
         decimal totalDeductions = salaryStructure.CalculateTotalDeductions();
-        decimal netSalary = basicSalaryForPeriod + totalEarnings - totalDeductions;
+
+        decimal netSalary = actualBasicSalaryForPeriod + totalEarnings - totalDeductions;
 
         var payslip = new Payslip
         {
             EmployeeId = request.EmployeeId,
             PayPeriodStartDate = request.PayPeriodStartDate,
             PayPeriodEndDate = request.PayPeriodEndDate,
-            BasicSalaryPaid = basicSalaryForPeriod,
+            BasicSalaryPaid = actualBasicSalaryForPeriod, // Pro-rated basic salary
             TotalEarnings = totalEarnings,
             TotalDeductions = totalDeductions,
             NetSalary = netSalary,
@@ -76,7 +96,7 @@ public class GeneratePayslipRequestHandler : IRequestHandler<GeneratePayslipRequ
             Status = PayslipStatus.Generated // Initial status after generation
         };
 
-        // Snapshot components
+        // Snapshot components (amounts are based on full basic salary for percentages as per above comment)
         foreach (var earning in salaryStructure.Earnings)
         {
             payslip.Components.Add(new PayslipComponent(earning.Name, earning.CalculateActualValue(salaryStructure.BasicSalary), PayslipComponentType.Earning));
