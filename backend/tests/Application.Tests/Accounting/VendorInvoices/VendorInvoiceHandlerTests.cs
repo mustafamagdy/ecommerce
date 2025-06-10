@@ -309,4 +309,100 @@ public class VendorInvoiceHandlerTests
         // Act & Assert
         await Assert.ThrowsAsync<ConflictException>(() => handler.Handle(request, CancellationToken.None));
     }
+
+    [Fact]
+    public async Task UpdateVendorInvoiceHandler_Should_Successfully_Update_Invoice_Items_When_Updating_Invoice()
+    {
+        // Arrange
+        var invoiceId = Guid.NewGuid();
+        var supplierId = Guid.NewGuid();
+        var existingItemId1 = Guid.NewGuid();
+        var existingItemId2 = Guid.NewGuid(); // This item will be removed
+        var productId1 = Guid.NewGuid();
+        var productIdNew = Guid.NewGuid();
+
+        var existingInvoice = new VendorInvoice(supplierId, "INV-ITEM-TEST", DateTime.UtcNow, DateTime.UtcNow.AddDays(30), 0, "USD", VendorInvoiceStatus.Draft);
+        existingInvoice.Id = invoiceId;
+
+        var item1 = new VendorInvoiceItem(invoiceId, "Existing Item 1", 1, 100m, 10m, productId1); // Total 100 + 10 tax = 110
+        item1.Id = existingItemId1;
+        var item2 = new VendorInvoiceItem(invoiceId, "Existing Item 2 To Remove", 1, 50m, 5m); // Total 50 + 5 tax = 55
+        item2.Id = existingItemId2;
+
+        existingInvoice.AddInvoiceItem(item1);
+        existingInvoice.AddInvoiceItem(item2);
+        // Initial TotalAmount = 110 + 55 = 165
+
+        var product1 = CreateSampleProduct(productId1, "Product 1");
+        var productNew = CreateSampleProduct(productIdNew, "New Product");
+
+        _mockInvoiceRepo.Setup(r => r.FirstOrDefaultAsync(It.Is<VendorInvoiceByIdWithItemsSpec>(spec => spec.Id == invoiceId), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingInvoice);
+        _mockProductReadRepo.Setup(r => r.GetByIdAsync(productId1, It.IsAny<CancellationToken>())).ReturnsAsync(product1);
+        _mockProductReadRepo.Setup(r => r.GetByIdAsync(productIdNew, It.IsAny<CancellationToken>())).ReturnsAsync(productNew);
+        _mockInvoiceRepo.Setup(r => r.UpdateAsync(It.IsAny<VendorInvoice>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+
+        var request = new UpdateVendorInvoiceRequest
+        {
+            Id = invoiceId,
+            InvoiceItems = new List<UpdateVendorInvoiceItemRequest>
+            {
+                // Update existing item 1
+                new UpdateVendorInvoiceItemRequest
+                {
+                    Id = existingItemId1, // Existing
+                    Description = "Updated Item 1 Description",
+                    Quantity = 2,
+                    UnitPrice = 110m, // Price changed
+                    TaxAmount = 22m,  // Tax changed
+                    ProductId = productId1,
+                    TotalAmount = 220m // 2 * 110
+                },
+                // Item 2 (existingItemId2) is omitted, so it should be removed.
+
+                // Add new item
+                new UpdateVendorInvoiceItemRequest
+                {
+                    Id = null, // New item
+                    Description = "New Added Item",
+                    Quantity = 1,
+                    UnitPrice = 75m,
+                    TaxAmount = 7.5m,
+                    ProductId = productIdNew,
+                    TotalAmount = 75m
+                }
+            }
+            // Notes, dates etc. can be null if not changing
+        };
+        // Expected total:
+        // Item 1 updated: (2 * 110) + 22 = 220 + 22 = 242
+        // New Item: (1 * 75) + 7.5 = 75 + 7.5 = 82.5
+        // Total = 242 + 82.5 = 324.5
+        request.TotalAmount = 324.5m; // The handler will validate this against the sum of new items or recalculate.
+                                      // The UpdateVendorInvoiceHandler recalculates TotalAmount from items if request.InvoiceItems is not null.
+
+        var handler = new UpdateVendorInvoiceHandler(_mockInvoiceRepo.Object, _mockSupplierReadRepo.Object, _mockUpdateLocalizer.Object, _mockUpdateLogger.Object, _mockProductReadRepo.Object);
+
+        // Act
+        await handler.Handle(request, CancellationToken.None);
+
+        // Assert
+        _mockInvoiceRepo.Verify(r => r.UpdateAsync(It.Is<VendorInvoice>(inv =>
+            inv.Id == invoiceId &&
+            inv.InvoiceItems.Count == 2 && // Item2 removed, new item added
+            inv.InvoiceItems.Any(i => i.Id == existingItemId1 && i.Description == "Updated Item 1 Description" && i.Quantity == 2 && i.UnitPrice == 110m && i.TaxAmount == 22m && i.TotalAmount == 220m) &&
+            inv.InvoiceItems.Any(i => i.Id != existingItemId1 && i.Id != existingItemId2 && i.Description == "New Added Item" && i.Quantity == 1 && i.UnitPrice == 75m && i.TaxAmount == 7.5m && i.TotalAmount == 75m) &&
+            !inv.InvoiceItems.Any(i => i.Id == existingItemId2) && // Item2 is removed
+            Math.Abs(inv.TotalAmount - 324.5m) < 0.001m // Check recalculated total
+        ), It.IsAny<CancellationToken>()), Times.Once);
+
+        // Also check the state of the `existingInvoice` object that was passed to the handler,
+        // as the handler modifies this instance directly.
+        existingInvoice.InvoiceItems.Should().HaveCount(2);
+        existingInvoice.InvoiceItems.Should().ContainSingle(i => i.Id == existingItemId1 && i.Description == "Updated Item 1 Description");
+        existingInvoice.InvoiceItems.Should().ContainSingle(i => i.Description == "New Added Item");
+        existingInvoice.InvoiceItems.Should().NotContain(i => i.Id == existingItemId2);
+        existingInvoice.TotalAmount.Should().Be(324.5m);
+    }
 }
