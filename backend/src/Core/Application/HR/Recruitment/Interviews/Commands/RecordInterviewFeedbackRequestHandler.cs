@@ -1,7 +1,8 @@
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Common.Events;
-using FSH.WebApi.Domain.HR; // For Interview entity
+using FSH.WebApi.Domain.HR;       // For Interview, Applicant entities
+using FSH.WebApi.Domain.HR.Enums; // For InterviewStatus, ApplicantStatus enums
 using MediatR;
 using Microsoft.Extensions.Localization;
 
@@ -10,16 +11,19 @@ namespace FSH.WebApi.Application.HR.Recruitment.Interviews.Commands;
 public class RecordInterviewFeedbackRequestHandler : IRequestHandler<RecordInterviewFeedbackRequest, Guid>
 {
     private readonly IRepositoryWithEvents<Interview> _interviewRepo;
+    private readonly IRepositoryWithEvents<Applicant> _applicantRepo; // Added for updating Applicant status
     private readonly IApplicationUnitOfWork _uow;
     private readonly IStringLocalizer _t;
     // Potentially ICurrentUser to check if the user is the assigned interviewer or a recruiter
 
     public RecordInterviewFeedbackRequestHandler(
         IRepositoryWithEvents<Interview> interviewRepo,
+        IRepositoryWithEvents<Applicant> applicantRepo, // Added
         IApplicationUnitOfWork uow,
         IStringLocalizer<RecordInterviewFeedbackRequestHandler> localizer)
     {
         _interviewRepo = interviewRepo;
+        _applicantRepo = applicantRepo; // Added
         _uow = uow;
         _t = localizer;
     }
@@ -37,11 +41,31 @@ public class RecordInterviewFeedbackRequestHandler : IRequestHandler<RecordInter
         // }
 
         interview.Feedback = request.Feedback;
-        interview.Status = request.NewStatus; // Typically set to Completed
+        interview.Status = request.InterviewNewStatus; // Use InterviewNewStatus from request
 
         interview.AddDomainEvent(EntityUpdatedEvent.WithEntity(interview));
         await _interviewRepo.UpdateAsync(interview, cancellationToken);
-        await _uow.CommitAsync(cancellationToken);
+
+        // Optional: Update Applicant Status based on NextRecommendedApplicantStep
+        if (request.NextRecommendedApplicantStep.HasValue)
+        {
+            var applicant = await _applicantRepo.GetByIdAsync(interview.ApplicantId, cancellationToken);
+            if (applicant is not null)
+            {
+                applicant.Status = request.NextRecommendedApplicantStep.Value;
+                // Potentially add a note to applicant about this status change origin
+                // applicant.Notes = $"{applicant.Notes}\nStatus updated to {applicant.Status} after interview {interview.Id} feedback.";
+                applicant.AddDomainEvent(EntityUpdatedEvent.WithEntity(applicant));
+                await _applicantRepo.UpdateAsync(applicant, cancellationToken);
+            }
+            else
+            {
+                // Log or handle missing applicant - though FK constraint should prevent this state.
+                _t.LogWarning("Applicant with ID {ApplicantId} not found when trying to update status after interview {InterviewId} feedback.", interview.ApplicantId, interview.Id);
+            }
+        }
+
+        await _uow.CommitAsync(cancellationToken); // Single commit for all changes
 
         return interview.Id;
     }

@@ -1,4 +1,4 @@
-using FSH.WebApi.Domain.HR; // For InterviewStatus enum
+using FSH.WebApi.Domain.HR.Enums; // For InterviewStatus, ApplicantStatus enums
 using MediatR;
 
 namespace FSH.WebApi.Application.HR.Recruitment.Interviews.Commands;
@@ -7,6 +7,6 @@ public class RecordInterviewFeedbackRequest : IRequest<Guid> // Returns Intervie
 {
     public Guid Id { get; set; } // Interview Id
     public string Feedback { get; set; } = string.Empty;
-    public InterviewStatus NewStatus { get; set; } = InterviewStatus.Completed; // Default to Completed when feedback is given
-    // Could also include a rating, e.g. public int? Rating { get; set; }
+    public InterviewStatus InterviewNewStatus { get; set; } = InterviewStatus.Completed; // Default to Completed
+    public ApplicantStatus? NextRecommendedApplicantStep { get; set; } // Optional: e.g., Shortlisted, OfferExtended, Rejected
 }
