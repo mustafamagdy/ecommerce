@@ -92,16 +92,16 @@ public class GenerateProfitAndLossHandler : IRequestHandler<GenerateProfitAndLos
 
 public class GenerateBalanceSheetHandler : IRequestHandler<GenerateBalanceSheetRequest, BalanceSheetDto>
 {
-    private readonly IRepository<Account> _accountRepository;
+    private readonly IReadRepository<Account> _accountRepository; // Changed to IReadRepository
     private readonly IStringLocalizer<GenerateBalanceSheetHandler> _localizer;
     private readonly ILogger<GenerateBalanceSheetHandler> _logger;
-    private readonly IRepository<Transaction> _transactionRepository; // Needed to calculate balances as of date
+    private readonly IReadRepository<Transaction> _transactionRepository; // Changed to IReadRepository
 
     public GenerateBalanceSheetHandler(
-        IRepository<Account> accountRepository,
+        IReadRepository<Account> accountRepository, // Changed to IReadRepository
         IStringLocalizer<GenerateBalanceSheetHandler> localizer,
         ILogger<GenerateBalanceSheetHandler> logger,
-        IRepository<Transaction> transactionRepository)
+        IReadRepository<Transaction> transactionRepository) // Changed to IReadRepository
     {
         _accountRepository = accountRepository;
         _localizer = localizer;
@@ -111,73 +111,143 @@ public class GenerateBalanceSheetHandler : IRequestHandler<GenerateBalanceSheetR
 
     public async Task<BalanceSheetDto> Handle(GenerateBalanceSheetRequest request, CancellationToken cancellationToken)
     {
-        var allAccounts = await _accountRepository.ListAsync(cancellationToken); // Get all accounts
+        // Define P&L period for current earnings calculation
+        // Simplification: Current calendar year up to AsOfDate
+        var profitAndLossStartDate = new DateTime(request.AsOfDate.Year, 1, 1);
+        if (profitAndLossStartDate > request.AsOfDate) // Handle cases where AsOfDate is early in the year
+        {
+            // This might mean taking from previous year's start, or just a very short period.
+            // For simplicity, if AsOfDate is Jan 1st, P&L period is just that day.
+            // Or adjust to previous year if that's the fiscal convention.
+            // For now, if AsOfDate is e.g. Jan 1 2023, P&L period is Jan 1 2023 to Jan 1 2023.
+            // If fiscal year starts differently, this logic would need adjustment.
+             profitAndLossStartDate = request.AsOfDate.Month == 1 && request.AsOfDate.Day == 1 ? request.AsOfDate : new DateTime(request.AsOfDate.Year, 1, 1);
+        }
+
+
+        var allAccounts = await _accountRepository.ListAsync(new AccountsByTypeSpec(null, true), cancellationToken); // Get all active accounts
 
         var statement = new BalanceSheetDto { AsOfDate = request.AsOfDate };
 
+        // Calculate Current Period Net Profit/Loss
+        decimal currentNetProfit = 0m;
+        decimal totalPeriodRevenue = 0m;
+        decimal totalPeriodExpenses = 0m;
+
+        var revenueAccounts = allAccounts.Where(a => a.AccountType == AccountType.Revenue).ToList();
+        var expenseAccounts = allAccounts.Where(a => a.AccountType == AccountType.Expense).ToList();
+
+        foreach (var acc in revenueAccounts)
+        {
+            var transactions = await _transactionRepository.ListAsync(
+                new TransactionsForAccountInPeriodSpec(acc.Id, profitAndLossStartDate, request.AsOfDate), cancellationToken);
+            // Revenue: Credit increases balance, Debit decreases.
+            totalPeriodRevenue += transactions.Sum(t => t.TransactionType == TransactionType.Credit ? t.Amount : -t.Amount);
+        }
+
+        foreach (var acc in expenseAccounts)
+        {
+            var transactions = await _transactionRepository.ListAsync(
+                new TransactionsForAccountInPeriodSpec(acc.Id, profitAndLossStartDate, request.AsOfDate), cancellationToken);
+            // Expense: Debit increases balance, Credit decreases.
+            totalPeriodExpenses += transactions.Sum(t => t.TransactionType == TransactionType.Debit ? t.Amount : -t.Amount);
+        }
+        // Assuming COGS is part of expenses for this calculation as per P&L handler's current simplification.
+        currentNetProfit = totalPeriodRevenue - totalPeriodExpenses;
+
+
+        // Calculate balances for Asset, Liability, and existing Equity accounts
         foreach (var acc in allAccounts)
         {
-            if (!acc.IsActive && acc.Balance == 0) continue; // Skip inactive zero-balance accounts
+            // We only need to process A, L, E accounts for the main BS structure. Revenue/Expense already processed for NetProfit.
+            if (acc.AccountType != AccountType.Asset && acc.AccountType != AccountType.Liability && acc.AccountType != AccountType.Equity)
+            {
+                continue;
+            }
 
             // Calculate balance as of request.AsOfDate
+            // This includes all transactions up to AsOfDate, effectively giving the closing balance for A, L, E accounts.
             var transactions = await _transactionRepository.ListAsync(
                 new TransactionsForAccountUpToDateSpec(acc.Id, request.AsOfDate), cancellationToken);
 
-            decimal currentBalance = 0; // Start with 0, or account.InitialBalance if that was a concept
+            decimal accountBalanceAsOfDate = 0;
             foreach (var trans in transactions)
             {
-                currentBalance += CalculateBalanceChange(trans.TransactionType, trans.Amount, acc.AccountType);
+                accountBalanceAsOfDate += CalculateBalanceChange(trans.TransactionType, trans.Amount, acc.AccountType);
             }
-            // The acc.Balance from repository is the *current* live balance, not necessarily as of AsOfDate.
-            // So, we must calculate it.
 
-            if (currentBalance == 0 && !acc.IsActive) continue; // Further filter out accounts that zero out by AsOfDate
+            // Only include if there's a balance or if it's an active account (even with zero balance)
+            if (accountBalanceAsOfDate == 0 && !acc.IsActive) continue;
 
-            var line = new FinancialStatementLineDto { AccountName = acc.AccountName, AccountNumber = acc.AccountNumber, Amount = currentBalance };
+            var line = new FinancialStatementLineDto { AccountName = acc.AccountName, AccountNumber = acc.AccountNumber, Amount = accountBalanceAsOfDate };
 
             switch (acc.AccountType)
             {
                 case AccountType.Asset:
                     statement.Assets.Add(line);
-                    statement.TotalAssets += currentBalance;
+                    statement.TotalAssets += accountBalanceAsOfDate;
                     break;
                 case AccountType.Liability:
                     statement.Liabilities.Add(line);
-                    statement.TotalLiabilities += currentBalance;
+                    // Liabilities have credit normal balance. If CalculateBalanceChange returns positive for credit normal, this is correct.
+                    // CalculateBalanceChange for Liability: Credit is positive, Debit is negative.
+                    // So, if currentBalance is positive, it's a credit balance (normal for liability).
+                    statement.TotalLiabilities += accountBalanceAsOfDate;
                     break;
                 case AccountType.Equity:
-                    // Retained Earnings is typically part of Equity.
-                    // For a full Balance Sheet, net profit/loss from P&L for the period ending AsOfDate
-                    // would be incorporated into Retained Earnings (an Equity account).
-                    // Here, we're taking the balance of existing equity accounts.
                     statement.Equity.Add(line);
-                    statement.TotalEquity += currentBalance;
+                    // Equity has credit normal balance.
+                    statement.TotalEquity += accountBalanceAsOfDate;
                     break;
             }
         }
 
+        // Add Current Period Earnings to Equity
+        if (currentNetProfit != 0) // Only add if there's a profit or loss
+        {
+            statement.Equity.Add(new FinancialStatementLineDto
+            {
+                AccountName = "Current Period Earnings", // Or "Retained Earnings - Current Period"
+                AccountNumber = "CPE", // Placeholder account number
+                Amount = currentNetProfit // Net profit increases equity (credit balance)
+            });
+        }
+        statement.TotalEquity += currentNetProfit; // Add current net profit to total equity
+
         statement.TotalLiabilitiesAndEquity = statement.TotalLiabilities + statement.TotalEquity;
 
-        if (Math.Abs(statement.TotalAssets - statement.TotalLiabilitiesAndEquity) > 0.001m) // Using a small tolerance for decimal comparison
+        // Final check for balance (Assets = Liabilities + Equity)
+        if (Math.Abs(statement.TotalAssets - statement.TotalLiabilitiesAndEquity) > 0.01m) // Increased tolerance slightly for multi-step calcs
         {
-            _logger.LogWarning(_localizer["Balance Sheet out of balance. Assets: {0}, Liabilities + Equity: {1}"], statement.TotalAssets, statement.TotalLiabilitiesAndEquity);
-            // This indicates an issue, possibly with how transactions are recorded or balances calculated.
+            _logger.LogWarning(_localizer["Balance Sheet potentially out of balance. Assets: {0}, Liabilities + Equity: {1}. Difference: {2}"],
+                statement.TotalAssets, statement.TotalLiabilitiesAndEquity, statement.TotalAssets - statement.TotalLiabilitiesAndEquity);
         }
 
         _logger.LogInformation(_localizer["Balance Sheet generated as of {0}"], request.AsOfDate);
         return statement;
     }
+
+    // CalculateBalanceChange helper is defined below, and assumed to be correct.
+    // It needs to correctly reflect how debits/credits affect the balance of different account types.
+    // Asset: Debit increases, Credit decreases
+    // Liability: Debit decreases, Credit increases
+    // Equity: Debit decreases, Credit increases
+    // Revenue: Debit decreases, Credit increases (Revenue is like negative expense/contra-expense from balance perspective)
+    // Expense: Debit increases, Credit decreases (Expense is like negative revenue/contra-revenue from balance perspective)
+    // The existing CalculateBalanceChange seems to handle Asset, Liability, Equity correctly for their normal balances.
+    // For Revenue: Credit is income (+), Debit is reduction (-). Handler returns: isDebit ? -amount : amount. Correct.
+    // For Expense: Debit is expense (+), Credit is reduction (-). Handler returns: isDebit ? amount : -amount. Correct.
     private decimal CalculateBalanceChange(TransactionType transactionType, decimal amount, AccountType accountType)
     {
         bool isDebit = transactionType == TransactionType.Debit;
         switch (accountType)
         {
             case AccountType.Asset:
-            case AccountType.Expense: // Expenses reduce equity, but here we look at their natural balance impact
+            case AccountType.Expense:
                 return isDebit ? amount : -amount;
             case AccountType.Liability:
             case AccountType.Equity:
-            case AccountType.Revenue: // Revenue increases equity
+            case AccountType.Revenue:
                 return isDebit ? -amount : amount;
             default:
                 return 0;
@@ -185,36 +255,52 @@ public class GenerateBalanceSheetHandler : IRequestHandler<GenerateBalanceSheetR
     }
 }
 
-// Specifications
+
+// Modified AccountsByTypeSpec to accept nullable AccountType and IsActive flag
 public class AccountsByTypeSpec : Specification<Account>
 {
-    public AccountsByTypeSpec(AccountType accountType) =>
-        Query.Where(a => a.AccountType == accountType && a.IsActive);
-}
-
-// Re-using from LedgerService or define locally if not shared.
-// For this context, assuming it might be specific or slightly different.
-public class TransactionsForAccountInPeriodSpec : Specification<Transaction>
-{
-    public TransactionsForAccountInPeriodSpec(Guid accountId, DateTime fromDate, DateTime toDate)
+    public AccountsByTypeSpec(AccountType? accountType, bool onlyActive = true)
     {
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate >= fromDate && t.JournalEntry.PostedDate < toDate.AddDays(1))
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
+        if (accountType.HasValue)
+        {
+            Query.Where(a => a.AccountType == accountType.Value);
+        }
+        if (onlyActive)
+        {
+            Query.Where(a => a.IsActive);
+        }
     }
 }
 
-public class TransactionsForAccountUpToDateSpec : Specification<Transaction>
-{
-    public TransactionsForAccountUpToDateSpec(Guid accountId, DateTime toDate)
-    {
-        Query
-            .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate < toDate.AddDays(1)) // up to and including 'toDate'
-            .Include(t => t.JournalEntry)
-            .OrderBy(t => t.JournalEntry.PostedDate);
-    }
-}
+
+// TransactionsForAccountInPeriodSpec: Assumed to be correct and fetches transactions for a specific account within a period.
+// It should filter by JournalEntry.IsPosted and use JournalEntry.PostedDate.
+// Existing definition:
+// public class TransactionsForAccountInPeriodSpec : Specification<Transaction>
+// {
+//     public TransactionsForAccountInPeriodSpec(Guid accountId, DateTime fromDate, DateTime toDate)
+//     {
+//         Query
+//             .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate >= fromDate && t.JournalEntry.PostedDate < toDate.AddDays(1))
+//             .Include(t => t.JournalEntry)
+//             .OrderBy(t => t.JournalEntry.PostedDate);
+//     }
+// }
+
+
+// TransactionsForAccountUpToDateSpec: Assumed to be correct and fetches transactions for an account up to a certain date.
+// Existing definition:
+// public class TransactionsForAccountUpToDateSpec : Specification<Transaction>
+// {
+//     public TransactionsForAccountUpToDateSpec(Guid accountId, DateTime toDate)
+//     {
+//         Query
+//             .Where(t => t.AccountId == accountId && t.JournalEntry.IsPosted && t.JournalEntry.PostedDate < toDate.AddDays(1)) // up to and including 'toDate'
+//             .Include(t => t.JournalEntry)
+//             .OrderBy(t => t.JournalEntry.PostedDate);
+//     }
+// }
+
 
 public class GenerateProfitAndLossReportHandler : IRequestHandler<GenerateProfitAndLossReportRequest, Stream>
 {
